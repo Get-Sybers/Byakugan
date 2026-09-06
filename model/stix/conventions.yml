@@ -8,9 +8,12 @@
 
 contract:
   name: car-stix-projection
-  version: 2                       # bump on any change to an id recipe or a target property
+  version: 3                       # bump on any change to an id recipe or a target property
                                    # 2: the row identity's forms (the spindle uuid5 + native.spindle_*),
                                    #    the fold's native keys (contributions / contributed_by)
+                                   # 3: the behaviour layer — attack-pattern / indicator / indicates
+                                   #    (GLOBAL) + sighting + host identity (CASE-SCOPED), from the
+                                   #    runnable CAR analytics over car.db (analytics.py; see `behaviour`)
   stix_version: '2.1'
   engine: piiat_mitrecar/stix.py
   validated_by: model/stix/validate.py
@@ -26,7 +29,8 @@ output:
   file: stix_bundle.json           # <car-dir>/stix_bundle.json (or --out)
   shape: >-
     one STIX 2.1 bundle. Objects are ordered (identity, SCOs by type/id, observed-data by time,
-    inferred nodes, relationships by time) so a re-export is byte-identical.
+    inferred nodes, relationships by time, then the behaviour layer: attack-pattern, indicator,
+    sighting) so a re-export is byte-identical.
   producer: identity--<uuid5(CAR_NS, "identity|piiat-mitrecar")> (name PIIAT-MitreCar, identity_class system)
   cli: 'python -m piiat_mitrecar.stix export <car-dir> [--out FILE] [--case ID] [--as-of ISO]'
   pipeline_flag: '--stix (python -m piiat_mitrecar --in/--batch ... --stix): export after the stores are built'
@@ -75,6 +79,18 @@ id_derivation:
       domain-name: {contributing: {value: <verbatim>}}
       url: {contributing: {value: <verbatim>}}
       email-addr: {contributing: {value: <verbatim>}}
+      # the behaviour catalogue — content-keyed, case-independent (EPOCH stamps),
+      # so the same technique / detection is the same object in every case, like
+      # the content SCOs. Built from the RUNNABLE CAR analytics (analytics.py).
+      attack-pattern:
+        contributing: '{external_references: [{source_name: mitre-attack, external_id: Txxxx[.yyy]}]}'
+        source: one per distinct ATT&CK id (technique OR subtechnique) the runnable analytics cover
+      indicator:
+        contributing: '{external_references: [{source_name: mitre-car, external_id: CAR-xxxx}]}'
+        source: 'one per runnable CAR analytic (pattern_type "car"; pattern = its pseudocode or id)'
+      relationship (indicates):
+        contributing: '{relationship_type: indicates, source_ref: <indicator id>, target_ref: <attack-pattern id>}'
+        source: 'indicator --indicates--> attack-pattern, one per technique/subtechnique an analytic covers'
 
   case_scoped:
     # INSTANCE / OBSERVATION — a thing on a host in a case; an observation; an edge.
@@ -94,6 +110,9 @@ id_derivation:
       relationship: [class, verb, source_ref, target_ref, timestamp, method]
       x-car-inferred-node: [source_host, node_id]
       bundle: [case]
+      # the behaviour TIMELINE — case-scoped evidence, like the observed-data
+      sighting: [analytic_id, guid, timestamp, clause]      # one per analytics.BehaviourHit
+      identity (host): [source_host]                        # where_sighted_refs target (identity_class system)
     observed_data_key_note: >-
       the pipeline same-event key (relationships.yml dedupe.key) — the same recipe the CAR->ECS
       contract recommends for the Elastic document _id, so an observation and its ECS document
@@ -202,6 +221,43 @@ inferred_nodes:
     x_car_identity_value, x_car_method, x_car_reason, x_car_corroborated_by (guids),
     x_car_corroborating_refs (those records' observed-data), x_car_properties (what the observed
     records said about it — pid, image_path…, conflicts kept), x_car_first_seen / x_car_last_seen.
+
+# ---------------------------------------------------------------------------
+# The behaviour layer — the third pillar (README: normalise -> relate -> flag TTPs).
+# The finished car.db is read back through the RUNNABLE MITRE CAR analytics
+# (analytics.py, flag_store — car.db only, so the "derived from the stores"
+# contract holds) and each hit becomes a Sighting of the technique's Attack-Pattern.
+# Evidence-driven: only analytics that FIRED in the case appear; a row matching
+# nothing adds nothing. The catalogue content is computed from the full runnable
+# corpus (case-independent), so the GLOBAL ids carry identical content everywhere.
+behaviour:
+  source: 'car.db via analytics.flag_store (the runnable single-search+filter CAR analytics)'
+  catalogue:                         # GLOBAL, content-keyed (EPOCH stamps) — like the content SCOs
+    attack-pattern: >-
+      one per distinct ATT&CK id (technique or subtechnique) the runnable analytics cover.
+      name = the ATT&CK id; external_references = [{mitre-attack, Txxxx[.yyy],
+      https://attack.mitre.org/techniques/Txxxx[/yyy]}]; kill_chain_phases = [{mitre-attack,
+      <tactic shortname>}] from the coverage tactics (TA000x -> the enterprise ATT&CK shortname,
+      else the id verbatim), UNIONED across every coverage entry naming the id so the phases are
+      case-independent.
+    indicator: >-
+      one per runnable CAR analytic (the detection). name = the analytic title; pattern_type = "car"
+      (a trust-group value: the CAR analytic IS the pattern); pattern = its pseudocode (or the id);
+      external_references = [{mitre-car, CAR-xxxx, https://car.mitre.org/analytics/CAR-xxxx}].
+    indicates: 'indicator --indicates--> attack-pattern, one per technique/subtechnique the analytic covers'
+  timeline:                          # CASE-SCOPED evidence — like the observed-data
+    sighting: >-
+      one per BehaviourHit. sighting_of_ref = the analytic's indicator; observed_data_refs =
+      [self.obs[(source_host, car_object, guid)]] when the matched row produced an observed-data
+      (omitted when it did not — the sighting still stands); where_sighted_refs = the host identity;
+      first_seen = last_seen = the row's instant (stix_ts(hit.timestamp), omitted when it does not
+      parse); count = 1. Keyed on [analytic_id, guid, timestamp, clause] so a re-export is identical.
+      Carries x_car_analytic / x_car_clause / x_car_object / x_car_action / x_car_event_id (the
+      spindle guid) / x_car_source_host / x_car_techniques.
+    host_identity: 'identity (identity_class system, name = source_host), keyed [source_host] — the where_sighted target'
+  never:
+    - fabricated: a technique/detection with no analytic that fired in the case is not emitted
+    - a native key or car.db re-derivation as a sighting source (the hits come from analytics.py over car.db)
 
 # ---------------------------------------------------------------------------
 # The three engine declarations the projection depends on.

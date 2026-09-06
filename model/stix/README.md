@@ -39,7 +39,11 @@ model/stix/
 | `observed-data` | car.db rows | row with an identity and a time — the observation, `x_car_*` header, `x_car_native` verbatim, `x_car_fields` for what no SCO property homed (a guid-less row keys nothing off itself: its content/path SCOs stand, no observation — `observations_skipped_no_identity`) |
 | `relationship` | superset `relationship` | row, both classes, labelled `car:declared` / `car:derived` + `car:<method>` |
 | `x-car-inferred-node` | superset `inferred_node` | reconstructed node — flagged, never an SCO, never inside an observation |
-| `identity` | — | bundle (the producer) |
+| `attack-pattern` | runnable CAR analytics' coverage | distinct ATT&CK id (technique / subtechnique) — **global**, content-keyed |
+| `indicator` | runnable CAR analytic | analytic (the detection, `pattern_type: car`) — **global**, keyed by the analytic id |
+| `relationship` (`indicates`) | analytic coverage | `indicator → attack-pattern`, one per technique an analytic covers — **global** |
+| `sighting` | `analytics.flag_store` over car.db | behaviour hit — a Sighting of the indicator over the row's observed-data — **case-scoped** |
+| `identity` | — | the producer; plus one per host (`identity_class: system`) where a behaviour was sighted |
 
 ## Ids — the two scopes
 
@@ -87,6 +91,33 @@ observation and as STIX `confidence` (100 / 50 / 20) on the SRO.
    (→ `process.guid`, the Sysmon 8 target; rule `injection_target`). They have no
    CAR column, live in native only, and the projection reads them from nowhere:
    the derived SROs they yield come from superset.db.
+
+## The behaviour layer — Sightings of ATT&CK techniques
+
+The third pillar (*normalise → relate → **flag TTPs***). After the SCOs,
+observations and SROs are projected, the finished `car.db` is read back through
+the **runnable MITRE CAR analytics** (`analytics.py`, `flag_store` — car.db
+only, so the "derived from the stores" contract holds) and each hit becomes STIX:
+
+- one **`attack-pattern`** per distinct ATT&CK id the analytics cover
+  (`name` = the id, `external_references` → attack.mitre.org, `kill_chain_phases`
+  from the coverage tactics, mapped `TA000x → shortname`);
+- one **`indicator`** per runnable analytic (the detection; `pattern_type: car`,
+  the analytic's pseudocode the pattern; `external_references` → car.mitre.org);
+- an **`indicates`** SRO `indicator → attack-pattern` per covered technique;
+- one **`sighting`** per hit — `sighting_of_ref` the indicator,
+  `observed_data_refs` the matched row's observed-data (by the spindle guid — the
+  same `self.obs` map the observations built; omitted when the row produced none,
+  the sighting still stands), `where_sighted_refs` the host identity,
+  `first_seen`/`last_seen` the row's instant.
+
+The catalogue (attack-pattern, indicator, `indicates`) is **global content** —
+the same technique / detection is the same object in every case, minted like the
+content SCOs — and the sightings are **case-scoped evidence**, minted like the
+observations: *identity and behaviour share the one STIX-minted id space*. It is
+**evidence-driven** — an analytic that did not fire in the case adds nothing —
+and **additive**: a missing analytics corpus leaves the rest of the bundle
+untouched. See `conventions.yml` `behaviour`.
 
 ## Inferred ends are flagged, never asserted
 

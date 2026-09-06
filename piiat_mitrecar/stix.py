@@ -26,6 +26,26 @@ path, no parser-side STIX, nothing a re-export could disagree with.
                     recovery): flagged, corroborated, referenced by derived SROs
                     only — never an SCO, never inside an observed-data
 
+The BEHAVIOUR layer (analytics.py, the third pillar — flag TTPs) is projected
+into the same id space: the finished car.db is read back through the runnable
+MITRE CAR analytics, and each hit becomes STIX:
+
+    attack-pattern  one per distinct ATT&CK id (technique or subtechnique) the
+                    runnable analytics cover — a CONTENT-KEYED global object
+                    (same technique = same object in every case)
+    indicator       one per runnable CAR analytic (the detection; pattern_type
+                    "car") — content-keyed global, keyed by the analytic id
+    relationship    indicator --indicates--> attack-pattern, one per technique an
+                    analytic covers (content-keyed global)
+    sighting        one per BehaviourHit — a Sighting of the analytic's indicator
+                    over the matched row's observed-data (observed_data_refs),
+                    where_sighted the host, first/last_seen the row's instant;
+                    CASE-SCOPED (keyed on analytic id + guid + timestamp + clause)
+
+So the technique/detection catalogue is GLOBAL content (like the SCOs) and the
+behaviour timeline is CASE-SCOPED evidence (like the observed-data) — identity
+and behaviour share the one STIX-minted id space.
+
 Ids come in two scopes, the D4 rule:
 
 - CONTENT-KEYED entities (a file by hash, an account by real SID, an IP, a
@@ -120,8 +140,22 @@ OBJECTS = {
 
 _MISSING = (None, "")
 _HEADER = set(store.HEADER) | {"car_object", "native", "event_id"}
-_ORDER = {"identity": 0, "observed-data": 2, "x-car-inferred-node": 3, "relationship": 4}  # SCOs: 1
+# bundle ordering: identity, SCOs (default 1), observations, inferred nodes, SROs,
+# then the BEHAVIOUR layer — the technique/detection catalogue (attack-pattern,
+# indicator) and the behaviour timeline (sighting).
+_ORDER = {"identity": 0, "observed-data": 2, "x-car-inferred-node": 3, "relationship": 4,
+          "attack-pattern": 5, "indicator": 6, "sighting": 7}  # SCOs: 1
 _INTEGRITY = {"low", "medium", "high", "system"}
+
+# ATT&CK enterprise tactic id -> the kill-chain phase shortname (kebab-case, the
+# ATT&CK convention); an id not in the map falls back to the id verbatim.
+ATTACK_TACTICS = {
+    "TA0001": "initial-access", "TA0002": "execution", "TA0003": "persistence",
+    "TA0004": "privilege-escalation", "TA0005": "defense-evasion", "TA0006": "credential-access",
+    "TA0007": "discovery", "TA0008": "lateral-movement", "TA0009": "collection",
+    "TA0010": "exfiltration", "TA0011": "command-and-control", "TA0040": "impact",
+    "TA0042": "resource-development", "TA0043": "reconnaissance",
+}
 
 
 # --------------------------------------------------------------------------- #
@@ -134,6 +168,102 @@ def global_id(sco_type: str, contributing: dict) -> str:
 
 def case_namespace(case: str) -> uuid.UUID:
     return uuid.uuid5(CAR_NS, f"case|{case}")
+
+
+# --------------------------------------------------------------------------- #
+# The behaviour layer catalogue — GLOBAL, content-keyed, case-independent.
+# One attack-pattern per ATT&CK id, one indicator per CAR analytic, and the ids
+# each indicator `indicates`; the same technique / detection is the same object
+# in every case (EPOCH stamps, §2.9 global ids), like the content SCOs.
+# --------------------------------------------------------------------------- #
+def _attack_url(tech_id: str) -> str:
+    """The ATT&CK technique url: T1059 -> techniques/T1059, T1059.001 -> .../T1059/001."""
+    return "https://attack.mitre.org/techniques/" + str(tech_id).replace(".", "/")
+
+
+def _tactic_phase(tactic) -> str:
+    return ATTACK_TACTICS.get(str(tactic).upper(), str(tactic))
+
+
+def _attack_pattern_obj(tech_id: str, tactics: list) -> dict:
+    ap_id = global_id("attack-pattern",
+                      {"external_references": [{"source_name": "mitre-attack", "external_id": tech_id}]})
+    phases = []
+    for ta in tactics:
+        ph = {"kill_chain_name": "mitre-attack", "phase_name": _tactic_phase(ta)}
+        if ph not in phases:
+            phases.append(ph)
+    return {"type": "attack-pattern", "spec_version": SPEC, "id": ap_id,
+            "created": EPOCH, "modified": EPOCH, "created_by_ref": PRODUCER["id"],
+            "name": tech_id,
+            "external_references": [{"source_name": "mitre-attack", "external_id": tech_id,
+                                     "url": _attack_url(tech_id)}],
+            "kill_chain_phases": phases}
+
+
+def _indicator_obj(an) -> dict:
+    ind_id = global_id("indicator",
+                       {"external_references": [{"source_name": "mitre-car", "external_id": an.id}]})
+    pattern = an.pseudocode if getattr(an, "pseudocode", None) else an.id
+    return {"type": "indicator", "spec_version": SPEC, "id": ind_id,
+            "created": EPOCH, "modified": EPOCH, "created_by_ref": PRODUCER["id"],
+            "name": an.title, "pattern_type": "car",         # the CAR analytic IS the pattern
+            "pattern": pattern.strip() if isinstance(pattern, str) else pattern,
+            "valid_from": EPOCH,
+            "external_references": [{"source_name": "mitre-car", "external_id": an.id,
+                                     "url": "https://car.mitre.org/analytics/" + an.id}],
+            "x_car_analytic": an.id, "x_car_car_object": getattr(an, "car_object", None),
+            "x_car_car_action": getattr(an, "car_action", None)}
+
+
+def _coverage_ids(coverage) -> list:
+    """The ATT&CK ids of a coverage list — each technique and each subtechnique,
+    de-duplicated, order-stable."""
+    out = []
+    for cov in coverage or []:
+        for tid in [cov.technique] + list(cov.subtechniques or []):
+            if tid and tid not in out:
+                out.append(tid)
+    return out
+
+
+def behaviour_catalogue(analytics_list) -> dict:
+    """The GLOBAL behaviour catalogue built from every RUNNABLE CAR analytic —
+    case-independent so a technique / detection is the same object everywhere:
+      attack_patterns: {att&ck id -> attack-pattern SDO} (tactics unioned across
+                       every coverage entry that names the id, so kill_chain_phases
+                       are stable regardless of which case fired the analytic)
+      indicators:      {analytic id -> indicator SDO}
+      covers:          {analytic id -> [att&ck ids it indicates]}"""
+    tactics_by_tech: dict[str, list] = {}
+    covers: dict[str, list] = {}
+    indicators: dict[str, dict] = {}
+    for an in analytics_list or []:
+        if not getattr(an, "runnable", False) or not an.coverage:
+            continue
+        for cov in an.coverage:
+            for tid in [cov.technique] + list(cov.subtechniques or []):
+                if not tid:
+                    continue
+                bucket = tactics_by_tech.setdefault(tid, [])
+                for ta in cov.tactics or []:
+                    if ta not in bucket:
+                        bucket.append(ta)
+        covers[an.id] = _coverage_ids(an.coverage)
+        indicators[an.id] = _indicator_obj(an)
+    attack_patterns = {tid: _attack_pattern_obj(tid, tactics)
+                       for tid, tactics in tactics_by_tech.items()}
+    return {"attack_patterns": attack_patterns, "indicators": indicators, "covers": covers}
+
+
+def _load_runnable_analytics() -> list:
+    """The pinned CAR analytics, or [] when the submodule / pyyaml is unavailable
+    (the behaviour layer is additive — a missing corpus must not break export)."""
+    try:
+        from . import analytics as _an
+        return _an.load_analytics()
+    except (ImportError, SystemExit):
+        return []
 
 
 class _NoKey:
@@ -678,6 +808,75 @@ class Projection:
                    "x_car_source_host": host})
         self.stats[f"relationships_{cls}"] += 1
 
+    # -- the behaviour layer (analytics.py hits over car.db) ------------------
+    def _host_identity(self, host) -> str | None:
+        """The host as a system identity — where a behaviour was sighted."""
+        if host in _MISSING:
+            return None
+        hid = case_id(self.ns, "identity", host)
+        self._put({"type": "identity", "spec_version": SPEC, "id": hid,
+                   "created": self.as_of, "modified": self.as_of, "created_by_ref": PRODUCER["id"],
+                   "name": str(host), "identity_class": "system", "x_car_source_host": host})
+        return hid
+
+    def _indicates(self, ind_id: str | None, ap_id: str | None) -> None:
+        """A GLOBAL indicator --indicates--> attack-pattern SRO (content-keyed)."""
+        if not ind_id or not ap_id:
+            return
+        rid = global_id("relationship", {"relationship_type": "indicates",
+                                         "source_ref": ind_id, "target_ref": ap_id})
+        self._put({"type": "relationship", "spec_version": SPEC, "id": rid,
+                   "created": EPOCH, "modified": EPOCH, "created_by_ref": PRODUCER["id"],
+                   "relationship_type": "indicates", "source_ref": ind_id, "target_ref": ap_id,
+                   "labels": ["car:behaviour"]})
+
+    def _sighting(self, hit, ind_id: str) -> str | None:
+        """One BehaviourHit as a CASE-SCOPED Sighting of the analytic's indicator
+        over the matched row's observed-data (skipped when the row produced none,
+        the sighting still stands)."""
+        sid = case_id(self.ns, "sighting", hit.analytic_id, hit.guid, hit.timestamp, hit.clause)
+        ts = stix_ts(hit.timestamp)
+        o = {"type": "sighting", "spec_version": SPEC, "id": sid,
+             "created": ts or self.as_of, "modified": ts or self.as_of,
+             "created_by_ref": PRODUCER["id"], "sighting_of_ref": ind_id, "count": 1,
+             "first_seen": ts, "last_seen": ts,
+             "x_car_analytic": hit.analytic_id, "x_car_title": hit.title, "x_car_clause": hit.clause,
+             "x_car_object": hit.car_object, "x_car_action": hit.car_action,
+             "x_car_event_id": hit.guid, "x_car_source_host": hit.source_host,
+             "x_car_techniques": _coverage_ids(hit.coverage)}
+        oid = self.obs.get((hit.source_host, hit.car_object, str(hit.guid))) \
+            if hit.guid is not None else None
+        if oid:
+            o["observed_data_refs"] = [oid]
+        host_ref = self._host_identity(hit.source_host)
+        if host_ref:
+            o["where_sighted_refs"] = [host_ref]
+        self._put(o)
+        return sid
+
+    def behaviour(self, hits, catalogue: dict) -> None:
+        """Project the behaviour timeline: for every analytic that fired, its
+        indicator, the attack-patterns it covers and the `indicates` SROs (all
+        GLOBAL, emitted once); for every hit, a case-scoped sighting."""
+        aps, inds, covers = (catalogue["attack_patterns"], catalogue["indicators"],
+                             catalogue["covers"])
+        emitted: set = set()
+        for hit in hits or []:
+            ind = inds.get(hit.analytic_id)
+            if ind is None:            # a hit whose analytic is not in the runnable catalogue
+                continue
+            ind_id = ind["id"]
+            if hit.analytic_id not in emitted:
+                self._put(ind)
+                for tid in covers.get(hit.analytic_id, []):
+                    ap = aps.get(tid)
+                    if ap is not None:
+                        self._indicates(ind_id, self._put(ap))
+                emitted.add(hit.analytic_id)
+            self._sighting(hit, ind_id)
+            self.stats["sightings"] += 1
+        self.stats["behaviour_indicators"] = len(emitted)
+
     # -- the bundle -----------------------------------------------------------
     def bundle(self) -> dict:
         def key(o):
@@ -919,11 +1118,17 @@ _BUILDERS = {"authentication": _b_authentication, "driver": _b_driver, "email": 
 # The pass
 # --------------------------------------------------------------------------- #
 def project(events: list[dict], edges: list[dict] = (), inferred_nodes: list[dict] = (),
-            case: str = "default", as_of: str | None = None) -> tuple[dict, dict]:
+            case: str = "default", as_of: str | None = None,
+            behaviour_hits: list | None = None, analytics_list: list | None = None) -> tuple[dict, dict]:
     """The bundle + a summary from in-memory stores: the enriched events (native
     as _native), superset relationship rows, inferred_node rows. `as_of` is the
     `created` stamp for objects that carry no evidence time (default: the
-    latest evidence time, so a re-export is byte-identical)."""
+    latest evidence time, so a re-export is byte-identical).
+
+    `behaviour_hits` (analytics.BehaviourHit list, computed from the same car.db)
+    add the behaviour layer — the attack-pattern / indicator catalogue and the
+    sightings; the timeline is projected only when hits are supplied (the SCO /
+    observation / relationship projection is unchanged when they are not)."""
     if as_of is None:
         stamps = [stix_ts(x.get("timestamp")) for x in list(events) + list(edges)]
         as_of = max([s for s in stamps if s], default=EPOCH)
@@ -935,6 +1140,9 @@ def project(events: list[dict], edges: list[dict] = (), inferred_nodes: list[dic
         p.inferred(n)
     for e in edges:
         p.edge(e)
+    if behaviour_hits:
+        ans = analytics_list if analytics_list is not None else _load_runnable_analytics()
+        p.behaviour(behaviour_hits, behaviour_catalogue(ans))
     bundle = p.bundle()
     summary = {"case": case, "as_of": as_of, "objects": len(bundle["objects"]),
                "by_type": dict(sorted(Counter(o["type"] for o in bundle["objects"]).items()))}
@@ -962,13 +1170,29 @@ def load(car_dir: str) -> tuple[list[dict], list[dict], list[dict]]:
     return events, edges, nodes
 
 
+def _behaviour_pass(car_db: str) -> tuple[list | None, list | None]:
+    """(runnable analytics, behaviour hits) over the finished car.db — the third
+    pillar read back through the pinned CAR analytics (analytics.flag_store reads
+    car.db and nothing else, so the D4 'derived from the stores' contract holds).
+    Both None when the corpus is unavailable: the behaviour layer is additive and
+    must never break a STIX export."""
+    try:
+        from . import analytics as _an
+        ans = _an.load_analytics()
+        return ans, _an.flag_store(car_db, ans)
+    except (ImportError, SystemExit):
+        return None, None
+
+
 def export(car_dir: str, out_path: str | None = None, case: str | None = None,
            as_of: str | None = None) -> dict:
     """Derive <car_dir>/stix_bundle.json (or `out_path`) from the stores.
     `case` scopes the instance ids (default: the car directory's name)."""
     case = case or os.path.basename(os.path.abspath(car_dir.rstrip("/\\"))) or "default"
     events, edges, nodes = load(car_dir)
-    bundle, summary = project(events, edges, nodes, case=case, as_of=as_of)
+    ans, hits = _behaviour_pass(os.path.join(car_dir, "car.db"))
+    bundle, summary = project(events, edges, nodes, case=case, as_of=as_of,
+                              behaviour_hits=hits, analytics_list=ans)
     out_path = out_path or os.path.join(car_dir, "stix_bundle.json")
     with open(out_path, "w", encoding="utf-8") as fh:
         json.dump(bundle, fh, ensure_ascii=False, default=str)
