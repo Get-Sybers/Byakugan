@@ -46,6 +46,23 @@ def test_unquoted_glob():
     assert p({"command_line": "certutil -something"}) is False
 
 
+def test_exe_basename_matching_path_valued():
+    """MITRE CAR defines `exe` as the executable NAME, but our cascade fills it
+    with the full PATH. A bare-name RHS must therefore match a path-valued field,
+    or every `exe == "X.exe"` analytic misses real data — the defect Hayabusa
+    surfaced on LS24 (8 cmd.exe rows, 0 CAR hits until this)."""
+    p = _pred('exe == "cmd.exe"')
+    assert p({"exe": r"C:\Windows\System32\cmd.exe"}) is True   # path-valued exe
+    assert p({"exe": "cmd.exe"}) is True                        # name-valued exe
+    assert p({"exe": r"C:\Windows\System32\powershell.exe"}) is False
+    g = _pred('exe == "procdump*.exe"')                          # bare-name glob too
+    assert g({"exe": r"C:\tools\procdump64.exe"}) is True
+    # a comparison the analytic wrote WITH a path is never loosened to a basename
+    q = _pred('image_path == "c:\\windows\\system32\\cmd.exe"')
+    assert q({"image_path": r"c:\windows\system32\cmd.exe"}) is True
+    assert q({"image_path": "cmd.exe"}) is False
+
+
 def test_regex_match():
     p = _pred('command_line match "sekurlsa"')
     assert p({"command_line": "mimikatz sekurlsa::logonpasswords"}) is True

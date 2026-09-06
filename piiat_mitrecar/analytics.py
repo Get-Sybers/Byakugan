@@ -187,16 +187,35 @@ def _num(v):
         return None
 
 
+def _basename(p) -> str:
+    """The last path component of a Windows/POSIX path (else the value itself)."""
+    return re.split(r"[\\/]", str(p))[-1]
+
+
 def _cmp(field_val, op: str, rhs) -> bool:
-    """Compile-time operator semantics over a resolved field value."""
+    """Compile-time operator semantics over a resolved field value.
+
+    Name fields carry a subtlety: MITRE CAR defines `exe` as the executable's
+    NAME (`cmd.exe`), and the analytics compare it that way — but our cascade
+    fills `exe`/`image_path` with the full path (`C:\\Windows\\System32\\cmd.exe`).
+    So an equality/glob RHS that carries no path separator is matched against the
+    value's BASENAME as well as the whole value: `exe == "cmd.exe"` catches a
+    path-valued exe, and `exe == "procdump*.exe"` a path-valued procdump — without
+    ever loosening a comparison the analytic wrote WITH a path."""
     if field_val is None:
         return op == "!="            # a null is 'not equal' to any literal
     sval = str(field_val)
     if op in ("==", "=", "!="):
         if isinstance(rhs, str) and _is_glob(rhs):
-            hit = bool(_glob_re(rhs).match(sval))
+            rx = _glob_re(rhs)
+            hit = bool(rx.match(sval))
+            if not hit and not re.search(r"[\\/]", rhs):     # bare-name glob -> basename
+                hit = bool(rx.match(_basename(sval)))
         else:
-            hit = sval.lower() == str(rhs).lower()
+            r = str(rhs).lower()
+            hit = sval.lower() == r
+            if not hit and not re.search(r"[\\/]", str(rhs)):  # bare name -> basename
+                hit = _basename(sval).lower() == r
         return hit if op in ("==", "=") else not hit
     if op == "match":
         try:
