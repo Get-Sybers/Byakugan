@@ -311,7 +311,8 @@ def test_external_forms_are_exactly_the_raw_guid_forms_the_maps_carry():
     assert vectors == {
         "evtx_record": "process-WIN-1M3263ACE5D-Security-2623",         # the real LoneWolf 4688 record
         "sysmon_process_guid": "{DFAE8213-70EB-5CDD-0000-0010F66D0A00}",  # a real Sysmon ProcessGuid
-        "zeek_uid": "CtEReq24zLXEGt4V67", "zeek_uid_trans_depth": "http-Cno6-1", "zeek_fuid": "file-FdEQ",
+        "zeek_uid": "CtEReq24zLXEGt4V67", "zeek_uid_trans_depth": "http-Cno6-1",
+        "zeek_uid_trans_id": "flow-CEVU-23150", "zeek_fuid": "file-FdEQ",
         "jlecmd_entry": "file-/in/fb3b.automaticDestinations-ms-1",
         "recmd_value": "registry-/in/UsrClass.dat-S-1-5-21-1_Classes\\X-LangID",
         "memory_proc_offset": "proc-1a2b"}

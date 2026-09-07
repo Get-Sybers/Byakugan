@@ -622,6 +622,14 @@ external:
       source: synthetic
       object: http
       values: {uid: Cno6, trans_depth: 1}
+  zeek_uid_trans_id:
+    kind: record
+    form: {fields: [uid, trans_id]}
+    stable_across: one DNS transaction (query/answer) within its connection, in one capture
+    golden:                     # synthetic (tests/test_car_zeek_dns.py)
+      source: synthetic
+      object: flow
+      values: {uid: CEVU, trans_id: 23150}
   zeek_fuid:
     kind: entity
     form: {fields: [fuid]}
