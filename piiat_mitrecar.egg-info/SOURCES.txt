@@ -74,6 +74,7 @@ tests/test_car_zeek_extra.py
 tests/test_crosssource.py
 tests/test_data_model_build.py
 tests/test_derive.py
+tests/test_native_ids.py
 tests/test_pipeline_sources.py
 tests/test_spindle_ids.py
 tests/test_spindle_model.py

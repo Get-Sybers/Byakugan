@@ -23,6 +23,18 @@ import re
 
 _GUID = r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 _VOLUME_RE = re.compile(r"Volume\{(" + _GUID + r")\}", re.IGNORECASE)
+_CANONICAL_RE = re.compile(r"^\{?(" + _GUID + r")\}?$")
+
+
+def canonical(value) -> str | None:
+    """`value` as a lower-cased canonical {8-4-4-4-12} GUID (optionally brace-
+    wrapped), or None if it is not one. Use it to VALIDATE a stored `volume_guid`
+    column before trusting it as a join key — a malformed value or a stray full
+    path must never mint a bogus cross-source convergence."""
+    if value is None:
+        return None
+    m = _CANONICAL_RE.match(str(value).strip())
+    return m.group(1).lower() if m else None
 
 
 def _as_text(native) -> str:

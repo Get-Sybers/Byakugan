@@ -28,6 +28,17 @@ def test_volume_guids_ignores_bare_com_guids():
     assert native_ids.volume_guids({"clsid": "f750e6c3-38ee-11d1-85e5-00c04fc295ee"}) == []
 
 
+def test_canonical_validates_and_folds():
+    assert native_ids.canonical("09931F21-7FAF-44A9-81D8-1E73C14B9EAF") \
+        == "09931f21-7faf-44a9-81d8-1e73c14b9eaf"
+    assert native_ids.canonical("{09931f21-7faf-44a9-81d8-1e73c14b9eaf}") \
+        == "09931f21-7faf-44a9-81d8-1e73c14b9eaf"
+    # not a canonical GUID -> None (must not become a join key)
+    for bad in (None, "", "not-a-guid", r"\\?\Volume{09931f21-7faf-44a9-81d8-1e73c14b9eaf}",
+                "09931f21-7faf-44a9-81d8"):
+        assert native_ids.canonical(bad) is None
+
+
 def test_enrich_lifts_volume_guid_into_the_column():
     ev = {"car_object": "registry", "car_action": "value_edit", "guid": "r-1",
           "source_host": "PM6C56D", "timestamp": "2026-01-01T00:00:00Z",

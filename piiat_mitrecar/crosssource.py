@@ -12,7 +12,7 @@ recovered `command_line`/handles, amcache's `sha1_hash`, prefetch's run count).
 view whose every field records WHICH source supplied it, plus the confidence the
 join was made at. The per-source stores stand exactly as they were.
 
-Three tiers, honest about certainty (CAR-Relations §: a property may be
+Four tiers, honest about certainty (CAR-Relations §: a property may be
 attributed across sources only via a key that identifies the same entity beyond
 doubt; anything else is heuristic; what cannot be known is an honest null):
 
@@ -91,15 +91,13 @@ def _native_ids(row: dict) -> list[tuple[str, str]]:
     the value case-folded. Only the high-precision, token-gated `volume` class —
     never a bare GUID (the ubiquitous COM CLSID/interface GUIDs are linkage noise).
 
-    Prefers the first-class `volume_guid` column (enrich lifts it there) and
-    falls back to mining `native` for rows written before the column existed —
-    the extractor itself lives in `native_ids` so enrich and this stage share it."""
-    vals = []
-    col = row.get("volume_guid")
-    if col:
-        vals = [str(col).lower()]
-    else:
-        vals = native_ids.volume_guids(row.get("native"))
+    Prefers the first-class `volume_guid` column (enrich lifts it there) but
+    only when it VALIDATES as a canonical GUID — a malformed or unexpected column
+    value must not mint a bogus join; otherwise it falls back to mining `native`
+    (also the path for rows written before the column existed). The extractor
+    lives in `native_ids` so enrich and this stage share one precision rule."""
+    col = native_ids.canonical(row.get("volume_guid"))
+    vals = [col] if col else native_ids.volume_guids(row.get("native"))
     return [("volume", v) for v in vals]
 
 

@@ -431,11 +431,12 @@ def enrich(events: list[dict]) -> list[dict]:
     for ev in events:
         obj_fields = set(model[ev["car_object"]]["fields"])
 
-        # B1: lift the globally-unique volume GUID out of `native` into the
+        # B1: lift the globally-unique volume GUID out of the in-memory `_native`
+        # blob (before it is serialised into the stored `native` column) into the
         # first-class `volume_guid` column — the strongest cross-source key on a
         # disk image (USN ↔ evtx ↔ registry ↔ mount table ↔ cloud-sync), which
         # MITRE CAR has no field for. Fill-only-null; a row may name only one
-        # volume, so the first is taken (any others stay in native).
+        # volume, so the first is taken (any others stay in _native).
         if not ev.get("volume_guid"):
             vols = native_ids.volume_guids(ev.get("_native"))
             if vols:

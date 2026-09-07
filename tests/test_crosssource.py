@@ -132,7 +132,7 @@ def test_disk_pe_hash_hydrates_a_driver(tmp_path):
 
 
 # --------------------------------------------------------------------------- #
-# B1: canonical native GUIDs (volume / MachineGuid) bridge sources
+# B1: the canonical native volume GUID bridges sources
 # --------------------------------------------------------------------------- #
 def _row(obj, action, guid, source_host, native):
     return {"car_object": obj, "car_action": action, "guid": guid,
@@ -169,6 +169,17 @@ def test_native_id_uses_the_first_class_column(tmp_path):
     hits = [c for c in crosssource.converge(d) if c["tier"] == "definitive_native_id"]
     assert hits and hits[0]["join_key"] == ["volume", "09931f21-7faf-44a9-81d8-1e73c14b9eaf"]
     assert set(hits[0]["sources"]) == {"a", "b"}
+
+
+def test_native_id_column_must_validate_as_canonical(tmp_path):
+    d = str(tmp_path)
+    # a malformed volume_guid column value (a stray path) must NOT mint a join —
+    # it is validated as a canonical GUID first, else ignored (falls back to
+    # native, which here carries nothing)
+    bad = r"\\?\Volume{not-a-guid}"
+    _store(d, "a", [dict(_row("registry", "value_edit", "a-1", "H", {"k": "v"}), volume_guid=bad)])
+    _store(d, "b", [dict(_row("file", "create", "b-1", "H", {"k": "w"}), volume_guid=bad)])
+    assert [c for c in crosssource.converge(d) if c["tier"] == "definitive_native_id"] == []
 
 
 def test_native_id_ignores_com_clsid_noise(tmp_path):
