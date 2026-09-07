@@ -56,6 +56,11 @@ custom_namespace:
   car.link_confidence:
     type: float
     description: numeric owner/parent-link confidence; see common_header.link_confidence.
+  car.volume_guid:
+    type: keyword
+    description: >-
+      the globally-unique volume identity (Volume{GUID}, case-folded); ECS has no
+      volume-GUID field, so it homes here. See common_header.volume_guid.
   car.native:
     type: flattened
     description: the CAR header `native` bag — source evidence with no CAR home, verbatim keys.
@@ -148,6 +153,15 @@ common_header:
         note: >-
           when set on a process row it names the ACTING process (Sysmon 10: SourceProcessGUID)
           and wins process.entity_id; guid then stays in event.id only.
+
+  volume_guid:
+    ecs: car.volume_guid
+    type: keyword
+    note: >-
+      the globally-unique volume identity (Volume{GUID}, case-folded) — the second non-MITRE
+      header field (B1). ECS has no volume-GUID home, so it projects to the custom
+      car.volume_guid; it ties a row to the USN journal / registry mount / event log / cloud-sync
+      that name the same volume.
 
   link_confidence:
     ecs: car.link_confidence
