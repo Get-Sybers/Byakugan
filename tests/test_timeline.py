@@ -43,7 +43,8 @@ def test_timeline_skips_auxiliary_tables_without_a_header(tmp_path):
     con.close()
     rows = timeline.build_timeline(d)                 # must not raise
     objs = {r["object"] for r in rows if r["kind"] == "object"}
-    assert objs == {"process", "module"} and "image_context" not in objs
+    assert "image_context" not in objs                # the aux table is skipped
+    assert objs == {"process", "module"}              # the CAR objects survive
 
 
 def test_timeline_merges_objects_and_edges_ordered(tmp_path):

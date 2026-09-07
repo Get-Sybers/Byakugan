@@ -846,7 +846,8 @@ external:
   - zeek_ssl
   car_object:
   - flow
-  stable_across: every Zeek log of one connection in one capture — conn / http / files share the uid
+  stable_across: every Zeek log of one connection in one capture — conn / http / files / ssl share the
+    uid
 - name: zeek_uid_trans_depth
   kind: record
   form:

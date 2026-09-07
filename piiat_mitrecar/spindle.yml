@@ -609,7 +609,7 @@ external:
   zeek_uid:
     kind: entity
     form: {field: uid}
-    stable_across: every Zeek log of one connection in one capture — conn / http / files share the uid
+    stable_across: every Zeek log of one connection in one capture — conn / http / files / ssl share the uid
     golden:                     # synthetic: Zeek uid shape (tests/test_car_zeek_conn.py)
       source: synthetic
       object: flow
