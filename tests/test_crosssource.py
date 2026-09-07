@@ -105,6 +105,10 @@ def test_disk_pe_hash_hydrates_a_module(tmp_path):
     # the merged view holds BOTH the disk PE's path and the module's own path/name
     assert "file_path" in c["properties"] and "module_path" in c["properties"]
     assert c["property_sources"]["sha256_hash"] == ["pe", "sysmon"]  # same bytes
+    # a mixed-object content group is labelled deterministically from the join
+    # key (the content bucket = "file"), not by row iteration order (#55 review)
+    assert c["car_object"] == "file"
+    assert set(c["car_objects"]) == {"file", "module"}
 
 
 def test_disk_pe_hash_hydrates_a_driver(tmp_path):
