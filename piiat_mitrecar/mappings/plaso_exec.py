@@ -158,6 +158,14 @@ _IMG_HOST = _R("image_hostname")
 
 _KEEP = ["SourceImage", "Parser"]
 
+# amcache stores the PROGRAM's SHA-1 in `file_identifier` — the plaso field is
+# the hive's 4-char record-length prefix "0000" followed by the 40-hex SHA-1
+# (e.g. "00009842cd16…afcbee"). The bare `sha1` key the KQL port reached for
+# does not exist in the shipping plaso build, so amcache's hash reached NO
+# object at all. Extract the 40-hex SHA-1 honestly (null unless it is exactly
+# that "0000"+40hex shape — never the hive's own sha256_hash).
+_AMCACHE_SHA1 = regex1(_R("file_identifier"), r"(?i)^0000([0-9a-f]{40})$")
+
 # provenance of the observation — the ARTEFACT file (never exe/image_path) and
 # its own hash, plus which plaso event this was
 _PROVENANCE = {
@@ -257,7 +265,12 @@ MAPPINGS = {
                     "file_path": _R("full_path"),
                     "file_name": basename(_R("full_path")),
                     "extension": ext(_R("full_path")),
-                    "sha1_hash": _R("sha1"),   # the PROGRAM's SHA-1 (as below)
+                    # the PROGRAM's SHA-1, out of file_identifier ("0000"+40hex)
+                    "sha1_hash": _AMCACHE_SHA1,
+                    # amcache records the binary's CompanyName version-resource
+                    # string — the file's `company` (a signer PROXY, not the
+                    # Authenticode signer; empty string → honest null)
+                    "company": _R("company_name"),
                     "hostname": _IMG_HOST,
                 },
                 "keep": _KEEP,
@@ -278,13 +291,13 @@ MAPPINGS = {
                 "host": _IMG_HOST,
                 "props": dict(
                     _win_props(_R("full_path")),
-                    # Record.sha1 is the PROGRAM's SHA-1 (plaso already strips
-                    # the hive's 4-char "0000" prefix). Record.sha1_hash would
-                    # be the parsed hive's own hash — deliberately not used.
-                    # The KQL's coalesce fallback onto Record.filename is
-                    # dropped: filename names the ARTEFACT file (owner
-                    # directive) — full_path or null.
-                    sha1_hash=_R("sha1"),
+                    # the PROGRAM's SHA-1, out of file_identifier ("0000"+40hex
+                    # — the plaso field; the bare `sha1` key does not exist).
+                    # Record.sha256_hash would be the parsed hive's own hash —
+                    # deliberately not used. The KQL's coalesce fallback onto
+                    # Record.filename is dropped: filename names the ARTEFACT
+                    # file (owner directive) — full_path or null.
+                    sha1_hash=_AMCACHE_SHA1,
                 ),
                 "keep": _KEEP,
                 "native_extract": dict(

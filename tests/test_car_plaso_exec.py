@@ -106,8 +106,15 @@ _AMCACHE = {  # synthetic (no real amcache evidence yet); plaso AMCacheFileEvent
         "image_hostname": "HOST1",
         "parser": "amcache",
         "program_identifier": "0006a1c48f048a1c",
-        "sha1": "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
-        "sha1_hash": "ffffffffffffffffffffffffffffffffffffffff",  # hive's own
+        # real plaso shape: the PROGRAM's SHA-1 lives in file_identifier as the
+        # hive's "0000" record-length prefix + the 40-hex hash (the bare `sha1`
+        # key does not exist in the shipping build)
+        "file_identifier": "0000a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
+        # the artefact (Amcache.hve) has its own sha256 — must never leak as the
+        # program hash
+        "sha256_hash": "f" * 64,
+        # amcache's CompanyName version-resource string -> file.company
+        "company_name": "Contoso Ltd",
         # the entry's key write (plaso: last_written_time) — the row that
         # evidences execution. NB plaso gives the file's own $SI mtime row
         # (file_modification_time) the very same description.
@@ -258,8 +265,10 @@ def test_amcache_program_hash_not_hive_hash_and_no_filename_leak():
     assert ev["timestamp"] == "2023-05-01T10:00:00.000000Z"   # the key write
     assert ev["image_path"] == "c:\\users\\bob\\downloads\\evil.exe"
     assert ev["exe"] == "evil.exe"
-    # Record.sha1 (program) — never Record.sha1_hash (the hive's own hash)
+    # A3: the PROGRAM's SHA-1 out of file_identifier ("0000"+40hex, prefix
+    # stripped) — never the hive's own sha256_hash
     assert ev["sha1_hash"] == "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"
+    assert ev["sha1_hash"] != "f" * 64
     # Amcache.hve (Record.filename/display_name) must never leak into exe
     assert "Amcache" not in str(ev["exe"]) + str(ev["image_path"])
 
@@ -273,9 +282,12 @@ def test_amcache_link_time_is_a_compile_stamp_never_an_execution():
     assert ev["timestamp"] is None
     assert ev["_native"]["compile_time"] == "2021-11-11T11:11:11.000000Z"
     assert ev["_native"]["timestamp_desc"] == "Link Time"
+    # A3: the file entity carries the program SHA-1 (from file_identifier) and
+    # amcache's CompanyName -> file.company
+    assert ev["sha1_hash"] == "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"  # program, not hive
+    assert ev["company"] == "Contoso Ltd"
     assert ev["file_path"] == "c:\\users\\bob\\downloads\\evil.exe"
     assert ev["file_name"] == "evil.exe" and ev["extension"] == "exe"
-    assert ev["sha1_hash"] == "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"   # program, not hive
     assert "Amcache" not in str(ev["file_path"]) + str(ev["file_name"])
     assert ev["_native"]["program_identifier"] == "0006a1c48f048a1c"
     assert ev["hostname"] == "HOST1" and ev["source_host"] == "HOST1"
@@ -288,6 +300,20 @@ def test_amcache_link_time_is_a_compile_stamp_never_an_execution():
     for key in pipeline.route("host.L2tWinreg"):
         out = normalize.normalize(key, _AMCACHE_LINK)
         assert out is None or out["car_object"] != "process", key
+
+
+def test_amcache_sha1_ignores_a_malformed_file_identifier():
+    # honest null: file_identifier that is not the "0000"+40hex shape yields no
+    # SHA-1 (never a truncated/garbage hash)
+    rec = json.loads(json.dumps(_AMCACHE))
+    rec["Record"]["file_identifier"] = "deadbeef"           # wrong shape
+    ev = normalize.normalize("plaso_exec_winreg", rec)
+    assert ev.get("sha1_hash") is None
+    # an empty CompanyName is an honest null, not ""
+    rec2 = json.loads(json.dumps(_AMCACHE_LINK))
+    rec2["Record"]["company_name"] = ""
+    ev2 = normalize.normalize("plaso_exec_winreg", rec2)
+    assert ev2.get("company") is None
 
 
 def test_amcache_link_time_without_full_path_is_still_no_execution():
