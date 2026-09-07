@@ -22,6 +22,7 @@ properties:
   - car_action
   - guid
   - owning_guid
+  - volume_guid
   - link_confidence
   - source_artefact
   - source_host

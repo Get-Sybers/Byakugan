@@ -42,7 +42,7 @@ import os
 import sqlite3
 import sys
 
-from . import spindle
+from . import native_ids, spindle
 
 # the strongest-to-weakest tiers; a converged group keeps the strongest that
 # joined it (so a content-hash match outranks a mere image-path lead).
@@ -86,38 +86,21 @@ def _basename(p) -> str:
 # mixes `09931F21…`/`09931f21…`. A MachineGuid IS the host identity and a volume
 # GUID is globally unique, so both keys are host- AND object-independent (a
 # registry row, a USN change and an event-log row of the same volume converge).
-import re as _re
-
-_GUID = r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
-# \\?\Volume{GUID} / \??\Volume{GUID} / MountPoints2 / MountedDevices values.
-# The `Volume{` token lives INSIDE the value string itself (the volume path), so
-# a text scan of the native blob is precise AND shape-independent — it catches
-# the GUID wherever the parser put it (a value, a mapped-files list, a rendered
-# message) without guessing the per-parser structure. A volume GUID is globally
-# unique, so no host scoping is needed and there is no COM-CLSID false-positive
-# surface (a bare {8-4-4-4-12} with no `Volume{` token is never picked up).
-# (The per-host MachineGuid anchor is deferred to the host_id follow-up: it is
-# better modelled as a per-image stamp than text-mined, and the value recurs in
-# crypto-key paths that a naive miner would misread.)
-_VOLUME_RE = _re.compile(r"Volume\{(" + _GUID + r")\}", _re.IGNORECASE)
-
-
 def _native_ids(row: dict) -> list[tuple[str, str]]:
     """The canonical native GUID join keys a row carries, as (class, value) with
     the value case-folded. Only the high-precision, token-gated `volume` class —
-    never a bare GUID (the ubiquitous COM CLSID/interface GUIDs are linkage noise)."""
-    native = row.get("native")
-    if not native:
-        return []
-    text = native if isinstance(native, str) else json.dumps(native, default=str)
-    out: list[tuple[str, str]] = []
-    seen: set[tuple[str, str]] = set()
-    for m in _VOLUME_RE.finditer(text):
-        k = ("volume", m.group(1).lower())
-        if k not in seen:
-            seen.add(k)
-            out.append(k)
-    return out
+    never a bare GUID (the ubiquitous COM CLSID/interface GUIDs are linkage noise).
+
+    Prefers the first-class `volume_guid` column (enrich lifts it there) and
+    falls back to mining `native` for rows written before the column existed —
+    the extractor itself lives in `native_ids` so enrich and this stage share it."""
+    vals = []
+    col = row.get("volume_guid")
+    if col:
+        vals = [str(col).lower()]
+    else:
+        vals = native_ids.volume_guids(row.get("native"))
+    return [("volume", v) for v in vals]
 
 
 def _find_stores(case_dir: str) -> list[str]:

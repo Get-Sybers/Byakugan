@@ -158,6 +158,19 @@ def test_native_volume_guid_bridges_sources_case_folded(tmp_path):
     assert c["car_object"] in c["car_objects"]                 # deterministic label
 
 
+def test_native_id_uses_the_first_class_column(tmp_path):
+    d = str(tmp_path)
+    # the volume_guid column is authoritative — a row that carries it (with no
+    # Volume{ token left in native) still converges on it
+    _store(d, "a", [dict(_row("registry", "value_edit", "a-1", "H", {"k": "v"}),
+                         volume_guid="09931f21-7faf-44a9-81d8-1e73c14b9eaf")])
+    _store(d, "b", [dict(_row("file", "create", "b-1", "H", {"k": "w"}),
+                         volume_guid="09931f21-7faf-44a9-81d8-1e73c14b9eaf")])
+    hits = [c for c in crosssource.converge(d) if c["tier"] == "definitive_native_id"]
+    assert hits and hits[0]["join_key"] == ["volume", "09931f21-7faf-44a9-81d8-1e73c14b9eaf"]
+    assert set(hits[0]["sources"]) == {"a", "b"}
+
+
 def test_native_id_ignores_com_clsid_noise(tmp_path):
     d = str(tmp_path)
     # bare canonical GUIDs with NO Volume{ token — pure COM noise, and the same
