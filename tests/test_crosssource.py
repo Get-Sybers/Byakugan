@@ -132,6 +132,55 @@ def test_disk_pe_hash_hydrates_a_driver(tmp_path):
 
 
 # --------------------------------------------------------------------------- #
+# B1: canonical native GUIDs (volume / MachineGuid) bridge sources
+# --------------------------------------------------------------------------- #
+def _row(obj, action, guid, source_host, native):
+    return {"car_object": obj, "car_action": action, "guid": guid,
+            "source_host": source_host, "timestamp": "2026-01-01T00:00:00Z",
+            "_native": native}
+
+
+def test_native_volume_guid_bridges_sources_case_folded(tmp_path):
+    d = str(tmp_path)
+    # the same volume, seen lower-case in a registry mount and UPPER in a USN row
+    _store(d, "registry", [_row("registry", "value_edit", "registry-1", "PM6C56D",
+                                {"key_path": r"...\MountPoints2",
+                                 "data": r"\??\Volume{09931f21-7faf-44a9-81d8-1e73c14b9eaf}"})])
+    _store(d, "usn", [_row("file", "create", "file-1", "PM6C56D",
+                           {"data_type": "fs:ntfs:usn_change",
+                            "path": r"\\?\Volume{09931F21-7FAF-44A9-81D8-1E73C14B9EAF}\x"})])
+    hits = [c for c in crosssource.converge(d) if c["tier"] == "definitive_native_id"]
+    assert hits, "volume GUID did not bridge the two sources"
+    c = hits[0]
+    assert c["join_key"] == ["volume", "09931f21-7faf-44a9-81d8-1e73c14b9eaf"]  # folded
+    assert set(c["sources"]) == {"registry", "usn"}
+    assert set(c["car_objects"]) == {"file", "registry"}       # a mixed-object bridge
+    assert c["car_object"] in c["car_objects"]                 # deterministic label
+
+
+def test_native_id_ignores_com_clsid_noise(tmp_path):
+    d = str(tmp_path)
+    # bare canonical GUIDs with NO Volume{ token — pure COM noise, and the same
+    # {8-4-4-4-12} shape a MachineGuid embedded in a crypto-key path would show;
+    # neither must ever create a native-id convergence.
+    clsid = "f750e6c3-38ee-11d1-85e5-00c04fc295ee"
+    _store(d, "a", [_row("registry", "value_edit", "a-1", "H", {"clsid": clsid})])
+    _store(d, "b", [_row("registry", "value_edit", "b-1", "H",
+                         {"key": r"...\Crypto\SystemKeys\0d8b_8b9b9f31-6016-4b10-83ef-324b62a37898"})])
+    assert [c for c in crosssource.converge(d)
+            if c["tier"] == "definitive_native_id"] == []
+
+
+def test_native_id_single_source_is_not_a_convergence(tmp_path):
+    d = str(tmp_path)
+    vol = r"\\?\Volume{09931f21-7faf-44a9-81d8-1e73c14b9eaf}"
+    _store(d, "only", [_row("registry", "value_edit", "x", "H", {"a": vol}),
+                       _row("file", "create", "y", "H", {"b": vol})])
+    assert [c for c in crosssource.converge(d)
+            if c["tier"] == "definitive_native_id"] == []   # one source ≠ cross-source
+
+
+# --------------------------------------------------------------------------- #
 # a single-source group is NOT a convergence; no cross-source noise
 # --------------------------------------------------------------------------- #
 def test_single_source_is_not_a_convergence(tmp_path):
