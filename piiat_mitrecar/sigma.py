@@ -46,6 +46,10 @@ LOGSOURCE: dict[str, tuple[str, str]] = {
     "image_load": ("module", "load"),
     "driver_load": ("driver", "load"),
     "file_event": ("file", "create"),
+    # Sysmon EID 15 (FileCreateStreamHash) writes a new (alternate-data-)stream —
+    # a file create; the rules key off TargetFilename/Contents, resolved off the
+    # file object like file_event.
+    "create_stream_hash": ("file", "create"),
     "file_change": ("file", "modify"),
     "file_delete": ("file", "delete"),
     "registry_set": ("registry", "modify"),
@@ -147,31 +151,84 @@ def _values(row: dict, field: str, obj: str):
     return None
 
 
+# Sigma value semantics are LITERAL substring/affix tests where only Sigma's own
+# `*`/`?` are wildcards (`\*`/`\?` escape them) — `%` is an ordinary character.
+# This is deliberately NOT routed through analytics._cmp, whose CAR-analytic glob
+# treats `%envvar%` as a wildcard: a Sigma value such as `%windir:~-1,1%` (a
+# cmd.exe obfuscation string, a LITERAL to find, not a pattern) would otherwise
+# collapse to a match-everything `.*` and fire the rule on every row.
+def _sigma_body(value: str) -> str:
+    """A Sigma match value -> a regex body: `*` -> ``.*``, `?` -> ``.`` (Sigma's
+    only wildcards; `\\*`/`\\?` are literal), every other char (``%`` included)
+    ``re.escape``d literal."""
+    out, i, s = [], 0, str(value)
+    while i < len(s):
+        c = s[i]
+        if c == "\\" and i + 1 < len(s) and s[i + 1] in "*?":
+            out.append(re.escape(s[i + 1]))
+            i += 2
+            continue
+        out.append(".*" if c == "*" else "." if c == "?" else re.escape(c))
+        i += 1
+    return "".join(out)
+
+
+def _matcher(mode: str, value: str):
+    """A one-value matcher ``str -> bool`` for a Sigma leaf modifier."""
+    if mode == "re":
+        try:
+            rx = re.compile(str(value), re.IGNORECASE)
+        except re.error:                 # a rule regex we cannot compile can't match
+            return lambda sval: False
+        return lambda sval: bool(rx.search(sval))
+    body = _sigma_body(value)
+    if mode == "contains":
+        rx = re.compile(body, re.IGNORECASE)
+        return lambda sval: bool(rx.search(sval))
+    if mode == "startswith":
+        rx = re.compile(body, re.IGNORECASE)
+        return lambda sval: bool(rx.match(sval))
+    if mode == "endswith":
+        rx = re.compile(body + r"\Z", re.IGNORECASE)
+        return lambda sval: bool(rx.search(sval))
+    # exact: the whole value; a bare name (no path separator) also matches the
+    # resolved value's BASENAME — CAR fills exe/image_path with a full path, so
+    # `Image: cmd.exe` must catch `C:\...\cmd.exe` (analytics._cmp's discipline).
+    rx = re.compile(body, re.IGNORECASE)
+    bare = not re.search(r"[\\/]", str(value))
+    return lambda sval: bool(rx.fullmatch(sval)
+                             or (bare and rx.fullmatch(A._basename(sval))))
+
+
 def _leaf(field: str, mods: list[str], value, obj: str):
     """A ``field|modifiers: value`` predicate over a row of CAR object ``obj``. A
-    list value is OR unless ``|all``. Pure closure — captures the matcher."""
+    list value is OR unless ``|all``. Pure closure — captures the matchers."""
     mset = {m.lower() for m in mods}
     if mset & _UNSUPPORTED_MODS:
         return lambda row: False
     is_all = "all" in mset
     if "re" in mset or "regex" in mset:
-        op, tmpl = "match", "{}"
+        mode = "re"
     elif "contains" in mset or "windash" in mset:
-        op, tmpl = "==", "*{}*"          # windash approximated as contains (v1)
+        mode = "contains"                # windash approximated as contains (v1)
     elif "startswith" in mset:
-        op, tmpl = "==", "{}*"
+        mode = "startswith"
     elif "endswith" in mset:
-        op, tmpl = "==", "*{}"
+        mode = "endswith"
     else:
-        op, tmpl = "==", "{}"
+        mode = "exact"
 
     wants = value if isinstance(value, list) else [value]
-    wants = [tmpl.format(w) if op == "==" else str(w) for w in
-             (str(x) for x in wants if x is not None)]
+    matchers = [_matcher(mode, str(x)) for x in wants if x is not None]
+    if not matchers:
+        return lambda row: False
 
     def pred(row):
         val = _values(row, field, obj)
-        results = (A._cmp(val, op, w) for w in wants)
+        if val in (None, ""):
+            return False
+        sval = str(val)
+        results = (m(sval) for m in matchers)
         return all(results) if is_all else any(results)
     return pred
 
@@ -310,9 +367,14 @@ def technique_tags(tags) -> tuple[list[str], list[str]]:
     return techs, tactics
 
 
-def compile_rule(doc: dict) -> CarAnalytic | None:
+def compile_rule(doc: dict, skip_ids: set[str] | None = None,
+                 skip_deprecated: bool = True) -> CarAnalytic | None:
     """One Sigma rule -> a runnable CarAnalytic, or None (unmappable/untagged/
-    uncompilable — the caller counts the reason)."""
+    uncompilable — the caller counts the reason). A rule whose ``status`` is
+    ``deprecated`` (unless ``skip_deprecated`` is off) or whose id is in
+    ``skip_ids`` (hayabusa's noisy/exclude lists) is recognised but deferred —
+    never runnable, so a broad rule cannot over-fire — with the reason recorded
+    like every other deferral."""
     if not isinstance(doc, dict):
         return None
     category = (doc.get("logsource") or {}).get("category")
@@ -324,6 +386,12 @@ def compile_rule(doc: dict) -> CarAnalytic | None:
                 for t in techs]
     an = CarAnalytic(id=rid, title=title, coverage=coverage)
     an.pseudocode = None
+    if skip_deprecated and str(doc.get("status") or "").lower() == "deprecated":
+        an.skip_reason = "rule status is deprecated"
+        return an
+    if skip_ids and str(doc.get("id") or "") in skip_ids:
+        an.skip_reason = "in hayabusa noisy/exclude rule list"
+        return an
     if mapped is None:
         an.skip_reason = f"logsource category {category!r} is not a CAR object"
         return an
@@ -358,17 +426,45 @@ def compile_rule(doc: dict) -> CarAnalytic | None:
     return an
 
 
-def load_sigma_analytics(sigma_dir: str) -> list[CarAnalytic]:
+def hayabusa_skip_ids(sigma_dir: str, config_dir: str | None = None) -> set[str]:
+    """The rule ids hayabusa ships as noisy or excluded
+    (``config/noisy_rules.txt`` + ``exclude_rules.txt``) — broad, duplicate or
+    replaced rules it does not run. Each line is ``<id> # comment``; blank and
+    ``#`` lines are skipped. ``config_dir`` defaults to the ``config`` sibling of
+    the rules' ``sigma`` directory (hayabusa's layout)."""
+    cfg = config_dir or os.path.join(os.path.dirname(os.path.normpath(sigma_dir)), "config")
+    ids: set[str] = set()
+    for name in ("noisy_rules.txt", "exclude_rules.txt"):
+        try:
+            with open(os.path.join(cfg, name), encoding="utf-8") as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line or line.startswith("#"):
+                        continue
+                    head = line.split("#", 1)[0].strip()
+                    if head:
+                        ids.add(head.split()[0])
+        except OSError:
+            continue
+    return ids
+
+
+def load_sigma_analytics(sigma_dir: str, honor_lists: bool = True,
+                         config_dir: str | None = None) -> list[CarAnalytic]:
     """Every ``*.yml`` under ``sigma_dir`` compiled to a CarAnalytic (runnable
-    where it maps + tags + compiles; recognised-but-deferred otherwise)."""
+    where it maps + tags + compiles; recognised-but-deferred otherwise). With
+    ``honor_lists`` (the default) hayabusa's noisy/exclude lists and any
+    ``status: deprecated`` rules are deferred instead of run, exactly as native
+    hayabusa skips them; pass ``honor_lists=False`` to compile the whole corpus."""
     import yaml
+    skip_ids = hayabusa_skip_ids(sigma_dir, config_dir) if honor_lists else set()
     out: list[CarAnalytic] = []
     for path in sorted(glob.glob(os.path.join(sigma_dir, "**", "*.yml"), recursive=True)):
         try:
             doc = yaml.safe_load(open(path, encoding="utf-8"))
         except (yaml.YAMLError, OSError):
             continue
-        an = compile_rule(doc)
+        an = compile_rule(doc, skip_ids=skip_ids, skip_deprecated=honor_lists)
         if an is not None:
             out.append(an)
     return out
@@ -436,8 +532,11 @@ def main(argv: list[str] | None = None) -> int:
                                  description="Byakugan — Sigma detection over CAR objects")
     ap.add_argument("--rules", required=True, help="a Sigma rules directory (walked for *.yml)")
     ap.add_argument("--car", help="a finished car.db to run the rules over")
+    ap.add_argument("--include-noisy", action="store_true",
+                    help="compile the whole corpus (do NOT honor hayabusa's "
+                         "noisy/exclude lists or skip deprecated rules)")
     args = ap.parse_args(argv)
-    ans = load_sigma_analytics(args.rules)
+    ans = load_sigma_analytics(args.rules, honor_lists=not args.include_noisy)
     report = coverage_report(ans)
     if args.car:
         hits = flag_store(args.car, [a for a in ans if a.runnable])
