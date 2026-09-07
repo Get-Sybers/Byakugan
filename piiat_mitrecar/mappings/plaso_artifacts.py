@@ -21,7 +21,8 @@ import re
 
 from ..normalize import (basename, ext, first, host_label, payload, regex1,  # noqa: F401
                          unescape_backslashes)
-from ._common import R as _r, plaso_rec as _rec, spindle as _spindle
+from ._common import (R as _r, plaso_rec as _rec, spindle as _spindle,
+                      user_from_path as _user_from_path)
 
 
 def _td(rec) -> str:
@@ -99,7 +100,12 @@ def _lnk_map(action):
             # the shortcut's stored target string -> the canonical link_target
             "link_target": _r("link_target"),
             "hostname": _r("image_hostname"),
-            "user": _r("username"),
+            # a Recent/Office .lnk lives under \Users\<name>\…\Recent — the
+            # shortcut's own path (display_name) names its owner; the recorded
+            # username, then the target path, are the fallbacks. Fill-only-null.
+            "user": first(_r("username"),
+                          _user_from_path(_r("display_name")),
+                          _user_from_path(_LNK_PATH)),
         },
         "keep": [], "native_extract": _LNK_NATIVE,
     }
@@ -127,7 +133,17 @@ MAPPINGS = {
                     "file_name": basename(_r("original_filename")),
                     "extension": ext(_r("original_filename")),
                     "hostname": _r("image_hostname"),
-                    "user": _r("username"),
+                    # the deleted file's ORIGINAL path is under \Users\<name>\ —
+                    # names the owning user. Fill-only-null after any recorded
+                    # username.
+                    "user": first(_r("username"),
+                                  _user_from_path(_r("original_filename"))),
+                    # the deleting account's SID is literally the $Recycle.Bin
+                    # per-user subdir the record was read from
+                    # (\$Recycle.Bin\<SID>\$I…) — the canonical uid (a SID the
+                    # record's own path states; no SAM lookup needed).
+                    "uid": regex1(_r("display_name"),
+                                  r"\$Recycle\.Bin[/\\](S-1-[0-9-]+)"),
                 },
                 "keep": [],
                 "native_extract": {"data_type": _r("data_type"),

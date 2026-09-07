@@ -45,17 +45,19 @@ mappings:
   action: create
   notes: Derived by log2timeline / Plaso — winreg (amcache/userassist/bam/appcompatcache).
   fields:
+  - company
   - extension
   - file_name
   - file_path
   - hostname
   - sha1_hash
   field_provenance:
+    company: company_name [direct]
     extension: full_path [derived]
     file_name: full_path [derived]
     file_path: full_path [direct]
     hostname: image_hostname [direct]
-    sha1_hash: sha1 [direct]
+    sha1_hash: file_identifier [inferred]
 - object: process
   action: create
   notes: Derived by log2timeline / Plaso — winreg (amcache/userassist/bam/appcompatcache).
@@ -70,12 +72,12 @@ mappings:
     exe: full_path [derived]
     hostname: image_hostname [direct]
     image_path: full_path [direct]
-    sha1_hash: sha1 [direct]
+    sha1_hash: file_identifier [inferred]
     sid: user_identifier [direct]
     user: username [direct]
 other_coverage:
 - 'native/join keys (file/create): artefact_file, artefact_sha256, compile_time, data_type, file_reference,
   key_path, program_identifier, timestamp_desc'
 - 'native/join keys (process/create): artefact_file, artefact_sha256, control_set, data_type, entry_index,
-  execution_inferred, file_reference, hive_user_sid, key_path, number_of_executions, program_identifier,
-  time_meaning, timestamp_desc, value_name'
+  execution_inferred, file_reference, key_path, number_of_executions, program_identifier, time_meaning,
+  timestamp_desc, value_name'

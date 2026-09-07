@@ -33,14 +33,16 @@ mappings:
   - hostname
   - image_path
   - key
+  - user
   field_provenance:
     hive: display_name [direct]
     hostname: image_hostname [direct]
     image_path: image_path [direct]
     key: key_path [direct]
+    user: username | display_name [coalesced]
 other_coverage:
 - 'native/join keys (registry/key_edit): account_rid, application, build_number, command, comments, configuration,
   data_type, device_display_name, device_type, drive_letter, entries, error_control, fullname, handler,
-  hive_user_sid, login_count, name, object_name, owner, product, product_name, revision, serial, server_name,
-  service_dll, service_pack, service_type, settings, share_name, source_type, start_type, subkey_name,
-  trigger, username, values, vendor, version'
+  login_count, name, object_name, owner, product, product_name, revision, serial, server_name, service_dll,
+  service_pack, service_type, settings, share_name, source_type, start_type, subkey_name, trigger, username,
+  values, vendor, version'

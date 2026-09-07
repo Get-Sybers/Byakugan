@@ -17,9 +17,13 @@ against real M57 records:
 - **firefox_cache** → http, action from the RECORDED request_method (GET/POST/
   PUT — others raw); response_status_code parsed from "HTTP/1.1 200 OK"; the
   cache prefixes url with "HTTP:" which is stripped.
-- **firefox places page_visited (sqlite table)** → http/get: the visit record,
-  with from_visit as the request_referrer (its " (host)" suffix stripped) —
-  recorded client-side data, never proof of real navigation provenance.
+- **browser history (sqlite table)** → http/get: firefox places page_visited
+  PLUS Chrome/Edge `chrome:history:page_visited` (Edge is Chromium, same
+  data_type) — the visit record, with from_visit as the request_referrer (its
+  " (host)" suffix stripped). Recorded client-side data, never proof of real
+  navigation provenance. Chrome/Edge `chrome:history:file_downloaded` rows map
+  too: a GET whose received_bytes are the response body size (total_bytes and
+  the local target full_path native).
 - **java_idx** → http/get: a Java download-cache record; the server IP the
   cache recorded stays native (CAR http has no dest_ip field).
 
@@ -54,10 +58,22 @@ def plasoweb_is_ff_cache(rec) -> bool:
     return _dt(rec) == "firefox:cache:record"
 
 
+# browser-history visit/download rows inside the generic sqlite table. Firefox
+# places, PLUS Chrome/Edge history — Edge is Chromium and shares the
+# `chrome:history:*` data_types (page_visited + file_downloaded). Every one is a
+# client-recorded request the endpoint saw; the field derivations already fit
+# (url, from_visit -> request_referrer, visit -> get), downloads add their bytes.
+_HISTORY_VISIT_DTS = {
+    "firefox:places:page_visited",
+    "chrome:history:page_visited",
+    "chrome:history:file_downloaded",
+}
+
+
 def plasoweb_is_ff_visit(rec) -> bool:
-    """firefox:places:page_visited inside the generic sqlite table — gated
-    strictly by data_type (bookmarks/annotations stay raw)."""
-    return _dt(rec) == "firefox:places:page_visited"
+    """A browser-history visit/download row → http/get. Gated strictly by
+    data_type (bookmarks/annotations and other sqlite plugins stay raw)."""
+    return _dt(rec) in _HISTORY_VISIT_DTS
 
 
 def plasoweb_is_javaidx(rec) -> bool:
@@ -141,13 +157,22 @@ MAPPINGS = {
                               # "url (host)" rendered; keep the url part only
                               request_referrer=first(
                                   regex1(_r("from_visit"), r"^(\S+)"),
-                                  _r("from_visit"))),
+                                  _r("from_visit")),
+                              # a chrome:history:file_downloaded row records the
+                              # bytes actually received — the response body size
+                              # (null on plain page_visited rows). total_bytes
+                              # (the expected size) rides native.
+                              response_body_bytes=_r("received_bytes")),
                 "keep": [],
                 "native_extract": {"data_type": _r("data_type"),
                                    "title": _r("title"),
                                    "visit_count": _r("visit_count"),
                                    "visit_type": _r("visit_type"),
                                    "typed": _r("typed"),
+                                   # download rows: the expected total size and
+                                   # the local target the browser saved it to
+                                   "total_bytes": _r("total_bytes"),
+                                   "full_path": _r("full_path"),
                                    "artefact_file": _r("display_name")},
             }),
         ],
