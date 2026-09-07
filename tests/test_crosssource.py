@@ -80,6 +80,54 @@ def test_content_hash_convergence_is_host_independent(tmp_path):
 
 
 # --------------------------------------------------------------------------- #
+# A4: a disk PE's hash converges with — and hydrates — a module / driver
+# --------------------------------------------------------------------------- #
+def test_disk_pe_hash_hydrates_a_module(tmp_path):
+    d = str(tmp_path)
+    # a disk PE (pe_coff -> file): path + sha256 + PE metadata, no load context
+    _store(d, "pe", [dict({"car_object": "file", "car_action": "create",
+                           "guid": "pe-1", "source_host": "WIN10",
+                           "timestamp": "2026-01-01T00:00:00Z",
+                           "file_path": r"C:\Windows\System32\evil.dll",
+                           "sha256_hash": "DEADBEEF"})])
+    # a loaded module (Sysmon EID 7): module_path + name + the same bytes' hash
+    _store(d, "sysmon", [dict({"car_object": "module", "car_action": "load",
+                               "guid": "mod-1", "source_host": "WIN10",
+                               "timestamp": "2026-01-01T00:00:00Z",
+                               "module_path": r"C:\Windows\System32\evil.dll",
+                               "module_name": "evil.dll",
+                               "sha256_hash": "DEADBEEF"})])
+    conv = crosssource.converge(d)
+    hits = [c for c in conv if c["tier"] == "definitive_content"
+            and set(c["sources"]) == {"pe", "sysmon"}]
+    assert hits, f"module did not converge with the disk PE by hash: {conv}"
+    c = hits[0]
+    # the merged view holds BOTH the disk PE's path and the module's own path/name
+    assert "file_path" in c["properties"] and "module_path" in c["properties"]
+    assert c["property_sources"]["sha256_hash"] == ["pe", "sysmon"]  # same bytes
+
+
+def test_disk_pe_hash_hydrates_a_driver(tmp_path):
+    d = str(tmp_path)
+    _store(d, "pe", [dict({"car_object": "file", "car_action": "create",
+                           "guid": "pe-2", "source_host": "WIN10",
+                           "timestamp": "2026-01-01T00:00:00Z",
+                           "file_path": r"C:\Windows\System32\drivers\wfplwfs.sys",
+                           "sha256_hash": "CAFED00D"})])
+    _store(d, "sysmon", [dict({"car_object": "driver", "car_action": "load",
+                               "guid": "drv-1", "source_host": "WIN10",
+                               "timestamp": "2026-01-01T00:00:00Z",
+                               "module_name": "wfplwfs",
+                               "sha256_hash": "CAFED00D"})])
+    conv = crosssource.converge(d)
+    hits = [c for c in conv if c["tier"] == "definitive_content"
+            and set(c["sources"]) == {"pe", "sysmon"}]
+    assert hits, f"driver did not converge with the disk PE by hash: {conv}"
+    # the disk PE's sha256 hydrates the driver (same bytes across the two rows)
+    assert hits[0]["property_sources"]["sha256_hash"] == ["pe", "sysmon"]
+
+
+# --------------------------------------------------------------------------- #
 # a single-source group is NOT a convergence; no cross-source noise
 # --------------------------------------------------------------------------- #
 def test_single_source_is_not_a_convergence(tmp_path):

@@ -47,6 +47,14 @@ _TIER_RANK = {DEFINITIVE_RECORD: 0, DEFINITIVE_CONTENT: 1, HEURISTIC_IMAGE: 2}
 
 # objects that carry a content hash (a binary / file identity)
 _HASHED = {"file", "process", "module", "driver"}
+# A content hash is the SAME bytes whatever object it rode in on: a disk PE
+# (file), a process's on-disk binary, a loaded module and a kernel driver of
+# identical bytes are one content. Collapse these objects into a single content
+# namespace so a pe_coff/file row's hash converges with — and hydrates — a
+# module's / driver's sha256_hash (A4). Without this the bucket was object-
+# scoped and only `process` folded into `file`, so a hashed disk PE never
+# reached a `module`/`driver` row of the same bytes.
+_CONTENT_BUCKET = {"process": "file", "module": "file", "driver": "file"}
 # objects an image-path lead is meaningful for (they execute a binary)
 _IMAGED = {"process", "service", "module", "driver"}
 _HASH_FIELDS = ("sha256_hash", "sha1_hash", "md5_hash")
@@ -126,8 +134,10 @@ def _keys(row: dict) -> list[tuple[str, tuple]]:
     if obj in _HASHED:
         h = _content_hash(row)
         if h:
-            # content identity is host-independent (the same bytes anywhere)
-            keys.append((DEFINITIVE_CONTENT, (obj if obj != "process" else "file", *h)))
+            # content identity is host- AND object-independent (the same bytes
+            # anywhere, in whatever object they rode in on) — file / process /
+            # module / driver share one content bucket
+            keys.append((DEFINITIVE_CONTENT, (_CONTENT_BUCKET.get(obj, obj), *h)))
     if obj in _IMAGED:
         ik = _image_key(row)
         if ik:
