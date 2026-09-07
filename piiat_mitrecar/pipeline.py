@@ -53,6 +53,7 @@ ROUTES = [
     ("http.json", ["zeek_http"]),
     ("smtp.json", ["zeek_smtp"]),
     ("files.json", ["zeek_files"]),
+    ("ssl.json", ["zeek_ssl"]),        # TLS handshake -> flow (SNI in dest_fqdn)
     # Zeek logs with no dedicated CAR object — routed to nothing EXPLICITLY (known,
     # not unknown): their per-flow detail can enrich the flow by uid at the
     # cascade stage, but they are not CAR objects.

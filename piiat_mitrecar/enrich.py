@@ -373,6 +373,44 @@ def _stamp_resolved_fqdn(ev, dns_res):
             ev["src_fqdn"] = s
 
 
+def _sni_by_uid(events):
+    """(host, zeek uid) -> the SNI the client requested on that TLS connection,
+    from zeek_ssl flow rows (B2): the map put the `server_name` (SNI) in the
+    ssl flow's `dest_fqdn`, and the ssl flow's guid IS the connection uid. The
+    OTHER half of the DNS work — DNS gives domain↔IP (labelled by IP), the SNI
+    gives the domain directly on the encrypted flow, joined by the uid conn and
+    ssl share. First SNI wins. Host-scoped like every join."""
+    res = {}
+    for ev in events:
+        # gate on the producing map, not application_protocol="tls" — only the
+        # ssl.log row carries the client-requested SNI
+        if ev.get("source_artefact") != "zeek_ssl":
+            continue
+        sni = ev.get("dest_fqdn")
+        if not sni:
+            continue
+        uid = ev.get("guid") or (ev.get("_native") or {}).get("uid")
+        if uid:
+            res.setdefault((ev.get("source_host"), str(uid)), sni)
+    return res
+
+
+def _stamp_sni_fqdn(ev, sni_res):
+    """Label the conn flow of the SAME uid with the SNI its TLS handshake named
+    — so the bare conn row to 100.101.0.42 also reads as scoring-c2.berylia.org.
+    Fill-only-null: the ssl flow already carries it (its own dest_fqdn), and a
+    DNS-resolved fqdn is never overwritten (both agree where DNS saw it; the SNI
+    fills the flows DNS did not resolve)."""
+    if ev.get("dest_fqdn"):
+        return
+    uid = ev.get("guid") or (ev.get("_native") or {}).get("uid")
+    if not uid:
+        return
+    sni = sni_res.get((ev.get("source_host"), str(uid)))
+    if sni:
+        ev["dest_fqdn"] = sni
+
+
 def _proc_by_image_path(events):
     """(host, lowercased image_path) -> [process create events]. Keys the
     file->process-by-path edge (CAR-2014-02-001): a file on disk whose path IS a
@@ -472,6 +510,7 @@ def enrich(events: list[dict]) -> list[dict]:
     login_luid, login_sid = _login_indexes(events)
     proc_by_image = _proc_by_image_path(events)
     dns_res = _dns_resolution(events)
+    sni_res = _sni_by_uid(events)
 
     for ev in events:
         obj_fields = set(model[ev["car_object"]]["fields"])
@@ -505,6 +544,11 @@ def enrich(events: list[dict]) -> list[dict]:
         # B2: label a flow's endpoints with the domain DNS resolved to that IP
         if ev["car_object"] == "flow" and dns_res:
             _stamp_resolved_fqdn(ev, dns_res)
+
+        # B2: label the conn flow with the SNI its TLS handshake named (by the
+        # shared uid) — the encrypted-flow half of the resolution work
+        if ev["car_object"] == "flow" and sni_res:
+            _stamp_sni_fqdn(ev, sni_res)
 
         # CAR-2014-02-001: a file whose path == a process image_path is the
         # binary that process executed (heuristic, path equality)

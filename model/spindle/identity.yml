@@ -843,6 +843,7 @@ external:
     field: uid
   maps:
   - zeek_conn
+  - zeek_ssl
   car_object:
   - flow
   stable_across: every Zeek log of one connection in one capture — conn / http / files share the uid
