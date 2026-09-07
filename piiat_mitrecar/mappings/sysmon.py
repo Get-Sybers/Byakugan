@@ -34,7 +34,8 @@ network_direction (EID 3 Initiated), extension (file), signature_valid
 from __future__ import annotations
 
 from ..normalize import (basename, const, ext, first, host_label,  # noqa: F401
-                         map_value, payload, regex1, replace, ts_before)
+                         lower, map_value, payload, regex1, replace, ts_before,
+                         user_canon)
 from ._common import (EVTX_FQDN as _FQDN, EVTX_HOST as _HOSTNAME,  # noqa: F401
                       EVTX_KEEP, EVTX_RECORD_GUID as _RECORD_GUID,
                       evtx_payload_field)
@@ -148,11 +149,14 @@ PREDICATES = {
 # The Hashes string ("SHA1=..,MD5=..,SHA256=..,IMPHASH=..") splits into the
 # three canonical hash fields; IMPHASH has no CAR home and stays native in
 # Payload (kept), never faked into a hash column.
+# hashes are canonicalised to LOWERCASE (EvtxECmd/Sysmon stamp them UPPERCASE):
+# a hash column means the same across every source, so cross-source equality and
+# a Sigma/hayabusa rule's (lowercase) hash literal both match.
 def _hashes(src):
     return {
-        "md5_hash": regex1(src, r"(?i)\bMD5=([0-9A-Fa-f]+)"),
-        "sha1_hash": regex1(src, r"(?i)\bSHA1=([0-9A-Fa-f]+)"),
-        "sha256_hash": regex1(src, r"(?i)\bSHA256=([0-9A-Fa-f]+)"),
+        "md5_hash": lower(regex1(src, r"(?i)\bMD5=([0-9A-Fa-f]+)")),
+        "sha1_hash": lower(regex1(src, r"(?i)\bSHA1=([0-9A-Fa-f]+)")),
+        "sha256_hash": lower(regex1(src, r"(?i)\bSHA256=([0-9A-Fa-f]+)")),
     }
 
 
@@ -196,7 +200,7 @@ def _file_props(hashed: bool):
         "extension": ext(payload("TargetFilename")),
         "image_path": payload("Image"),
         "pid": payload("ProcessId"),
-        "user": payload("User"),
+        "user": user_canon(payload("User")),
         "hostname": _HOSTNAME, "fqdn": _FQDN,
     }
     if hashed:
@@ -214,7 +218,7 @@ def _registry_props(with_value: bool, with_data: bool):
         "key": payload("TargetObject"),
         "image_path": payload("Image"),
         "pid": payload("ProcessId"),
-        "user": payload("User"),
+        "user": user_canon(payload("User")),
         "hostname": _HOSTNAME, "fqdn": _FQDN,
     }
     if with_value:
@@ -234,7 +238,11 @@ def _registry_variant(action: str, with_value=False, with_data=False, native=Non
         **_proc_ctx(),
         "props": _registry_props(with_value, with_data),
         "keep": _KEEP,
-        "native_extract": dict(_UTC, **(native or {})),
+        # EventType (CreateKey/SetValue/DeleteValue/…) is the action authority
+        # our variants already dispatch on; retained native so a Sigma registry
+        # rule that gates on it (`EventType: SetValue`) resolves. No CAR column —
+        # the canonical action already encodes it.
+        "native_extract": dict(_UTC, EventType=payload("EventType"), **(native or {})),
     }
 
 
@@ -247,6 +255,30 @@ def _image_load_props():
         "signature_valid": _SIGNATURE_VALID,
         "hostname": _HOSTNAME, "fqdn": _FQDN,
     }
+
+
+def _image_load_native(pe_metadata: bool):
+    """EID 6/7 native retention: the signed flag (a bool string WinVerifyTrust
+    reports; signature_valid canonicalises only the 'Valid' verdict) and IMPHASH
+    (no CAR hash column) — both prime Sigma image_load fields with no CAR home,
+    retained under their Sysmon names for the native-bag fallback. EID 7
+    additionally carries the module's PE version-resource identity
+    (OriginalFileName/Company/... — heavily referenced by image_load rules); a
+    kernel driver (EID 6) carries none of those, so they are module-only."""
+    native = dict(
+        _UTC,
+        Signed=payload("Signed"),
+        Imphash=lower(regex1(payload("Hashes"), r"(?i)\bIMPHASH=([0-9A-Fa-f]+)")),
+    )
+    if pe_metadata:
+        native.update(
+            OriginalFileName=payload("OriginalFileName"),
+            Company=payload("Company"),
+            Product=payload("Product"),
+            Description=payload("Description"),
+            FileVersion=payload("FileVersion"),
+        )
+    return native
 
 
 MAPPINGS = {
@@ -275,7 +307,7 @@ MAPPINGS = {
                     "integrity_level": payload("IntegrityLevel"),
                     "pid": payload("ProcessId"),
                     "ppid": payload("ParentProcessId"),
-                    "user": payload("User"),
+                    "user": user_canon(payload("User")),
                     # sid/signer: EID 1 carries neither (the KQL's "") — null
                     **_hashes(payload("Hashes")),
                     "hostname": _HOSTNAME, "fqdn": _FQDN,
@@ -289,6 +321,24 @@ MAPPINGS = {
                     # LUID + logon guid: the user_session join candidates
                     LogonId=payload("LogonId"),
                     LogonGuid=payload("LogonGuid"),
+                    # PE version-resource identity Sysmon reads off the image —
+                    # no CAR column, but THE most-referenced Sigma detection
+                    # fields (OriginalFileName alone: ~1000 rules). Retained
+                    # native under their Sysmon names so a rule naming them
+                    # resolves via the native-bag fallback; never faked into a
+                    # CAR column (they carry no canonical home).
+                    OriginalFileName=payload("OriginalFileName"),
+                    Company=payload("Company"),
+                    Product=payload("Product"),
+                    Description=payload("Description"),
+                    FileVersion=payload("FileVersion"),
+                    # the parent process's account (Sysmon v10+): a Sigma
+                    # ancestry field with no CAR column of its own
+                    ParentUser=payload("ParentUser"),
+                    # IMPHASH out of the combined Hashes string — no CAR hash
+                    # column (per _hashes), so it stays native like the KQL kept
+                    # it; surfaced under its Sigma name for rules that test it
+                    Imphash=lower(regex1(payload("Hashes"), r"(?i)\bIMPHASH=([0-9A-Fa-f]+)")),
                 ),
             }),
             # ---- EID 5 ProcessTerminate (Image/ProcessId/Guid only) ---------
@@ -303,7 +353,7 @@ MAPPINGS = {
                     "exe": payload("Image"),
                     "image_path": payload("Image"),
                     "pid": payload("ProcessId"),
-                    "user": payload("User"),   # absent pre-v11 — honest null
+                    "user": user_canon(payload("User")),   # absent pre-v11 — honest null
                     "hostname": _HOSTNAME, "fqdn": _FQDN,
                 },
                 "keep": _KEEP, "native_extract": _UTC,
@@ -333,7 +383,7 @@ MAPPINGS = {
                     "exe": payload("Image"),
                     "image_path": payload("Image"),
                     "pid": payload("ProcessId"),
-                    "user": payload("User"),
+                    "user": user_canon(payload("User")),
                     "start_time": "TimeCreated",
                     # end_time/packet_count/bytes: a single connect event —
                     # none exist (the KQL's nulls). Source/DestinationPortName
@@ -397,7 +447,7 @@ MAPPINGS = {
                     "pid": payload("ProcessId"),
                     **_image_load_props(),
                 },
-                "keep": _KEEP, "native_extract": _UTC,
+                "keep": _KEEP, "native_extract": _image_load_native(pe_metadata=True),
             }),
             # ---- EID 10 ProcessAccess — cross-process handle open: the SOURCE
             # process opened a handle into the TARGET (cred-dump / injection
@@ -418,7 +468,7 @@ MAPPINGS = {
                     "target_name": basename(payload("TargetImage")),
                     "access_level": payload("GrantedAccess"),
                     "call_trace": payload("CallTrace"),
-                    "user": payload("SourceUser"),   # absent pre-v13 — honest null
+                    "user": user_canon(payload("SourceUser")),   # absent pre-v13 — honest null
                     "hostname": _HOSTNAME, "fqdn": _FQDN,
                 },
                 "keep": _KEEP,
@@ -437,7 +487,7 @@ MAPPINGS = {
                     "image_path": payload("ImageLoaded"),
                     **_image_load_props(),
                 },
-                "keep": _KEEP, "native_extract": _UTC,
+                "keep": _KEEP, "native_extract": _image_load_native(pe_metadata=False),
             }),
             # ---- EID 8 CreateRemoteThread — cross-process injection: Source
             # creates a thread in Target. The ACTING process is the source, so

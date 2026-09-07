@@ -67,8 +67,9 @@ from __future__ import annotations
 
 import re
 
-from ..normalize import (basename, const, ext, first, map_value,  # noqa: F401
-                         payload, regex1)
+from ..normalize import (basename, const, ext, first, lower, map_value,  # noqa: F401
+                         payload, regex1, user_canon, win_program_name,
+                         win_program_path)
 from ._common import (R as _R, spindle as _spindle,
                       user_from_path as _user_from_path)
 
@@ -163,8 +164,9 @@ _KEEP = ["SourceImage", "Parser"]
 # (e.g. "00009842cd16…afcbee"). The bare `sha1` key the KQL port reached for
 # does not exist in the shipping plaso build, so amcache's hash reached NO
 # object at all. Extract the 40-hex SHA-1 honestly (null unless it is exactly
-# that "0000"+40hex shape — never the hive's own sha256_hash).
-_AMCACHE_SHA1 = regex1(_R("file_identifier"), r"(?i)^0000([0-9a-f]{40})$")
+# that "0000"+40hex shape — never the hive's own sha256_hash). Canonicalised to
+# LOWERCASE so it equates with a hash emitted by any other source/map.
+_AMCACHE_SHA1 = lower(regex1(_R("file_identifier"), r"(?i)^0000([0-9a-f]{40})$"))
 
 # provenance of the observation — the ARTEFACT file (never exe/image_path) and
 # its own hash, plus which plaso event this was
@@ -178,13 +180,20 @@ _PROVENANCE = {
 
 def _win_props(image_path_marker):
     """The common process props for the Windows execution artefacts: full path
-    into image_path, its basename into exe, plus user and host identity."""
+    into image_path, its basename into exe, plus user and host identity.
+
+    exe/image_path go through win_program_name/win_program_path so a modern
+    Store/UWP AppCompatCache (or Amcache) entry — a TAB-delimited package
+    descriptor, not a filesystem path — yields the clean Package Family Name in
+    exe and a null image_path, NEVER the raw tab blob (a real path is unchanged).
+    """
     return {
-        "exe": basename(image_path_marker),
-        "image_path": image_path_marker,
+        "exe": win_program_name(image_path_marker),
+        "image_path": win_program_path(image_path_marker),
         # plaso's username is "-" on most registry/prefetch rows — the payload
-        # marker's blank rules turn that into an honest null
-        "user": _R("username"),
+        # marker's blank rules turn that into an honest null; user_canon folds a
+        # well-known account (SYSTEM/LOCAL|NETWORK SERVICE) to its canonical token
+        "user": user_canon(_R("username")),
         "hostname": _IMG_HOST,
     }
 
@@ -227,7 +236,7 @@ MAPPINGS = {
                     # and image_path stays an honest null rather than carrying
                     # the bare name (null-over-near-miss).
                     "exe": _R("executable"),
-                    "user": _R("username"),
+                    "user": user_canon(_R("username")),
                     "hostname": _IMG_HOST,
                 },
                 "keep": _KEEP,
@@ -321,8 +330,8 @@ MAPPINGS = {
                     # account is right there in the hive path
                     # (\Users\<name>\NTUSER.DAT). Fill-only-null: the recorded
                     # username ("-" → null here) wins if ever present.
-                    "user": first(_R("username"),
-                                  _user_from_path(_R("display_name"))),
+                    "user": user_canon(first(_R("username"),
+                                             _user_from_path(_R("display_name")))),
                     "hostname": _IMG_HOST,
                 },
                 "keep": _KEEP,

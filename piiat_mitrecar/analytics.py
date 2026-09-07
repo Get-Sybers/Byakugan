@@ -87,6 +87,10 @@ class CarAnalytic:
     runnable: bool = False
     skip_reason: str | None = None
     pseudocode: str | None = None
+    # Alert severity (a rule-level judgement — Sigma's `level`), kept DISTINCT
+    # from a Coverage's `grade` (MITRE's detection-COVERAGE confidence). The two
+    # are different axes; only `severity` is shared vocabulary across sources.
+    severity: str | None = None
 
 
 @dataclass

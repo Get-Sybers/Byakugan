@@ -42,7 +42,7 @@ mappings:
     file_name: shell_item_path | long_name | name [derived]
     file_path: shell_item_path | long_name | name [derived]
     hostname: image_hostname [direct]
-    user: display_name | shell_item_path | long_name | name [coalesced]
+    user: display_name | shell_item_path | long_name | name [derived]
 - object: file
   action: modify
   notes: Derived by log2timeline / Plaso — shell items (embedded, e.g. in lnk/registry).
@@ -57,7 +57,7 @@ mappings:
     file_name: shell_item_path | long_name | name [derived]
     file_path: shell_item_path | long_name | name [derived]
     hostname: image_hostname [direct]
-    user: display_name | shell_item_path | long_name | name [coalesced]
+    user: display_name | shell_item_path | long_name | name [derived]
 - object: file
   action: read
   notes: Derived by log2timeline / Plaso — shell items (embedded, e.g. in lnk/registry).
@@ -72,7 +72,7 @@ mappings:
     file_name: shell_item_path | long_name | name [derived]
     file_path: shell_item_path | long_name | name [derived]
     hostname: image_hostname [direct]
-    user: display_name | shell_item_path | long_name | name [coalesced]
+    user: display_name | shell_item_path | long_name | name [derived]
 other_coverage:
 - 'native/join keys (file/create): artefact_path, artefact_sha256, data_type, disk_id, localized_name,
   long_name, name, origin, shell_item_path, volume_id, volume_offset'

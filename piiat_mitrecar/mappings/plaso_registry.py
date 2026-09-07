@@ -26,7 +26,7 @@ expressible on this KEY-level record shape (to-be-validated/spindle_identity.yml
 """
 from __future__ import annotations
 
-from ..normalize import first, host_label, payload, regex1  # noqa: F401
+from ..normalize import first, host_label, payload, regex1, user_canon  # noqa: F401
 from ._common import R as _R, spindle as _spindle, user_from_path as _user_from_path
 
 
@@ -58,8 +58,8 @@ MAPPINGS = {
                     # names its user. Fill-only-null (a real recorded username
                     # wins); a system hive (SYSTEM/SOFTWARE/SAM) has no \Users\
                     # segment and stays an honest null.
-                    "user": first(_R("username"),
-                                  _user_from_path(_R("display_name"))),
+                    "user": user_canon(first(_R("username"),
+                                             _user_from_path(_R("display_name")))),
                 },
                 "keep": [],
                 # surface everything a registry data_type may carry — absent

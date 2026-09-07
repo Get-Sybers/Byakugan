@@ -43,10 +43,10 @@ mappings:
     fqdn: Computer [inferred]
     hostname: Computer [derived]
     image_path: ImageLoaded [direct]
-    md5_hash: Hashes [inferred]
+    md5_hash: Hashes [derived]
     module_name: ImageLoaded [derived]
-    sha1_hash: Hashes [inferred]
-    sha256_hash: Hashes [inferred]
+    sha1_hash: Hashes [derived]
+    sha256_hash: Hashes [derived]
     signature_valid: SignatureStatus [inferred]
     signer: Signature [direct]
 - object: file
@@ -71,7 +71,7 @@ mappings:
     hostname: Computer [derived]
     image_path: Image [direct]
     pid: ProcessId [direct]
-    user: User [direct]
+    user: User [derived]
 - object: file
   action: delete
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Microsoft-Windows-Sysmon/Operational.
@@ -94,11 +94,11 @@ mappings:
     fqdn: Computer [inferred]
     hostname: Computer [derived]
     image_path: Image [direct]
-    md5_hash: Hashes [inferred]
+    md5_hash: Hashes [derived]
     pid: ProcessId [direct]
-    sha1_hash: Hashes [inferred]
-    sha256_hash: Hashes [inferred]
-    user: User [direct]
+    sha1_hash: Hashes [derived]
+    sha256_hash: Hashes [derived]
+    user: User [derived]
 - object: flow
   action: start
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Microsoft-Windows-Sysmon/Operational.
@@ -133,7 +133,7 @@ mappings:
     src_port: SourcePort [direct]
     start_time: TimeCreated [direct]
     transport_protocol: Protocol [direct]
-    user: User [direct]
+    user: User [derived]
 - object: module
   action: load
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Microsoft-Windows-Sysmon/Operational.
@@ -153,12 +153,12 @@ mappings:
     fqdn: Computer [inferred]
     hostname: Computer [derived]
     image_path: Image [direct]
-    md5_hash: Hashes [inferred]
+    md5_hash: Hashes [derived]
     module_name: ImageLoaded [derived]
     module_path: ImageLoaded [direct]
     pid: ProcessId [direct]
-    sha1_hash: Hashes [inferred]
-    sha256_hash: Hashes [inferred]
+    sha1_hash: Hashes [derived]
+    sha256_hash: Hashes [derived]
     signature_valid: SignatureStatus [inferred]
     signer: Signature [direct]
 - object: process
@@ -187,7 +187,7 @@ mappings:
     target_guid: TargetProcessGUID [direct]
     target_name: TargetImage [derived]
     target_pid: TargetProcessId [direct]
-    user: SourceUser [direct]
+    user: SourceUser [derived]
 - object: process
   action: create
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Microsoft-Windows-Sysmon/Operational.
@@ -216,15 +216,15 @@ mappings:
     hostname: Computer [derived]
     image_path: Image [direct]
     integrity_level: IntegrityLevel [direct]
-    md5_hash: Hashes [inferred]
+    md5_hash: Hashes [derived]
     parent_command_line: ParentCommandLine [direct]
     parent_exe: ParentImage [direct]
     parent_image_path: ParentImage [direct]
     pid: ProcessId [direct]
     ppid: ParentProcessId [direct]
-    sha1_hash: Hashes [inferred]
-    sha256_hash: Hashes [inferred]
-    user: User [direct]
+    sha1_hash: Hashes [derived]
+    sha256_hash: Hashes [derived]
+    user: User [derived]
 - object: process
   action: terminate
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Microsoft-Windows-Sysmon/Operational.
@@ -241,7 +241,7 @@ mappings:
     hostname: Computer [derived]
     image_path: Image [direct]
     pid: ProcessId [direct]
-    user: User [direct]
+    user: User [derived]
 - object: registry
   action: add
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Microsoft-Windows-Sysmon/Operational.
@@ -258,7 +258,7 @@ mappings:
     image_path: Image [direct]
     key: TargetObject [direct]
     pid: ProcessId [direct]
-    user: User [direct]
+    user: User [derived]
 - object: registry
   action: key_edit
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Microsoft-Windows-Sysmon/Operational.
@@ -275,7 +275,7 @@ mappings:
     image_path: Image [direct]
     key: TargetObject [direct]
     pid: ProcessId [direct]
-    user: User [direct]
+    user: User [derived]
 - object: registry
   action: remove
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Microsoft-Windows-Sysmon/Operational.
@@ -292,7 +292,7 @@ mappings:
     image_path: Image [direct]
     key: TargetObject [direct]
     pid: ProcessId [direct]
-    user: User [direct]
+    user: User [derived]
 - object: registry
   action: value_edit
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Microsoft-Windows-Sysmon/Operational.
@@ -314,7 +314,7 @@ mappings:
     key: TargetObject [direct]
     new_content: Details [direct]
     pid: ProcessId [direct]
-    user: User [direct]
+    user: User [derived]
     value: TargetObject [derived]
 - object: thread
   action: remote_create
@@ -338,16 +338,18 @@ mappings:
     tgt_pid: TargetProcessId [direct]
     tgt_tid: NewThreadId [direct]
 other_coverage:
-- 'native/join keys (driver/load): UtcTime'
+- 'native/join keys (driver/load): Imphash, Signed, UtcTime'
 - 'native/join keys (file/create): CreationUtcTime, UtcTime, overwrite'
 - 'native/join keys (file/delete): UtcTime'
 - 'native/join keys (flow/start): UtcTime'
-- 'native/join keys (module/load): UtcTime'
+- 'native/join keys (module/load): Company, Description, FileVersion, Imphash, OriginalFileName, Product,
+  Signed, UtcTime'
 - 'native/join keys (process/access): TargetImage, TargetProcessGUID, UtcTime'
-- 'native/join keys (process/create): LogonGuid, LogonId, ParentProcessGuid, UtcTime'
+- 'native/join keys (process/create): Company, Description, FileVersion, Imphash, LogonGuid, LogonId,
+  OriginalFileName, ParentProcessGuid, ParentUser, Product, UtcTime'
 - 'native/join keys (process/terminate): UtcTime'
-- 'native/join keys (registry/add): UtcTime'
-- 'native/join keys (registry/key_edit): NewName, UtcTime'
-- 'native/join keys (registry/remove): UtcTime'
-- 'native/join keys (registry/value_edit): UtcTime'
+- 'native/join keys (registry/add): EventType, UtcTime'
+- 'native/join keys (registry/key_edit): EventType, NewName, UtcTime'
+- 'native/join keys (registry/remove): EventType, UtcTime'
+- 'native/join keys (registry/value_edit): EventType, UtcTime'
 - 'native/join keys (thread/remote_create): TargetProcessGuid, UtcTime'

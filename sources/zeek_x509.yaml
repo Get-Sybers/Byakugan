@@ -25,5 +25,5 @@ mappings:
   fields:
   - sha256_hash
   field_provenance:
-    sha256_hash: fingerprint [direct]
+    sha256_hash: fingerprint [derived]
 other_coverage: []

@@ -83,6 +83,14 @@ def load_piiat_car(car_db: str, image_name: str | None = None) -> list[dict]:
                 "_native": native,
             }
             ev.update(props)
+            # memory (PIIAT-Mem) renders principals as friendly names
+            # (Local System / Local|Network Service, and the no-space
+            # LocalService/NetworkService in its registry plugin) — fold them to
+            # the SAME canonical token the artefact maps emit (normalize.user_canon),
+            # so SYSTEM / LOCAL SERVICE / NETWORK SERVICE read identically across
+            # the evtx, disk and memory CARs. A blank / real user is unchanged.
+            if ev.get("user") is not None:
+                ev["user"] = normalize._canon_user(ev["user"])
             events.append(ev)
     conn.close()
     return events

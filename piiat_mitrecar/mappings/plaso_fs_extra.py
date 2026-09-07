@@ -38,7 +38,7 @@ from __future__ import annotations
 
 import re
 
-from ..normalize import (basename, ext, first, host_label,  # noqa: F401
+from ..normalize import (basename, ext, first, host_label, lower,  # noqa: F401
                          payload, regex1)
 from ._common import R as _R, plaso_rec as _rec, spindle as _spindle
 
@@ -106,7 +106,7 @@ def _pe_map(stamp):
     file exists on disk (it was created, at an unknown time), never when."""
     native = {
         "data_type": _R("data_type"), "timestamp_desc": _R("timestamp_desc"),
-        "imphash": _R("imphash"), "pe_type": _R("pe_type"),
+        "imphash": lower(_R("imphash")), "pe_type": _R("pe_type"),
         "export_dll_name": _R("export_dll_name"),
         "section_names": _R("section_names"), **_PROV,
     }
@@ -121,8 +121,8 @@ def _pe_map(stamp):
             "file_path": _PATH,
             "file_name": basename(_PATH),
             "extension": ext(_PATH),
-            # the PE file's own SHA-256 (the `pe` parser hashes the file)
-            "sha256_hash": _R("sha256_hash"),
+            # the PE file's own SHA-256 (the `pe` parser hashes the file); LOWER
+            "sha256_hash": lower(_R("sha256_hash")),
             "hostname": _R("image_hostname"),
         },
         "keep": [],
@@ -138,7 +138,7 @@ def _ole_map(action):
             "file_path": _PATH,
             "file_name": basename(_PATH),
             "extension": ext(_PATH),
-            "sha256_hash": _R("sha256_hash"),      # the document's own hash
+            "sha256_hash": lower(_R("sha256_hash")),      # the document's own hash (LOWER)
             "owner": _R("author"),                 # doc author (best-effort)
             "hostname": _R("image_hostname"),
         },

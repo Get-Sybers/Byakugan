@@ -45,7 +45,7 @@ mappings:
     src_ip: IpAddress | ClientAddress [inferred]
     src_port: IpPort [inferred]
     uid: TargetUserSid [direct]
-    user: TargetUserName | AccountName | UserName [coalesced]
+    user: TargetUserName | AccountName | UserName [derived]
 - object: user_session
   action: logout
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Security channel (4624/4634/4647/4778/4779).
@@ -64,7 +64,7 @@ mappings:
     src_ip: IpAddress | ClientAddress [inferred]
     src_port: IpPort [inferred]
     uid: TargetUserSid [direct]
-    user: TargetUserName | AccountName | UserName [coalesced]
+    user: TargetUserName | AccountName | UserName [derived]
 - object: user_session
   action: reconnect
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Security channel (4624/4634/4647/4778/4779).
@@ -83,7 +83,7 @@ mappings:
     src_ip: IpAddress | ClientAddress [inferred]
     src_port: IpPort [inferred]
     uid: TargetUserSid [direct]
-    user: TargetUserName | AccountName | UserName [coalesced]
+    user: TargetUserName | AccountName | UserName [derived]
 - object: user_session
   action: unlock
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Security channel (4624/4634/4647/4778/4779).
@@ -104,7 +104,7 @@ mappings:
     src_ip: IpAddress | ClientAddress [inferred]
     src_port: IpPort [inferred]
     uid: TargetUserSid [direct]
-    user: TargetUserName | AccountName | UserName [coalesced]
+    user: TargetUserName | AccountName | UserName [derived]
 other_coverage:
 - 'native/join keys (user_session/login): ClientName, LogonType, SessionName, SubjectLogonId, WorkstationName'
 - 'native/join keys (user_session/logout): ClientName, LogonType, SessionName, SubjectLogonId, WorkstationName'
