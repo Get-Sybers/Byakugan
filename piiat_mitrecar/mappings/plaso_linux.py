@@ -174,7 +174,7 @@ _SRC_IP = regex1(_r("ip_address"),
                  r"\A(?!(?:0\.0\.0\.0|127\.0\.0\.1|::1)\Z)(.+)\Z")
 
 
-def _file_map(action, path_marker, hashes=False, native=None, identity=None):
+def _file_map(action, path_marker, hashes=False, posix=False, native=None, identity=None):
     """One CAR file variant. creation_time (MITRE: 'Time the file was
     created') only when the event IS the creation — any other MACB row's
     time is provably not it. `identity` is the row's spindle guid spec."""
@@ -194,6 +194,18 @@ def _file_map(action, path_marker, hashes=False, native=None, identity=None):
         # $MFT/$UsnJrnl artefact's own — omitted, never a near-miss fill.
         props.update(md5_hash=_r("md5_hash"), sha1_hash=_r("sha1_hash"),
                      sha256_hash=_r("sha256_hash"))
+    if posix:
+        # filestat only: the stat'ed inode IS the file, so its POSIX stat
+        # fields are the file's own (canonical). MITRE file.mode is "the mode
+        # or permissions set of the file" (Plaso `mode` = the permission bits,
+        # e.g. 420 = 0o644); owner_uid/gid are the numeric owner/group ids
+        # (MITRE owner_uid "user ID of the owner", gid "group ID of the file").
+        # A 0 (root) is a real id, never a blank — the payload marker keeps it.
+        # owner/group NAMES are not carried by fs:stat (only the numeric ids),
+        # so file.owner / file.group stay honest nulls. mft/usnjrnl carry no
+        # POSIX stat block (NTFS uses ACLs/SIDs) — omitted there, never faked.
+        props.update(mode=_r("mode"), owner_uid=_r("owner_identifier"),
+                     gid=_r("group_identifier"))
     if action == "create":
         props["creation_time"] = "Timestamp"
     return {
@@ -217,6 +229,9 @@ _FILESTAT_NATIVE = {
     "file_entry_type": _r("file_entry_type"), "file_size": _r("file_size"),
     "file_system_type": _r("file_system_type"),
     "is_allocated": _r("is_allocated"), "inode": _r("inode"),
+    # hard-link count — forensically meaningful (a >1 count flags hard links);
+    # no CAR file field, so it stays native rather than a faked column
+    "number_of_links": _r("number_of_links"),
     "display_name": _r("display_name"), **_PROV,
 }
 _MFT_NATIVE = {
@@ -255,17 +270,17 @@ _USN_IDENTITY = _spindle("l2t_usnjrnl")
 _SSH_IDENTITY = _spindle("l2t_text")
 
 
-def _macb_entry(path_marker, hashes, native, identity):
+def _macb_entry(path_marker, hashes, native, identity, posix=False):
     """filestat/mft: action from Plaso's timestamp_desc (create first so
     overlaps resolve to it). A description matching none of the four (e.g.
     'Backup Time', 'Expiration Time') has no canonical CAR file action — the
     row stays raw (the KQL kept it with action="", which this store forbids)."""
     return {
         "variants": [
-            ("l2t_td_create", _file_map("create", path_marker, hashes, native, identity)),
-            ("l2t_td_modify", _file_map("modify", path_marker, hashes, native, identity)),
-            ("l2t_td_read", _file_map("read", path_marker, hashes, native, identity)),
-            ("l2t_td_delete", _file_map("delete", path_marker, hashes, native, identity)),
+            ("l2t_td_create", _file_map("create", path_marker, hashes, posix, native, identity)),
+            ("l2t_td_modify", _file_map("modify", path_marker, hashes, posix, native, identity)),
+            ("l2t_td_read", _file_map("read", path_marker, hashes, posix, native, identity)),
+            ("l2t_td_delete", _file_map("delete", path_marker, hashes, posix, native, identity)),
         ],
         "default": None,
     }
@@ -333,7 +348,8 @@ def _utmp_entry(spindle_name):
 
 MAPPINGS = {
     # ---- Plaso filesystem MACB → file events (CarFile_Plaso) ----------------
-    "l2t_filestat": _macb_entry(_FN_DN_PATH, hashes=True, native=_FILESTAT_NATIVE,
+    "l2t_filestat": _macb_entry(_FN_DN_PATH, hashes=True, posix=True,
+                                native=_FILESTAT_NATIVE,
                                 identity=_FILESTAT_IDENTITY),
     "l2t_mft": _macb_entry(_MFT_PATH, hashes=False, native=_MFT_NATIVE,
                            identity=_MFT_IDENTITY),

@@ -33,8 +33,11 @@ mappings:
   - extension
   - file_name
   - file_path
+  - gid
   - hostname
   - md5_hash
+  - mode
+  - owner_uid
   - sha1_hash
   - sha256_hash
   - user
@@ -43,8 +46,11 @@ mappings:
     extension: filename | display_name | display_name [derived]
     file_name: filename | display_name | display_name [derived]
     file_path: filename | display_name | display_name [coalesced]
+    gid: group_identifier [direct]
     hostname: image_hostname [direct]
     md5_hash: md5_hash [direct]
+    mode: mode [direct]
+    owner_uid: owner_identifier [direct]
     sha1_hash: sha1_hash [direct]
     sha256_hash: sha256_hash [direct]
     user: username [direct]
@@ -55,8 +61,11 @@ mappings:
   - extension
   - file_name
   - file_path
+  - gid
   - hostname
   - md5_hash
+  - mode
+  - owner_uid
   - sha1_hash
   - sha256_hash
   - user
@@ -64,8 +73,11 @@ mappings:
     extension: filename | display_name | display_name [derived]
     file_name: filename | display_name | display_name [derived]
     file_path: filename | display_name | display_name [coalesced]
+    gid: group_identifier [direct]
     hostname: image_hostname [direct]
     md5_hash: md5_hash [direct]
+    mode: mode [direct]
+    owner_uid: owner_identifier [direct]
     sha1_hash: sha1_hash [direct]
     sha256_hash: sha256_hash [direct]
     user: username [direct]
@@ -76,8 +88,11 @@ mappings:
   - extension
   - file_name
   - file_path
+  - gid
   - hostname
   - md5_hash
+  - mode
+  - owner_uid
   - sha1_hash
   - sha256_hash
   - user
@@ -85,8 +100,11 @@ mappings:
     extension: filename | display_name | display_name [derived]
     file_name: filename | display_name | display_name [derived]
     file_path: filename | display_name | display_name [coalesced]
+    gid: group_identifier [direct]
     hostname: image_hostname [direct]
     md5_hash: md5_hash [direct]
+    mode: mode [direct]
+    owner_uid: owner_identifier [direct]
     sha1_hash: sha1_hash [direct]
     sha256_hash: sha256_hash [direct]
     user: username [direct]
@@ -97,8 +115,11 @@ mappings:
   - extension
   - file_name
   - file_path
+  - gid
   - hostname
   - md5_hash
+  - mode
+  - owner_uid
   - sha1_hash
   - sha256_hash
   - user
@@ -106,17 +127,20 @@ mappings:
     extension: filename | display_name | display_name [derived]
     file_name: filename | display_name | display_name [derived]
     file_path: filename | display_name | display_name [coalesced]
+    gid: group_identifier [direct]
     hostname: image_hostname [direct]
     md5_hash: md5_hash [direct]
+    mode: mode [direct]
+    owner_uid: owner_identifier [direct]
     sha1_hash: sha1_hash [direct]
     sha256_hash: sha256_hash [direct]
     user: username [direct]
 other_coverage:
 - 'native/join keys (file/create): data_type, disk_id, display_name, file_entry_type, file_size, file_system_type,
-  inode, is_allocated, timestamp_desc, volume_id, volume_offset'
+  inode, is_allocated, number_of_links, timestamp_desc, volume_id, volume_offset'
 - 'native/join keys (file/delete): data_type, disk_id, display_name, file_entry_type, file_size, file_system_type,
-  inode, is_allocated, timestamp_desc, volume_id, volume_offset'
+  inode, is_allocated, number_of_links, timestamp_desc, volume_id, volume_offset'
 - 'native/join keys (file/modify): data_type, disk_id, display_name, file_entry_type, file_size, file_system_type,
-  inode, is_allocated, timestamp_desc, volume_id, volume_offset'
+  inode, is_allocated, number_of_links, timestamp_desc, volume_id, volume_offset'
 - 'native/join keys (file/read): data_type, disk_id, display_name, file_entry_type, file_size, file_system_type,
-  inode, is_allocated, timestamp_desc, volume_id, volume_offset'
+  inode, is_allocated, number_of_links, timestamp_desc, volume_id, volume_offset'
