@@ -71,6 +71,41 @@ def test_firefox_page_visit_with_referrer():
         {"data_type": "firefox:places:bookmark_annotation", "url": "place:x"})) is None
 
 
+# ---- Chrome/Edge history (A7 — same sqlite route, widened predicate) ---------
+
+def test_chrome_page_visit_maps_to_http_get():
+    # real LoneWolf shape: Chrome/Edge history rows share chrome:history:*
+    rec = {"data_type": "chrome:history:page_visited",
+           "url": "https://portal.office.com/", "from_visit": "",
+           "title": "Sign in to your account", "visit_count": 1,
+           "image_hostname": "DESKTOP-PM6C56D",
+           "display_name": r"NTFS:\Users\jcloudy\AppData\Local\Google\Chrome"
+                           r"\User Data\Default\History"}
+    ev = normalize.normalize("l2t_firefox_places", _wrap(rec))
+    assert ev is not None and ev["car_object"] == "http" and ev["car_action"] == "get"
+    assert ev["url_full"] == "https://portal.office.com/"
+    assert ev["url_domain"] == "portal.office.com"
+    assert ev["hostname"] == "DESKTOP-PM6C56D"        # endpoint = the vantage
+    assert ev["_native"]["title"] == "Sign in to your account"
+
+
+def test_chrome_file_download_maps_with_response_bytes():
+    rec = {"data_type": "chrome:history:file_downloaded",
+           "url": "https://s3browser.com/download/s3browser-7-6-9.exe",
+           "received_bytes": 2483848, "total_bytes": 2483848,
+           "full_path": r"C:\Users\jcloudy\Downloads\s3browser-7-6-9.exe",
+           "image_hostname": "DESKTOP-PM6C56D",
+           "display_name": r"NTFS:\Users\jcloudy\AppData\Local\Google\Chrome"
+                           r"\User Data\Default\History"}
+    ev = normalize.normalize("l2t_firefox_places", _wrap(rec))
+    assert ev is not None and ev["car_action"] == "get"
+    assert ev["url_domain"] == "s3browser.com"
+    # bytes actually received -> the response body size; total + local target native
+    assert ev["response_body_bytes"] == 2483848
+    assert ev["_native"]["total_bytes"] == 2483848
+    assert ev["_native"]["full_path"].endswith("s3browser-7-6-9.exe")
+
+
 # ---- java idx ---------------------------------------------------------------
 
 def test_javaidx_download_with_server_ip_native():
