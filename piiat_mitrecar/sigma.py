@@ -54,23 +54,79 @@ LOGSOURCE: dict[str, tuple[str, str]] = {
     "registry_delete": ("registry", "delete"),
     "create_remote_thread": ("thread", "remote_create"),
 }
-# Sigma field -> candidate CAR columns; the raw Sigma name is always tried last,
-# and analytics._field then resolves it against the row's `native` evidence bag.
-FIELD_MAP: dict[str, list[str]] = {
-    "Image": ["exe", "image_path"], "NewProcessName": ["exe", "image_path"],
-    "OriginalFileName": ["original_file_name"], "CommandLine": ["command_line"],
-    "ParentImage": ["parent_exe", "parent_image_path"],
-    "ParentProcessName": ["parent_exe", "parent_image_path"],
-    "ParentCommandLine": ["parent_command_line"], "IntegrityLevel": ["integrity_level"],
-    "User": ["user"], "CurrentDirectory": ["current_working_directory"],
-    "TargetFilename": ["file_path", "file_name"], "TargetObject": ["file_path", "target_name"],
-    "ImageLoaded": ["image_path", "exe"], "Signed": ["signature_valid"], "Signature": ["signer"],
-    "DestinationIp": ["dest_ip"], "DestinationPort": ["dest_port"],
-    "DestinationHostname": ["dest_fqdn", "dest_hostname"], "SourceIp": ["src_ip"],
-    "Protocol": ["transport_protocol", "application_protocol"], "QueryName": ["dest_fqdn"],
-    "md5": ["md5_hash"], "sha1": ["sha1_hash"], "sha256": ["sha256_hash"],
-    "Hashes": ["sha256_hash", "sha1_hash", "md5_hash"],
+# The Sigma-field -> CAR-column map is DERIVED from the engine's own artefact
+# maps (mappings.MAPPINGS), so it is authoritative and stays in sync: whatever
+# Sysmon/Windows field a map reads into a CAR column is exactly how a Sigma rule
+# naming that field resolves. Built per CAR object (a field like `ProcessId`
+# lands in `pid` on a process event but `owning_pid`/`src_pid` elsewhere — the
+# rule's logsource object disambiguates). The raw Sigma name is always tried
+# last, so a field a map kept only in `native_extract` still resolves via
+# analytics._field's native-bag fallback.
+
+
+def _marker_fields(marker):
+    """The source event field name(s) a normalize marker reads (recursively
+    through first/basename/map_value/… wrappers). A bare string is a System
+    field name; anything else contributes nothing."""
+    if isinstance(marker, str):
+        yield marker
+        return
+    if not isinstance(marker, tuple) or not marker:
+        return
+    tag = marker[0]
+    arg = marker[1] if len(marker) > 1 else None
+    if tag in ("payload", "userdata"):
+        yield arg[1]                                  # (field, key) -> the key
+    elif tag == "const":
+        return
+    elif tag == "first" or tag == "concat":
+        for sub in arg or ():
+            yield from _marker_fields(sub)
+    elif tag == "map_value" or tag == "regex1":
+        yield from _marker_fields(arg[0])
+    else:                                             # basename/ext/lower/domain_of/exe_path/host_label/…
+        yield from _marker_fields(arg)
+
+
+def _build_field_map() -> dict[str, dict[str, list[str]]]:
+    """{CAR object: {Sigma/source field: [CAR columns]}} from every artefact map."""
+    from .mappings import MAPPINGS
+    out: dict[str, dict[str, set]] = {}
+    for entry in MAPPINGS.values():
+        variants = entry["variants"] if isinstance(entry.get("variants"), list) else [(None, entry)]
+        for item in variants:
+            v = item[1] if isinstance(item, tuple) else item
+            if not isinstance(v, dict):
+                continue
+            obj = v.get("object")
+            if not obj:
+                continue
+            table = out.setdefault(obj, {})
+            for car_col, marker in (v.get("props") or {}).items():
+                for field in _marker_fields(marker):
+                    table.setdefault(field, set()).add(car_col)
+    return {obj: {f: sorted(cols) for f, cols in fields.items()} for obj, fields in out.items()}
+
+
+_FIELDS_BY_OBJECT: dict[str, dict[str, list[str]]] = _build_field_map()
+# Transform/alias fields no direct payload mapping captures: Sysmon's combined
+# `Hashes` string is split into the CAR hash columns, so a rule matching a digest
+# should test all three; the bare algorithm names alias the same columns.
+_SUPPLEMENT: dict[str, list[str]] = {
+    "Hashes": ["sha256_hash", "sha1_hash", "md5_hash"], "Hash": ["sha256_hash", "sha1_hash", "md5_hash"],
+    "md5": ["md5_hash"], "sha1": ["sha1_hash"], "sha256": ["sha256_hash"], "Imphash": ["imphash"],
 }
+
+
+def _car_columns(field: str, obj: str) -> list[str]:
+    """The CAR columns a Sigma ``field`` resolves to for a rule over ``obj``,
+    plus the raw name last (native-bag fallback via analytics._field)."""
+    cols = list(_FIELDS_BY_OBJECT.get(obj, {}).get(field, []))
+    for c in _SUPPLEMENT.get(field, []):
+        if c not in cols:
+            cols.append(c)
+    cols.append(field)
+    return cols
 # fields that only pin the evtx SOURCE (channel/record/provider) — meaningless
 # over CAR, so a selection built only of these is treated as satisfied.
 _GATE_ONLY = frozenset({"eventid", "channel", "provider", "provider_name", "computer",
@@ -83,17 +139,17 @@ _TECHNIQUE_TAG = re.compile(r"attack\.(t\d{4}(?:\.\d{3})?)", re.IGNORECASE)
 
 
 # --------------------------------------------------------------- field matching
-def _values(row: dict, field: str):
-    for cand in FIELD_MAP.get(field, []) + [field]:
+def _values(row: dict, field: str, obj: str):
+    for cand in _car_columns(field, obj):
         v = A._field(row, cand)
         if v not in (None, ""):
             return v
     return None
 
 
-def _leaf(field: str, mods: list[str], value):
-    """A ``field|modifiers: value`` predicate over a row. A list value is OR
-    unless ``|all``. Pure closure — captures the compiled matcher."""
+def _leaf(field: str, mods: list[str], value, obj: str):
+    """A ``field|modifiers: value`` predicate over a row of CAR object ``obj``. A
+    list value is OR unless ``|all``. Pure closure — captures the matcher."""
     mset = {m.lower() for m in mods}
     if mset & _UNSUPPORTED_MODS:
         return lambda row: False
@@ -114,17 +170,18 @@ def _leaf(field: str, mods: list[str], value):
              (str(x) for x in wants if x is not None)]
 
     def pred(row):
-        val = _values(row, field)
+        val = _values(row, field, obj)
         results = (A._cmp(val, op, w) for w in wants)
         return all(results) if is_all else any(results)
     return pred
 
 
-def _selection(block):
-    """A selection block -> predicate. dict = AND over fields; list = OR over
-    sub-blocks; a channel/record-only block = always-true (evtx source gate)."""
+def _selection(block, obj: str):
+    """A selection block -> predicate over a row of CAR object ``obj``. dict = AND
+    over fields; list = OR over sub-blocks; a channel/record-only block =
+    always-true (evtx source gate, irrelevant over CAR)."""
     if isinstance(block, list):
-        preds = [_selection(b) for b in block]
+        preds = [_selection(b, obj) for b in block]
         return lambda row: any(p(row) for p in preds)
     if not isinstance(block, dict):
         return lambda row: False
@@ -133,7 +190,7 @@ def _selection(block):
         field, *mods = key.split("|")
         if not mods and field.lower() in _GATE_ONLY:
             continue                     # pure evtx gate — irrelevant over CAR
-        leaves.append(_leaf(field, mods, value))
+        leaves.append(_leaf(field, mods, value, obj))
     if not leaves:
         return lambda row: True
     return lambda row: all(p(row) for p in leaves)
@@ -280,7 +337,8 @@ def compile_rule(doc: dict) -> CarAnalytic | None:
     condition = detection.get("condition")
     if isinstance(condition, list):      # a list of conditions is their OR
         condition = " or ".join(f"({c})" for c in condition)
-    sels = {k: _selection(v) for k, v in detection.items() if k != "condition"}
+    car_object, car_action = mapped
+    sels = {k: _selection(v, car_object) for k, v in detection.items() if k != "condition"}
     if not sels:
         an.skip_reason = "no selections"
         return an
@@ -294,7 +352,7 @@ def compile_rule(doc: dict) -> CarAnalytic | None:
         results = {name: pred(row) for name, pred in _sels.items()}
         return _eval_cond(_ast, results)
 
-    an.car_object, an.car_action = mapped
+    an.car_object, an.car_action = car_object, car_action
     an.clauses = [Clause(name="sigma", predicate=predicate, source=str(condition))]
     an.runnable = True
     return an

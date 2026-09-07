@@ -49,39 +49,52 @@ def test_condition_process_creation_gate_form():
 # -- field / modifier leaf matching ------------------------------------------
 def test_leaf_modifiers():
     row = {"command_line": "cmd.exe /c whoami", "exe": r"C:\Windows\System32\cmd.exe"}
-    assert S._leaf("CommandLine", ["contains"], "/c who")(row) is True
-    assert S._leaf("CommandLine", ["startswith"], "cmd.exe")(row) is True
-    assert S._leaf("CommandLine", ["endswith"], "whoami")(row) is True
-    assert S._leaf("CommandLine", ["re"], r"/c\s+whoami")(row) is True
-    assert S._leaf("CommandLine", ["contains"], "powershell")(row) is False
+    assert S._leaf("CommandLine", ["contains"], "/c who", "process")(row) is True
+    assert S._leaf("CommandLine", ["startswith"], "cmd.exe", "process")(row) is True
+    assert S._leaf("CommandLine", ["endswith"], "whoami", "process")(row) is True
+    assert S._leaf("CommandLine", ["re"], r"/c\s+whoami", "process")(row) is True
+    assert S._leaf("CommandLine", ["contains"], "powershell", "process")(row) is False
     # Image maps to exe with CAR basename semantics (a path-valued exe matches a bare name)
-    assert S._leaf("Image", [], "cmd.exe")(row) is True
+    assert S._leaf("Image", [], "cmd.exe", "process")(row) is True
 
 
 def test_leaf_list_is_or_and_all_is_and():
     row = {"command_line": "cmd /c whoami"}
-    assert S._leaf("CommandLine", ["contains"], ["nope", "whoami"])(row) is True   # OR
-    assert S._leaf("CommandLine", ["contains", "all"], ["cmd", "whoami"])(row) is True   # AND
-    assert S._leaf("CommandLine", ["contains", "all"], ["cmd", "notthere"])(row) is False
+    assert S._leaf("CommandLine", ["contains"], ["nope", "whoami"], "process")(row) is True   # OR
+    assert S._leaf("CommandLine", ["contains", "all"], ["cmd", "whoami"], "process")(row) is True   # AND
+    assert S._leaf("CommandLine", ["contains", "all"], ["cmd", "notthere"], "process")(row) is False
 
 
 def test_unsupported_modifier_refuses_to_match():
     row = {"command_line": "whatever"}
-    assert S._leaf("CommandLine", ["base64"], "d2hvYW1p")(row) is False
+    assert S._leaf("CommandLine", ["base64"], "d2hvYW1p", "process")(row) is False
 
 
 def test_gate_only_selection_is_true():
     # a selection of only channel/eventid gates is satisfied over CAR (no evtx here)
-    pred = S._selection({"EventID": 1, "Channel": "Microsoft-Windows-Sysmon/Operational"})
+    pred = S._selection({"EventID": 1, "Channel": "Microsoft-Windows-Sysmon/Operational"}, "process")
     assert pred({"anything": "x"}) is True
 
 
 def test_selection_list_is_or():
-    block = [{"Image|endswith": r"\bcdedit.exe"}, {"OriginalFileName": "bcdedit.exe"}]
-    pred = S._selection(block)
+    # a list of sub-blocks is OR; use fields the engine maps actually retain
+    block = [{"Image|endswith": r"\bcdedit.exe"}, {"CommandLine|contains": "bcdedit"}]
+    pred = S._selection(block, "process")
     assert pred({"exe": r"C:\Windows\System32\bcdedit.exe"}) is True
-    assert pred({"exe": "other.exe", "original_file_name": "bcdedit.exe"}) is True
-    assert pred({"exe": "other.exe"}) is False
+    assert pred({"exe": "other.exe", "command_line": "run bcdedit now"}) is True
+    assert pred({"exe": "other.exe", "command_line": "notepad"}) is False
+
+
+def test_field_map_is_derived_from_engine_maps():
+    # the Sigma->CAR field map comes from the engine's own artefact maps, not a
+    # hand list: the authoritative correspondences resolve...
+    assert "exe" in S._car_columns("Image", "process")
+    assert "command_line" in S._car_columns("CommandLine", "process")
+    assert "key" in S._car_columns("TargetObject", "registry")   # NOT file_path (the hand-map's bug)
+    assert "dest_ip" in S._car_columns("DestinationIp", "flow")
+    # ...and a field the maps DROP (OriginalFileName/Company/…) resolves to nothing
+    # but its own name (native-bag fallback) — a known gap for the maps to close.
+    assert S._car_columns("OriginalFileName", "process") == ["OriginalFileName"]
 
 
 # -- compile_rule -------------------------------------------------------------
