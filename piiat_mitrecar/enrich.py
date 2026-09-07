@@ -411,6 +411,36 @@ def _stamp_sni_fqdn(ev, sni_res):
         ev["dest_fqdn"] = sni
 
 
+def _cert_by_fingerprint(events):
+    """{fingerprint -> certificate subject} from zeek_x509 `file` rows (B2). A
+    certificate is identified by its fingerprint globally (not host-scoped — a
+    cert is the same cert wherever it is seen)."""
+    idx = {}
+    for ev in events:
+        if ev.get("source_artefact") == "zeek_x509":
+            fp = ev.get("guid") or ev.get("sha256_hash")
+            subj = (ev.get("_native") or {}).get("certificate.subject")
+            if fp and subj:
+                idx.setdefault(str(fp), subj)
+    return idx
+
+
+def _stamp_flow_cert(ev, cert_by_fp):
+    """Surface the leaf certificate's subject on the TLS flow that presented it:
+    an ssl flow names its chain in native `cert_chain_fps` (the x509
+    fingerprints), so the C2 flow reads its certificate identity (CN=berylia.org)
+    alongside its SNI — and `sni_matches_cert` is the mismatch tell. Evidence, so
+    it lands in native, never a canonical column."""
+    if ev.get("application_protocol") != "tls":
+        return
+    fps = (ev.get("_native") or {}).get("cert_chain_fps") or []
+    for fp in fps:
+        subj = cert_by_fp.get(str(fp))
+        if subj:
+            ev.setdefault("_native", {})["server_cert_subject"] = subj
+            break
+
+
 def _proc_by_image_path(events):
     """(host, lowercased image_path) -> [process create events]. Keys the
     file->process-by-path edge (CAR-2014-02-001): a file on disk whose path IS a
@@ -511,6 +541,7 @@ def enrich(events: list[dict]) -> list[dict]:
     proc_by_image = _proc_by_image_path(events)
     dns_res = _dns_resolution(events)
     sni_res = _sni_by_uid(events)
+    cert_by_fp = _cert_by_fingerprint(events)
 
     for ev in events:
         obj_fields = set(model[ev["car_object"]]["fields"])
@@ -558,6 +589,11 @@ def enrich(events: list[dict]) -> list[dict]:
         # shared uid) — the encrypted-flow half of the resolution work
         if ev["car_object"] == "flow" and sni_res:
             _stamp_sni_fqdn(ev, sni_res)
+
+        # B2: surface the leaf certificate subject on the TLS flow that presented
+        # it (ssl.cert_chain_fps -> x509 fingerprint) — the flow's cert identity
+        if ev["car_object"] == "flow" and cert_by_fp:
+            _stamp_flow_cert(ev, cert_by_fp)
 
         # CAR-2014-02-001: a file whose path == a process image_path is the
         # binary that process executed (heuristic, path equality)

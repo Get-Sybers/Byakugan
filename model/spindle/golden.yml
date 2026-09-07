@@ -353,6 +353,13 @@ external:
   values:
     ProcessGuid: '{DFAE8213-70EB-5CDD-0000-0010F66D0A00}'
   guid: '{DFAE8213-70EB-5CDD-0000-0010F66D0A00}'
+- name: zeek_cert_fp
+  kind: entity
+  source: synthetic
+  car_object: file
+  values:
+    fingerprint: bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d
+  guid: bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d
 - name: zeek_fuid
   kind: entity
   source: synthetic

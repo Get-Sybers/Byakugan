@@ -630,6 +630,14 @@ external:
       source: synthetic
       object: flow
       values: {uid: CEVU, trans_id: 23150}
+  zeek_cert_fp:
+    kind: entity
+    form: {field: fingerprint}
+    stable_across: one X.509 certificate (its SHA-256 fingerprint) — stable across captures
+    golden:                     # synthetic (tests/test_car_zeek_x509.py)
+      source: synthetic
+      object: file
+      values: {fingerprint: bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d}
   zeek_fuid:
     kind: entity
     form: {fields: [fuid]}
