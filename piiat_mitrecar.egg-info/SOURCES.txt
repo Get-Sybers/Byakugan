@@ -13,6 +13,7 @@ piiat_mitrecar/derive.py
 piiat_mitrecar/enrich.py
 piiat_mitrecar/gen_sources.py
 piiat_mitrecar/ids.py
+piiat_mitrecar/native_ids.py
 piiat_mitrecar/normalize.py
 piiat_mitrecar/pipeline.py
 piiat_mitrecar/readers.py
