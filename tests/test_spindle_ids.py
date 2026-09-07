@@ -59,7 +59,11 @@ _AMCACHE = {  # synthetic, the plaso AMCacheFileEventData shape
     "display_name": "NTFS:\\Windows\\appcompat\\Programs\\Amcache.hve",
     "full_path": "c:\\users\\bob\\downloads\\evil.exe", "image_hostname": "M57-JO",
     "program_identifier": "0006a1c48f048a1c",
+    # the program SHA-1 as plaso renders it: file_identifier = "0000" prefix +
+    # the 40-hex hash (the map strips the prefix); `sha1` is the bare hash the
+    # test reuses as the matching filestat row's sha1_hash.
     "sha1": "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
+    "file_identifier": "0000a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
     "timestamp_desc": "Content Modification Time",     # the key write: the execution row
     "username": "-",
 }
