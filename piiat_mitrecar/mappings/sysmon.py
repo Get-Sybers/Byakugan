@@ -234,7 +234,11 @@ def _registry_variant(action: str, with_value=False, with_data=False, native=Non
         **_proc_ctx(),
         "props": _registry_props(with_value, with_data),
         "keep": _KEEP,
-        "native_extract": dict(_UTC, **(native or {})),
+        # EventType (CreateKey/SetValue/DeleteValue/…) is the action authority
+        # our variants already dispatch on; retained native so a Sigma registry
+        # rule that gates on it (`EventType: SetValue`) resolves. No CAR column —
+        # the canonical action already encodes it.
+        "native_extract": dict(_UTC, EventType=payload("EventType"), **(native or {})),
     }
 
 
@@ -247,6 +251,30 @@ def _image_load_props():
         "signature_valid": _SIGNATURE_VALID,
         "hostname": _HOSTNAME, "fqdn": _FQDN,
     }
+
+
+def _image_load_native(pe_metadata: bool):
+    """EID 6/7 native retention: the signed flag (a bool string WinVerifyTrust
+    reports; signature_valid canonicalises only the 'Valid' verdict) and IMPHASH
+    (no CAR hash column) — both prime Sigma image_load fields with no CAR home,
+    retained under their Sysmon names for the native-bag fallback. EID 7
+    additionally carries the module's PE version-resource identity
+    (OriginalFileName/Company/... — heavily referenced by image_load rules); a
+    kernel driver (EID 6) carries none of those, so they are module-only."""
+    native = dict(
+        _UTC,
+        Signed=payload("Signed"),
+        Imphash=regex1(payload("Hashes"), r"(?i)\bIMPHASH=([0-9A-Fa-f]+)"),
+    )
+    if pe_metadata:
+        native.update(
+            OriginalFileName=payload("OriginalFileName"),
+            Company=payload("Company"),
+            Product=payload("Product"),
+            Description=payload("Description"),
+            FileVersion=payload("FileVersion"),
+        )
+    return native
 
 
 MAPPINGS = {
@@ -289,6 +317,24 @@ MAPPINGS = {
                     # LUID + logon guid: the user_session join candidates
                     LogonId=payload("LogonId"),
                     LogonGuid=payload("LogonGuid"),
+                    # PE version-resource identity Sysmon reads off the image —
+                    # no CAR column, but THE most-referenced Sigma detection
+                    # fields (OriginalFileName alone: ~1000 rules). Retained
+                    # native under their Sysmon names so a rule naming them
+                    # resolves via the native-bag fallback; never faked into a
+                    # CAR column (they carry no canonical home).
+                    OriginalFileName=payload("OriginalFileName"),
+                    Company=payload("Company"),
+                    Product=payload("Product"),
+                    Description=payload("Description"),
+                    FileVersion=payload("FileVersion"),
+                    # the parent process's account (Sysmon v10+): a Sigma
+                    # ancestry field with no CAR column of its own
+                    ParentUser=payload("ParentUser"),
+                    # IMPHASH out of the combined Hashes string — no CAR hash
+                    # column (per _hashes), so it stays native like the KQL kept
+                    # it; surfaced under its Sigma name for rules that test it
+                    Imphash=regex1(payload("Hashes"), r"(?i)\bIMPHASH=([0-9A-Fa-f]+)"),
                 ),
             }),
             # ---- EID 5 ProcessTerminate (Image/ProcessId/Guid only) ---------
@@ -397,7 +443,7 @@ MAPPINGS = {
                     "pid": payload("ProcessId"),
                     **_image_load_props(),
                 },
-                "keep": _KEEP, "native_extract": _UTC,
+                "keep": _KEEP, "native_extract": _image_load_native(pe_metadata=True),
             }),
             # ---- EID 10 ProcessAccess — cross-process handle open: the SOURCE
             # process opened a handle into the TARGET (cred-dump / injection
@@ -437,7 +483,7 @@ MAPPINGS = {
                     "image_path": payload("ImageLoaded"),
                     **_image_load_props(),
                 },
-                "keep": _KEEP, "native_extract": _UTC,
+                "keep": _KEEP, "native_extract": _image_load_native(pe_metadata=False),
             }),
             # ---- EID 8 CreateRemoteThread — cross-process injection: Source
             # creates a thread in Target. The ACTING process is the source, so

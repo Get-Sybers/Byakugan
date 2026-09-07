@@ -337,6 +337,10 @@ MAPPINGS = {
                     "SubjectLogonId": payload("SubjectLogonId"),
                     "TokenElevationType": payload("TokenElevationType"),
                     "MandatoryLabel": payload("MandatoryLabel"),
+                    # the creating account's domain — a Sigma process_creation
+                    # field (SubjectDomainName) with no CAR column; the running
+                    # user is already `user`, this is join/context evidence
+                    "SubjectDomainName": payload("SubjectDomainName"),
                 },
             }),
         ],
