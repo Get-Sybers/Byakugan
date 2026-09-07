@@ -188,6 +188,36 @@ def test_native_mac_bridges_a_lnk_droid_and_a_networklist_entry(tmp_path):
     assert set(hits[0]["sources"]) == {"lnk", "registry"}
 
 
+def test_native_serial_bridges_usbstor_and_setupapi(tmp_path):
+    d = str(tmp_path)
+    # the SAME SanDisk stick: a registry USBSTOR key names it one way, a setupapi
+    # device-install log another (# separators, {guid} suffix) — they converge on
+    # the mined iSerialNumber even though neither carries a device_serial column.
+    _store(d, "usbstor", [_row("registry", "value_edit", "r-1", "PM6C56D",
+                               {"key_path": r"...\Enum\USBSTOR\Disk&Ven_SanDisk&Prod_Extreme"
+                                            r"&Rev_0001\AA010215170355310594&0"})])
+    _store(d, "setupapi", [_row("registry", "value_edit", "r-2", "PM6C56D",
+                                {"message": r"Device Install ... _??_USBSTOR#Disk&Ven_SanDisk"
+                                            r"&Prod_Extreme&Rev_0001#AA010215170355310594&0"
+                                            r"#{53f56307-b6bf-11d0-94f2-00a0c91efb8b} - SUCCESS"})])
+    hits = [c for c in crosssource.converge(d)
+            if c["tier"] == "definitive_native_id" and c["join_key"][0] == "serial"]
+    assert hits, "the USB serial did not bridge the USBSTOR and setupapi rows"
+    assert hits[0]["join_key"] == ["serial", "AA010215170355310594"]
+    assert set(hits[0]["sources"]) == {"usbstor", "setupapi"}
+
+
+def test_native_serial_column_must_validate(tmp_path):
+    d = str(tmp_path)
+    # a malformed device_serial column value (a stray USBSTOR path, not a bare
+    # serial) must NOT mint a join — as_serial rejects it, and native carries
+    # nothing else to converge on.
+    bad = r"USBSTOR\Disk&Ven_SanDisk&Prod_Extreme&Rev_0001\AA010215170355310594&0"
+    _store(d, "a", [dict(_row("registry", "value_edit", "a-1", "H", {"k": "v"}), device_serial=bad)])
+    _store(d, "b", [dict(_row("file", "create", "b-1", "H", {"k": "w"}), device_serial=bad)])
+    assert [c for c in crosssource.converge(d) if c["tier"] == "definitive_native_id"] == []
+
+
 def test_native_id_column_must_validate_as_canonical(tmp_path):
     d = str(tmp_path)
     # a malformed volume_guid column value (a stray path) must NOT mint a join —

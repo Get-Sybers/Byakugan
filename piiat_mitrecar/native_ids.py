@@ -20,6 +20,21 @@ B3 adds the **MAC address**: literal `xx:xx:xx:xx:xx:xx` values and the NIC MAC
 embedded in a version-1 (time+MAC) GUID's node — the DLT birth-droid a LNK
 carries — both lifted to the `mac_address` column and converged on. Synthetic /
 RFC-random nodes (multicast bit set) and the OLE-family node are excluded.
+
+B3 also adds the **USB device serial**: the iSerialNumber Windows records in a
+USBSTOR device-instance path — `USBSTOR<sep>Disk&Ven_..&Prod_..&Rev_..<sep>
+<serial>&0` (the separator is `\` in a registry key path, `#` in a setupapi /
+WPDBUSENUM device-instance id, `/` in an Amcache InventoryDevicePnp key). The
+serial is the instance-id segment after the `Disk&Ven_..` descriptor and before
+the trailing `&0` interface suffix. It is the physical-device join key that ties
+USBSTOR ↔ setupapi ↔ DeviceClasses ↔ WPDBUSENUM ↔ MountedDevices ↔ EMDMgmt rows
+to one stick (real data: SanDisk `AA010215170355310594` / `AA010603160707470215`,
+2,470× across the LoneWolf image). Precision over recall: the extractor is gated
+on the USBSTOR + `Ven_` context and the `&0` suffix, so a Windows-minted
+instance id (`7&1e8dc766&0&0`, an embedded `&`) and a bare alphanumeric string
+are never mistaken for a serial. Case-folded to UPPER — the Windows-canonical
+device-instance rendering — so the USBSTOR/setupapi upper form and the Amcache
+lower form converge.
 """
 from __future__ import annotations
 
@@ -130,3 +145,56 @@ def as_mac(value) -> str | None:
         return None
     v = str(value).strip().replace("-", ":").lower()
     return v if _MAC_ONLY_RE.match(v) else None
+
+
+# --- USB device serials (B3) ----------------------------------------------- #
+# A USB stick's iSerialNumber survives in `native` as the instance-id segment of
+# a USBSTOR device path. The same serial is rendered three ways on real data —
+#   registry key : USBSTOR\Disk&Ven_SanDisk&Prod_Extreme&Rev_0001\AA0102...94&0
+#   setupapi /WPDBUSENUM : ..._??_USBSTOR#Disk&Ven_..&Prod_..&Rev_..#AA0102...94&0#{guid}
+#   Amcache InventoryDevicePnp : usbstor/disk&ven_sandisk&prod_..&rev_../aa0102...94&0
+# — so the separator between path parts is one of `\` `#` `/` (a serialised dict
+# renders a lone `\` as `\\`, which the `+` still spans), and case varies.
+# Precision over recall: the match is GATED on the USBSTOR enumerator + a `Ven_`
+# device descriptor and the trailing `&0` interface suffix, so the ubiquitous
+# `usb/vid_..&pid_..` PnP path (no `Ven_`), a bare alphanumeric string, and a
+# Windows-MINTED instance id (`7&1e8dc766&0&0` — an embedded `&`, no hardware
+# serial) are never returned as a serial. A false serial would mint bogus device
+# convergence — worse than a null. Folded to UPPER (the Windows-canonical
+# device-instance rendering) so the USBSTOR/setupapi and Amcache forms converge.
+_USBSTOR_RE = re.compile(
+    r"USBSTOR[\\#/]+"           # the USBSTOR enumerator + a path/instance separator
+    r"[^\\#/]*Ven_[^\\#/]*"     # the Disk&Ven_..&Prod_..&Rev_.. device descriptor
+    r"[\\#/]+"                  # separator before the device instance id
+    r"([0-9A-Za-z]{4,})"        # the serial = the instance-id token
+    r"&0(?![0-9A-Za-z&])",      # the &0 interface suffix (reject minted x&hex&0&0)
+    re.IGNORECASE,
+)
+
+
+def device_serials(native) -> list[str]:
+    """Every distinct USB device serial a row's `native` carries — the
+    instance-id segment of a USBSTOR device path (USBSTOR + `Ven_` gated) —
+    folded to UPPER, in first-seen order. `native` may be a dict or a str."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for m in _USBSTOR_RE.finditer(_as_text(native)):
+        v = m.group(1).upper()
+        if v not in seen:
+            seen.add(v)
+            out.append(v)
+    return out
+
+
+_SERIAL_ONLY_RE = re.compile(r"^[0-9A-Za-z]{4,}$")
+
+
+def as_serial(value) -> str | None:
+    """`value` as a canonical UPPER bare device serial, or None — used to
+    VALIDATE a stored `device_serial` column before trusting it as a join key.
+    Rejects anything carrying a separator (a stray USBSTOR path, a GUID, a MAC),
+    so a malformed column value never mints a bogus device convergence."""
+    if value is None:
+        return None
+    v = str(value).strip().upper()
+    return v if _SERIAL_ONLY_RE.match(v) else None

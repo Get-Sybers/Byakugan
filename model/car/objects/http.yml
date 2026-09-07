@@ -21,6 +21,7 @@ properties:
   - owning_guid
   - volume_guid
   - mac_address
+  - device_serial
   - link_confidence
   - source_artefact
   - source_host
