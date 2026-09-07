@@ -49,6 +49,7 @@ EVTX_MAPS = ["evtx_security",           # Security 4624/4625/4672 -> authenticat
 ROUTES = [
     ("_EvtxECmd_Output", EVTX_MAPS),
     ("conn.json", ["zeek_conn"]),
+    ("dns.json", ["zeek_dns"]),
     ("http.json", ["zeek_http"]),
     ("smtp.json", ["zeek_smtp"]),
     ("files.json", ["zeek_files"]),

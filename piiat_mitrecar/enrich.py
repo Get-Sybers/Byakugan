@@ -329,6 +329,48 @@ def _flow_by_uid(events):
     return idx
 
 
+def _is_ip(v) -> bool:
+    import ipaddress
+    try:
+        ipaddress.ip_address(str(v))
+        return True
+    except ValueError:
+        return False
+
+
+def _dns_resolution(events):
+    """(host, ip) -> the domain that DNS resolved to it, from zeek_dns flow rows
+    (B2): each row's `fqdn` is the queried name, its native `answers` the
+    resolved values — the A/AAAA answers are the IPs. First resolution wins.
+    Host-scoped like every join (a capture is one vantage)."""
+    res = {}
+    for ev in events:
+        if ev.get("car_object") != "flow" or ev.get("application_protocol") != "dns":
+            continue
+        domain = ev.get("fqdn")
+        if not domain:
+            continue
+        for a in (ev.get("_native") or {}).get("answers") or []:
+            if _is_ip(a):
+                res.setdefault((ev.get("source_host"), str(a)), domain)
+    return res
+
+
+def _stamp_resolved_fqdn(ev, dns_res):
+    """Label a flow's endpoints with the domain DNS resolved to that IP — so a
+    bare connection to 100.101.0.42 reads as scoring-c2.berylia.org. Fill-only-
+    null: a natively-supplied fqdn (zeek_dns' own `query`) is never overwritten."""
+    host = ev.get("source_host")
+    if not ev.get("dest_fqdn") and ev.get("dest_ip"):
+        d = dns_res.get((host, str(ev["dest_ip"])))
+        if d:
+            ev["dest_fqdn"] = d
+    if not ev.get("src_fqdn") and ev.get("src_ip"):
+        s = dns_res.get((host, str(ev["src_ip"])))
+        if s:
+            ev["src_fqdn"] = s
+
+
 def _proc_by_image_path(events):
     """(host, lowercased image_path) -> [process create events]. Keys the
     file->process-by-path edge (CAR-2014-02-001): a file on disk whose path IS a
@@ -427,6 +469,7 @@ def enrich(events: list[dict]) -> list[dict]:
     flows = _flow_by_uid(events)
     login_luid, login_sid = _login_indexes(events)
     proc_by_image = _proc_by_image_path(events)
+    dns_res = _dns_resolution(events)
 
     for ev in events:
         obj_fields = set(model[ev["car_object"]]["fields"])
@@ -456,6 +499,10 @@ def enrich(events: list[dict]) -> list[dict]:
         # R3: zeek http/file spoke -> its connection (definitive by uid)
         if ev["car_object"] in ("http", "file"):
             _link_zeek_spoke_to_flow(ev, flows, obj_fields)
+
+        # B2: label a flow's endpoints with the domain DNS resolved to that IP
+        if ev["car_object"] == "flow" and dns_res:
+            _stamp_resolved_fqdn(ev, dns_res)
 
         # CAR-2014-02-001: a file whose path == a process image_path is the
         # binary that process executed (heuristic, path equality)

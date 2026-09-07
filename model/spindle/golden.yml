@@ -375,3 +375,11 @@ external:
     uid: Cno6
     trans_depth: 1
   guid: http-Cno6-1
+- name: zeek_uid_trans_id
+  kind: record
+  source: synthetic
+  car_object: flow
+  values:
+    uid: CEVU
+    trans_id: 23150
+  guid: flow-CEVU-23150

@@ -859,6 +859,17 @@ external:
   - email
   - http
   stable_across: one HTTP transaction within its connection, in one capture
+- name: zeek_uid_trans_id
+  kind: record
+  form:
+    fields:
+    - uid
+    - trans_id
+  maps:
+  - zeek_dns
+  car_object:
+  - flow
+  stable_across: one DNS transaction (query/answer) within its connection, in one capture
 equality:
   rule: exact
   key:

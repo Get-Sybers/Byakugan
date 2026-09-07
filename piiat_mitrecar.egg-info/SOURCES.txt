@@ -53,6 +53,7 @@ piiat_mitrecar/mappings/plaso_web.py
 piiat_mitrecar/mappings/recmd.py
 piiat_mitrecar/mappings/sysmon.py
 piiat_mitrecar/mappings/zeek_conn.py
+piiat_mitrecar/mappings/zeek_dns.py
 piiat_mitrecar/mappings/zeek_extra.py
 tests/test_analytics.py
 tests/test_car.py
