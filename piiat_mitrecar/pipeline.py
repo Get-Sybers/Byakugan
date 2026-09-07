@@ -54,10 +54,11 @@ ROUTES = [
     ("smtp.json", ["zeek_smtp"]),
     ("files.json", ["zeek_files"]),
     ("ssl.json", ["zeek_ssl"]),        # TLS handshake -> flow (SNI in dest_fqdn)
+    ("x509.json", ["zeek_x509"]),      # TLS certificate -> file (fingerprint = sha256)
     # Zeek logs with no dedicated CAR object — routed to nothing EXPLICITLY (known,
     # not unknown): their per-flow detail can enrich the flow by uid at the
     # cascade stage, but they are not CAR objects.
-    ("dns.json", []), ("ssl.json", []), ("x509.json", []), ("dhcp.json", []),
+    ("dhcp.json", []),
     ("ntp.json", []), ("snmp.json", []), ("ocsp.json", []), ("weird.json", []),
     ("pe.json", []), ("packet_filter.json", []),
     (".L2tPrefetch", ["plaso_exec_prefetch"]),

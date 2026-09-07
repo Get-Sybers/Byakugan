@@ -827,6 +827,15 @@ external:
   - process
   stable_across: 'every Sysmon event of one process, on any tool that parses the log: the sensor''s own
     process guid'
+- name: zeek_cert_fp
+  kind: entity
+  form:
+    field: fingerprint
+  maps:
+  - zeek_x509
+  car_object:
+  - file
+  stable_across: one X.509 certificate (its SHA-256 fingerprint) — stable across captures
 - name: zeek_fuid
   kind: entity
   form:

@@ -5,3 +5,4 @@ __pycache__/
 car.db
 car_*.jsonl
 .car_l2t_*/
+.claude/

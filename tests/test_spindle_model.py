@@ -313,6 +313,7 @@ def test_external_forms_are_exactly_the_raw_guid_forms_the_maps_carry():
         "sysmon_process_guid": "{DFAE8213-70EB-5CDD-0000-0010F66D0A00}",  # a real Sysmon ProcessGuid
         "zeek_uid": "CtEReq24zLXEGt4V67", "zeek_uid_trans_depth": "http-Cno6-1",
         "zeek_uid_trans_id": "flow-CEVU-23150", "zeek_fuid": "file-FdEQ",
+        "zeek_cert_fp": "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d",
         "jlecmd_entry": "file-/in/fb3b.automaticDestinations-ms-1",
         "recmd_value": "registry-/in/UsrClass.dat-S-1-5-21-1_Classes\\X-LangID",
         "memory_proc_offset": "proc-1a2b"}

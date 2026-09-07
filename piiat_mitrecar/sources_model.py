@@ -153,6 +153,8 @@ DERIVATIONS: dict[str, Derivation] = {
                             "conn.log", "network capture (pcap / live traffic)"),
     "zeek_dns": Derivation("Zeek", "The Zeek Project", "https://zeek.org",
                            "dns.log", "network capture (pcap / live traffic)"),
+    "zeek_x509": Derivation("Zeek", "The Zeek Project", "https://zeek.org",
+                            "x509.log", "network capture (pcap / live traffic)"),
     "zeek_ssl": Derivation("Zeek", "The Zeek Project", "https://zeek.org",
                            "ssl.log", "network capture (pcap / live traffic)"),
     "zeek_http": Derivation("Zeek", "The Zeek Project", "https://zeek.org",
