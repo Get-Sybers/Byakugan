@@ -171,6 +171,23 @@ def test_native_id_uses_the_first_class_column(tmp_path):
     assert set(hits[0]["sources"]) == {"a", "b"}
 
 
+def test_native_mac_bridges_a_lnk_droid_and_a_networklist_entry(tmp_path):
+    d = str(tmp_path)
+    # a LNK carries the origin NIC MAC inside its DLT droid (v1 GUID); a registry
+    # NetworkList row carries the same MAC literally — they converge on it
+    _store(d, "lnk", [_row("file", "create", "f-1", "PM6C56D",
+                           {"data_type": "windows:lnk:link",
+                            "droid_file_id": "5c2307d9-3369-11e2-be70-001cc42df40b"})])
+    _store(d, "registry", [_row("registry", "value_edit", "r-1", "PM6C56D",
+                                {"key_path": r"...\NetworkList\Signatures",
+                                 "DefaultGatewayMac": "00:1C:C4:2D:F4:0B"})])
+    hits = [c for c in crosssource.converge(d)
+            if c["tier"] == "definitive_native_id" and c["join_key"][0] == "mac"]
+    assert hits, "the NIC MAC did not bridge the LNK droid and the NetworkList entry"
+    assert hits[0]["join_key"] == ["mac", "00:1c:c4:2d:f4:0b"]
+    assert set(hits[0]["sources"]) == {"lnk", "registry"}
+
+
 def test_native_id_column_must_validate_as_canonical(tmp_path):
     d = str(tmp_path)
     # a malformed volume_guid column value (a stray path) must NOT mint a join —

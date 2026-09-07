@@ -21,12 +21,13 @@ doubt; anything else is heuristic; what cannot be known is an honest null):
                       (EvtxECmd vs Plaso winevtx). A union.
   definitive_content  same content hash (sha256 > sha1 > md5): the SAME bytes —
                       the amcache/PE/memory file and the log process's binary.
-  definitive_native_id  same canonical native GUID (B1): a globally-unique
-                      Volume{GUID} mined from `native` — a strong real cross-source
-                      key (USN ↔ evtx ↔ registry ↔ mount table ↔ cloud-sync) that
-                      the CAR guid columns (minted synthetic ids) never carried.
-                      Token-gated so COM CLSID/interface GUIDs (linkage noise) are
-                      never joined on.
+  definitive_native_id  a canonical native identity mined from `native` that the
+                      CAR guid columns (minted synthetic ids) never carried: a
+                      globally-unique Volume{GUID} (B1 — USN ↔ evtx ↔ registry ↔
+                      mount table ↔ cloud-sync) or a hardware MAC (B3 — literal, or
+                      the NIC MAC in a v1-GUID node, tying a LNK's DLT droid to a
+                      NetworkList entry). Token/shape-gated so COM CLSID/interface
+                      GUIDs and synthetic nodes (linkage noise) are never joined on.
   heuristic_image     same (host, image_path | exe basename): the same BINARY,
                       possibly a different process instance. A lead, never a
                       destructive merge — tagged heuristic so a consumer can weigh it.
@@ -87,18 +88,24 @@ def _basename(p) -> str:
 # GUID is globally unique, so both keys are host- AND object-independent (a
 # registry row, a USN change and an event-log row of the same volume converge).
 def _native_ids(row: dict) -> list[tuple[str, str]]:
-    """The canonical native GUID join keys a row carries, as (class, value) with
-    the value case-folded. Only the high-precision, token-gated `volume` class —
-    never a bare GUID (the ubiquitous COM CLSID/interface GUIDs are linkage noise).
+    """The canonical native join keys a row carries, as (class, value) with the
+    value normalised. Two high-precision classes — a globally-unique `volume`
+    GUID and a hardware `mac` address (literal or v1-GUID-embedded) — never a
+    bare GUID (the ubiquitous COM CLSID/interface GUIDs are linkage noise).
 
-    Prefers the first-class `volume_guid` column (enrich lifts it there) but
-    only when it VALIDATES as a canonical GUID — a malformed or unexpected column
-    value must not mint a bogus join; otherwise it falls back to mining `native`
-    (also the path for rows written before the column existed). The extractor
-    lives in `native_ids` so enrich and this stage share one precision rule."""
-    col = native_ids.canonical(row.get("volume_guid"))
-    vals = [col] if col else native_ids.volume_guids(row.get("native"))
-    return [("volume", v) for v in vals]
+    Each prefers its first-class column (enrich lifts it there) but only when it
+    VALIDATES — a malformed or unexpected column value must not mint a bogus
+    join; otherwise it falls back to mining `native` (also the path for rows
+    written before the columns existed). The extractors live in `native_ids` so
+    enrich and this stage share one precision rule."""
+    keys: list[tuple[str, str]] = []
+    vol = native_ids.canonical(row.get("volume_guid"))
+    for v in ([vol] if vol else native_ids.volume_guids(row.get("native"))):
+        keys.append(("volume", v))
+    mac = native_ids.as_mac(row.get("mac_address"))
+    for m in ([mac] if mac else native_ids.mac_addresses(row.get("native"))):
+        keys.append(("mac", m))
+    return keys
 
 
 def _find_stores(case_dir: str) -> list[str]:

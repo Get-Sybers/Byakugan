@@ -15,6 +15,11 @@ CLSID/interface/TypeLib GUIDs are pure linkage noise. The token lives INSIDE the
 value string (the volume path), so a text scan is both precise and independent
 of each parser's native shape. Values are case-folded — real data mixes
 `09931F21…`/`09931f21…`.
+
+B3 adds the **MAC address**: literal `xx:xx:xx:xx:xx:xx` values and the NIC MAC
+embedded in a version-1 (time+MAC) GUID's node — the DLT birth-droid a LNK
+carries — both lifted to the `mac_address` column and converged on. Synthetic /
+RFC-random nodes (multicast bit set) and the OLE-family node are excluded.
 """
 from __future__ import annotations
 
@@ -54,3 +59,74 @@ def volume_guids(native) -> list[str]:
             seen.add(v)
             out.append(v)
     return out
+
+
+# --- MAC addresses (B3) ---------------------------------------------------- #
+# A MAC survives in `native` two ways: as a literal `xx:xx:xx:xx:xx:xx` (a
+# NetworkList gateway MAC, a Zeek L2 address) and — invisibly — inside the NODE
+# of a version-1 (time+MAC) GUID: the DLT birth-droid a LNK carries, and the
+# `-11e2-`/`-11e8-` volume/interface GUIDs, all embed the originating NIC's MAC
+# in their last 6 bytes. No CAR field ever carried either, so a file opened via
+# a shortcut could not be tied to the machine that created it.
+# A literal MAC (6 hex pairs, ':' or '-' separated), folded to ':' lower-case:
+_MAC_LITERAL_RE = re.compile(r"\b([0-9a-fA-F]{2}(?:[:-][0-9a-fA-F]{2}){5})\b")
+# a version-1 GUID: the version nibble (first char of the 3rd group) is '1':
+_V1_GUID_RE = re.compile(
+    r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-1[0-9a-fA-F]{3}-[0-9a-fA-F]{4}-([0-9a-fA-F]{12})\b")
+# nodes that are NOT a hardware MAC: the OLE `-c000-000000000046` family node,
+# and the RFC 4122 synthetic placeholder. (A random/software node also sets the
+# multicast bit of its first octet — RFC 4122 §4.5 — so those are excluded too.)
+_NON_MAC_NODES = {"000000000046", "806e6f6e6963"}
+
+
+def _node_to_mac(node: str) -> str | None:
+    """A 12-hex v1-GUID node as a hardware MAC `xx:xx:xx:xx:xx:xx` (lower), or
+    None if it is not one — a known synthetic node, or a node whose first octet
+    has the I/G (multicast) bit set, which marks an RFC-random (non-hardware) id."""
+    node = node.lower()
+    if node in _NON_MAC_NODES:
+        return None
+    if int(node[0:2], 16) & 0x01:               # I/G bit set -> not a real NIC MAC
+        return None
+    return ":".join(node[i:i + 2] for i in range(0, 12, 2))
+
+
+def mac_from_v1_guid(guid) -> str | None:
+    """The originating NIC MAC embedded in a version-1 GUID's node, or None if
+    `guid` is not a v1 GUID (or its node is not a hardware MAC)."""
+    if guid is None:
+        return None
+    m = _V1_GUID_RE.search(str(guid).strip())
+    return _node_to_mac(m.group(1)) if m else None
+
+
+def mac_addresses(native) -> list[str]:
+    """Every distinct hardware MAC a row's `native` carries — literal
+    `xx:xx:xx:xx:xx:xx` values AND those embedded in a v1-GUID node — folded to
+    ':' lower-case, in first-seen order. `native` may be a dict or a str."""
+    text = _as_text(native)
+    out: list[str] = []
+    seen: set[str] = set()
+
+    def add(mac):
+        if mac and mac not in seen:
+            seen.add(mac)
+            out.append(mac)
+
+    for m in _MAC_LITERAL_RE.finditer(text):
+        add(m.group(1).replace("-", ":").lower())
+    for m in _V1_GUID_RE.finditer(text):
+        add(_node_to_mac(m.group(1)))
+    return out
+
+
+_MAC_ONLY_RE = re.compile(r"^[0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5}$")
+
+
+def as_mac(value) -> str | None:
+    """`value` as a canonical ':'-separated lower-case MAC, or None — used to
+    VALIDATE a stored `mac_address` column before trusting it as a join key."""
+    if value is None:
+        return None
+    v = str(value).strip().replace("-", ":").lower()
+    return v if _MAC_ONLY_RE.match(v) else None
