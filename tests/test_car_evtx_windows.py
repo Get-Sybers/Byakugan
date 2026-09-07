@@ -170,7 +170,9 @@ def test_7045_service_create():
     assert ev["image_path"] == "C:\\Windows\\system32\\svchost.exe"
     assert ev["exe"] == "svchost.exe"
     assert ev["command_line"] == "C:\\Windows\\system32\\svchost.exe -k netsvcs"
-    assert ev["user"] == "LocalSystem"
+    # "LocalSystem" (the SCM run-as string for S-1-5-18) folds to the canonical
+    # SYSTEM token so it reads the same as NT AUTHORITY\SYSTEM / memory's Local System
+    assert ev["user"] == "SYSTEM"
     assert ev["hostname"] == "WIN-1M3263ACE5D"
     assert ev["fqdn"] is None                    # NetBIOS name is not an fqdn
     assert ev.get("pid") is None                 # install event: no running pid
@@ -191,7 +193,7 @@ def test_4697_service_create_field_names():
     assert ev["car_action"] == "create" and ev["name"] == "PwnSvc"
     assert ev["image_path"] == "C:\\Tools\\pwn.exe" and ev["exe"] == "pwn.exe"
     assert ev["command_line"] == "C:\\Tools\\pwn.exe"
-    assert ev["user"] == "LocalSystem"           # the run-as account, NOT the installer
+    assert ev["user"] == "SYSTEM"                # run-as account (LocalSystem→SYSTEM canonical), NOT the installer
     assert ev["_native"]["SubjectLogonId"] == "0x2A5E1"   # installer LUID join key
     assert ev["_native"]["StartType"] == "2"
 

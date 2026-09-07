@@ -32,8 +32,8 @@ mappings:
   field_provenance:
     extension: filename [derived]
     file_name: filename [direct]
-    md5_hash: md5 [direct]
+    md5_hash: md5 [derived]
     mime_type: mime_type [direct]
-    sha1_hash: sha1 [direct]
-    sha256_hash: sha256 [direct]
+    sha1_hash: sha1 [derived]
+    sha256_hash: sha256 [derived]
 other_coverage: []

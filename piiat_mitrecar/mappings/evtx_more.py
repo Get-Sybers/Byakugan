@@ -30,7 +30,7 @@ Each variant is grounded in a verified payload field on a real record:
 from __future__ import annotations
 
 from ..normalize import (basename, const, ext, host_label,  # noqa: F401
-                         hex_int, payload, regex1, userdata)
+                         hex_int, payload, regex1, user_canon, userdata)
 from ._common import (EVTX_FQDN as _FQDN, EVTX_HOST as _HOST,  # noqa: F401
                       EVTX_KEEP as _KEEP, EVTX_RECORD_GUID as _GUID,
                       evtx_payload_field as _payload_field)
@@ -105,7 +105,7 @@ MAPPINGS = {
                     "extension": ext(payload("ObjectName")),
                     "image_path": payload("ProcessName"),
                     "pid": hex_int(payload("ProcessId")),
-                    "user": payload("SubjectUserName"),
+                    "user": user_canon(payload("SubjectUserName")),
                     "hostname": _HOST, "fqdn": _FQDN,
                 },
                 "keep": _KEEP,

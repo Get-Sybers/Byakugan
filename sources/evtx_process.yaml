@@ -51,6 +51,6 @@ mappings:
     pid: NewProcessId [derived]
     ppid: ProcessId [derived]
     sid: TargetUserSid | SubjectUserSid [coalesced]
-    user: TargetUserName | SubjectUserName [coalesced]
+    user: TargetUserName | SubjectUserName [derived]
 other_coverage:
-- 'native/join keys (process/create): MandatoryLabel, SubjectLogonId, TokenElevationType'
+- 'native/join keys (process/create): MandatoryLabel, SubjectDomainName, SubjectLogonId, TokenElevationType'

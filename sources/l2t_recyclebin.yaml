@@ -42,7 +42,7 @@ mappings:
     file_path: original_filename [direct]
     hostname: image_hostname [direct]
     uid: display_name [inferred]
-    user: username | original_filename [coalesced]
+    user: username | original_filename [derived]
 other_coverage:
 - 'native/join keys (file/delete): artefact_file, artefact_sha256, data_type, disk_id, drive_number, file_size,
   record_index, volume_id, volume_offset'

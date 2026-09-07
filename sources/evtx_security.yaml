@@ -53,7 +53,7 @@ mappings:
     target_uid: TargetUserSid [direct]
     target_user: TargetUserName [direct]
     uid: SubjectUserSid [direct]
-    user: SubjectUserName [direct]
+    user: SubjectUserName [derived]
 - object: authentication
   action: success
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — Security channel (4624/4625/4672).
@@ -81,7 +81,7 @@ mappings:
     target_uid: TargetUserSid [direct]
     target_user: TargetUserName [direct]
     uid: SubjectUserSid [direct]
-    user: SubjectUserName [direct]
+    user: SubjectUserName [derived]
     user_role: '[asserted]'
 other_coverage:
 - 'native/join keys (authentication/failure): IpAddress, LogonType, SubjectLogonId, TargetLogonId'

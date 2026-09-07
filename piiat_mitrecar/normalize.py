@@ -143,6 +143,37 @@ def ts_before(src, other):
     return ("ts_before", (src, other))
 
 
+def win_program_path(src):
+    """The executable PATH out of a Windows execution-artefact field (Amcache /
+    AppCompatCache). A modern Store/UWP entry records a TAB-delimited PACKAGE
+    DESCRIPTOR (``<seq>\\t<hex>\\t<hex>\\t<arch>\\t<PackageName>\\t<PublisherId>``
+    [``\\t<res-arch>``]) in place of a path — a package moniker is NOT a
+    filesystem path, so it yields None (never the raw tab blob); a real path
+    passes through verbatim."""
+    return ("win_program_path", src)
+
+
+def win_program_name(src):
+    """The executable NAME out of a Windows execution-artefact field (Amcache /
+    AppCompatCache): the basename of a real path, or — for the TAB-delimited
+    Store/UWP package descriptor ``win_program_path`` rejects — the Package
+    Family Name ``<PackageName>_<PublisherId>`` (a clean identity), never the
+    tab blob."""
+    return ("win_program_name", src)
+
+
+def user_canon(src):
+    """A Windows principal canonicalized to ONE account-name form across sources
+    (see ``_canon_user``): a well-known SID → its name (S-1-5-18 → SYSTEM), a
+    leading well-known authority stripped (``NT AUTHORITY\\SYSTEM`` → SYSTEM,
+    ``BUILTIN\\Administrators`` → ADMINISTRATORS), the memory friendly forms
+    folded (``Local System`` → SYSTEM, ``Local``/``Network Service`` →
+    LOCAL/NETWORK SERVICE), a real machine/AD domain KEPT (``DESKTOP-1\\jdoe``
+    stays), and an unknown SID left as the SID string (never invented). The raw
+    SID is untouched — the maps keep it in the ``sid``/``uid`` column."""
+    return ("user_canon", src)
+
+
 # --- timestamps -------------------------------------------------------------
 
 # YYYY-MM-DD, T or space, HH:MM:SS, optional .fraction, optional Z or ±HH[:]MM.
@@ -237,6 +268,84 @@ def _parsed_payload(rec, field):
             names, data = None, None
     cache[field] = (raw, names, data)
     return names, data
+
+
+# --- Windows principal canonicalization -------------------------------------
+
+# well-known SIDs → the canonical ACCOUNT NAME (an uppercase token, so the SID
+# form, the "NT AUTHORITY\\…"/"BUILTIN\\…" form and memory's friendly form all
+# converge on ONE string). Only the STANDARD set; an unknown SID is left as the
+# SID string by _canon_user — never invented into a name.
+_WELLKNOWN_SIDS = {
+    "S-1-0-0": "NULL SID",
+    "S-1-1-0": "EVERYONE",
+    "S-1-2-0": "LOCAL",
+    "S-1-3-0": "CREATOR OWNER",
+    "S-1-3-1": "CREATOR GROUP",
+    "S-1-5-7": "ANONYMOUS LOGON",
+    "S-1-5-11": "AUTHENTICATED USERS",
+    "S-1-5-18": "SYSTEM",
+    "S-1-5-19": "LOCAL SERVICE",
+    "S-1-5-20": "NETWORK SERVICE",
+    "S-1-5-32-544": "ADMINISTRATORS",
+    "S-1-5-32-545": "USERS",
+    "S-1-5-32-546": "GUESTS",
+    "S-1-5-32-547": "POWER USERS",
+    "S-1-5-32-551": "BACKUP OPERATORS",
+    "S-1-5-32-555": "REMOTE DESKTOP USERS",
+}
+
+# well-known ACCOUNT NAMES (incl. memory's friendly + no-space renderings) → the
+# canonical token the matching SID resolves to. Keyed on the uppercased name.
+_WELLKNOWN_NAMES = {
+    "SYSTEM": "SYSTEM",
+    "LOCAL SYSTEM": "SYSTEM", "LOCALSYSTEM": "SYSTEM", "SYSTEMPROFILE": "SYSTEM",
+    "LOCAL SERVICE": "LOCAL SERVICE", "LOCALSERVICE": "LOCAL SERVICE",
+    "NETWORK SERVICE": "NETWORK SERVICE", "NETWORKSERVICE": "NETWORK SERVICE",
+    "ADMINISTRATORS": "ADMINISTRATORS",
+    "EVERYONE": "EVERYONE",
+    "ANONYMOUS LOGON": "ANONYMOUS LOGON",
+    "AUTHENTICATED USERS": "AUTHENTICATED USERS",
+}
+
+# domain prefixes that are a well-known AUTHORITY (never a real machine/AD
+# domain) — stripped to the bare account name; a real host/AD domain is kept.
+_WELLKNOWN_AUTHORITIES = {"NT AUTHORITY", "BUILTIN"}
+
+
+def _canon_name(s):
+    """A bare account name → its canonical well-known token, else unchanged (a
+    real user name keeps its own case)."""
+    return _WELLKNOWN_NAMES.get(str(s).strip().upper(), str(s))
+
+
+def _canon_user(v):
+    """The principal canonicalization `user_canon` documents — None for a blank."""
+    if _blank(v):
+        return None
+    s = str(v).strip()
+    if not s:
+        return None
+    name = _WELLKNOWN_SIDS.get(s.upper())
+    if name:
+        return name                            # a well-known SID → its name
+    if "\\" in s:
+        dom, _, acct = s.partition("\\")
+        if dom.strip().upper() in _WELLKNOWN_AUTHORITIES:
+            return _canon_name(acct)           # a well-known authority → strip it
+        return s                               # a real machine/AD domain → keep DOMAIN\name
+    return _canon_name(s)
+
+
+def _pkg_family(v):
+    """The Package Family Name ``<PackageName>_<PublisherId>`` out of a TAB-
+    delimited AppCompatCache/Amcache Store/UWP descriptor, or None when the
+    value does not have that shape (never the raw tab blob)."""
+    parts = [p for p in str(v).split("\t") if p != ""]
+    # <seq> <hex> <hex> <arch> <PackageName> <PublisherId> [<resource-arch>]
+    if len(parts) >= 6 and "." in parts[4]:
+        return f"{parts[4]}_{parts[5]}"
+    return None
 
 
 def _resolve(src, rec):
@@ -384,6 +493,20 @@ def _resolve(src, rec):
     if kind == "ts_before":
         a, b = (parse_ts(_resolve(s, rec)) for s in arg)
         return None if a is None or b is None else a < b
+    if kind == "win_program_path":
+        v = _resolve(arg, rec)
+        if _blank(v):
+            return None
+        s = str(v)
+        return None if "\t" in s else s        # a UWP package descriptor is not a path
+    if kind == "win_program_name":
+        v = _resolve(arg, rec)
+        if _blank(v):
+            return None
+        s = str(v)
+        return _pkg_family(s) if "\t" in s else _basename(s)
+    if kind == "user_canon":
+        return _canon_user(_resolve(arg, rec))
     raise ValueError(f"unknown source marker: {src!r}")
 
 

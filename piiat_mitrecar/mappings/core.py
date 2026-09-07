@@ -30,7 +30,8 @@ The memory artefact does NOT map here: PIIAT-Mem already emits finished CAR —
 from __future__ import annotations
 
 from ..normalize import (basename, concat, const, domain_of, epoch_ts, ext,  # noqa: F401
-                        first, host_label, lower, map_value, payload, regex1)
+                        first, host_label, lower, map_value, payload, regex1,
+                        user_canon)
 
 
 # --- variant predicates -----------------------------------------------------
@@ -81,7 +82,7 @@ def _auth_props():
         "target_ad_domain": payload("TargetDomainName"),
         # the reporting/calling context (often a machine account — evidence,
         # never asserted as "the person who typed the password")
-        "user": payload("SubjectUserName"),
+        "user": user_canon(payload("SubjectUserName")),
         "uid": payload("SubjectUserSid"),
         "ad_domain": payload("SubjectDomainName"),
         # ORIGIN vs DESTINATION (4624/4625): WorkstationName is the requesting
@@ -168,7 +169,7 @@ MAPPINGS = {
                 "guid": {"fields": ["Computer", "Channel", "EventRecordId"]},
                 "host": host_label("Computer"),
                 "props": {
-                    "user": payload("SubjectUserName"),
+                    "user": user_canon(payload("SubjectUserName")),
                     "uid": payload("SubjectUserSid"),
                     "ad_domain": payload("SubjectDomainName"),
                     "auth_target": "Computer",

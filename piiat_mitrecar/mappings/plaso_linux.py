@@ -69,7 +69,7 @@ from __future__ import annotations
 
 import re
 
-from ..normalize import basename, ext, first, host_label, payload, regex1  # noqa: F401
+from ..normalize import basename, ext, first, host_label, lower, payload, regex1  # noqa: F401
 from ._common import R as _r, plaso_rec as _record, spindle as _spindle
 
 
@@ -192,8 +192,9 @@ def _file_map(action, path_marker, hashes=False, posix=False, native=None, ident
         # filestat only: the parsed file IS the file, so Plaso's hashes are
         # the file's own (canonical). For mft/usnjrnl a hash would be the
         # $MFT/$UsnJrnl artefact's own — omitted, never a near-miss fill.
-        props.update(md5_hash=_r("md5_hash"), sha1_hash=_r("sha1_hash"),
-                     sha256_hash=_r("sha256_hash"))
+        # canonicalised to LOWERCASE (one hash format across sources)
+        props.update(md5_hash=lower(_r("md5_hash")), sha1_hash=lower(_r("sha1_hash")),
+                     sha256_hash=lower(_r("sha256_hash")))
     if posix:
         # filestat only: the stat'ed inode IS the file, so its POSIX stat
         # fields are the file's own (canonical). MITRE file.mode is "the mode

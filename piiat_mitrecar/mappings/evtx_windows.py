@@ -32,7 +32,8 @@ prefixed to stay globally unique across mapping submodules.
 from __future__ import annotations
 
 from ..normalize import (basename, concat, const, domain_of, epoch_ts, ext, exe_path,  # noqa: F401
-                        first, hex_int, host_label, lower, map_value, payload, regex1)
+                        first, hex_int, host_label, lower, map_value, payload, regex1,
+                        user_canon)
 
 
 # S-1-16-<RID> mandatory-label SID -> CAR integrity_level (the memory processes
@@ -129,8 +130,8 @@ def _session_props():
         # the user whose session this is. UserName (EvtxECmd's own column) is
         # the view's last-resort fallback; in practice every in-scope EventId
         # carries one of the payload names.
-        "user": first(payload("TargetUserName"), payload("AccountName"),
-                      "UserName"),
+        "user": user_canon(first(payload("TargetUserName"), payload("AccountName"),
+                                 "UserName")),
         # the session user's SID — the model's uid (4778/4779 carry no SID:
         # honest null there).
         "uid": payload("TargetUserSid"),
@@ -198,7 +199,7 @@ _SVC_PROPS = {
     # falling back to EvtxECmd's UserName column like the view. 4697's
     # SubjectUserName (who INSTALLED it) is a different entity — never
     # coalesced into `user`; it stays in the kept Payload.
-    "user": first(payload("AccountName"), payload("ServiceAccount"), "UserName"),
+    "user": user_canon(first(payload("AccountName"), payload("ServiceAccount"), "UserName")),
     "hostname": host_label("Computer"),
     # the view: fqdn only when Computer actually is one (contains a dot) —
     # a bare NetBIOS name faked into fqdn would be a near-miss.
@@ -320,7 +321,7 @@ MAPPINGS = {
                     # run AS a different user carries that in Target*; where
                     # Target is "-"/S-1-0-0 (the common case) the running user IS
                     # the creator, so Subject is the honest fill.
-                    "user": first(payload("TargetUserName"), payload("SubjectUserName")),
+                    "user": user_canon(first(payload("TargetUserName"), payload("SubjectUserName"))),
                     # S-1-0-0 is the NULL SID ("Nobody") — 4688 sets Target to it
                     # when the process runs as the creator, so it falls through to
                     # the Subject SID (the name already blanks on "-")

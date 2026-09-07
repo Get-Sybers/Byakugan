@@ -68,10 +68,13 @@ dedupe:
 # RENDERINGS of the same account only — any other native value (e.g. a machine
 # account DESKTOP-X$ on a 4624 Subject) is evidence and is never overwritten.
 identity:
+  # the canonical token MUST equal what normalize.user_canon emits at the map
+  # layer (normalize._WELLKNOWN_SIDS), so an enrich blank-fill from a SID and a
+  # map's own extraction render the account identically — one string per source.
   well_known_sids:
-    S-1-5-18: Local System
-    S-1-5-19: Local Service
-    S-1-5-20: Network Service
+    S-1-5-18: SYSTEM
+    S-1-5-19: LOCAL SERVICE
+    S-1-5-20: NETWORK SERVICE
   # renderings of those SAME accounts that may be unified (lowercased match):
   canonical_aliases:
     - system

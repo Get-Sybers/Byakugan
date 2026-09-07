@@ -43,6 +43,6 @@ mappings:
     hostname: Computer [derived]
     image_path: ImagePath | ServiceFileName [derived]
     name: ServiceName [direct]
-    user: AccountName | ServiceAccount | UserName [coalesced]
+    user: AccountName | ServiceAccount | UserName [derived]
 other_coverage:
 - 'native/join keys (service/create): ServiceType, StartType, SubjectLogonId'
