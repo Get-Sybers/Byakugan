@@ -41,6 +41,13 @@ def _object_entries(car_db: str):
         tables = [r[0] for r in c.execute(
             "SELECT name FROM sqlite_master WHERE type='table'")]
         for t in tables:
+            # only CAR object tables carry the event header; a producer may add
+            # its own auxiliary table (PIIAT-Mem's car.db has `image_context`:
+            # source_image/source_plugin/record, no timestamp) — skip anything
+            # without the header rather than crashing the whole timeline on it
+            cols = {r[1] for r in c.execute(f'PRAGMA table_info("{t}")')}
+            if "timestamp" not in cols:
+                continue
             for r in c.execute(f'SELECT * FROM "{t}" WHERE timestamp IS NOT NULL'):
                 entry = {"timestamp": r["timestamp"], "kind": "object", "object": t}
                 for k in r.keys():
