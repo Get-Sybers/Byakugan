@@ -21,6 +21,12 @@ doubt; anything else is heuristic; what cannot be known is an honest null):
                       (EvtxECmd vs Plaso winevtx). A union.
   definitive_content  same content hash (sha256 > sha1 > md5): the SAME bytes —
                       the amcache/PE/memory file and the log process's binary.
+  definitive_native_id  same canonical native GUID (B1): a globally-unique
+                      Volume{GUID} mined from `native` — a strong real cross-source
+                      key (USN ↔ evtx ↔ registry ↔ mount table ↔ cloud-sync) that
+                      the CAR guid columns (minted synthetic ids) never carried.
+                      Token-gated so COM CLSID/interface GUIDs (linkage noise) are
+                      never joined on.
   heuristic_image     same (host, image_path | exe basename): the same BINARY,
                       possibly a different process instance. A lead, never a
                       destructive merge — tagged heuristic so a consumer can weigh it.
@@ -42,8 +48,10 @@ from . import spindle
 # joined it (so a content-hash match outranks a mere image-path lead).
 DEFINITIVE_RECORD = "definitive_record"
 DEFINITIVE_CONTENT = "definitive_content"
+DEFINITIVE_NATIVE_ID = "definitive_native_id"
 HEURISTIC_IMAGE = "heuristic_image"
-_TIER_RANK = {DEFINITIVE_RECORD: 0, DEFINITIVE_CONTENT: 1, HEURISTIC_IMAGE: 2}
+_TIER_RANK = {DEFINITIVE_RECORD: 0, DEFINITIVE_CONTENT: 1,
+              DEFINITIVE_NATIVE_ID: 2, HEURISTIC_IMAGE: 3}
 
 # objects that carry a content hash (a binary / file identity)
 _HASHED = {"file", "process", "module", "driver"}
@@ -66,6 +74,50 @@ _META = {"event_id", "car_object", "native", "_native", "_source",
 def _basename(p) -> str:
     import re
     return re.split(r"[\\/]", str(p))[-1]
+
+
+# --- canonical native GUID join keys (B1) ---------------------------------- #
+# Canonical {8-4-4-4-12} GUIDs survive only inside `native` text (the CAR guid
+# columns hold minted synthetic ids), so the strongest real cross-source keys —
+# the per-host MachineGuid and the per-volume Volume{GUID} — are never joined on.
+# Mine them back out, but PRECISELY: each is gated by its own literal token
+# (`MachineGuid`, `Volume{`) so the ubiquitous COM CLSID/interface GUIDs (pure
+# noise for linkage) are never picked up. Values are case-folded — real data
+# mixes `09931F21…`/`09931f21…`. A MachineGuid IS the host identity and a volume
+# GUID is globally unique, so both keys are host- AND object-independent (a
+# registry row, a USN change and an event-log row of the same volume converge).
+import re as _re
+
+_GUID = r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+# \\?\Volume{GUID} / \??\Volume{GUID} / MountPoints2 / MountedDevices values.
+# The `Volume{` token lives INSIDE the value string itself (the volume path), so
+# a text scan of the native blob is precise AND shape-independent — it catches
+# the GUID wherever the parser put it (a value, a mapped-files list, a rendered
+# message) without guessing the per-parser structure. A volume GUID is globally
+# unique, so no host scoping is needed and there is no COM-CLSID false-positive
+# surface (a bare {8-4-4-4-12} with no `Volume{` token is never picked up).
+# (The per-host MachineGuid anchor is deferred to the host_id follow-up: it is
+# better modelled as a per-image stamp than text-mined, and the value recurs in
+# crypto-key paths that a naive miner would misread.)
+_VOLUME_RE = _re.compile(r"Volume\{(" + _GUID + r")\}", _re.IGNORECASE)
+
+
+def _native_ids(row: dict) -> list[tuple[str, str]]:
+    """The canonical native GUID join keys a row carries, as (class, value) with
+    the value case-folded. Only the high-precision, token-gated `volume` class —
+    never a bare GUID (the ubiquitous COM CLSID/interface GUIDs are linkage noise)."""
+    native = row.get("native")
+    if not native:
+        return []
+    text = native if isinstance(native, str) else json.dumps(native, default=str)
+    out: list[tuple[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for m in _VOLUME_RE.finditer(text):
+        k = ("volume", m.group(1).lower())
+        if k not in seen:
+            seen.add(k)
+            out.append(k)
+    return out
 
 
 def _find_stores(case_dir: str) -> list[str]:
@@ -138,6 +190,11 @@ def _keys(row: dict) -> list[tuple[str, tuple]]:
             # anywhere, in whatever object they rode in on) — file / process /
             # module / driver share one content bucket
             keys.append((DEFINITIVE_CONTENT, (_CONTENT_BUCKET.get(obj, obj), *h)))
+    for cls, val in _native_ids(row):
+        # a canonical native GUID bridges any object on any source (the volume
+        # a USN change and a registry mount both name; the host a MachineGuid
+        # identifies) — keyed on (class, value), host- and object-independent
+        keys.append((DEFINITIVE_NATIVE_ID, (cls, val)))
     if obj in _IMAGED:
         ik = _image_key(row)
         if ik:
@@ -195,18 +252,26 @@ def converge(case_dir: str) -> list[dict]:
         members: dict[str, list] = {}
         for r in rows:
             members.setdefault(r["_source"], []).append(r.get("guid"))
-        # A content-hash group may legitimately hold MIXED car_objects (the same
-        # bytes seen as a disk `file`, a running `process`, a loaded `module`
-        # and a `driver` all share one content bucket), so `rows[0]` would label
-        # the group non-deterministically by iteration order. Label it from the
-        # join key instead: the content bucket object (`kv[0]`, e.g. "file") for
-        # a content join, else the key's own object component (`kv[1]`, which
-        # every row in a record/image group shares). Keep the full set of folded
-        # object types in `car_objects` so nothing is lost.
-        group_object = kv[0] if tier == DEFINITIVE_CONTENT else kv[1]
+        # A content-hash or native-GUID group may legitimately hold MIXED
+        # car_objects (the same bytes seen as a disk `file`, a running `process`,
+        # a `module` and a `driver`; or a `registry` row and a `file` USN change
+        # sharing one volume GUID), so `rows[0]` would label the group
+        # non-deterministically by iteration order. Label it from the join key
+        # where the key names an object: the content bucket object (`kv[0]`) for
+        # a content join; the shared object component (`kv[1]`) for a record/image
+        # join; and for a native-GUID bridge — whose key is (class, value), not an
+        # object — the deterministic first member object. `car_objects` always
+        # carries the full folded set so nothing is lost.
+        objects_here = sorted({r["car_object"] for r in rows})
+        if tier == DEFINITIVE_CONTENT:
+            group_object = kv[0]
+        elif tier == DEFINITIVE_NATIVE_ID:
+            group_object = objects_here[0]
+        else:
+            group_object = kv[1]
         converged.append({
             "car_object": group_object,
-            "car_objects": sorted({r["car_object"] for r in rows}),
+            "car_objects": objects_here,
             "tier": tier,
             "join_key": list(kv),
             "sources": sorted(sources),
