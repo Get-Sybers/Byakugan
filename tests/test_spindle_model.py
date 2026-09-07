@@ -200,7 +200,7 @@ def test_snapshot_registry_materializes_the_resolved_identities():
                                           "form": {"marker": {"payload": "ProcessGuid"}}, "maps": ["evtx_sysmon"],
                                           "car_object": ["process"],
                                           "stable_across": spindle.externals()["sysmon_process_guid"]["stable_across"]}
-    assert ext["zeek_uid"]["maps"] == ["zeek_conn"] and ext["zeek_fuid"]["maps"] == ["zeek_files"]
+    assert ext["zeek_uid"]["maps"] == ["zeek_conn", "zeek_ssl"] and ext["zeek_fuid"]["maps"] == ["zeek_files"]
     assert ext["zeek_uid_trans_depth"]["maps"] == ["zeek_http", "zeek_smtp"]
     assert ext["jlecmd_entry"]["maps"] == ["jlecmd_dest"] and ext["recmd_value"]["maps"] == ["recmd_batch"]
     assert ext["memory_proc_offset"] ["maps"] == [] and ext["memory_proc_offset"]["form"] == {"form": "proc-{hex}"}
