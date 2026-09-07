@@ -61,6 +61,13 @@ custom_namespace:
     description: >-
       the globally-unique volume identity (Volume{GUID}, case-folded); ECS has no
       volume-GUID field, so it homes here. See common_header.volume_guid.
+  car.mac_address:
+    type: keyword
+    description: >-
+      a hardware MAC (literal, or recovered from a v1-GUID node), ':'-lower. A
+      cross-object device-linkage key; ECS's mac fields are role-specific
+      (source.mac / destination.mac / host.mac), so a header field not tied to one
+      role homes here. See common_header.mac_address.
   car.native:
     type: flattened
     description: the CAR header `native` bag — source evidence with no CAR home, verbatim keys.
@@ -162,6 +169,17 @@ common_header:
       header field (B1). ECS has no volume-GUID home, so it projects to the custom
       car.volume_guid; it ties a row to the USN journal / registry mount / event log / cloud-sync
       that name the same volume.
+
+  mac_address:
+    ecs: car.mac_address
+    type: keyword
+    note: >-
+      a hardware MAC (literal xx:xx:xx:xx:xx:xx, or the NIC MAC recovered from a version-1
+      GUID node — a DLT birth-droid) — the third non-MITRE header field (B3), ':'-lower. ECS's
+      mac fields are role-specific (source.mac / destination.mac / host.mac); this is a
+      cross-object device-linkage key not tied to one role, so it homes at the custom
+      car.mac_address. A per-object projection to the role-appropriate ECS mac field is a
+      later refinement.
 
   link_confidence:
     ecs: car.link_confidence

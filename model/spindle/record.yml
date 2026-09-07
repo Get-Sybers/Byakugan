@@ -23,6 +23,7 @@ properties:
   - guid
   - owning_guid
   - volume_guid
+  - mac_address
   - link_confidence
   - source_artefact
   - source_host

@@ -442,6 +442,14 @@ def enrich(events: list[dict]) -> list[dict]:
             if vols:
                 ev["volume_guid"] = vols[0]
 
+        # B3: lift a hardware MAC — a literal xx:xx:xx:xx:xx:xx, or the NIC MAC
+        # embedded in a v1-GUID node (a DLT birth-droid) — into the first-class
+        # `mac_address` column. Fill-only-null; the first is taken.
+        if not ev.get("mac_address"):
+            macs = native_ids.mac_addresses(ev.get("_native"))
+            if macs:
+                ev["mac_address"] = macs[0]
+
         if ev["car_object"] == "authentication":
             _link_auth_sessions(ev, sessions)
 

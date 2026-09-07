@@ -40,8 +40,13 @@ from . import carmodel
 # no field for it, so like owning_guid it lives in the header as a queryable
 # column on every object (nullable — enrich fills it from the in-memory
 # `_native` blob before it is serialised into the `native` column).
+# mac_address is the third non-MITRE addition (B3): a hardware MAC — literal, or
+# recovered from the node of a version-1 (time+MAC) GUID (a DLT birth-droid) —
+# is a device-linkage join key MITRE CAR has no field for, so like volume_guid
+# it lives in the header (nullable, enrich fills it from `_native`).
 HEADER = ["timestamp", "car_action", "guid", "owning_guid", "volume_guid",
-          "link_confidence", "source_artefact", "source_host", "native"]
+          "mac_address", "link_confidence", "source_artefact", "source_host",
+          "native"]
 
 
 def _q(name: str) -> str:
