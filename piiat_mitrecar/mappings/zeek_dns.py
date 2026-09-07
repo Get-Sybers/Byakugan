@@ -12,9 +12,12 @@ endpoint IP that query resolved — so a bare connection to `100.101.0.42` becom
 a connection to `scoring-c2.berylia.org` (the C2 chain the value hunt found,
 which no CAR field carried). Normalisation only here; the stamping is enrich's.
 
-`guid` is the Zeek `uid` — shared with the conn/http/… events of the SAME
-connection (run-scoped, never equated across runs); a DNS `flow`/message row and
-the conn `flow`/end row of one connection are two honest facets of it.
+`guid` is `flow-<uid>-<trans_id>` — the connection `uid` (shared with the
+conn/http/… events of the SAME connection, run-scoped and never equated across
+runs) PLUS the DNS transaction id, because one UDP :53 connection carries many
+queries and `uid` alone would fold distinct resolutions into one row. The `uid`
+still ties each DNS row back to its conn `flow`/end row — two honest facets of
+one connection.
 """
 from __future__ import annotations
 

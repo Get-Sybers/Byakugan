@@ -345,7 +345,9 @@ def _dns_resolution(events):
     Host-scoped like every join (a capture is one vantage)."""
     res = {}
     for ev in events:
-        if ev.get("car_object") != "flow" or ev.get("application_protocol") != "dns":
+        # gate on the producing map, not application_protocol="dns" — a zeek_conn
+        # flow whose `service` is dns also carries that value but has no answers
+        if ev.get("source_artefact") != "zeek_dns":
             continue
         domain = ev.get("fqdn")
         if not domain:
