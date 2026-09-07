@@ -134,7 +134,19 @@ def test_compile_rule_skips_unmapped_and_untagged():
 def test_technique_tags():
     techs, tactics = S.technique_tags(["attack.execution", "attack.t1059.001", "attack.t1053"])
     assert techs == ["T1059.001", "T1053"]
-    assert "execution" in tactics
+    assert tactics == ["TA0002"]                       # shortname -> ATT&CK tactic id (MITRE's format)
+
+
+def test_values_same_format_as_mitre():
+    # a compiled Sigma analytic carries coverage in the SAME value formats as a
+    # MITRE CAR analytic: technique T####, tactics TA#### ids, grade is None
+    # (no self-assessed coverage), severity holds the Sigma level (distinct axis).
+    an = S.compile_rule(dict(_CMD_RULE, level="high"))
+    cov = an.coverage[0]
+    assert cov.technique == "T1059.001"          # T#### — same as MITRE
+    assert cov.tactics == ["TA0002"]             # TA#### id — same as MITRE (not "execution")
+    assert cov.grade is None                     # no self-assessed coverage confidence
+    assert an.severity == "high"                 # the Sigma level lives here, a distinct axis
 
 
 # -- end-to-end flagging ------------------------------------------------------
