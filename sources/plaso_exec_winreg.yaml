@@ -77,5 +77,5 @@ other_coverage:
 - 'native/join keys (file/create): artefact_file, artefact_sha256, compile_time, data_type, file_reference,
   key_path, program_identifier, timestamp_desc'
 - 'native/join keys (process/create): artefact_file, artefact_sha256, control_set, data_type, entry_index,
-  execution_inferred, file_reference, hive_user_sid, key_path, number_of_executions, program_identifier,
-  time_meaning, timestamp_desc, value_name'
+  execution_inferred, file_reference, key_path, number_of_executions, program_identifier, time_meaning,
+  timestamp_desc, value_name'

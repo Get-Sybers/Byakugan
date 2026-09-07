@@ -69,7 +69,8 @@ import re
 
 from ..normalize import (basename, const, ext, first, map_value,  # noqa: F401
                          payload, regex1)
-from ._common import R as _R, spindle as _spindle
+from ._common import (R as _R, spindle as _spindle,
+                      user_from_path as _user_from_path)
 
 
 # --- variant predicates (globally-unique names, plaso_ prefixed) -------------
@@ -303,7 +304,12 @@ MAPPINGS = {
                     # full path only when the value actually IS a path (has a
                     # separator) — a bare decoded name never fakes image_path
                     "image_path": regex1(_UA_PROG, r"^(.*[\\/].*)$"),
-                    "user": _R("username"),
+                    # userassist lives in the per-user NTUSER.DAT — the owning
+                    # account is right there in the hive path
+                    # (\Users\<name>\NTUSER.DAT). Fill-only-null: the recorded
+                    # username ("-" → null here) wins if ever present.
+                    "user": first(_R("username"),
+                                  _user_from_path(_R("display_name"))),
                     "hostname": _IMG_HOST,
                 },
                 "keep": _KEEP,
@@ -312,12 +318,11 @@ MAPPINGS = {
                     key_path=_R("key_path"),
                     value_name=_R("value_name"),
                     number_of_executions=_R("number_of_executions"),
-                    # the OWNING USER's SID, provable from the NTUSER hive
-                    # path the artefact was read out of — a join candidate for
-                    # the user attribution step, never a canonical `sid` (the
-                    # record itself does not state it)
-                    hive_user_sid=regex1(_R("display_name"),
-                                         r"(S-1-5-21-[0-9-]+)"),
+                    # (the former hive_user_sid native extract scanned
+                    # display_name for an S-1-5-21… SID — Plaso renders the
+                    # NTUSER path as \Users\<name>\NTUSER.DAT, never a SID, so it
+                    # matched 0% of real rows. Retired: the owning account is
+                    # now derived into the canonical `user` above.)
                 ),
             }),
             ("plaso_is_bam", {

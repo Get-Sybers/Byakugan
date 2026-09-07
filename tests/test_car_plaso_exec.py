@@ -74,14 +74,15 @@ _APPCOMPAT = {
 }
 
 _USERASSIST_RUNPATH = {
-    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "SourceImage": "log2timeline/jsonl/DESKTOP-PM6C56D.jsonl",
     "Timestamp": "2009-11-20T01:23:45.000000Z",
     "Parser": "winreg/userassist",
     "Record": {
         "data_type": "windows:registry:userassist",
-        "display_name": "NTFS:\\Documents and Settings\\Administrator\\"
-                        "NTUSER_S-1-5-21-606747145-1547161642-1644491937-500",
-        "image_hostname": "M57-JO",
+        # real LoneWolf shape: the per-user NTUSER.DAT under \Users\<name>\
+        # (a VSS shadow copy of it here) — the owning account is in the path
+        "display_name": "VSS2:NTFS:\\Users\\jcloudy\\NTUSER.DAT",
+        "image_hostname": "DESKTOP-PM6C56D",
         "key_path": "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\"
                     "CurrentVersion\\Explorer\\UserAssist\\"
                     "{75048700-EF1F-11D0-9888-006097DEACF9}\\Count",
@@ -216,14 +217,19 @@ def test_appcompatcache_execution_is_labelled_inferred():
         assert ev["_native"]["time_meaning"] == meaning, desc
 
 
-def test_userassist_runpath_maps_and_extracts_hive_sid():
+def test_userassist_runpath_maps_and_derives_user_from_hive_path():
     ev = normalize.normalize("plaso_exec_winreg", _USERASSIST_RUNPATH)
     assert ev is not None
     assert ev["exe"] == "R54402.EXE"
     assert ev["image_path"] == "E:\\R54402.EXE"
-    # join candidate: the NTUSER hive owner's SID (native, never canonical sid)
-    assert ev["_native"]["hive_user_sid"] == \
-        "S-1-5-21-606747145-1547161642-1644491937-500"
+    # A1 (the #1 disk win): the owning account, derived from the per-user
+    # NTUSER hive path (\Users\jcloudy\NTUSER.DAT). The "-" native username is
+    # an honest null, so the path fills it.
+    assert ev["user"] == "jcloudy"
+    # the dead hive_user_sid native extract is retired — it scanned display_name
+    # for an S-1-5-21… SID, a form Plaso never renders into the hive path, so it
+    # matched 0% of real rows. Owner attribution now rides the canonical `user`.
+    assert "hive_user_sid" not in ev["_native"]
     assert ev.get("sid") is None
 
 

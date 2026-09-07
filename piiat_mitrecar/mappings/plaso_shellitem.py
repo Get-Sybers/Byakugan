@@ -18,7 +18,8 @@ import re
 
 from ..normalize import (basename, ext, first, host_label,  # noqa: F401
                          regex1, unescape_backslashes)
-from ._common import R as _R, plaso_rec as _rec, spindle as _spindle
+from ._common import (R as _R, plaso_rec as _rec, spindle as _spindle,
+                      user_from_path as _user_from_path)
 
 
 def _td(rec) -> str:
@@ -64,6 +65,12 @@ def _shell_map(action):
         "file_name": basename(_PATH),
         "extension": ext(_PATH),
         "hostname": _R("image_hostname"),
+        # the acting user: a shellbag/MRU item is read from a per-user hive and
+        # a Recent .lnk lives under \Users\<name>\ — the artefact path
+        # (display_name) names its owner, the navigated target the fallback.
+        # Honest null for a system-hive/system-path origin.
+        "user": first(_user_from_path(_R("display_name")),
+                      _user_from_path(_PATH)),
     }
     if action == "create":
         props["creation_time"] = "Timestamp"

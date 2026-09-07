@@ -11,6 +11,20 @@ import json
 from ..normalize import host_label, payload, regex1
 
 
+# --- shared derivations -----------------------------------------------------
+
+def user_from_path(src):
+    """The owning account named by a Vista+ per-user path — the ``\\Users\\<name>\\``
+    convention. A hive/lnk/item read out of ``\\Users\\jcloudy\\…`` belongs to
+    ``jcloudy``; a system path (no ``\\Users\\`` segment) honestly yields null.
+
+    ``recmd.py`` already mines the hive path exactly this way; this is the
+    shared marker the disk maps that leave ``user`` null derive it with. It is
+    always used FILL-ONLY-NULL (``first(<native username>, user_from_path(…))``)
+    so a real recorded username is never overwritten by a path inference."""
+    return regex1(src, r"[/\\]Users[/\\]([^/\\]+)[/\\]")
+
+
 # --- Plaso (log2timeline) wrapped records -----------------------------------
 
 def R(key):

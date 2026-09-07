@@ -26,8 +26,8 @@ expressible on this KEY-level record shape (to-be-validated/spindle_identity.yml
 """
 from __future__ import annotations
 
-from ..normalize import host_label, payload, regex1  # noqa: F401
-from ._common import R as _R, spindle as _spindle
+from ..normalize import first, host_label, payload, regex1  # noqa: F401
+from ._common import R as _R, spindle as _spindle, user_from_path as _user_from_path
 
 
 def plaso_is_registry(rec) -> bool:
@@ -53,6 +53,13 @@ MAPPINGS = {
                     # present on service rows (the svchost/binary) — null else
                     "image_path": _R("image_path"),
                     "hostname": _R("image_hostname"),
+                    # the owning account: a per-user hive (NTUSER.DAT /
+                    # UsrClass.dat) is read out of \Users\<name>\ — that path
+                    # names its user. Fill-only-null (a real recorded username
+                    # wins); a system hive (SYSTEM/SOFTWARE/SAM) has no \Users\
+                    # segment and stays an honest null.
+                    "user": first(_R("username"),
+                                  _user_from_path(_R("display_name"))),
                 },
                 "keep": [],
                 # surface everything a registry data_type may carry — absent
@@ -103,9 +110,11 @@ MAPPINGS = {
                     "owner": _R("owner"),
                     "configuration": _R("configuration"),
                     "settings": _R("settings"),
-                    # hive-owner SID for the end-stage user attribution
-                    "hive_user_sid": regex1(_R("display_name"),
-                                            r"(S-1-5-21-[0-9-]+)"),
+                    # (the former hive_user_sid native extract scanned
+                    # display_name for an S-1-5-21… SID — a form Plaso never
+                    # renders into the hive path (it is \Users\<name>\NTUSER.DAT),
+                    # so it matched 0% of real rows. Retired: the owning account
+                    # is now derived into the canonical `user` above.)
                 },
             }),
         ],
