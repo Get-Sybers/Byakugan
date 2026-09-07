@@ -52,7 +52,7 @@ MAPPINGS = {
                     # parity with the Sysmon registry map (data + new_content)
                     "new_content": first("ValueData", "ValueData2", "ValueData3"),
                     # a per-user hive names its user (hive-path convention)
-                    "user": regex1("HivePath", r"[/\\]Users[/\\]([^/\\]+)[/\\]"),
+                    "user": regex1("HivePath", r"(?i)[/\\]Users[/\\]([^/\\]+)[/\\]"),
                 },
                 "keep": ["HivePath", "HiveType", "Category", "Description",
                          "Comment", "ValueType", "Deleted", "Recursive"],

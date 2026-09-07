@@ -22,7 +22,10 @@ def user_from_path(src):
     shared marker the disk maps that leave ``user`` null derive it with. It is
     always used FILL-ONLY-NULL (``first(<native username>, user_from_path(…))``)
     so a real recorded username is never overwritten by a path inference."""
-    return regex1(src, r"[/\\]Users[/\\]([^/\\]+)[/\\]")
+    # case-insensitive: Windows paths are case-insensitive and sources emit
+    # \Users\, \users\ and \USERS\ interchangeably (the captured name keeps its
+    # own case).
+    return regex1(src, r"(?i)[/\\]Users[/\\]([^/\\]+)[/\\]")
 
 
 # --- Plaso (log2timeline) wrapped records -----------------------------------

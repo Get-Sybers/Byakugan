@@ -119,3 +119,31 @@ def test_recyclebin_derives_user_and_sid_uid_from_path():
     assert ev["user"] == "jcloudy"
     # …and the $Recycle.Bin per-user subdir IS the deleting account's SID
     assert ev["uid"] == "S-1-5-21-2734969515-1644526556-1039763013-1001"
+
+
+# --- case-insensitivity (#55 review) ----------------------------------------
+# Windows paths are case-insensitive and sources emit the segment in any case;
+# the match must not be, or attribution silently fails on a casing difference.
+
+def test_user_from_path_is_case_insensitive():
+    rec = {"data_type": "windows:registry:key_value",
+           "key_path": r"HKEY_CURRENT_USER\Software\Foo",
+           "display_name": r"NTFS:\users\jcloudy\ntuser.dat",   # lower-case \users\
+           "image_hostname": "DESKTOP-PM6C56D", "username": "-"}
+    ev = normalize.normalize("plaso_registry", _wrap(rec))
+    # matched despite the casing; the captured name keeps its own case
+    assert ev["user"] == "jcloudy"
+
+
+def test_recyclebin_sid_uid_is_case_insensitive():
+    rec = {"data_type": "windows:metadata:deleted_item",
+           "timestamp_desc": "Content Deletion Time",
+           "original_filename": r"C:\users\jcloudy\Desktop\x",
+           "display_name": (r"NTFS:\$recycle.bin"      # lower-case bucket dir
+                            r"\S-1-5-21-2734969515-1644526556-1039763013-1001"
+                            r"\$IQAU6NQ"),
+           "file_size": 1, "record_index": 1,
+           "image_hostname": "DESKTOP-PM6C56D", "username": "-"}
+    ev = normalize.normalize("l2t_recyclebin", _wrap(rec))
+    assert ev["user"] == "jcloudy"
+    assert ev["uid"] == "S-1-5-21-2734969515-1644526556-1039763013-1001"

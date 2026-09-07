@@ -195,8 +195,18 @@ def converge(case_dir: str) -> list[dict]:
         members: dict[str, list] = {}
         for r in rows:
             members.setdefault(r["_source"], []).append(r.get("guid"))
+        # A content-hash group may legitimately hold MIXED car_objects (the same
+        # bytes seen as a disk `file`, a running `process`, a loaded `module`
+        # and a `driver` all share one content bucket), so `rows[0]` would label
+        # the group non-deterministically by iteration order. Label it from the
+        # join key instead: the content bucket object (`kv[0]`, e.g. "file") for
+        # a content join, else the key's own object component (`kv[1]`, which
+        # every row in a record/image group shares). Keep the full set of folded
+        # object types in `car_objects` so nothing is lost.
+        group_object = kv[0] if tier == DEFINITIVE_CONTENT else kv[1]
         converged.append({
-            "car_object": rows[0]["car_object"],
+            "car_object": group_object,
+            "car_objects": sorted({r["car_object"] for r in rows}),
             "tier": tier,
             "join_key": list(kv),
             "sources": sorted(sources),

@@ -143,7 +143,7 @@ MAPPINGS = {
                     # (\$Recycle.Bin\<SID>\$I…) — the canonical uid (a SID the
                     # record's own path states; no SAM lookup needed).
                     "uid": regex1(_r("display_name"),
-                                  r"\$Recycle\.Bin[/\\](S-1-[0-9-]+)"),
+                                  r"(?i)\$Recycle\.Bin[/\\](S-1-[0-9-]+)"),
                 },
                 "keep": [],
                 "native_extract": {"data_type": _r("data_type"),
