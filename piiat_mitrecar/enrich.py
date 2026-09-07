@@ -534,6 +534,15 @@ def enrich(events: list[dict]) -> list[dict]:
             if macs:
                 ev["mac_address"] = macs[0]
 
+        # B3: lift the USB device serial — the iSerialNumber in a USBSTOR
+        # device-instance path (USBSTOR + Ven_ gated) — into the first-class
+        # `device_serial` column, the physical-device join key MITRE CAR lacks.
+        # Fill-only-null; the first is taken.
+        if not ev.get("device_serial"):
+            sers = native_ids.device_serials(ev.get("_native"))
+            if sers:
+                ev["device_serial"] = sers[0]
+
         if ev["car_object"] == "authentication":
             _link_auth_sessions(ev, sessions)
 

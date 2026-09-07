@@ -91,6 +91,67 @@ def test_enrich_lifts_mac_from_a_v1_guid_into_the_column():
     assert out["mac_address"] == "00:1c:c4:2d:f4:0b"   # decoded from the DLT droid node
 
 
+# --- USB device serial (B3) ------------------------------------------------- #
+
+def test_device_serials_extracts_from_real_usbstor_shapes():
+    # the three renderings the SAME SanDisk serial takes on real LoneWolf data:
+    # a registry key path (\), a setupapi/WPDBUSENUM device-instance id (#), and
+    # an Amcache InventoryDevicePnp key (/, lower-case). All fold to one UPPER
+    # serial in first-seen order, de-duped.
+    nat = {"key_path": r"...\Enum\USBSTOR\Disk&Ven_SanDisk&Prod_Extreme&Rev_0001\AA010215170355310594&0",
+           "setupapi": r"_??_USBSTOR#Disk&Ven_SanDisk&Prod_Extreme&Rev_0001#AA010215170355310594&0#{53f56307-b6bf-11d0-94f2-00a0c91efb8b}",
+           "amcache": r"\Root\InventoryDevicePnp\usbstor/disk&ven_sandisk&prod_extreme&rev_0001/aa010215170355310594&0"}
+    assert native_ids.device_serials(nat) == ["AA010215170355310594"]
+
+
+def test_device_serials_accepts_str_and_gathers_two_units_in_order():
+    s = (r"USBSTOR\Disk&Ven_SanDisk&Prod_Extreme&Rev_0001\AA010215170355310594&0 then "
+         r"USBSTOR#Disk&Ven_SanDisk&Prod_Extreme&Rev_0001#AA010603160707470215&0#{x}")
+    assert native_ids.device_serials(s) == ["AA010215170355310594", "AA010603160707470215"]
+    assert native_ids.device_serials(None) == []
+    assert native_ids.device_serials({}) == []
+
+
+def test_device_serials_is_precision_gated():
+    # a raw usb/vid_/pid_ PnP path has no Ven_ descriptor and no &0 suffix
+    assert native_ids.device_serials(
+        {"k": r"\Root\InventoryDevicePnp\usb/vid_0781&pid_5580/aa010215170355310594"}) == []
+    # a Windows-MINTED instance id (embedded &, ends &0&0 — no hardware serial)
+    assert native_ids.device_serials(
+        {"k": r"USBSTOR\Disk&Ven_Generic&Prod_Flash&Rev_1.00\7&1e8dc766&0&0"}) == []
+    # a bare alphanumeric string out of any USBSTOR context is never a serial
+    assert native_ids.device_serials({"k": "AA010215170355310594"}) == []
+
+
+def test_as_serial_validates_and_folds():
+    assert native_ids.as_serial("aa010215170355310594") == "AA010215170355310594"
+    assert native_ids.as_serial("AA010215170355310594") == "AA010215170355310594"
+    # anything carrying a separator (a stray path, a GUID, a MAC) is rejected —
+    # it must not be trusted as a device join key
+    for bad in (None, "", "abc",
+                r"USBSTOR\Disk&Ven_SanDisk&Prod_Extreme&Rev_0001\AA010215170355310594&0",
+                "09931f21-7faf-44a9-81d8-1e73c14b9eaf", "00:1c:c4:2d:f4:0b"):
+        assert native_ids.as_serial(bad) is None
+
+
+def test_enrich_lifts_device_serial_into_the_column():
+    ev = {"car_object": "registry", "car_action": "value_edit", "guid": "r-1",
+          "source_host": "PM6C56D", "timestamp": "2026-01-01T00:00:00Z",
+          "_native": {"key_path": r"...\Enum\USBSTOR\Disk&Ven_SanDisk&Prod_Extreme&Rev_0001"
+                                  r"\AA010215170355310594&0"}}
+    (out,) = enrich.enrich([ev])
+    assert out["device_serial"] == "AA010215170355310594"   # lifted into the column
+
+
+def test_device_serial_is_a_stored_column_on_every_object(tmp_path):
+    st = store.CarStore(str(tmp_path / "car.db"))
+    try:
+        for obj in st.model:
+            assert "device_serial" in st._cols(obj)
+    finally:
+        st.close()
+
+
 def test_volume_guid_is_a_stored_column_on_every_object(tmp_path):
     # the non-MITRE header addition must be a real column on all 13 objects
     st = store.CarStore(str(tmp_path / "car.db"))
