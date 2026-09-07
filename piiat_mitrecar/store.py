@@ -44,9 +44,14 @@ from . import carmodel
 # recovered from the node of a version-1 (time+MAC) GUID (a DLT birth-droid) —
 # is a device-linkage join key MITRE CAR has no field for, so like volume_guid
 # it lives in the header (nullable, enrich fills it from `_native`).
+# device_serial is the fourth non-MITRE addition (B3): the USB iSerialNumber from
+# a USBSTOR device-instance path — the physical-device join key tying USBSTOR ↔
+# setupapi ↔ DeviceClasses ↔ MountedDevices ↔ EMDMgmt to one stick — which MITRE
+# CAR has no field for, so like mac_address it lives in the header (nullable,
+# enrich fills it from `_native`).
 HEADER = ["timestamp", "car_action", "guid", "owning_guid", "volume_guid",
-          "mac_address", "link_confidence", "source_artefact", "source_host",
-          "native"]
+          "mac_address", "device_serial", "link_confidence", "source_artefact",
+          "source_host", "native"]
 
 
 def _q(name: str) -> str:

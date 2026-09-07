@@ -68,6 +68,12 @@ custom_namespace:
       cross-object device-linkage key; ECS's mac fields are role-specific
       (source.mac / destination.mac / host.mac), so a header field not tied to one
       role homes here. See common_header.mac_address.
+  car.device_serial:
+    type: keyword
+    description: >-
+      a USB device serial (the USBSTOR iSerialNumber), UPPER-folded. A cross-object
+      physical-device linkage key; ECS has no device-serial field, so it homes here.
+      See common_header.device_serial.
   car.native:
     type: flattened
     description: the CAR header `native` bag — source evidence with no CAR home, verbatim keys.
@@ -180,6 +186,15 @@ common_header:
       cross-object device-linkage key not tied to one role, so it homes at the custom
       car.mac_address. A per-object projection to the role-appropriate ECS mac field is a
       later refinement.
+
+  device_serial:
+    ecs: car.device_serial
+    type: keyword
+    note: >-
+      a USB device serial (the USBSTOR iSerialNumber from a device-instance path) — the fourth
+      non-MITRE header field (B3), UPPER-folded. ECS has no device-serial field, so it homes at
+      the custom car.device_serial; it is the physical-device join key tying USBSTOR ↔ setupapi
+      ↔ DeviceClasses ↔ MountedDevices ↔ EMDMgmt rows that name the same stick.
 
   link_confidence:
     ecs: car.link_confidence

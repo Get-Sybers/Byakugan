@@ -27,6 +27,26 @@ def _make(tmp: str):
     superset.build_superset_db(tmp, _events())
 
 
+def test_timeline_skips_auxiliary_tables_without_a_header(tmp_path):
+    # a producer may add its own non-CAR table (PIIAT-Mem's car.db carries
+    # `image_context`: source_image/source_plugin/record, no timestamp). The
+    # timeline must skip it, not crash on the missing header column.
+    import sqlite3
+    d = str(tmp_path)
+    st = store.CarStore(os.path.join(d, "car.db"))
+    st.insert_events(_events())
+    st.close()
+    con = sqlite3.connect(os.path.join(d, "car.db"))
+    con.execute("CREATE TABLE image_context (source_image TEXT, source_plugin TEXT, record TEXT)")
+    con.execute("INSERT INTO image_context VALUES ('mem.raw', 'windows.pslist', 'x')")
+    con.commit()
+    con.close()
+    rows = timeline.build_timeline(d)                 # must not raise
+    objs = {r["object"] for r in rows if r["kind"] == "object"}
+    assert "image_context" not in objs                # the aux table is skipped
+    assert objs == {"process", "module"}              # the CAR objects survive
+
+
 def test_timeline_merges_objects_and_edges_ordered(tmp_path):
     _make(str(tmp_path))
     rows = timeline.build_timeline(str(tmp_path))
