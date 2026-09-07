@@ -34,7 +34,7 @@ from __future__ import annotations
 import os
 from collections import defaultdict
 
-from . import carmodel, spindle
+from . import carmodel, native_ids, spindle
 
 # the fold vocabulary (relationships.yml dedupe.fold)
 FOLD_ADDITIVE, FOLD_MOST_POPULATED = "additive", "most_populated"
@@ -430,6 +430,17 @@ def enrich(events: list[dict]) -> list[dict]:
 
     for ev in events:
         obj_fields = set(model[ev["car_object"]]["fields"])
+
+        # B1: lift the globally-unique volume GUID out of the in-memory `_native`
+        # blob (before it is serialised into the stored `native` column) into the
+        # first-class `volume_guid` column — the strongest cross-source key on a
+        # disk image (USN ↔ evtx ↔ registry ↔ mount table ↔ cloud-sync), which
+        # MITRE CAR has no field for. Fill-only-null; a row may name only one
+        # volume, so the first is taken (any others stay in _native).
+        if not ev.get("volume_guid"):
+            vols = native_ids.volume_guids(ev.get("_native"))
+            if vols:
+                ev["volume_guid"] = vols[0]
 
         if ev["car_object"] == "authentication":
             _link_auth_sessions(ev, sessions)

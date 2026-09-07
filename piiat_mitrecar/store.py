@@ -33,8 +33,15 @@ from . import carmodel
 #   - parent_pid / owning_pid: not MITRE fields — transient enrichment inputs
 #     (enrich reads them off the in-memory event); the canonical parent/owner
 #     pid already lives in the object's own `ppid`/`pid` MITRE fields.
-HEADER = ["timestamp", "car_action", "guid", "owning_guid", "link_confidence",
-          "source_artefact", "source_host", "native"]
+#
+# volume_guid is the second non-MITRE addition (B1): the globally-unique volume
+# identity (`\\?\Volume{GUID}`) is the strongest cross-source key on a disk image
+# (it ties USN ↔ evtx ↔ registry ↔ mount table ↔ cloud-sync), but MITRE CAR has
+# no field for it, so like owning_guid it lives in the header as a queryable
+# column on every object (nullable — enrich fills it from the in-memory
+# `_native` blob before it is serialised into the `native` column).
+HEADER = ["timestamp", "car_action", "guid", "owning_guid", "volume_guid",
+          "link_confidence", "source_artefact", "source_host", "native"]
 
 
 def _q(name: str) -> str:
