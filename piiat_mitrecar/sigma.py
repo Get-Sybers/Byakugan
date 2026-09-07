@@ -350,8 +350,24 @@ def _eval_cond(node, results: dict[str, bool]) -> bool:
 
 
 # ------------------------------------------------------------------ compilation
+# ATT&CK Enterprise tactic shortname -> tactic id. Sigma tags tactics by
+# shortname (`attack.defense-evasion`); MITRE's CAR coverage uses the id
+# (`TA0005`). Byakugan emits the ID so a Sigma hit and a CAR-analytic hit carry
+# tactics in ONE format (the 14 enterprise tactics are fixed).
+_TACTIC_TA = {
+    "reconnaissance": "TA0043", "resource-development": "TA0042", "initial-access": "TA0001",
+    "execution": "TA0002", "persistence": "TA0003", "privilege-escalation": "TA0004",
+    "defense-evasion": "TA0005", "credential-access": "TA0006", "discovery": "TA0007",
+    "lateral-movement": "TA0008", "collection": "TA0009", "command-and-control": "TA0011",
+    "exfiltration": "TA0010", "impact": "TA0040",
+}
+
+
 def technique_tags(tags) -> tuple[list[str], list[str]]:
-    """(techniques, tactic-shortnames) from a rule's ``tags``."""
+    """(techniques as ``T####[.###]``, tactics as ``TA####`` ids) from a rule's
+    ``tags`` — the SAME value formats MITRE's CAR coverage uses, so the two
+    detection corpora are interchangeable downstream. An unknown tactic shortname
+    is dropped (never a fabricated id)."""
     techs, tactics = [], []
     for t in tags or []:
         s = str(t)
@@ -361,9 +377,9 @@ def technique_tags(tags) -> tuple[list[str], list[str]]:
             if tid not in techs:
                 techs.append(tid)
         elif s.lower().startswith("attack."):
-            tac = s.split(".", 1)[1]
-            if not tac.lower().startswith("t") and tac not in tactics:
-                tactics.append(tac)
+            ta = _TACTIC_TA.get(s.split(".", 1)[1].lower())
+            if ta and ta not in tactics:
+                tactics.append(ta)
     return techs, tactics
 
 
@@ -382,9 +398,14 @@ def compile_rule(doc: dict, skip_ids: set[str] | None = None,
     rid = str(doc.get("id") or doc.get("title") or "sigma")
     title = str(doc.get("title") or rid)
     techs, tactics = technique_tags(doc.get("tags"))
-    coverage = [Coverage(technique=t, subtechniques=[], tactics=tactics, grade=doc.get("level"))
+    # `grade` is MITRE's detection-COVERAGE confidence — a Sigma rule makes no
+    # such self-assessment, so it stays None; the rule's `level` is ALERT
+    # SEVERITY, carried on the analytic (a different axis), so a Byakugan and a
+    # CAR-analytic coverage are the same shape and their values the same format.
+    coverage = [Coverage(technique=t, subtechniques=[], tactics=tactics, grade=None)
                 for t in techs]
-    an = CarAnalytic(id=rid, title=title, coverage=coverage)
+    an = CarAnalytic(id=rid, title=title, coverage=coverage,
+                     severity=str(doc.get("level") or "") or None)
     an.pseudocode = None
     if skip_deprecated and str(doc.get("status") or "").lower() == "deprecated":
         an.skip_reason = "rule status is deprecated"
