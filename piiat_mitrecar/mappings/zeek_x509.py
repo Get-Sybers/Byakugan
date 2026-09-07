@@ -18,7 +18,7 @@ its SNI (`sni_matches_cert` is the mismatch tell).
 """
 from __future__ import annotations
 
-from ..normalize import epoch_ts  # noqa: F401
+from ..normalize import epoch_ts, lower  # noqa: F401
 
 
 def zeek_x509_has_fingerprint(rec) -> bool:
@@ -45,7 +45,7 @@ MAPPINGS = {
                     # Zeek's x509 fingerprint is a SHA-256 of the DER cert, so it
                     # IS the content hash — this is what makes a cert converge
                     # (same bytes across captures / with an on-disk/in-memory copy)
-                    "sha256_hash": "fingerprint",
+                    "sha256_hash": lower("fingerprint"),   # LOWERCASE: one hash format across sources
                 },
                 # the cert identity + metadata that has no CAR file field — the
                 # subject/issuer the cert vouches for, the SAN dns names, serial,

@@ -57,8 +57,11 @@ def test_eid1_process_create_full_extraction():
     assert ev["current_working_directory"].startswith(r"C:\Users")
     assert ev["integrity_level"] == "High"
     assert ev["pid"] == "3836" and ev["ppid"] == "1372"
-    assert ev["md5_hash"] == "64FDBD98584331982A15B1F2DF7F08DA"
-    assert ev["sha1_hash"].startswith("8CC66ED5") and ev["sha256_hash"].startswith("B5DE10A0")
+    # hashes are canonicalised to LOWERCASE at extraction (Sysmon stamps them
+    # UPPERCASE) — one hash format across every source, so cross-source equality
+    # and a Sigma/hayabusa lowercase-hash rule both match.
+    assert ev["md5_hash"] == "64fdbd98584331982a15b1f2df7f08da"
+    assert ev["sha1_hash"].startswith("8cc66ed5") and ev["sha256_hash"].startswith("b5de10a0")
     assert ev.get("sid") is None                    # EID 1 has no SID — honest null
     assert ev["hostname"] == "IEWIN7" and ev.get("fqdn") is None  # NetBIOS, no faked fqdn
     assert ev["source_host"] == "IEWIN7"
@@ -124,7 +127,7 @@ def test_eid11_file_create_and_eid23_delete_hashes():
         "TargetFilename": r"C:\Users\IEUser\Desktop\dummy.sys",
         "Hashes": _HASHES, "IsExecutable": "true", "Archived": "true"}))
     assert delete["car_action"] == "delete"
-    assert delete["md5_hash"] == "64FDBD98584331982A15B1F2DF7F08DA"
+    assert delete["md5_hash"] == "64fdbd98584331982a15b1f2df7f08da"   # lowercased
     assert delete.get("creation_time") is None      # deletion proves no create time
 
 

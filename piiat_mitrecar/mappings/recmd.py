@@ -21,7 +21,7 @@ the real LoneWolf hives (7,493 records).
 """
 from __future__ import annotations
 
-from ..normalize import basename, first, payload, regex1, replace  # noqa: F401
+from ..normalize import basename, first, payload, regex1, replace, user_canon  # noqa: F401
 
 
 def recmd_is_value_record(rec) -> bool:
@@ -52,7 +52,7 @@ MAPPINGS = {
                     # parity with the Sysmon registry map (data + new_content)
                     "new_content": first("ValueData", "ValueData2", "ValueData3"),
                     # a per-user hive names its user (hive-path convention)
-                    "user": regex1("HivePath", r"(?i)[/\\]Users[/\\]([^/\\]+)[/\\]"),
+                    "user": user_canon(regex1("HivePath", r"(?i)[/\\]Users[/\\]([^/\\]+)[/\\]")),
                 },
                 "keep": ["HivePath", "HiveType", "Category", "Description",
                          "Comment", "ValueType", "Deleted", "Recursive"],

@@ -73,7 +73,9 @@ MAPPINGS = {
                     "file_name": "filename",
                     "extension": ext("filename"),
                     "mime_type": "mime_type",
-                    "md5_hash": "md5", "sha1_hash": "sha1", "sha256_hash": "sha256",
+                    # canonicalised to LOWERCASE (one hash format across sources)
+                    "md5_hash": lower("md5"), "sha1_hash": lower("sha1"),
+                    "sha256_hash": lower("sha256"),
                 },
                 # uid ties the file to its flow; source (HTTP/SMTP/...) + fuid tie
                 # it to the transaction; bytes/analyzers are the transfer evidence

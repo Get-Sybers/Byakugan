@@ -22,7 +22,7 @@ stop only), so forcing it would fake an action. It stays raw.
 from __future__ import annotations
 
 from ..normalize import (basename, const, domain_of, first, host_label,  # noqa: F401
-                         map_value, payload, regex1, userdata)
+                         map_value, payload, regex1, user_canon, userdata)
 
 
 def evtxx_is_bits_transfer(rec) -> bool:
@@ -82,7 +82,7 @@ MAPPINGS = {
                                                 "25": "reconnect"}),
                 "ts": "TimeCreated", "guid": _GUID, "host": host_label("Computer"),
                 "props": {
-                    "user": userdata("User"),
+                    "user": user_canon(userdata("User")),
                     # the remote source of an RDP session; "LOCAL" (console) is
                     # not an IP -> honest null via the negative-lookahead regex
                     "src_ip": regex1(userdata("Address"), r"^(?!LOCAL$)(.+)$"),

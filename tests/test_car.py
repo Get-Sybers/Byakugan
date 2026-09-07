@@ -107,7 +107,7 @@ def test_canonicalization_never_overwrites_native_evidence():
     out = enrich.enrich([machine, alias])
     by = {e.get("guid"): e for e in out}
     assert by["a3"]["user"] == "DESKTOP-X$"        # native evidence untouched
-    assert by["us-2"]["user"] == "Local System"    # alias of the SAME account unified
+    assert by["us-2"]["user"] == "SYSTEM"          # alias of the SAME account unified (canonical token)
 
 
 def test_ts_before_marker_compares_instants_not_strings():

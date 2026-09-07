@@ -45,7 +45,7 @@ mappings:
     hostname: Computer [derived]
     image_path: ProcessName [direct]
     pid: ProcessId [derived]
-    user: SubjectUserName [direct]
+    user: SubjectUserName [derived]
 - object: flow
   action: start
   notes: Derived by EvtxECmd — Windows Event Log (.evtx) — assorted channels (4907/5857/20003/30803/7001/7002/7034).

@@ -57,7 +57,7 @@ mappings:
     file_name: full_path [derived]
     file_path: full_path [direct]
     hostname: image_hostname [direct]
-    sha1_hash: file_identifier [inferred]
+    sha1_hash: file_identifier [derived]
 - object: process
   action: create
   notes: Derived by log2timeline / Plaso — winreg (amcache/userassist/bam/appcompatcache).
@@ -71,10 +71,10 @@ mappings:
   field_provenance:
     exe: full_path [derived]
     hostname: image_hostname [direct]
-    image_path: full_path [direct]
-    sha1_hash: file_identifier [inferred]
+    image_path: full_path [derived]
+    sha1_hash: file_identifier [derived]
     sid: user_identifier [direct]
-    user: username [direct]
+    user: username [derived]
 other_coverage:
 - 'native/join keys (file/create): artefact_file, artefact_sha256, compile_time, data_type, file_reference,
   key_path, program_identifier, timestamp_desc'

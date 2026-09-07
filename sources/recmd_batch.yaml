@@ -37,6 +37,6 @@ mappings:
     key: KeyPath [direct]
     new_content: ValueData | ValueData2 | ValueData3 [coalesced]
     type: ValueType [direct]
-    user: HivePath [inferred]
+    user: HivePath [derived]
     value: ValueName [direct]
 other_coverage: []

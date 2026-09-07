@@ -35,7 +35,7 @@ mappings:
   field_provenance:
     exe: executable [direct]
     hostname: image_hostname [direct]
-    user: username [direct]
+    user: username [derived]
 other_coverage:
 - 'native/join keys (process/create): artefact_file, artefact_sha256, data_type, mapped_files, number_of_volumes,
   path_hints, prefetch_hash, run_count, timestamp_desc, version, volume_device_paths, volume_serial_numbers'
