@@ -279,6 +279,8 @@ class _CondParser:
 
     def parse(self):
         node = self._or()
+        if self.i != len(self.t):
+            raise ValueError("trailing tokens in condition")
         return node
 
     def _or(self):
@@ -306,8 +308,9 @@ class _CondParser:
         if tok == "(":
             self._next()
             node = self._or()
-            if self._peek() == ")":
-                self._next()
+            if self._peek() != ")":
+                raise ValueError("unclosed parenthesis in condition")
+            self._next()
             return node
         if tok in ("all", "any", "1"):
             quant = self._next().lower()
@@ -482,7 +485,8 @@ def load_sigma_analytics(sigma_dir: str, honor_lists: bool = True,
     out: list[CarAnalytic] = []
     for path in sorted(glob.glob(os.path.join(sigma_dir, "**", "*.yml"), recursive=True)):
         try:
-            doc = yaml.safe_load(open(path, encoding="utf-8"))
+            with open(path, encoding="utf-8") as fh:
+                doc = yaml.safe_load(fh)
         except (yaml.YAMLError, OSError):
             continue
         an = compile_rule(doc, skip_ids=skip_ids, skip_deprecated=honor_lists)
