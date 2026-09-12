@@ -200,3 +200,42 @@ wall clock + peak RSS; print a small table. Run once and record results in go/RE
 5. **pyjson lone surrogates** are stored as WTF-8 so an escaped surrogate
    pair and a lone surrogate both re-encode byte-identically; the parity
    vectors are lone-surrogate-free by design.
+
+## Stage B adjustments (recorded deviations — the Python source won)
+
+6. **The live runtime is Python 3.11, not 3.10** (the doc's parse_ts note
+   named 3.10): zeek_conn's `_parse_ts` fromisoformat path therefore has
+   3.11's LENIENT grammar, and the Go port matches the runtime — any-width
+   fraction ('.'/',', first 6 digits used, the rest dropped), compact
+   `YYYYMMDD`/`HHMMSS` forms, ANY single separator character, date-only,
+   `Z` and `±HH[[:]MM[[:]SS]]` offsets. Not ported (→ unparseable, exactly
+   like a junk string — never a mis-parse): ISO week/ordinal dates and
+   fractional-second offsets. The predicate vectors pin the shapes the zeek
+   lane can actually carry.
+7. **epoch_ts on astronomically large epochs**: `datetime.fromtimestamp`
+   raises OSError (NOT in normalize's except list) for |epoch| ≳ 1e18 — the
+   Python engine CRASHES there. The Go engine treats it like the caught
+   ValueError range (year outside 1..9999) and falls back to the
+   ISO-passthrough gate. Both engines agree everywhere Python survives.
+8. **iter_jsonl strips ALL trailing commas** (`rstrip(",")`), not one — the
+   doc said "one trailing comma"; and non-object JSON lines are yielded by
+   iter_jsonl in both engines (the reader vectors pin it), but a non-object
+   RECORD crashes Python's normalize (AttributeError) where
+   `byakugan-parse parse` exits 1 with a named error.
+9. **str()/case-mapping corners**: Python `str()` of a CONTAINER (never
+   produced by the live maps) is emulated with a Python-repr approximation;
+   `.lower()`/`.upper()`/`isdigit()` are Unicode-simple/ASCII in Go where
+   CPython applies full special casing (e.g. 'İ') and Unicode digits. No
+   live field exercises the difference; the marker vectors include a
+   container-repr case to pin the common shape.
+10. **Predicate completeness is informational until stage C**: the registry
+    exposes `predicates.Check`; `byakugan-parse ir-check` prints the
+    not-yet-registered IR names as a note (exit 0), the Go tests log them,
+    and an actually-referenced unregistered predicate fails `parse` loudly
+    at evaluation. Once every family is ported, Check's error should be
+    promoted to a hard ir-check failure.
+11. **Payload parse cache** lives on the Go Record struct (not as a
+    `__car_parsed_payload__` key inside the record dict); observable
+    behavior is identical because the engine never serializes the raw
+    record and keep-lists never name the cache key. `Record.Set`
+    invalidates the field's parse, mirroring the Python `is raw` check.

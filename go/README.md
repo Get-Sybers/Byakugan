@@ -13,7 +13,7 @@ and must reproduce the Python engine's output byte for byte.
     make -C go test      # go vet + go test ./...
     make -C go fmt
 
-## Layout (stage A)
+## Layout (stages A + B)
 
 | package            | what                                                              |
 | ------------------ | ----------------------------------------------------------------- |
@@ -21,7 +21,20 @@ and must reproduce the Python engine's output byte for byte.
 | `internal/ids`     | the identity recipe of `byakugan/ids.py`: uuid5 chain, `Mint`, `GuidOf`, `Render`, `FieldsGuid` — pinned to `model/spindle/golden.yml` via the IR |
 | `internal/pyre`    | Python-regex adapter: RE2 compile + the start-anchored negative-lookahead idiom as {deny, accept} pairs; vectors from `tests/parity/gen_pyre_vectors.py` |
 | `internal/ir`      | embedded IR load + validation                                     |
-| `cmd/byakugan-parse` | CLI skeleton (`parse` / `split-l2t` land in stage B; `ir-check` works) |
+| `internal/record`  | the input-record type: ordered object, blank rule, Python str()/truthiness/strip/int()/float(), EvtxECmd Payload lazy parse (stripped view) + `EvtxPayloadField` (unstripped gating view) |
+| `internal/readers` | `iter_jsonl` semantics: utf-8-sig, errors='replace' maximal subparts, universal newlines, line cleaning; byte-level vectors from `tests/parity/gen_reader_vectors.py` |
+| `internal/markers` | the 24-kind resolver (`normalize._resolve`), `parse_ts`, `_clean_ts`, epoch/isoformat rendering; vectors from `tests/parity/gen_marker_vectors.py` |
+| `internal/predicates` | `Register(name, fn)` registry, per-family files (`predicates_core.go`, `predicates_zeek_conn.go` ported; stage C fills the rest), `Check` completeness gate; vectors from `tests/parity/gen_predicate_vectors.py` |
+| `internal/spindle` | identity resolution over the normalized event + positional fallback + spindle natives; vectors from `tests/parity/gen_spindle_vectors.py` |
+| `internal/normalize` | the orchestrator: variant select → action gate → exact event key order → natives → props → guid LAST |
+| `cmd/byakugan-parse` | CLI: `parse` (adapter `none`) emits PyDumps event lines in input order; `ir-check` byte-compares + reports unported predicates; `split-l2t` + winevt/jlecmd adapters are stage C |
+
+## Parity harness
+
+`tests/parity/test_go_parity.py` runs every `tests/parity/fixtures/<name>/`
+manifest through BOTH engines (frozen reference plumbing + live Python maps
+vs `byakugan-parse parse`) and asserts per-line byte equality. Exemplar
+families proven in stage B: `core_evtx_security`, `zeek_http`, `zeek_conn`.
 
 ## Regenerating the IR and vectors
 
@@ -29,6 +42,11 @@ and must reproduce the Python engine's output byte for byte.
     python -m byakugan.export_ir --check      # CI drift gate
     python tests/parity/gen_pyjson_vectors.py
     python tests/parity/gen_pyre_vectors.py
+    python tests/parity/gen_marker_vectors.py
+    python tests/parity/gen_reader_vectors.py
+    python tests/parity/gen_predicate_vectors.py
+    python tests/parity/gen_spindle_vectors.py
+    python tests/parity/gen_fixtures.py       # rewrites the exemplar fixtures
 
 ## Known, deliberate deltas from Python (stage A)
 

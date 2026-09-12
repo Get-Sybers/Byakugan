@@ -1,0 +1,657 @@
+{
+ "cases": [
+  {
+   "predicate": "is_sec_4624",
+   "rec": {
+    "EventId": 4624,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "is_sec_4624",
+   "rec": {
+    "EventId": 4624,
+    "Channel": "Microsoft-Windows-Security-Auditing"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": "Microsoft-Windows-Security-Auditing"
+   }
+  },
+  {
+   "predicate": "is_sec_4624",
+   "rec": {
+    "EventId": 4624,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "is_sec_4624",
+   "rec": {
+    "EventId": "4624",
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": "4624",
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "is_sec_4624",
+   "rec": {
+    "EventId": 4624.0,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4624.0,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "is_sec_4624",
+   "rec": {
+    "EventId": 4624
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4624
+   }
+  },
+  {
+   "predicate": "is_sec_4624",
+   "rec": {
+    "EventId": 4624,
+    "Channel": null
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": null
+   }
+  },
+  {
+   "predicate": "is_sec_4625",
+   "rec": {
+    "EventId": 4625,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4625,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "is_sec_4625",
+   "rec": {
+    "EventId": 4624,
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "is_sec_4672",
+   "rec": {
+    "EventId": 4672,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4672,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "is_http_origin",
+   "rec": {
+    "method": "GET"
+   },
+   "result": true,
+   "rec_after": {
+    "method": "GET"
+   }
+  },
+  {
+   "predicate": "is_http_origin",
+   "rec": {
+    "method": "post"
+   },
+   "result": true,
+   "rec_after": {
+    "method": "post"
+   }
+  },
+  {
+   "predicate": "is_http_origin",
+   "rec": {
+    "method": "Put"
+   },
+   "result": true,
+   "rec_after": {
+    "method": "Put"
+   }
+  },
+  {
+   "predicate": "is_http_origin",
+   "rec": {
+    "method": "HEAD"
+   },
+   "result": false,
+   "rec_after": {
+    "method": "HEAD"
+   }
+  },
+  {
+   "predicate": "is_http_origin",
+   "rec": {
+    "method": "CONNECT"
+   },
+   "result": false,
+   "rec_after": {
+    "method": "CONNECT"
+   }
+  },
+  {
+   "predicate": "is_http_origin",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "is_http_origin",
+   "rec": {
+    "method": null
+   },
+   "result": false,
+   "rec_after": {
+    "method": null
+   }
+  },
+  {
+   "predicate": "is_http_tunnel",
+   "rec": {
+    "method": "CONNECT"
+   },
+   "result": true,
+   "rec_after": {
+    "method": "CONNECT"
+   }
+  },
+  {
+   "predicate": "is_http_tunnel",
+   "rec": {
+    "method": "connect"
+   },
+   "result": true,
+   "rec_after": {
+    "method": "connect"
+   }
+  },
+  {
+   "predicate": "is_http_tunnel",
+   "rec": {
+    "method": "GET"
+   },
+   "result": false,
+   "rec_after": {
+    "method": "GET"
+   }
+  },
+  {
+   "predicate": "is_http_tunnel",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_end_time": "2012-07-09T17:50:13.334184Z",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": 1341856211.834184,
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": 1341856211.834184,
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_end_time": "2012-07-09T17:50:13.334184Z",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "1341856211.834184",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "1341856211.834184",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_end_time": "2012-07-09T17:50:13.334184Z",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "duration": 5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "duration": 5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_end_time": "2012-07-09T17:50:16.834184Z",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "duration": "1.5",
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "duration": "1.5",
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "2012-07-09T17:50:11.834184",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "2012-07-09T17:50:11.834184",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_end_time": "2012-07-09T17:50:13.334184",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "2012-07-09T17:50:11.834184+01:00",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "2012-07-09T17:50:11.834184+01:00",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_end_time": "2012-07-09T17:50:13.334184+01:00",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "2012-07-09T17:50:11.834",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "2012-07-09T17:50:11.834",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_end_time": "2012-07-09T17:50:13.334000",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "2012-07-09T17:50:11.83418Z",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "2012-07-09T17:50:11.83418Z",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_end_time": "2012-07-09T17:50:13.334180Z",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "2012-07-09 17:50:11Z",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "2012-07-09 17:50:11Z",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_end_time": "2012-07-09T17:50:12.500000Z",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "not a time",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "not a time",
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": null,
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": null,
+    "uid": "C1",
+    "duration": 1.5,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "duration": 0.123456789,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "duration": 0.123456789,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_end_time": "2012-07-09T17:50:11.957641Z",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "duration": -1.25,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "uid": "C1",
+    "duration": -1.25,
+    "orig_pkts": 6,
+    "resp_pkts": 5,
+    "conn_state": "SF",
+    "_zc_end_time": "2012-07-09T17:50:10.584184Z",
+    "_zc_packet_count": 11
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "conn_state": "S0",
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "orig_pkts": 1,
+    "resp_pkts": 0
+   },
+   "result": true,
+   "rec_after": {
+    "conn_state": "S0",
+    "ts": "2012-07-09T17:50:11.834184Z",
+    "orig_pkts": 1,
+    "resp_pkts": 0,
+    "_zc_packet_count": 1
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "conn_state": "SF",
+    "ts": "2012-07-09T17:50:11Z",
+    "duration": 2,
+    "orig_pkts": 1.5
+   },
+   "result": true,
+   "rec_after": {
+    "conn_state": "SF",
+    "ts": "2012-07-09T17:50:11Z",
+    "duration": 2,
+    "orig_pkts": 1.5,
+    "_zc_end_time": "2012-07-09T17:50:13Z",
+    "_zc_packet_count": 1
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "conn_state": "SF",
+    "orig_pkts": "6",
+    "resp_pkts": 5
+   },
+   "result": true,
+   "rec_after": {
+    "conn_state": "SF",
+    "orig_pkts": "6",
+    "resp_pkts": 5,
+    "_zc_packet_count": 5
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "conn_state": "SF",
+    "orig_pkts": true,
+    "resp_pkts": 2
+   },
+   "result": true,
+   "rec_after": {
+    "conn_state": "SF",
+    "orig_pkts": true,
+    "resp_pkts": 2,
+    "_zc_packet_count": 3
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "conn_state": "SF"
+   },
+   "result": true,
+   "rec_after": {
+    "conn_state": "SF"
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "conn_state": ""
+   },
+   "result": false,
+   "rec_after": {
+    "conn_state": ""
+   }
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "zeek_conn_has_state",
+   "rec": {
+    "conn_state": "SF",
+    "_zc_end_time": "preset",
+    "_zc_packet_count": 9,
+    "ts": 1.0,
+    "duration": 1.0
+   },
+   "result": true,
+   "rec_after": {
+    "conn_state": "SF",
+    "_zc_end_time": "preset",
+    "_zc_packet_count": 9,
+    "ts": 1.0,
+    "duration": 1.0
+   }
+  }
+ ]
+}
