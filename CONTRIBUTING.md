@@ -10,11 +10,20 @@ git clone --recursive https://github.com/Get-Sybers/byakugan
 # or, in an existing checkout:
 git submodule update --init --recursive
 pip install -e '.[dev]'
+make -C go build                 # the Go parse engine — REQUIRED to run the pipeline
 ```
 
 - `third_party/car` — the MITRE CAR data model (the 13 CAR objects).
 - `third_party/attack-datasources` — the ATT&CK data-sources model (the superset
   objects + the relationship catalogue).
+
+**Go >= 1.24 is a prerequisite.** The parse stage (raw file → pre-enrichment CAR
+events) is the Go engine in `go/`; `python -m byakugan` shells out to
+`go/bin/byakugan-parse` for every file source and fails with a build hint if it
+is absent. Point `$BYAKUGAN_PARSE_BIN` at a binary to use one from elsewhere.
+After changing a mapping table, a marker or a route, re-export the engine's IR
+(`python -m byakugan.export_ir`) and rebuild — `export_ir --check` is the drift
+gate. See [go/README.md](go/README.md).
 
 A model refresh is a **submodule-pin bump**, never a hand-edit — nothing about the
 model or the ATT&CK vocabulary is committed as a copy (see
@@ -28,7 +37,9 @@ python -m byakugan --batch <processed_dir>          # every source
 python -m byakugan.gen_sources                      # regenerate sources/ after a map change
 python -m byakugan.timeline <car-dir>               # unified CAR timeline (car.db + superset.db)
 python -m byakugan.build_data_model --write out/    # export the models for inspection
-pytest -q                                                 # tests
+python -m byakugan.export_ir                        # re-export the Go engine's IR after a map change
+make -C go build test                               # build the parse engine + go vet/test
+pytest -q                                                 # tests (parity suite included)
 ```
 
 The import package was renamed `piiat_mitrecar` → `byakugan`; a full
@@ -36,8 +47,10 @@ The import package was renamed `piiat_mitrecar` → `byakugan`; a full
 one release only — write new code against `byakugan`.
 
 CI (`.github/workflows/lint.yml`) runs `gen_sources --check`, `spindle --check`
-(the identity registry, its snapshot and the golden vectors), `yamale`,
-`yamllint`, and `pytest` — with submodules checked out.
+(the identity registry, its snapshot and the golden vectors), `export_ir --check`,
+`make -C go build test`, `yamale`, `yamllint`, and `pytest` (whose parity suite
+builds the engine and byte-compares it against the frozen Python reference) —
+with submodules checked out and a Go toolchain installed.
 
 ## Code style — [module-best-practices](https://github.com/mattdesl/module-best-practices)
 
@@ -58,7 +71,8 @@ CI (`.github/workflows/lint.yml`) runs `gen_sources --check`, `spindle --check`
   object + action; nulls/duplicates are fine, near-misses are not (see
   [docs/CAR-Relations.md](docs/CAR-Relations.md)). Unvalidated inferences go in
   `to-be-validated/`.
-- Naming: `readers.py` = input readers; `sources_model.py` = the source-manifest
+- Naming: `readers.py` = the memory-passthrough reader (the mapped-artefact
+  readers are the Go engine now); `sources_model.py` = the source-manifest
   generator; `sources/` = its generated output. Keep those distinct.
 
 ## Adding a map
@@ -78,7 +92,12 @@ CI (`.github/workflows/lint.yml`) runs `gen_sources --check`, `spindle --check`
    compile stamp, an amcache Link Time) MUST name a time-free `kind: entity`
    entry; `spindle --check` refuses a Plaso leaf without an entry and a timed
    identity on an untimed leaf.
-5. Add a test; run `pytest -q`.
+5. `python -m byakugan.export_ir` (the engine reads the tables through the IR)
+   and, for a new predicate, port it in
+   `go/internal/predicates/predicates_<family>.go` — `ir-check` and the Go
+   registry test fail on an unported name.
+6. Add a test and a parity fixture (`tests/parity/genf/<family>.py`); run
+   `pytest -q` and `make -C go build test`.
 
 ## Changing a row identity (the change protocol)
 

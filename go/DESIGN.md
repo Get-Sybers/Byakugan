@@ -11,8 +11,9 @@ adaptation, the 24-marker resolver over the declarative maps, uuid5/spindle guid
 Python KEEPS: mappings tables + normalize marker constructors (they are the introspection
 substrate for sigma.py, sources_model, spindle drift guards, and the executable spec for the
 300-test suite), enrich, store, superset, derive, stix, sigma, analytics, crosssource, timeline.
-Python LOSES (deleted once parity is proven): pipeline's Python ingestion loop,
-readers.iter_jsonl, adapters/l2t_split.py, adapters/winevt.py, adapters/jlecmd.py.
+Python LOST (deleted — see "Wiring + deletion", done): pipeline's Python ingestion loop,
+readers.iter_jsonl (and iter_mapped), adapters/l2t_split.py, adapters/winevt.py,
+adapters/jlecmd.py — the whole `byakugan/adapters/` package.
 readers.load_piiat_car (sqlite passthrough) stays in Python.
 
 ## Single source of truth: the IR
@@ -189,16 +190,33 @@ Steps, start to finish:
 6. Report: the family, the files created, any deviation found between the Python source and this
    doc (the Python source wins — the deviation is a note, never a code change to Python).
 
-## Wiring + deletion (only after parity green)
-pipeline.py: file ingestion goes through the Go binary (resolve: $BYAKUGAN_PARSE_BIN, PATH,
-<repo>/go/bin/byakugan-parse; missing → actionable error naming `make -C go build`). Raw-l2t
-sources: split via `split-l2t` into the same tempdir-under-out location. Passthrough car.db
-stays Python. Delete: the Python read/normalize loop in pipeline.py, readers.iter_jsonl,
-adapters/{l2t_split,winevt,jlecmd}.py (reference copies move to tests/parity/reference/).
-Repoint the tests that exercised deleted units (adapter unit tests, shape-lock, routing tests
-stay — route() remains Python) at the parity harness / Go binary. Everything else untouched.
-CI (lint.yml): add go toolchain setup, `python -m byakugan.export_ir --check`, `make -C go build test`,
-parity tests run inside pytest as before.
+## Wiring + deletion — DONE
+pipeline.py: file ingestion goes through the Go binary. `pipeline.parse_binary()` resolves
+$BYAKUGAN_PARSE_BIN (an unusable value is fatal, never a silent fallback), else
+<repo>/go/bin/byakugan-parse (relative to the package), else `shutil.which`; missing →
+`SystemExit` naming `make -C go build` and BYAKUGAN_PARSE_BIN. (Deviation from this doc's
+original order — the repo's own binary is preferred over PATH, so a checkout always runs its
+own engine.) `pipeline.parse_events(path, artefacts, adapter, default_host)` invokes
+`parse --in … --artefacts … [--host …] [--adapter winevt|jlecmd]` and `json.loads`es the
+stdout lines back into the event dicts the Python path used to build; the adapter ROUTE KEYS
+(`jlecmd_dest`, `l2t_winevt`) are passed verbatim and the engine fans them out through
+`ir.adapters`, while pipeline keeps filling `used` (route key + the whole evtx family).
+`pipeline.split_l2t(path, tmp)` runs `split-l2t` into the same tempdir-under-out location and
+returns {table: file} in first-seen order. Passthrough car.db stays Python (readers.load_piiat_car).
+DELETED: pipeline's read/normalize loop, `readers.iter_jsonl` + `readers.iter_mapped`,
+`byakugan/adapters/` entirely (l2t_split, winevt, jlecmd + the package docstring) and the
+`piiat_mitrecar.adapters` shim subpackage; both dropped from pyproject's packages list. The
+frozen copies under tests/parity/reference/ are now the only Python statement of that
+behaviour, and `tests/reference_plumbing.py` is how the repointed unit tests load them
+(route() and the mapping tables stayed Python, so the routing/mapping tests are untouched).
+Real-evidence tests drive `pipeline.parse_events` — the shipping engine — instead.
+Proof: the whole smoke corpus (evtx / zeek / raw-l2t / L2tWinevtx / jump list / directory
+source / --batch (+idempotent skip, --force) / --derive --stix / explicit --artefacts, and the
+memory passthrough) produced byte-identical `car_<object>.jsonl`, `sources.yaml`,
+`stix_bundle.json`, car.db + superset.db SQL dumps, summary JSON lines and exit codes against a
+worktree of the pre-wiring commit — 211/211 files identical.
+CI (lint.yml): go toolchain setup, `python -m byakugan.export_ir --check`, gofmt,
+`make -C go build test`, `ir-check`, parity tests inside pytest — all in place.
 
 ## Benchmark (report numbers honestly)
 scripts/bench-parse.py: synthesize 500k-line EvtxECmd JSONL, 1M-line raw l2t container,

@@ -3,7 +3,10 @@ import os
 
 import pytest
 
-from byakugan import normalize, readers as sources
+from byakugan import normalize, pipeline
+# the raw line reader moved to Go with the rest of the parse stage; its
+# frozen reference copy is what a raw-row count is counted with
+from reference_plumbing import iter_jsonl
 
 _ZEEK_DIR = os.path.join(os.path.dirname(__file__), "..", "..",
                          "data_store", "processed", "zeek")
@@ -117,14 +120,15 @@ def test_real_conn_json_maps_every_row(capture, expected_rows):
     path = os.path.join(_ZEEK_DIR, capture, "conn.json")
     if not os.path.exists(path):
         pytest.skip("real zeek evidence not present")
-    events = list(sources.iter_mapped("zeek_conn", path, default_host=capture))
+    # the REAL ingestion path: the Go parse engine, exactly as pipeline runs it
+    events = pipeline.parse_events(path, ["zeek_conn"], default_host=capture)
     assert len(events) == expected_rows      # every row carries a conn_state
     assert all(e["car_object"] == "flow" for e in events)
     assert all(e["car_action"] in ("start", "end", "message") for e in events)
     assert all(e["guid"] for e in events)    # zeek always mints a uid
     # a null is honest, a fabricated 0 is not: end_time exists exactly for the
     # rows zeek measured a duration on
-    with_duration = sum("duration" in r for r in sources.iter_jsonl(path))
+    with_duration = sum("duration" in r for r in iter_jsonl(path))
     assert sum(e["end_time"] is not None for e in events) == with_duration
     ends = [e for e in events if e["car_action"] == "end" and e["end_time"]]
     assert ends and all(e["end_time"] >= e["start_time"] for e in ends)

@@ -1,5 +1,13 @@
-"""Plaso winevt(x) -> EvtxECmd-shape adapter -> the ported winevtx CAR maps (epic #86)."""
-from byakugan.adapters import winevt as winevt_adapter
+"""Plaso winevt(x) -> EvtxECmd-shape adapter -> the ported winevtx CAR maps (epic #86).
+
+The adapter itself now runs inside the Go parse engine (go/internal/adapt);
+what these tests assert is the ARTEFACT contract it implements — which
+positional string is which named field, per (channel, EventId), and that the
+unchanged evtx maps consume the result. That contract is held byte-identical
+by tests/parity (fixture adapter_winevt), and its executable statement is the
+frozen reference copy these tests drive.
+"""
+from reference_plumbing import winevt as winevt_adapter
 from byakugan import normalize
 
 

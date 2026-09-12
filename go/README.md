@@ -31,6 +31,27 @@ and must reproduce the Python engine's output byte for byte.
 | `internal/split`   | the raw-l2t container splitter (`byakugan/adapters/l2t_split.py`): physical-line `RecordId`, `L2t<Camel>` table names, plaso-µs `Timestamp` |
 | `cmd/byakugan-parse` | CLI: `parse` (adapters `none`/`winevt`/`jlecmd`, adapter-route-key fan-out) emits PyDumps event lines in input order; `split-l2t` writes the per-parser table files + a JSON summary; `ir-check` validates the embedded IR, byte-compares `--in`, and FAILS on any unported IR predicate |
 
+## How the pipeline uses it
+
+`python -m byakugan` parses EVERY file source through this binary — there is no
+Python ingestion path left. `byakugan/pipeline.py` resolves it via
+`$BYAKUGAN_PARSE_BIN`, then `<repo>/go/bin/byakugan-parse`, then `PATH`, and
+exits with a `make -C go build` hint if it finds none; it then calls
+
+    byakugan-parse parse --in FILE --artefacts k1,k2 [--host H] [--adapter winevt|jlecmd]
+
+once per source file (the routed map keys of that file, adapter route keys
+`l2t_winevt` / `jlecmd_dest` passed verbatim and fanned out here via
+`ir.adapters`) and `json.loads`es the emitted lines straight into the
+unchanged enrich → store → superset → derive → STIX path, and
+
+    byakugan-parse split-l2t --in RAW.jsonl --out-dir TMP
+
+for a raw log2timeline container, into a tempdir under the source's output dir.
+Routing (`pipeline.ROUTES`), the mapping tables, normalize's marker
+constructors (the introspection substrate for sigma/sources_model/spindle) and
+the PIIAT-Mem `car.db` passthrough stay in Python.
+
 ## Parity harness
 
 `tests/parity/test_go_parity.py` runs every `tests/parity/fixtures/<name>/`

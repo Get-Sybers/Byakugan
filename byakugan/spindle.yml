@@ -56,7 +56,8 @@ spindle:
   # `normalize: json` (type-faithful canonical JSON text). None override in v1.
   rendering: str
   normalize: [str, json]
-  # the per-record index adapters/l2t_split.py stamps on every wrapped row —
+  # the per-record index the l2t container splitter (go/internal/split) stamps
+  # on every wrapped row —
   # the POSITIONAL identity a row falls back to when a component of its
   # intrinsic identity is blank (raw wrapped-row fields, not event fields);
   # it is versioned like an entry

@@ -16,6 +16,14 @@ A PIIAT-Mem car.db input passes through 1:1 (already finished CAR).
 Routing is by filename when --artefacts is not given; a Security log feeds BOTH
 its authentication and its user_session maps (same file — the in-file LUID join
 between them is legitimately self-contained).
+
+**The parse stage is the Go engine.** Everything from a raw processor file to
+the pre-enrichment CAR event stream — line reading, raw-l2t container splitting,
+the winevt/jlecmd format adapters, the marker resolver and the spindle identity
+— runs in `go/bin/byakugan-parse` (build: `make -C go build`), proven
+byte-identical to the Python path it replaced (tests/parity). Routing, the
+per-source layout, enrichment and everything after it stay here in Python; the
+PIIAT-Mem car.db passthrough is Python too (it never parsed anything).
 """
 from __future__ import annotations
 
@@ -23,6 +31,7 @@ import argparse
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 
@@ -125,6 +134,96 @@ def _is_raw_l2t(path: str) -> bool:
     return False
 
 
+# --------------------------------------------------------------------------- #
+# the Go parse engine
+# --------------------------------------------------------------------------- #
+PARSE_BIN_ENV = "BYAKUGAN_PARSE_BIN"
+
+
+def _repo_parse_bin() -> str:
+    """<repo>/go/bin/byakugan-parse, relative to this package."""
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(repo, "go", "bin", "byakugan-parse")
+
+
+def parse_binary() -> str:
+    """The byakugan-parse binary: $BYAKUGAN_PARSE_BIN, else the repo's own
+    go/bin/byakugan-parse, else one on PATH. Missing is fatal and says so —
+    file ingestion has no Python fallback any more."""
+    env = os.environ.get(PARSE_BIN_ENV)
+    if env:
+        if os.path.isfile(env) and os.access(env, os.X_OK):
+            return env
+        raise SystemExit(
+            f"{PARSE_BIN_ENV}={env!r} is not an executable file — build the Go "
+            f"parse engine with: make -C go build (-> {_repo_parse_bin()}), or "
+            f"unset {PARSE_BIN_ENV} to use the repo's own binary / PATH")
+    local = _repo_parse_bin()
+    if os.path.isfile(local) and os.access(local, os.X_OK):
+        return local
+    found = shutil.which("byakugan-parse")
+    if found:
+        return found
+    raise SystemExit(
+        "byakugan-parse (the Go parse engine) not found — every file source is "
+        "parsed by it. Build it with: make -C go build "
+        f"(-> {local}), or set {PARSE_BIN_ENV} to an existing binary")
+
+
+def _run_parse(argv: list[str]) -> subprocess.Popen:
+    return subprocess.Popen([parse_binary(), *argv], stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+
+
+def _engine_failed(argv: list[str], code: int, err: bytes) -> RuntimeError:
+    return RuntimeError(f"byakugan-parse {' '.join(argv)}: exited {code}: "
+                        f"{err.decode('utf-8', 'replace').strip()}")
+
+
+def parse_events(path: str, artefacts: list[str], adapter: str = "none",
+                 default_host: str | None = None) -> list[dict]:
+    """One file -> its CAR events, in input order (records × artefacts, the
+    engine running every map per record — the file is read ONCE).
+
+    The engine emits one `json.dumps(event)` line per event, so `json.loads`
+    rebuilds exactly the dicts the Python parse path used to build (proven
+    byte-for-byte by tests/parity)."""
+    argv = ["parse", "--in", path, "--artefacts", ",".join(artefacts),
+            "--adapter", adapter]
+    if default_host:
+        argv += ["--host", default_host]
+    proc = _run_parse(argv)
+    events = []
+    try:
+        for line in proc.stdout:
+            ev = json.loads(line)
+            # the engine already applied it; re-assert the pipeline's own rule
+            # so a falsy-but-not-None fallback host behaves exactly as before
+            if not ev.get("source_host"):
+                ev["source_host"] = default_host
+            events.append(ev)
+    finally:
+        proc.stdout.close()
+        err = proc.stderr.read()
+        proc.stderr.close()
+        code = proc.wait()
+    if code != 0:
+        raise _engine_failed(argv, code, err)
+    return events
+
+
+def split_l2t(path: str, out_dir: str) -> dict[str, str]:
+    """A raw log2timeline json_line CONTAINER -> {table: file}, split into
+    `out_dir` by the engine (same wrapped rows, same physical-line RecordId).
+    Insertion order is the order each table's first record appeared."""
+    argv = ["split-l2t", "--in", path, "--out-dir", out_dir]
+    proc = _run_parse(argv)
+    out, err = proc.communicate()
+    if proc.returncode != 0:
+        raise _engine_failed(argv, proc.returncode, err)
+    return json.loads(out)["tables"]
+
+
 def _iter_source_files(in_path: str):
     """The files that make up ONE source. A directory (a Zeek capture, a host's
     event-log export) is a single source: every file under it is routed and
@@ -157,48 +256,31 @@ def process_file(in_path: str, out_dir: str, artefacts: list[str] | None = None,
     else:
         events, used = [], []
 
-        def _consume_rec(arts, rec):
-            for art in arts:
-                ev = readers.normalize.normalize(art, rec)
-                if ev is None:
-                    continue
-                if not ev.get("source_host"):
-                    ev["source_host"] = default_host
-                events.append(ev)
-
         def _consume(arts, path):
-            """Read `path` ONCE and run every routed map per record (content-
-            routing sends an evtx file to all evtx maps — re-reading the file per
-            map is what made this O(maps × file))."""
+            """Hand `path` to the parse engine ONCE with every routed map: it
+            runs them per record (content-routing sends an evtx file to all evtx
+            maps — re-reading the file per map is what made this O(maps × file))."""
             arts = [a for a in arts if a]
             if not arts:
                 return
             for a in arts:
                 if a not in used:
                     used.append(a)
-            # a Plaso winevt table is PORTED to the evtx maps: adapt each record
-            # to the EvtxECmd shape, then run the existing EVTX_MAPS over it
+            # jlecmd_dest and l2t_winevt are ADAPTER route keys, not plain maps:
+            # a jump-list record is flattened per DestListEntry, and a Plaso
+            # winevt table is PORTED to the evtx maps (each record reshaped to
+            # the EvtxECmd shape, then the whole EVTX_MAPS family run over it —
+            # the engine fans the route key out, ir.adapters carries the pair).
+            adapter = "none"
             if arts == ["jlecmd_dest"]:
-                from .adapters import jlecmd as _jl
-                for a in arts:
-                    if a not in used:
-                        used.append(a)
-                for rec in readers.iter_jsonl(path):
-                    for flat in _jl.flatten(rec):
-                        _consume_rec(["jlecmd_dest"], flat)
-                return
-            if arts == ["l2t_winevt"]:
-                from .adapters import winevt as winevt_adapter
+                adapter = "jlecmd"
+            elif arts == ["l2t_winevt"]:
+                adapter = "winevt"
                 for a in EVTX_MAPS:
                     if a not in used:
                         used.append(a)
-                for wrapped in readers.iter_jsonl(path):
-                    shaped = winevt_adapter.adapt(wrapped)
-                    if shaped is not None:
-                        _consume_rec(EVTX_MAPS, shaped)
-                return
-            for rec in readers.iter_jsonl(path):
-                _consume_rec(arts, rec)
+            events.extend(parse_events(path, arts, adapter=adapter,
+                                       default_host=default_host))
 
         for f in _iter_source_files(in_path):
             if artefacts:
@@ -206,16 +288,13 @@ def process_file(in_path: str, out_dir: str, artefacts: list[str] | None = None,
             elif _is_raw_l2t(f):
                 # a raw log2timeline json_line file is a CONTAINER of many
                 # parsers; wrap+split it into per-parser tables (the shape the
-                # l2t maps expect) and route each table by its name
-                from .adapters import l2t_split as prepare
+                # l2t maps expect) and route each table by its name.
                 # split under the (disk-backed) output dir — a big container's
                 # per-parser tables overflow a tmpfs /tmp (hit for real: 15G
                 # tmpfs at 98% killed the two largest sources)
                 tmp = tempfile.mkdtemp(prefix=".car_l2t_", dir=out_dir)
                 try:
-                    tables = prepare.split_l2t(f, os.path.basename(f), tmp,
-                                               os.path.basename(f))
-                    for tpath in tables.values():
+                    for tpath in split_l2t(f, tmp).values():
                         _consume(route(tpath), tpath)
                 finally:
                     shutil.rmtree(tmp, ignore_errors=True)

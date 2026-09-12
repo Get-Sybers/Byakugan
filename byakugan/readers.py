@@ -1,9 +1,13 @@
-"""CAR source readers — raw artefact files → events for the store (epic #86).
+"""CAR source readers — the memory passthrough (epic #86).
 
-Two kinds of source:
+Mapped artefacts (files whose rows go through a per-artefact map) are read and
+normalized by the GO PARSE ENGINE now — `go/bin/byakugan-parse`, driven by
+`pipeline.parse_events`; the Python line reader (`iter_jsonl`/`iter_mapped`)
+that used to do it is gone, its frozen reference copy living on as the parity
+harness's authority (tests/parity/reference/readers_iter_jsonl.py).
 
-- **Mapped artefacts** (`iter_mapped`): files whose rows go through
-  `normalize()` with a per-artefact map (evtx_security, zeek_http, …).
+What stays here is the one source that was never parsed:
+
 - **The memory passthrough** (`load_piiat_car`): PIIAT-Mem v1.0.0 already emits
   finished CAR (its car.db per image, built by the volatility lane) — its events
   are translated 1:1 into this store's header (no re-mapping, no re-deriving):
@@ -22,32 +26,6 @@ from . import normalize
 _PIIAT_HEADER = {"timestamp", "car_action", "guid", "owning_pid", "owning_offset",
                  "owning_guid", "parent_pid", "parent_guid", "link_confidence",
                  "source_plugin", "source_image", "native", "event_id"}
-
-
-def iter_jsonl(path: str):
-    # utf-8-sig: EvtxECmd stamps a UTF-8 BOM on every export — plain utf-8 makes
-    # json.loads reject each file's FIRST line, silently dropping a record per
-    # file (the same BOM gotcha downstream ingestion once hit).
-    with open(path, encoding="utf-8-sig", errors="replace") as fh:
-        for line in fh:
-            line = line.strip().rstrip(",")
-            if not line or line in ("[", "]"):
-                continue
-            try:
-                yield json.loads(line)
-            except json.JSONDecodeError:
-                continue
-
-
-def iter_mapped(artefact: str, path: str, default_host: str | None = None):
-    """Normalize every row of one artefact file; yields CAR events."""
-    for rec in iter_jsonl(path):
-        ev = normalize.normalize(artefact, rec)
-        if ev is None:
-            continue
-        if not ev.get("source_host"):
-            ev["source_host"] = default_host
-        yield ev
 
 
 def load_piiat_car(car_db: str, image_name: str | None = None) -> list[dict]:

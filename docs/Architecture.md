@@ -5,8 +5,8 @@
 - **Artefact ≠ processor.** Maps are keyed to the *artefact* (the Windows event
   log, the filesystem, a flow), never to the tool that parsed it. EvtxECmd and
   log2timeline share one set of event-log maps via a format adapter
-  (`byakugan/adapters/`), verified to produce byte-identical CAR from the
-  same evidence. A new processor for a mapped artefact is a new *adapter*, never
+  (`go/internal/adapt`, in the parse engine), verified to produce byte-identical
+  CAR from the same evidence. A new processor for a mapped artefact is a new *adapter*, never
   a second map set.
 - **One source → one database.** Enrichment is self-contained within a source;
   no source ever depends on another being present. Cross-source correlation is a
@@ -42,14 +42,14 @@
 | `byakugan/build_data_model.py` | reconstructs CAR (13) and the CAR+ATT&CK superset (38) + the ATT&CK relationship catalogue from the pinned submodules |
 | `byakugan/mappings/` | declarative per-artefact maps (auto-discovered, one file per family) |
 | `byakugan/normalize.py` | the marker engine: raw record → CAR event |
-| `byakugan/adapters/` | format adapters (Plaso winevt(x) → EvtxECmd shape; l2t container splitting; jump lists) |
+| `go/` | the **parse engine** (`go/bin/byakugan-parse`, `make -C go build`): line reading, the format adapters (Plaso winevt(x) → EvtxECmd shape; jump lists), l2t container splitting, the marker resolver and the spindle identity — byte-identical to the Python path it replaced (tests/parity) |
 | `byakugan/relationships.yml` | the within-source cascade & inheritance rules, as data |
 | `byakugan/cascade_relationships.yml` | the CAR-action → ATT&CK-verb bridge for relationship instances |
 | `byakugan/enrich.py` | the cascade: identity, two-tier owner/parent links, LUID auth↔session join, file→process, null-only inheritance, dedupe |
 | `byakugan/superset.py` | builds `superset.db`: seeds the superset model + edge-types, materialises relationship instances |
 | `byakugan/sources_model.py` + `gen_sources.py` | generates the per-source manifests (objects/actions/properties + provenance) from the maps |
 | `byakugan/store.py` | the car.db store + JSONL export |
-| `byakugan/pipeline.py` | source discovery, routing, batch mode |
+| `byakugan/pipeline.py` | source discovery, routing, batch mode; drives the parse engine per file |
 
 ## Coverage
 

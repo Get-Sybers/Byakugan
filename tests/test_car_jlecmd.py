@@ -1,6 +1,13 @@
-"""JLECmd jump lists -> file/read via the flattening adapter (real LoneWolf shape)."""
+"""JLECmd jump lists -> file/read via the flattening adapter (real LoneWolf shape).
+
+The flatten step runs in the Go parse engine now (go/internal/adapt); the
+behaviour asserted here — one record per DestListEntry, app context merged in,
+/Date(ms)/ rendered ISO — is the artefact contract, held byte-identical by
+tests/parity (fixture adapter_jlecmd) and stated by the frozen reference copy
+these tests drive.
+"""
 from byakugan import normalize
-from byakugan.adapters import jlecmd
+from reference_plumbing import jlecmd
 
 
 _RECORD = {

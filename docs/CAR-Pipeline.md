@@ -57,12 +57,11 @@ python -m byakugan --in <file-or-dir> --out <dir> [--host NAME] [--artefacts k1,
 | `carmodel.py` | loads repo-root `car_data_model.json` — the single source of truth for objects/actions/fields |
 | `mappings/` | per-artefact declarative maps (one file per family; auto-discovered) |
 | `normalize.py` | the marker engine: `normalize(artefact, record) → CAR event`, or `None` if unmapped |
-| `adapters/winevt.py` | Plaso winevt(x) record → EvtxECmd shape, so the evtx maps run unchanged |
-| `adapters/l2t_split.py` | a raw log2timeline json_line container → per-parser wrapped tables (`SourceImage`, `RecordId`, `Timestamp`, `Parser`, `Record`) |
+| `../go/` (`byakugan-parse`) | the **parse engine**: raw file → pre-enrichment CAR events. Holds the line reader, the winevt adapter (Plaso winevt(x) record → EvtxECmd shape, so the evtx maps run unchanged), the jlecmd flatten, the l2t container splitter (→ per-parser wrapped tables: `SourceImage`, `RecordId`, `Timestamp`, `Parser`, `Record`), the marker resolver and the spindle identity — reading the mapping tables through `internal/ir/ir.json` (`python -m byakugan.export_ir`) |
 | `ids.py` | the one id recipe — canonical JSON + the namespaces (`STIX_NS`, `CAR_NS`, `SPINDLE_NS`) — shared by the STIX projection and the spindle row guid |
 | `enrich.py` | the relationship + inheritance cascade (identity, joins, inheritance, dedupe, canonical accounts) |
 | `store.py` | the per-object SQLite CAR store + `export_jsonl()` (the downstream ingest contract) |
-| `sources.py` | source readers: `iter_mapped()` (raw → normalize) and `load_piiat_car()` (memory passthrough) |
+| `readers.py` | `load_piiat_car()` — the memory passthrough (the only source that is not parsed) |
 | `pipeline.py` | orchestration: route source → normalize → enrich (self-contained) → store → JSON |
 
 ## 4. The CAR data model (13 objects)
@@ -248,7 +247,7 @@ prefetch's eight last-run times, a key's successive snapshots, an $MFT entry's
 $SI and $FN times) the time is part of what identifies the event — so distinct
 events never collapse, and true duplicates (the same record parsed twice) do.
 
-**Positional fallback.** `adapters/l2t_split.py` stamps every wrapped row with
+**Positional fallback.** The container splitter stamps every wrapped row with
 `RecordId` — its physical line in the container, minted from the input like
 the EVTX record id (stable across re-splits of the same json_line file, not
 across a re-run of the parser). A row whose intrinsic identity is incomplete

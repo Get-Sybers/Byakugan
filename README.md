@@ -31,10 +31,22 @@ not just the events a single detection cares about.
 
 ```
 git submodule update --init --recursive          # the model comes from pinned submodules
+make -C go build                                 # the Go parse engine (Go >= 1.24)
 python -m byakugan --in <file-or-dir> --out <dir>   # one source
 python -m byakugan --batch <processed_dir>          # every source, isolated
 python -m byakugan.timeline <car-dir>               # one property-rich, time-ordered timeline
 ```
+
+**The parse stage is Go-accelerated.** Everything from a raw processor file to
+the pre-enrichment CAR event stream — line reading, raw-l2t container splitting,
+the format adapters, the marker resolver, the spindle identity — runs in
+`go/bin/byakugan-parse`, built by `make -C go build` (**prerequisite: Go >=
+1.24**) and byte-for-byte identical to the Python path it replaced
+([go/README.md](go/README.md)). The CLI is unchanged: `python -m byakugan` is
+still the pipeline, and routing, enrichment, the relationship cascade, STIX and
+every mapping table stay Python. The pipeline finds the binary via
+`$BYAKUGAN_PARSE_BIN`, then `go/bin/byakugan-parse`, then `PATH`, and says so
+if it is missing.
 
 Each evidence **source** becomes two self-contained SQLite stores:
 

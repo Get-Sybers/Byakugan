@@ -29,8 +29,11 @@ Issues = "https://github.com/Get-Sybers/byakugan/issues"
 byakugan = "byakugan.pipeline:main"
 
 [tool.setuptools]
-packages = ["byakugan", "byakugan.mappings", "byakugan.adapters",
-            "piiat_mitrecar", "piiat_mitrecar.mappings", "piiat_mitrecar.adapters"]
+# byakugan.adapters is gone: the winevt/jlecmd/l2t-split plumbing it held now
+# lives in the Go parse engine (go/internal/{adapt,split}), so the shim's
+# piiat_mitrecar.adapters went with it.
+packages = ["byakugan", "byakugan.mappings",
+            "piiat_mitrecar", "piiat_mitrecar.mappings"]
 
 [tool.setuptools.package-data]
 # the CAR/superset models + ATT&CK relationships are reconstructed live from the
