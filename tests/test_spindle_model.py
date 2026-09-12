@@ -1,6 +1,6 @@
 """The spindle identity model as DATA.
 
-piiat_mitrecar/spindle.yml is the single source of the per-artefact identity
+byakugan/spindle.yml is the single source of the per-artefact identity
 rules the engine mints disk-image guids from (the relationships.yml discipline:
 rules are data, the engine is mechanics); model/spindle/ holds its deterministic
 snapshot plus the spindle record's shape, generated like model/generate.py
@@ -18,7 +18,7 @@ import uuid
 import pytest
 import yaml
 
-from piiat_mitrecar import enrich, ids, mappings, normalize, pipeline, sources_model, spindle, store
+from byakugan import enrich, ids, mappings, normalize, pipeline, sources_model, spindle, store
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MODEL_SPINDLE = ROOT / "model" / "spindle"
@@ -282,7 +282,7 @@ def test_golden_vectors_pin_the_mint_and_gate_the_change_protocol(tmp_path, monk
     assert any("recipe vector moved" in p for p in problems)
     assert any(p.startswith("l2t_usnjrnl:") and "stale" in p for p in problems)
     # the CLI refuses the same way (INVALID, before the snapshot comparison)
-    r = subprocess.run([sys.executable, "-m", "piiat_mitrecar.spindle", "--check", "--out", str(out)],
+    r = subprocess.run([sys.executable, "-m", "byakugan.spindle", "--check", "--out", str(out)],
                        capture_output=True, text=True, check=False, cwd=str(ROOT))
     assert r.returncode == 1 and "INVALID" in r.stderr and "recipe vector" in r.stderr
 
@@ -455,7 +455,7 @@ def test_every_minted_row_of_a_full_pipeline_run_remints_from_its_own_key(tmp_pa
     normalized, enriched, stored — read back from car.db: every row carrying
     native.spindle_key re-mints to its guid (ids.guid_of == the one seam),
     validates as a spindle, and every other row (Sysmon) keeps its raw guid."""
-    from piiat_mitrecar import derive, pipeline
+    from byakugan import derive, pipeline
     src = tmp_path / "in"
     src.mkdir()
     rows = [_raw_l2t(_ROWS["l2t_usnjrnl"][1], "usnjrnl"),
@@ -508,7 +508,7 @@ def test_every_minted_row_of_a_full_pipeline_run_remints_from_its_own_key(tmp_pa
 # the generator wiring: the CLI --check (CI) and model/generate.py
 # --------------------------------------------------------------------------- #
 def test_check_cli_passes_and_model_generate_wires_the_same_writer():
-    r = subprocess.run([sys.executable, "-m", "piiat_mitrecar.spindle", "--check"],
+    r = subprocess.run([sys.executable, "-m", "byakugan.spindle", "--check"],
                        capture_output=True, text=True, check=False, cwd=str(ROOT))
     assert r.returncode == 0 and "OK" in r.stdout, r.stdout + r.stderr
     src = (ROOT / "model" / "generate.py").read_text(encoding="utf-8")

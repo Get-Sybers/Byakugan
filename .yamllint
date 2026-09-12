@@ -1,4 +1,4 @@
-# yamllint config for PIIAT-MitreCar YAML artefacts (sources/, to-be-validated/).
+# yamllint config for Byakugan YAML artefacts (sources/, to-be-validated/).
 # sources/*.yaml are machine-generated (PyYAML: block sequences at the parent
 # indent); to-be-validated/*.yml are hand-written (indented sequences). Both are
 # internally consistent, so indent-sequences=consistent accepts each; the schema

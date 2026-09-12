@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "evtx_sysmon"
+ ],
+ "host": "SENSOR9",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "plaso_shellitem"
+ ],
+ "host": "fallback-host",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

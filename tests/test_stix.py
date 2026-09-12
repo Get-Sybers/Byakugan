@@ -10,7 +10,7 @@ import subprocess
 import sys
 import uuid
 
-from piiat_mitrecar import derive, enrich, pipeline, stix, store, superset
+from byakugan import derive, enrich, pipeline, stix, store, superset
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 _H = "H"
@@ -247,7 +247,7 @@ def test_export_step_cli_and_pipeline_flag(tmp_path, capsys):
     s = pipeline.process_file(str(src), str(out), derive_pass=True)
     assert s["events"] == 2 and s["inferred_nodes"] == 1
 
-    r = subprocess.run([sys.executable, "-m", "piiat_mitrecar.stix", "export", str(out), "--case", "smoke"],
+    r = subprocess.run([sys.executable, "-m", "byakugan.stix", "export", str(out), "--case", "smoke"],
                        capture_output=True, text=True, check=False, cwd=str(ROOT))
     assert r.returncode == 0, r.stderr
     summary = json.loads(r.stdout)
@@ -321,4 +321,4 @@ def test_a9_a_guid_less_row_yields_its_scos_and_no_observation():
     shuffled = [events[4], events[2], events[0], events[3], events[1]]
     bundle2, _ = stix.project(shuffled, case="c")
     assert {o["id"] for o in bundle["objects"]} == {o["id"] for o in bundle2["objects"]}
-    assert "row{" not in (ROOT / "piiat_mitrecar" / "stix.py").read_text(encoding="utf-8")
+    assert "row{" not in (ROOT / "byakugan" / "stix.py").read_text(encoding="utf-8")

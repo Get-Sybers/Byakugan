@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "evtx_rdp"
+ ],
+ "host": "WIN-FALLBACK",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

@@ -1,7 +1,7 @@
 # HAND-AUTHORED contract — validated by `python model/projection/validate.py`.
 # This file is NOT generated: it records boundary DECISIONS (how every CAR
 # common-header field lands in ECS 8.x, and the shape of the Elastic data
-# streams that hold CAR events). PIIAT-MitreCar owns it; the DX_DFIR loader
+# streams that hold CAR events). Byakugan owns it; the DX_DFIR loader
 # consumes it to write CAR events into Elastic as logs-car.<object>-* data
 # streams. Per-object field decisions live in objects/<object>.yml.
 # Change a decision here, then re-run validate.py.
@@ -32,7 +32,7 @@ data_stream:
     # field; the loader derives it. Recommended (non-normative) recipe:
     recipe: sha1(source_host | <object> | guid | car_action | timestamp | target_guid | access_level)
     note: >-
-      mirrors the pipeline same-event key (piiat_mitrecar/relationships.yml dedupe.key); the
+      mirrors the pipeline same-event key (byakugan/relationships.yml dedupe.key); the
       pipeline folds same-key rows into one (dedupe.fold, additive by default), so one document
       per key is what the stores hold.
 
@@ -115,7 +115,7 @@ rules:
     in objects/<object>.yml; they are ECS categorisation, not CAR data.
 
 # ---------------------------------------------------------------------------
-# The common header (piiat_mitrecar/store.py HEADER) — the eight fields every
+# The common header (byakugan/store.py HEADER) — the eight fields every
 # CAR event row shares. `per_object` overrides name a CAR object explicitly.
 common_header:
   timestamp:
@@ -137,7 +137,7 @@ common_header:
       (<object>-<host>-<channel>-<record number> for an EVTX record; the JLECmd / RECmd field
       forms), a memory-object offset (PIIAT-Mem's proc-<hex>), or the spindle uuid5 a disk-image
       row is MINTED with — uuid5(SPINDLE_NS, canonical_json(car.native.spindle_key)), the
-      registry piiat_mitrecar/spindle.yml (snapshot model/spindle/): car.native.spindle_key is the
+      registry byakugan/spindle.yml (snapshot model/spindle/): car.native.spindle_key is the
       readable key (_obj, _v = the entry's identity-key version, the identity names),
       car.native.spindle_scope is intrinsic | positional (positional = valid inside this source
       only), car.native.spindle_ref is where the record came from (outside the key). This is the

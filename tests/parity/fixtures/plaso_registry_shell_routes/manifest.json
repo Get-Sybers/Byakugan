@@ -1,0 +1,11 @@
+{
+ "artefacts": [
+  "plaso_registry",
+  "plaso_shellitem",
+  "l2t_lnk",
+  "l2t_recyclebin"
+ ],
+ "host": "fallback-host",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

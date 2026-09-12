@@ -13,7 +13,7 @@ import os
 
 import pytest
 
-from piiat_mitrecar import normalize, readers as sources
+from byakugan import normalize, pipeline
 
 _EVIDENCE = ("/opt/github/DX_DFIR/data_store/processed/windows_logs/lonewolf"
              "/Windows/System32/winevt/Logs")
@@ -216,7 +216,8 @@ def test_service_wrong_channel_and_ids_stay_raw():
 
 @pytest.mark.skipif(not os.path.exists(_SECURITY), reason="lonewolf evidence absent")
 def test_real_security_sessions():
-    evs = list(sources.iter_mapped("evtx_security_sessions", _SECURITY))
+    # the REAL ingestion path: the Go parse engine, as pipeline runs it
+    evs = pipeline.parse_events(_SECURITY, ["evtx_security_sessions"])
     assert len(evs) == 875                       # 827×4624 + 45×4634 + 3×4647
     actions = collections.Counter(e["car_action"] for e in evs)
     assert actions == {"login": 827, "logout": 48}
@@ -233,7 +234,7 @@ def test_real_security_sessions():
 
 @pytest.mark.skipif(not os.path.exists(_SYSTEM), reason="lonewolf evidence absent")
 def test_real_system_services():
-    evs = list(sources.iter_mapped("evtx_services", _SYSTEM))
+    evs = pipeline.parse_events(_SYSTEM, ["evtx_services"])
     assert len(evs) == 57                        # every System 7045
     assert all(e["car_object"] == "service" and e["car_action"] == "create"
                for e in evs)
@@ -248,8 +249,8 @@ def test_real_system_services():
 def test_real_cross_feed_yields_nothing_wrong():
     # the Security file holds no 4697 in this evidence; the System file holds
     # no session events — cross-feeding drops everything instead of mis-mapping
-    assert list(sources.iter_mapped("evtx_services", _SECURITY)) == []
-    assert list(sources.iter_mapped("evtx_security_sessions", _SYSTEM)) == []
+    assert pipeline.parse_events(_SECURITY, ["evtx_services"]) == []
+    assert pipeline.parse_events(_SYSTEM, ["evtx_security_sessions"]) == []
 
 
 def _sec_4688(**over):
@@ -276,7 +277,7 @@ def _sec_4688(**over):
 
 
 def test_sec_4688_is_process_create():
-    from piiat_mitrecar import normalize
+    from byakugan import normalize
     ev = normalize.normalize("evtx_process", _sec_4688())
     assert ev["car_object"] == "process" and ev["car_action"] == "create"
     assert ev["pid"] == 336 and ev["ppid"] == 4          # NewProcessId=0x150, parent=ProcessId
@@ -300,7 +301,7 @@ def test_sec_4688_is_process_create():
 
 
 def test_sec_4688_not_claimed_by_other_evtx_maps():
-    from piiat_mitrecar import normalize
+    from byakugan import normalize
     assert normalize.normalize("evtx_security", _sec_4688()) is None       # not auth
     assert normalize.normalize("evtx_security_sessions", _sec_4688()) is None
     assert normalize.normalize("evtx_services", _sec_4688()) is None
@@ -329,7 +330,7 @@ def _sec_4688(**over):
 
 
 def test_sec_4688_is_process_create():
-    from piiat_mitrecar import normalize
+    from byakugan import normalize
     ev = normalize.normalize("evtx_process", _sec_4688())
     assert ev["car_object"] == "process" and ev["car_action"] == "create"
     assert ev["pid"] == 0x150 and ev["ppid"] == 4        # NewProcessId / ProcessId(parent), hex->int
@@ -356,7 +357,7 @@ def test_sec_4688_is_process_create():
 
 
 def test_sec_4688_not_claimed_by_other_evtx_maps():
-    from piiat_mitrecar import normalize
+    from byakugan import normalize
     # a 4688 is a process, not a session/service/auth
     assert normalize.normalize("evtx_security_sessions", _sec_4688()) is None
     assert normalize.normalize("evtx_services", _sec_4688()) is None

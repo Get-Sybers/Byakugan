@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "evtx_security"
+ ],
+ "host": null,
+ "adapter": "none",
+ "input": "input.jsonl"
+}

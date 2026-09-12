@@ -1,7 +1,7 @@
 """Value-normalization markers — CAR property VALUES rendered in ONE format
 regardless of source (evtx / plaso-disk / volatility-memory), so hayabusa/Sigma
 and CAR analytics detect consistently and cross-source convergence agrees. See
-piiat_mitrecar/normalize.py:
+byakugan/normalize.py:
 
   * win_program_path / win_program_name — the AppCompatCache/Amcache Store-app
     (UWP) tab-delimited package descriptor fix (never the raw tab blob),
@@ -10,8 +10,8 @@ piiat_mitrecar/normalize.py:
 """
 import json
 
-from piiat_mitrecar import normalize
-from piiat_mitrecar.normalize import (lower, user_canon, win_program_name,
+from byakugan import normalize
+from byakugan.normalize import (lower, user_canon, win_program_name,
                                        win_program_path)
 
 _r = normalize._resolve

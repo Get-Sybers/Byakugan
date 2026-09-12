@@ -1,0 +1,1705 @@
+{
+ "resolve": [
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "filename": "\\Program Files\\app\\FPEXT.MSG",
+     "display_name": "NTFS:\\Program Files\\app\\FPEXT.MSG"
+    }
+   },
+   "out": "\\Program Files\\app\\FPEXT.MSG"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "filename": "",
+     "display_name": "GZIP:\\.fseventsd\\fc007712b62e1122"
+    }
+   },
+   "out": "\\.fseventsd\\fc007712b62e1122"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "filename": "-",
+     "display_name": "OS:/var/log/syslog"
+    }
+   },
+   "out": "/var/log/syslog"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "display_name": "TSK:/$MFT"
+    }
+   },
+   "out": "/$MFT"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "display_name": "/plain/path"
+    }
+   },
+   "out": "/plain/path"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "display_name": "ntfs:\\x"
+    }
+   },
+   "out": "ntfs:\\x"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "display_name": "NTFS:"
+    }
+   },
+   "out": "NTFS:"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "display_name": "OS:/y"
+    }
+   },
+   "out": "/y"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "display_name": "A1:tail"
+    }
+   },
+   "out": "tail"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "display_name": "NTFS:a\nb"
+    }
+   },
+   "out": "NTFS:a\nb"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {}
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     },
+     {
+      "!": [
+       "regex1",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       },
+       "\\A[A-Z0-9]+:(.*)\\Z"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "display_name"
+      ]
+     }
+    ]
+   },
+   "rec": {},
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     {
+      "!": [
+       "first",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "filename"
+        ]
+       },
+       {
+        "!": [
+         "regex1",
+         {
+          "!": [
+           "payload",
+           "Record",
+           "display_name"
+          ]
+         },
+         "\\A[A-Z0-9]+:(.*)\\Z"
+        ]
+       },
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "filename": "\\Program Files\\app\\FPEXT.MSG"
+    }
+   },
+   "out": "msg"
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     {
+      "!": [
+       "first",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "filename"
+        ]
+       },
+       {
+        "!": [
+         "regex1",
+         {
+          "!": [
+           "payload",
+           "Record",
+           "display_name"
+          ]
+         },
+         "\\A[A-Z0-9]+:(.*)\\Z"
+        ]
+       },
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "filename": "a15f3474-ab93-46b9-8834-124287ab1646.tmp"
+    }
+   },
+   "out": "tmp"
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     {
+      "!": [
+       "first",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "filename"
+        ]
+       },
+       {
+        "!": [
+         "regex1",
+         {
+          "!": [
+           "payload",
+           "Record",
+           "display_name"
+          ]
+         },
+         "\\A[A-Z0-9]+:(.*)\\Z"
+        ]
+       },
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "filename": "/etc/hostname"
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     {
+      "!": [
+       "first",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "filename"
+        ]
+       },
+       {
+        "!": [
+         "regex1",
+         {
+          "!": [
+           "payload",
+           "Record",
+           "display_name"
+          ]
+         },
+         "\\A[A-Z0-9]+:(.*)\\Z"
+        ]
+       },
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {}
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     {
+      "!": [
+       "first",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "filename"
+        ]
+       },
+       {
+        "!": [
+         "regex1",
+         {
+          "!": [
+           "payload",
+           "Record",
+           "display_name"
+          ]
+         },
+         "\\A[A-Z0-9]+:(.*)\\Z"
+        ]
+       },
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "filename": "\\Program Files\\app\\FPEXT.MSG"
+    }
+   },
+   "out": "FPEXT.MSG"
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     {
+      "!": [
+       "first",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "filename"
+        ]
+       },
+       {
+        "!": [
+         "regex1",
+         {
+          "!": [
+           "payload",
+           "Record",
+           "display_name"
+          ]
+         },
+         "\\A[A-Z0-9]+:(.*)\\Z"
+        ]
+       },
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "filename": "",
+     "display_name": "GZIP:\\.fseventsd\\fc007712b62e1122"
+    }
+   },
+   "out": "fc007712b62e1122"
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     {
+      "!": [
+       "first",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "filename"
+        ]
+       },
+       {
+        "!": [
+         "regex1",
+         {
+          "!": [
+           "payload",
+           "Record",
+           "display_name"
+          ]
+         },
+         "\\A[A-Z0-9]+:(.*)\\Z"
+        ]
+       },
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "filename": "/var/log/syslog"
+    }
+   },
+   "out": "syslog"
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     {
+      "!": [
+       "first",
+       {
+        "!": [
+         "payload",
+         "Record",
+         "filename"
+        ]
+       },
+       {
+        "!": [
+         "regex1",
+         {
+          "!": [
+           "payload",
+           "Record",
+           "display_name"
+          ]
+         },
+         "\\A[A-Z0-9]+:(.*)\\Z"
+        ]
+       },
+       {
+        "!": [
+         "payload",
+         "Record",
+         "display_name"
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {}
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "name"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "name": "notes.txt",
+     "filename": "\\$MFT"
+    }
+   },
+   "out": "notes.txt"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "name"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "name": "",
+     "filename": "\\$MFT"
+    }
+   },
+   "out": "\\$MFT"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "name"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "name": "-",
+     "filename": "\\$MFT"
+    }
+   },
+   "out": "\\$MFT"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "name"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "filename": "\\$MFT"
+    }
+   },
+   "out": "\\$MFT"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "name"
+      ]
+     },
+     {
+      "!": [
+       "payload",
+       "Record",
+       "filename"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {}
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "10.0.0.9"
+    }
+   },
+   "out": "10.0.0.9"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "156.59.33.60"
+    }
+   },
+   "out": "156.59.33.60"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "0.0.0.0"
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "127.0.0.1"
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "::1"
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "0.0.0.0.1"
+    }
+   },
+   "out": "0.0.0.0.1"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "127.0.0.10"
+    }
+   },
+   "out": "127.0.0.10"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "::11"
+    }
+   },
+   "out": "::11"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "x0.0.0.0"
+    }
+   },
+   "out": "x0.0.0.0"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "0.0.0.0 "
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "1.2.3.4\n"
+    }
+   },
+   "out": "1.2.3.4"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "0.0.0.0\n"
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "::ffff:10.0.0.9"
+    }
+   },
+   "out": "::ffff:10.0.0.9"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": ""
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": "-"
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": null
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "ip_address": 5
+    }
+   },
+   "out": "5"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {
+    "Record": {}
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "ip_address"
+      ]
+     },
+     "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z"
+    ]
+   },
+   "rec": {},
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "lower",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "sha256_hash"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "sha256_hash": "B64170B5"
+    }
+   },
+   "out": "b64170b5"
+  },
+  {
+   "spec": {
+    "!": [
+     "lower",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "md5_hash"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "md5_hash": "-"
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "lower",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "md5_hash"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {}
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "host_label",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "image_hostname"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "image_hostname": "M57-JO"
+    }
+   },
+   "out": "M57-JO"
+  },
+  {
+   "spec": {
+    "!": [
+     "host_label",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "image_hostname"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "image_hostname": "m57-jo.local.dom"
+    }
+   },
+   "out": "m57-jo"
+  },
+  {
+   "spec": {
+    "!": [
+     "host_label",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "image_hostname"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "image_hostname": ""
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "host_label",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "image_hostname"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {
+     "image_hostname": "-"
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "host_label",
+     {
+      "!": [
+       "payload",
+       "Record",
+       "image_hostname"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "Record": {}
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "mode"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "mode": 420
+    }
+   },
+   "out": 420
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "owner_identifier"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "owner_identifier": 0
+    }
+   },
+   "out": 0
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "group_identifier"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "group_identifier": "0"
+    }
+   },
+   "out": "0"
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "username"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "username": "-"
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "username"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "username": "  logserv  "
+    }
+   },
+   "out": "logserv"
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "is_allocated"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "is_allocated": false
+    }
+   },
+   "out": false
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "path_hints"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "path_hints": [
+      "\\Users\\jo\\notes.txt"
+     ]
+    }
+   },
+   "out": [
+    "\\Users\\jo\\notes.txt"
+   ]
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "file_reference"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "file_reference": 281474976727294
+    }
+   },
+   "out": 281474976727294
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "port"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "port": "54544"
+    }
+   },
+   "out": "54544"
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "pid"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "pid": 3401
+    }
+   },
+   "out": 3401
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "anything"
+    ]
+   },
+   "rec": {
+    "Record": "not a dict"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "anything"
+    ]
+   },
+   "rec": {
+    "Record": [
+     "not a dict"
+    ]
+   },
+   "out": null
+  }
+ ]
+}

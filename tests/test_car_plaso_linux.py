@@ -2,13 +2,15 @@
 
 Synthetic rows are shaped EXACTLY like the wrapped l2t rows the KQL views were
 vetted against — {"SourceImage","Timestamp","Parser","Record"} as emitted by
-`ingest.prepare.split_l2t` — with Record fields copied from real evidence
+`l2t_split.split_l2t` — with Record fields copied from real evidence
 (data_store/processed/log2timeline/jsonl: dualserver_logs for utmp/ssh, M57-JO
 for filestat/usnjrnl; no real mft rows exist, so those are synthetic per the
 Plaso mft parser's documented fields).
 """
-from piiat_mitrecar import normalize
-from piiat_mitrecar.adapters import l2t_split as prepare
+from byakugan import normalize
+# the splitter runs in the Go engine now (go/internal/split); its frozen
+# reference copy states the wrapped-row shape this module shape-locks
+from reference_plumbing import l2t_split as prepare
 
 
 def _wrap(parser, record, ts="2020-09-16T13:14:30.462820Z",

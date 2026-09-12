@@ -13,7 +13,7 @@ produces for the same event.
 import json
 import os
 
-from piiat_mitrecar import enrich, normalize
+from byakugan import enrich, normalize
 
 _FIX = os.path.join(os.path.dirname(__file__), "fixtures")
 

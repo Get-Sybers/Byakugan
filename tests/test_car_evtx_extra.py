@@ -1,6 +1,6 @@
 """BITS -> http and TerminalServices -> user_session grabs (epic #86)."""
 import json
-from piiat_mitrecar import normalize
+from byakugan import normalize
 
 
 def _bits(**o):

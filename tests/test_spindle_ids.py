@@ -17,10 +17,13 @@ import uuid
 
 import pytest
 
-from piiat_mitrecar import (derive, enrich, ids, mappings, normalize, pipeline, sources_model,
+from byakugan import (derive, enrich, ids, mappings, normalize, pipeline, sources_model,
                             spindle, stix, store, superset)
-from piiat_mitrecar.adapters import jlecmd, l2t_split, winevt as winevt_adapter
-from piiat_mitrecar.mappings import _common
+# the container splitter and the two format adapters run in the Go parse
+# engine now; their frozen reference copies (tests/parity/reference/, proven
+# byte-identical to the engine) are what these identity assertions drive
+from reference_plumbing import jlecmd, l2t_split, winevt as winevt_adapter
+from byakugan.mappings import _common
 
 _TS = "2020-09-16T13:14:30.462820Z"
 

@@ -12,7 +12,7 @@ import os
 
 import pytest
 
-from piiat_mitrecar import enrich, normalize, readers as sources
+from byakugan import enrich, normalize, pipeline
 
 _SAMPLES = os.path.join(os.path.dirname(__file__), "..", "..", "data_store",
                         "processed", "windows_logs", "sysmon-attack-samples")
@@ -271,7 +271,8 @@ def test_enrich_links_sysmon_spokes_definitively():
 def test_real_sysmon_attack_samples_normalize():
     counts = {}
     for path in sorted(glob.glob(os.path.join(_SAMPLES, "*.json"))):
-        for ev in sources.iter_mapped("evtx_sysmon", path):
+        # the REAL ingestion path: the Go parse engine, as pipeline runs it
+        for ev in pipeline.parse_events(path, ["evtx_sysmon"]):
             counts[ev["car_object"]] = counts.get(ev["car_object"], 0) + 1
             assert ev["car_action"] is not None
             assert ev["timestamp"] and ev["timestamp"][:2] == "20"

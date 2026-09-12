@@ -1,0 +1,1658 @@
+{
+ "cases": [
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "creation time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "creation time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "CRTIME"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "CRTIME"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "crtime"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "crtime"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Birth Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Birth Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Content Modification Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Content Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Metadata Modification Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Metadata Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Backup Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Backup Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": ""
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": null
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "-"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "-"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": 0
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": false
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": false
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": true
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": true
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": 17
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": 17
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": [
+      "Creation Time"
+     ]
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": [
+      "Creation Time"
+     ]
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Creat\u0131on Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Creat\u0131on Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "CREAT\u0130ON TIME"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "CREAT\u0130ON TIME"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "B\u0130RTH"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "B\u0130RTH"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "b\u0131rth"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "b\u0131rth"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Record": null
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": "Creation Time"
+   },
+   "result": false,
+   "rec_after": {
+    "Record": "Creation Time"
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": [
+     "Creation Time"
+    ]
+   },
+   "result": false,
+   "rec_after": {
+    "Record": [
+     "Creation Time"
+    ]
+   }
+  },
+  {
+   "predicate": "l2t_td_create",
+   "rec": {
+    "Record": 5
+   },
+   "result": false,
+   "rec_after": {
+    "Record": 5
+   }
+  },
+  {
+   "predicate": "l2t_td_modify",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Content Modification Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Content Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_modify",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Metadata Modification Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Metadata Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_modify",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "mtime"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "mtime"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_modify",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "MTIME"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "MTIME"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_modify",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "mt\u0131me"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "mt\u0131me"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_modify",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "MOD\u0130F\u0130CAT\u0130ON T\u0130ME"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "MOD\u0130F\u0130CAT\u0130ON T\u0130ME"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_modify",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "mti\u0131me"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "mti\u0131me"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_modify",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_modify",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Last Access Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Last Access Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_modify",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "l2t_td_modify",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "l2t_td_read",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Last Access Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Last Access Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_read",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "LAST ACCESS TIME"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "LAST ACCESS TIME"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_read",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "atime"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "atime"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_read",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "at\u0131me"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "at\u0131me"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_read",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "AT\u0130ME"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "AT\u0130ME"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_read",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "la\u017ft access"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "la\u017ft access"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_read",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Last  Access Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Last  Access Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_read",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_read",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "l2t_td_delete",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Deletion Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Deletion Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_delete",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "File Deleted"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "File Deleted"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_delete",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "DELETED"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "DELETED"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_delete",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "delet\u0131on"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "delet\u0131on"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_delete",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "DELET\u0130ON"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "DELET\u0130ON"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_delete",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Delete Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Delete Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_delete",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_td_delete",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 2147484416
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 2147484416
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 256
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 256
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 512
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 512
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 768
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 768
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 2147516416
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 2147516416
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 0
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": null
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": ""
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": "-"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": "-"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": "256"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": "256"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": "  256  "
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": "  256  "
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": "0x100"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": "0x100"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 256.9
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 256.9
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 255.9
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 255.9
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": true
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": true
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": false
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": false
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": -1
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": -1
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": -256
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": -256
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": [
+      256
+     ]
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": [
+      256
+     ]
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": {
+      "a": 1
+     }
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": {
+      "a": 1
+     }
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 1e+30
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 1e+30
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "l2t_usn_create",
+   "rec": {
+    "Record": "0x100"
+   },
+   "result": false,
+   "rec_after": {
+    "Record": "0x100"
+   }
+  },
+  {
+   "predicate": "l2t_usn_delete",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 512
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 512
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_delete",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 2147484416
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 2147484416
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_delete",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 256
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 256
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_delete",
+   "rec": {
+    "Record": {
+     "update_reason_flags": 2147516416
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": 2147516416
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_delete",
+   "rec": {
+    "Record": {
+     "update_reason_flags": "512"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": "512"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_delete",
+   "rec": {
+    "Record": {
+     "update_reason_flags": -1
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "update_reason_flags": -1
+    }
+   }
+  },
+  {
+   "predicate": "l2t_usn_delete",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "l2t_usn_delete",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": 7
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "login_type": 7
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": 6
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "login_type": 6
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": 8
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": 8
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": 0
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": 1
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": 1
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": 2
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": 2
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": 5
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": 5
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": "7"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "login_type": "7"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": " 7 "
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "login_type": " 7 "
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": "7.5"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": "7.5"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": "seven"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": "seven"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": 7.9
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "login_type": 7.9
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": 6.0
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "login_type": 6.0
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": true
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": true
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": null
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": ""
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": 0.0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": 0.0
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {
+     "login_type": [
+      7
+     ]
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": [
+      7
+     ]
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "l2t_utmp_login",
+   "rec": {
+    "Record": 7
+   },
+   "result": false,
+   "rec_after": {
+    "Record": 7
+   }
+  },
+  {
+   "predicate": "l2t_utmp_logout",
+   "rec": {
+    "Record": {
+     "login_type": 8
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "login_type": 8
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_logout",
+   "rec": {
+    "Record": {
+     "login_type": "8"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "login_type": "8"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_logout",
+   "rec": {
+    "Record": {
+     "login_type": 8.7
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "login_type": 8.7
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_logout",
+   "rec": {
+    "Record": {
+     "login_type": 7
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": 7
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_logout",
+   "rec": {
+    "Record": {
+     "login_type": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "login_type": null
+    }
+   }
+  },
+  {
+   "predicate": "l2t_utmp_logout",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "l2t_utmp_logout",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "l2t_text_ssh_login",
+   "rec": {
+    "Record": {
+     "data_type": "syslog:ssh:login"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "syslog:ssh:login"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_text_ssh_login",
+   "rec": {
+    "Record": {
+     "data_type": "syslog:line"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "syslog:line"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_text_ssh_login",
+   "rec": {
+    "Record": {
+     "data_type": "SYSLOG:SSH:LOGIN"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "SYSLOG:SSH:LOGIN"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_text_ssh_login",
+   "rec": {
+    "Record": {
+     "data_type": " syslog:ssh:login"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": " syslog:ssh:login"
+    }
+   }
+  },
+  {
+   "predicate": "l2t_text_ssh_login",
+   "rec": {
+    "Record": {
+     "data_type": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": null
+    }
+   }
+  },
+  {
+   "predicate": "l2t_text_ssh_login",
+   "rec": {
+    "Record": {
+     "data_type": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": ""
+    }
+   }
+  },
+  {
+   "predicate": "l2t_text_ssh_login",
+   "rec": {
+    "Record": {
+     "data_type": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": 0
+    }
+   }
+  },
+  {
+   "predicate": "l2t_text_ssh_login",
+   "rec": {
+    "Record": {
+     "data_type": [
+      "syslog:ssh:login"
+     ]
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": [
+      "syslog:ssh:login"
+     ]
+    }
+   }
+  },
+  {
+   "predicate": "l2t_text_ssh_login",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "l2t_text_ssh_login",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "l2t_text_ssh_login",
+   "rec": {
+    "Record": "syslog:ssh:login"
+   },
+   "result": false,
+   "rec_after": {
+    "Record": "syslog:ssh:login"
+   }
+  }
+ ]
+}

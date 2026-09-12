@@ -1,7 +1,7 @@
 # to-be-validated
 
 CAR mapping **inferences that are not yet sample-verified**. They are kept here
-as YAML specs — out of the active `piiat_mitrecar/mappings/` package, so the live
+as YAML specs — out of the active `byakugan/mappings/` package, so the live
 pipeline never runs an unvalidated mapping — but preserved so the technical work
 is not lost.
 

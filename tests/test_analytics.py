@@ -5,7 +5,7 @@ The analytics are reconstructed live from the pinned car submodule, so the
 count assertions are thresholds + membership (a pin bump may add analytics),
 never a brittle exact equality.
 """
-from piiat_mitrecar import analytics as A
+from byakugan import analytics as A
 
 
 # -- the expression compiler --------------------------------------------------

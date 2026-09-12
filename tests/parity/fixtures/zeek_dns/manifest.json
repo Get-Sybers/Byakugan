@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "zeek_dns"
+ ],
+ "host": "cap",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

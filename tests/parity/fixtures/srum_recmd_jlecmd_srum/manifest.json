@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "l2t_srum"
+ ],
+ "host": "lonewolf",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

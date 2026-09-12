@@ -3,9 +3,14 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "piiat-mitrecar"
+# Distribution and import package are both byakugan (formerly piiat-mitrecar).
+# piiat_mitrecar remains as a one-release compat shim that forwards every module
+# and `python -m` entry point to byakugan. The STIX namespace/producer identity
+# seed strings are frozen INSIDE ids.py/stix.py — they do not depend on the
+# import name, so every previously minted deterministic id survives the rename.
+name = "byakugan"
 version = "0.1.0"
-description = "Put It In A Timeline (MITRE CAR) — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, PIIAT-Mem) into finished MITRE CAR: per-source databases, an inference cascade, per-object JSON."
+description = "Byakugan (formerly PIIAT-MitreCar) — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, PIIAT-Mem) into finished MITRE CAR: per-source databases, an inference cascade, per-object JSON."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
@@ -17,17 +22,22 @@ dependencies = ["pyyaml>=6"]
 dev = ["pytest>=8", "yamale>=4", "yamllint>=1.30"]
 
 [project.urls]
-Repository = "https://github.com/Get-Sybers/PIIAT-MitreCar"
-Issues = "https://github.com/Get-Sybers/PIIAT-MitreCar/issues"
+Repository = "https://github.com/Get-Sybers/byakugan"
+Issues = "https://github.com/Get-Sybers/byakugan/issues"
 
 [project.scripts]
-piiat-mitrecar = "piiat_mitrecar.pipeline:main"
+byakugan = "byakugan.pipeline:main"
 
 [tool.setuptools]
-packages = ["piiat_mitrecar", "piiat_mitrecar.mappings", "piiat_mitrecar.adapters"]
+# byakugan.adapters is gone: the winevt/jlecmd/l2t-split plumbing it held now
+# lives in the Go parse engine (go/internal/{adapt,split}), so the shim's
+# piiat_mitrecar.adapters went with it.
+packages = ["byakugan", "byakugan.mappings",
+            "piiat_mitrecar", "piiat_mitrecar.mappings"]
 
 [tool.setuptools.package-data]
 # the CAR/superset models + ATT&CK relationships are reconstructed live from the
 # pinned submodules, so they are not shipped; only the owned data files are.
-piiat_mitrecar = ["cascade_relationships.yml", "relationships.yml", "spindle.yml",
-                  "car_source_schema.yaml"]
+# The piiat_mitrecar shim ships no data files — it only forwards imports.
+byakugan = ["cascade_relationships.yml", "relationships.yml", "spindle.yml",
+            "car_source_schema.yaml"]
