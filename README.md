@@ -4,10 +4,10 @@
 artefact into MITRE CAR, relate the objects through proven relationships, and
 (roadmap) flag adversary TTP behaviours — automatically.**
 
-> Formerly **PIIAT-MitreCar**. The repository and distribution are now
-> **byakugan**; the Python package keeps its historical import name
-> `piiat_mitrecar`, and the STIX namespace/producer identity keep their
-> original seeds so previously issued deterministic ids stay stable.
+> Formerly **PIIAT-MitreCar**. Repository, distribution and Python import
+> package are now all **byakugan**; a `piiat_mitrecar` forwarding shim remains
+> for one release. The STIX namespace/producer identity keep their original
+> seeds so previously issued deterministic ids stay stable.
 
 An analyst points it at what their forensic tooling already produces and gets
 back a timeline that is **CAR-normalised**, **relationship-enriched**, and
@@ -31,9 +31,9 @@ not just the events a single detection cares about.
 
 ```
 git submodule update --init --recursive          # the model comes from pinned submodules
-python -m piiat_mitrecar --in <file-or-dir> --out <dir>   # one source
-python -m piiat_mitrecar --batch <processed_dir>          # every source, isolated
-python -m piiat_mitrecar.timeline <car-dir>               # one property-rich, time-ordered timeline
+python -m byakugan --in <file-or-dir> --out <dir>   # one source
+python -m byakugan --batch <processed_dir>          # every source, isolated
+python -m byakugan.timeline <car-dir>               # one property-rich, time-ordered timeline
 ```
 
 Each evidence **source** becomes two self-contained SQLite stores:

@@ -4,7 +4,7 @@ import json
 import os
 import sqlite3
 
-from piiat_mitrecar import derive, enrich, store, superset
+from byakugan import derive, enrich, store, superset
 
 _H = "H"
 _T0 = "2020-01-01T00:00:00Z"
@@ -132,7 +132,7 @@ def test_prefer_field_still_ambiguous_makes_no_edge():
 def test_all_derived_verbs_are_attack_vocabulary():
     """Every verb the derived rules can emit is a real ATT&CK verb — the same
     typed-edge contract the declared cascade is held to."""
-    from piiat_mitrecar import build_data_model
+    from byakugan import build_data_model
     _, rels = build_data_model.build_superset()
     vocab = {r["relationship"] for r in rels}
     verbs = {r["relationship"] for r in derive.rules()["links"]}
@@ -267,7 +267,7 @@ def test_superset_schema_is_backward_compatible(tmp_path):
 
 
 def test_pipeline_derive_stage_is_optional(tmp_path):
-    from piiat_mitrecar import pipeline
+    from byakugan import pipeline
     src = tmp_path / "in"
     src.mkdir()
     rec = {"EventId": 7, "Channel": "Microsoft-Windows-Sysmon/Operational", "Computer": "HOSTA",

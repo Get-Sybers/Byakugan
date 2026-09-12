@@ -3,7 +3,7 @@ database (owner's isolation rule — no cross-source dependence)."""
 import json
 import os
 
-from piiat_mitrecar import pipeline
+from byakugan import pipeline
 
 _SEC = os.path.join(os.path.dirname(__file__), "..", "..",
                     "data_store/processed/windows_logs/lonewolf/Windows/System32/winevt/Logs/Security_EvtxECmd_Output.json")
@@ -39,7 +39,7 @@ def test_one_file_one_enriched_db(tmp_path):
 
 def test_batch_discovery_and_isolation(tmp_path):
     import json as _json
-    from piiat_mitrecar import pipeline
+    from byakugan import pipeline
     # a mini processed tree: one evtx host dir + one zeek capture dir
     (tmp_path / "windows_logs" / "hostA").mkdir(parents=True)
     (tmp_path / "windows_logs" / "hostA" / "Security_EvtxECmd_Output.json").write_text(

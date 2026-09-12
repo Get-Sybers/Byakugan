@@ -1,7 +1,7 @@
 """Unit tests for the DX_DFIR CAR normalization engine (epic #86)."""
 import json
 
-from piiat_mitrecar import carmodel, enrich, normalize, readers as sources, store
+from byakugan import carmodel, enrich, normalize, readers as sources, store
 
 _SEC_4624 = {
     "EventId": 4624, "Channel": "Security", "Computer": "HOST1.example.com",
@@ -111,7 +111,7 @@ def test_canonicalization_never_overwrites_native_evidence():
 
 
 def test_ts_before_marker_compares_instants_not_strings():
-    from piiat_mitrecar.normalize import parse_ts, ts_before
+    from byakugan.normalize import parse_ts, ts_before
     rec = {"a": "2020-02-10 08:20:00.000",           # Sysmon rendering
            "b": "2020-02-10T08:28:12.876Z",          # ISO, Z
            "c": "2020-02-10T09:28:12.876+01:00",     # the SAME instant as b, offset form

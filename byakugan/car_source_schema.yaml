@@ -40,11 +40,11 @@ extractor:
   parser: str()                           # the specific parser/channel/handler invoked
   url: str()
   alternates: list(str(), required=False) # same-coverage alternate derivations
-# the row identity (piiat_mitrecar/spindle.yml): a Plaso-derived source mints its
+# the row identity (byakugan/spindle.yml): a Plaso-derived source mints its
 # guid from the registry entries its map names; any other source carries one of
 # the registry's external forms verbatim (a sensor's / tool's own id).
 identity:
-  registry: str(required=False)           # piiat_mitrecar/spindle.yml
+  registry: str(required=False)           # byakugan/spindle.yml
   version: int(required=False)            # the registry version (spindle.version)
   entries: list(include('identity_entry'), required=False)
   external: list(str(), required=False)   # spindle.yml external: form names

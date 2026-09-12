@@ -1,6 +1,6 @@
 """Plaso winevt(x) -> EvtxECmd-shape adapter -> the ported winevtx CAR maps (epic #86)."""
-from piiat_mitrecar.adapters import winevt as winevt_adapter
-from piiat_mitrecar import normalize
+from byakugan.adapters import winevt as winevt_adapter
+from byakugan import normalize
 
 
 def _wrapped(eid, strings, ts="2018-03-27T12:11:42.0Z",

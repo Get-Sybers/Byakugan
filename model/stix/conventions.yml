@@ -1,6 +1,6 @@
 # HAND-AUTHORED contract — validated by `python model/stix/validate.py`.
 # The CAR -> STIX 2.1 projection: how car.db + superset.db + native are DERIVED
-# into STIX at export (piiat_mitrecar/stix.py). Nothing here is generated; it
+# into STIX at export (byakugan/stix.py). Nothing here is generated; it
 # records boundary DECISIONS — which STIX object a CAR row becomes, how its id
 # is minted, how both relationship classes and the reconstructed nodes appear.
 # Per-object field decisions live in objects.yml. Change a decision here AND in
@@ -15,7 +15,7 @@ contract:
                                    #    (GLOBAL) + sighting + host identity (CASE-SCOPED), from the
                                    #    runnable CAR analytics over car.db (analytics.py; see `behaviour`)
   stix_version: '2.1'
-  engine: piiat_mitrecar/stix.py
+  engine: byakugan/stix.py
   validated_by: model/stix/validate.py
   car_model: model/car/objects     # the 13 CAR objects objects.yml must cover exactly
   derives_from: [car.db, superset.db, native]   # the ONLY inputs — no second extraction path
@@ -35,8 +35,8 @@ output:
   # seeds across the byakugan rename: they are wire-format constants — changing
   # either would re-mint every deterministic id ever issued.
   producer: identity--<uuid5(CAR_NS, "identity|piiat-mitrecar")> (name PIIAT-MitreCar, identity_class system)
-  cli: 'python -m piiat_mitrecar.stix export <car-dir> [--out FILE] [--case ID] [--as-of ISO]'
-  pipeline_flag: '--stix (python -m piiat_mitrecar --in/--batch ... --stix): export after the stores are built'
+  cli: 'python -m byakugan.stix export <car-dir> [--out FILE] [--case ID] [--as-of ISO]'
+  pipeline_flag: '--stix (python -m byakugan --in/--batch ... --stix): export after the stores are built'
   as_of: >-
     the `created`/`modified` stamp for objects that carry no evidence time (a relationship row
     without a timestamp, an inferred node without first_seen): --as-of, else the LATEST evidence
@@ -137,7 +137,7 @@ identity_conventions:
     map renders (<object>-<host>-<channel>-<record number> for an EVTX record; the JLECmd /
     RECmd field forms), a memory-object offset (PIIAT-Mem's proc-<hex>), or the spindle uuid5 a
     disk-image row is MINTED with — uuid5(SPINDLE_NS, canonical_json(native.spindle_key)), the
-    registry piiat_mitrecar/spindle.yml (snapshot model/spindle/): native.spindle_key is the
+    registry byakugan/spindle.yml (snapshot model/spindle/): native.spindle_key is the
     readable key (_obj, _v = the entry's identity-key version, the identity names),
     native.spindle_scope is intrinsic | positional, native.spindle_ref is where the record came
     from (outside the key). The forms are the registry's `external:` section and its entries.

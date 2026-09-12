@@ -14,9 +14,9 @@ from __future__ import annotations
 import json
 import os
 
-from piiat_mitrecar import normalize, pipeline
+from byakugan import normalize, pipeline
 
-from piiat_mitrecar import carmodel as _cm
+from byakugan import carmodel as _cm
 
 
 # --- rows (wrapped shape) ---------------------------------------------------
@@ -393,7 +393,7 @@ def test_other_syslog_lines_stay_raw():
 
 def test_all_mapped_props_exist_on_the_model_objects():
     model = _cm.load()
-    from piiat_mitrecar.mappings import plaso_exec
+    from byakugan.mappings import plaso_exec
 
     def maps(entry):
         for _, sub in entry.get("variants", []):

@@ -9,7 +9,7 @@ import os
 
 import yaml
 
-from piiat_mitrecar import pipeline
+from byakugan import pipeline
 
 
 def test_write_source_manifests_emits_and_validates(tmp_path):

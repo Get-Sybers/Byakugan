@@ -12,7 +12,7 @@ import os
 
 import pytest
 
-from piiat_mitrecar import enrich, normalize, readers as sources
+from byakugan import enrich, normalize, readers as sources
 
 _SAMPLES = os.path.join(os.path.dirname(__file__), "..", "..", "data_store",
                         "processed", "windows_logs", "sysmon-attack-samples")

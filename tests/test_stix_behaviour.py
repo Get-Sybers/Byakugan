@@ -12,7 +12,7 @@ import json
 import pathlib
 import uuid
 
-from piiat_mitrecar import derive, enrich, store, stix, superset
+from byakugan import derive, enrich, store, stix, superset
 
 _H = "HOSTA"
 _T0 = "2020-01-01T00:00:00Z"
@@ -181,7 +181,7 @@ def test_no_behaviour_objects_without_a_hit(tmp_path):
 # runnable analytic, tactics unioned so kill_chain_phases are case-independent
 # --------------------------------------------------------------------------- #
 def test_behaviour_catalogue_over_the_pinned_corpus():
-    from piiat_mitrecar import analytics as A
+    from byakugan import analytics as A
     ans = A.load_analytics()
     cat = stix.behaviour_catalogue(ans)
     runnable = [a for a in ans if a.runnable]

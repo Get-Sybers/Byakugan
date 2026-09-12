@@ -13,7 +13,7 @@ import os
 
 import pytest
 
-from piiat_mitrecar import normalize, readers as sources
+from byakugan import normalize, readers as sources
 
 _EVIDENCE = ("/opt/github/DX_DFIR/data_store/processed/windows_logs/lonewolf"
              "/Windows/System32/winevt/Logs")
@@ -276,7 +276,7 @@ def _sec_4688(**over):
 
 
 def test_sec_4688_is_process_create():
-    from piiat_mitrecar import normalize
+    from byakugan import normalize
     ev = normalize.normalize("evtx_process", _sec_4688())
     assert ev["car_object"] == "process" and ev["car_action"] == "create"
     assert ev["pid"] == 336 and ev["ppid"] == 4          # NewProcessId=0x150, parent=ProcessId
@@ -300,7 +300,7 @@ def test_sec_4688_is_process_create():
 
 
 def test_sec_4688_not_claimed_by_other_evtx_maps():
-    from piiat_mitrecar import normalize
+    from byakugan import normalize
     assert normalize.normalize("evtx_security", _sec_4688()) is None       # not auth
     assert normalize.normalize("evtx_security_sessions", _sec_4688()) is None
     assert normalize.normalize("evtx_services", _sec_4688()) is None
@@ -329,7 +329,7 @@ def _sec_4688(**over):
 
 
 def test_sec_4688_is_process_create():
-    from piiat_mitrecar import normalize
+    from byakugan import normalize
     ev = normalize.normalize("evtx_process", _sec_4688())
     assert ev["car_object"] == "process" and ev["car_action"] == "create"
     assert ev["pid"] == 0x150 and ev["ppid"] == 4        # NewProcessId / ProcessId(parent), hex->int
@@ -356,7 +356,7 @@ def test_sec_4688_is_process_create():
 
 
 def test_sec_4688_not_claimed_by_other_evtx_maps():
-    from piiat_mitrecar import normalize
+    from byakugan import normalize
     # a 4688 is a process, not a session/service/auth
     assert normalize.normalize("evtx_security_sessions", _sec_4688()) is None
     assert normalize.normalize("evtx_services", _sec_4688()) is None

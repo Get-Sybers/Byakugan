@@ -17,10 +17,10 @@ import uuid
 
 import pytest
 
-from piiat_mitrecar import (derive, enrich, ids, mappings, normalize, pipeline, sources_model,
+from byakugan import (derive, enrich, ids, mappings, normalize, pipeline, sources_model,
                             spindle, stix, store, superset)
-from piiat_mitrecar.adapters import jlecmd, l2t_split, winevt as winevt_adapter
-from piiat_mitrecar.mappings import _common
+from byakugan.adapters import jlecmd, l2t_split, winevt as winevt_adapter
+from byakugan.mappings import _common
 
 _TS = "2020-09-16T13:14:30.462820Z"
 

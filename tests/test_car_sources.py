@@ -9,7 +9,7 @@ import os
 
 import pytest
 
-from piiat_mitrecar import carmodel, gen_sources, mappings, sources_model
+from byakugan import carmodel, gen_sources, mappings, sources_model
 
 _SOURCES_DIR = os.path.join(os.path.dirname(__file__), "..", "sources")
 
@@ -76,7 +76,7 @@ def test_evtx_family_records_both_derivations():
 
 
 def test_action_resolver_covers_marker_shapes():
-    from piiat_mitrecar.normalize import const, first, map_value
+    from byakugan.normalize import const, first, map_value
     assert sources_model.resolve_actions("create") == {"create"}
     assert sources_model.resolve_actions(const("get")) == {"get"}
     assert sources_model.resolve_actions(
@@ -116,7 +116,7 @@ def test_sources_validate_against_yamale_schema():
     import glob
     yamale = pytest.importorskip("yamale")
     schema_path = os.path.join(os.path.dirname(__file__), "..",
-                               "piiat_mitrecar", "car_source_schema.yaml")
+                               "byakugan", "car_source_schema.yaml")
     schema = yamale.make_schema(schema_path)
     docs = glob.glob(os.path.join(_SOURCES_DIR, "*.yaml"))
     assert docs, "no source manifests to validate"
@@ -135,13 +135,13 @@ def test_source_docs_state_the_row_identity_from_the_registry():
 
     import yaml
 
-    from piiat_mitrecar import gen_sources, spindle
+    from byakugan import gen_sources, spindle
     docs = sources_model.all_source_docs()
     plaso = {k for k, d in sources_model.DERIVATIONS.items() if d.tool == sources_model.PLASO_TOOL}
     for key in sources_model.DERIVATIONS:
         ident = docs[key]["identity"]
         if key in plaso:
-            assert ident["registry"] == "piiat_mitrecar/spindle.yml", key
+            assert ident["registry"] == "byakugan/spindle.yml", key
             assert ident["version"] == spindle.rules()["spindle"]["version"] and "external" not in ident
             assert ident["entries"], key
             for e in ident["entries"]:

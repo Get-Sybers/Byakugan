@@ -8,7 +8,7 @@ execution artefact the run — converged into more than any one source held.
 """
 import os
 
-from piiat_mitrecar import crosssource, store
+from byakugan import crosssource, store
 
 
 def _store(case_dir, source, events):

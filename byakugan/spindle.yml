@@ -5,12 +5,12 @@
 # implements the mechanics. A map references an entry by name
 # (`"guid": spindle("<name>")` in mappings/*.py) and never spells identity
 # fields itself, so the registry and the maps cannot drift
-# (piiat_mitrecar.spindle.verify_registry — tests/test_spindle_model.py and
-# `python -m piiat_mitrecar.spindle --check`). The resolved, materialized
+# (byakugan.spindle.verify_registry — tests/test_spindle_model.py and
+# `python -m byakugan.spindle --check`). The resolved, materialized
 # snapshot is model/spindle/identity.yml; the shape of a spindle row is
 # model/spindle/record.yml (both `python model/generate.py`).
 #
-# The recipe (piiat_mitrecar/ids.py — the one stix.py mints STIX 2.1 §2.9 ids with):
+# The recipe (byakugan/ids.py — the one stix.py mints STIX 2.1 §2.9 ids with):
 #
 #     guid       = uuid5(SPINDLE_NS, canonical_json({"_obj": <car_object>, "_v": <version>,
 #                                                    <name>: <value>, ...}))
@@ -39,7 +39,7 @@
 # sample change ONLY with a `version` bump: edit the entry, bump its version,
 # regenerate model/spindle/ (python model/generate.py), commit the snapshot
 # (golden.yml included); every guid of that entry re-mints, so existing stores
-# are rebuilt (--batch --force). `python -m piiat_mitrecar.spindle --check`
+# are rebuilt (--batch --force). `python -m byakugan.spindle --check`
 # (and the generator itself) refuse an entry whose golden guid moved without
 # a version bump — or whose version moved without the guid — and a change of
 # the recipe vector, which would move every guid at once.

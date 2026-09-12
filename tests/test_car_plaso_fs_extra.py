@@ -12,7 +12,7 @@ from __future__ import annotations
 import json
 import uuid
 
-from piiat_mitrecar import normalize, pipeline
+from byakugan import normalize, pipeline
 
 _PE_HEADER = {  # synthetic; the header TimeDateStamp row (compile/link time)
     "SourceImage": "log2timeline/jsonl/synth.jsonl",

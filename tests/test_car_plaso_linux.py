@@ -7,8 +7,8 @@ vetted against — {"SourceImage","Timestamp","Parser","Record"} as emitted by
 for filestat/usnjrnl; no real mft rows exist, so those are synthetic per the
 Plaso mft parser's documented fields).
 """
-from piiat_mitrecar import normalize
-from piiat_mitrecar.adapters import l2t_split as prepare
+from byakugan import normalize
+from byakugan.adapters import l2t_split as prepare
 
 
 def _wrap(parser, record, ts="2020-09-16T13:14:30.462820Z",

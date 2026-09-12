@@ -1,6 +1,6 @@
 """JLECmd jump lists -> file/read via the flattening adapter (real LoneWolf shape)."""
-from piiat_mitrecar import normalize
-from piiat_mitrecar.adapters import jlecmd
+from byakugan import normalize
+from byakugan.adapters import jlecmd
 
 
 _RECORD = {

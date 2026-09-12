@@ -1,6 +1,6 @@
 # Spindle row identity (guid) — what a real multi-tool corpus must still confirm.
 #
-# The active identity registry (piiat_mitrecar/spindle.yml; its snapshot
+# The active identity registry (byakugan/spindle.yml; its snapshot
 # model/spindle/identity.yml; docs/CAR-Pipeline.md §7.1) mints every l2t/Plaso
 # row's guid as
 # uuid5(SPINDLE_NS, canonical_json({"_obj": <object>, "_v": <version>, <name>: <value>, ...}))

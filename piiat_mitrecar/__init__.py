@@ -1,13 +1,19 @@
-"""CAR normalization for DX_DFIR — the materialized MITRE CAR data model (epic #86).
+"""Compat shim for the ``piiat_mitrecar`` -> ``byakugan`` import-package rename.
 
-The pipeline-wide application of the PIIAT-Mem approach: an owned normalization
-stage turns each artefact's raw records into finished **MITRE CAR** events and
-emits JSON, which ADX ingests as new `mitre.car_*` tables — so the query layer
-just reads the model instead of re-deriving it. The mapping engine (markers +
-`normalize`) and the `carmodel` loader are the same design proven in PIIAT-Mem
-v1.0.0; the memory artefact reuses PIIAT-Mem's already-finished CAR directly.
+The repository, distribution, console script and import package are all named
+**byakugan** now (issue #71). This package forwards every module and ``-m``
+entry point to :mod:`byakugan` so existing imports and invocations keep working
+for ONE release; it will then be removed — switch to ``import byakugan``.
 
-The object model is reconstructed live from the pinned car submodule (13 CAR
-objects; `carmodel`) and the CAR+ATT&CK superset from the attack-datasources
-submodule (`build_data_model`) — no committed copy, always the pinned source.
+Wire-format constants (``CAR_NS_URL``, the STIX producer identity seed) live
+inside ``byakugan/ids.py`` and ``byakugan/stix.py`` and never depended on the
+import name, so every previously minted deterministic id is unchanged.
 """
+import warnings as _warnings
+
+_warnings.warn(
+    "the 'piiat_mitrecar' package was renamed to 'byakugan'; this compat shim "
+    "will be removed after one release — import 'byakugan' instead",
+    DeprecationWarning, stacklevel=2)
+
+from byakugan import *  # noqa: F401,F403,E402

@@ -3,9 +3,11 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-# The distribution is byakugan (formerly piiat-mitrecar); the import package
-# keeps the historical name piiat_mitrecar — every consumer drives it as
-# `python -m piiat_mitrecar`, and the STIX namespace seeds derive from it.
+# Distribution and import package are both byakugan (formerly piiat-mitrecar).
+# piiat_mitrecar remains as a one-release compat shim that forwards every module
+# and `python -m` entry point to byakugan. The STIX namespace/producer identity
+# seed strings are frozen INSIDE ids.py/stix.py — they do not depend on the
+# import name, so every previously minted deterministic id survives the rename.
 name = "byakugan"
 version = "0.1.0"
 description = "Byakugan (formerly PIIAT-MitreCar) — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, PIIAT-Mem) into finished MITRE CAR: per-source databases, an inference cascade, per-object JSON."
@@ -24,13 +26,15 @@ Repository = "https://github.com/Get-Sybers/byakugan"
 Issues = "https://github.com/Get-Sybers/byakugan/issues"
 
 [project.scripts]
-byakugan = "piiat_mitrecar.pipeline:main"
+byakugan = "byakugan.pipeline:main"
 
 [tool.setuptools]
-packages = ["piiat_mitrecar", "piiat_mitrecar.mappings", "piiat_mitrecar.adapters"]
+packages = ["byakugan", "byakugan.mappings", "byakugan.adapters",
+            "piiat_mitrecar", "piiat_mitrecar.mappings", "piiat_mitrecar.adapters"]
 
 [tool.setuptools.package-data]
 # the CAR/superset models + ATT&CK relationships are reconstructed live from the
 # pinned submodules, so they are not shipped; only the owned data files are.
-piiat_mitrecar = ["cascade_relationships.yml", "relationships.yml", "spindle.yml",
-                  "car_source_schema.yaml"]
+# The piiat_mitrecar shim ships no data files — it only forwards imports.
+byakugan = ["cascade_relationships.yml", "relationships.yml", "spindle.yml",
+            "car_source_schema.yaml"]

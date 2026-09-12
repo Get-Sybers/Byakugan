@@ -5,7 +5,7 @@
 - **Artefact ≠ processor.** Maps are keyed to the *artefact* (the Windows event
   log, the filesystem, a flow), never to the tool that parsed it. EvtxECmd and
   log2timeline share one set of event-log maps via a format adapter
-  (`piiat_mitrecar/adapters/`), verified to produce byte-identical CAR from the
+  (`byakugan/adapters/`), verified to produce byte-identical CAR from the
   same evidence. A new processor for a mapped artefact is a new *adapter*, never
   a second map set.
 - **One source → one database.** Enrichment is self-contained within a source;
@@ -38,18 +38,18 @@
 
 | | |
 |---|---|
-| `piiat_mitrecar/carmodel.py` | the 13 CAR objects, reconstructed live from the pinned car submodule |
-| `piiat_mitrecar/build_data_model.py` | reconstructs CAR (13) and the CAR+ATT&CK superset (38) + the ATT&CK relationship catalogue from the pinned submodules |
-| `piiat_mitrecar/mappings/` | declarative per-artefact maps (auto-discovered, one file per family) |
-| `piiat_mitrecar/normalize.py` | the marker engine: raw record → CAR event |
-| `piiat_mitrecar/adapters/` | format adapters (Plaso winevt(x) → EvtxECmd shape; l2t container splitting; jump lists) |
-| `piiat_mitrecar/relationships.yml` | the within-source cascade & inheritance rules, as data |
-| `piiat_mitrecar/cascade_relationships.yml` | the CAR-action → ATT&CK-verb bridge for relationship instances |
-| `piiat_mitrecar/enrich.py` | the cascade: identity, two-tier owner/parent links, LUID auth↔session join, file→process, null-only inheritance, dedupe |
-| `piiat_mitrecar/superset.py` | builds `superset.db`: seeds the superset model + edge-types, materialises relationship instances |
-| `piiat_mitrecar/sources_model.py` + `gen_sources.py` | generates the per-source manifests (objects/actions/properties + provenance) from the maps |
-| `piiat_mitrecar/store.py` | the car.db store + JSONL export |
-| `piiat_mitrecar/pipeline.py` | source discovery, routing, batch mode |
+| `byakugan/carmodel.py` | the 13 CAR objects, reconstructed live from the pinned car submodule |
+| `byakugan/build_data_model.py` | reconstructs CAR (13) and the CAR+ATT&CK superset (38) + the ATT&CK relationship catalogue from the pinned submodules |
+| `byakugan/mappings/` | declarative per-artefact maps (auto-discovered, one file per family) |
+| `byakugan/normalize.py` | the marker engine: raw record → CAR event |
+| `byakugan/adapters/` | format adapters (Plaso winevt(x) → EvtxECmd shape; l2t container splitting; jump lists) |
+| `byakugan/relationships.yml` | the within-source cascade & inheritance rules, as data |
+| `byakugan/cascade_relationships.yml` | the CAR-action → ATT&CK-verb bridge for relationship instances |
+| `byakugan/enrich.py` | the cascade: identity, two-tier owner/parent links, LUID auth↔session join, file→process, null-only inheritance, dedupe |
+| `byakugan/superset.py` | builds `superset.db`: seeds the superset model + edge-types, materialises relationship instances |
+| `byakugan/sources_model.py` + `gen_sources.py` | generates the per-source manifests (objects/actions/properties + provenance) from the maps |
+| `byakugan/store.py` | the car.db store + JSONL export |
+| `byakugan/pipeline.py` | source discovery, routing, batch mode |
 
 ## Coverage
 

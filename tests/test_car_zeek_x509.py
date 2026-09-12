@@ -2,7 +2,7 @@
 link (B2). The cert's fingerprint IS a SHA-256, so it becomes the file's
 sha256_hash — giving free content-hash convergence — and enrich surfaces the
 cert subject on the TLS flow that presented it (via ssl's cert_chain_fps)."""
-from piiat_mitrecar import crosssource, enrich, normalize, store
+from byakugan import crosssource, enrich, normalize, store
 
 _FP = "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d"
 _X509 = {"ts": "2024-04-21T06:34:48.870004Z", "fingerprint": _FP,

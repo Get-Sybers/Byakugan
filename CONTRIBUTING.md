@@ -23,13 +23,17 @@ model or the ATT&CK vocabulary is committed as a copy (see
 ## Everyday commands
 
 ```
-python -m piiat_mitrecar --in <file-or-dir> --out <dir>   # run one source
-python -m piiat_mitrecar --batch <processed_dir>          # every source
-python -m piiat_mitrecar.gen_sources                      # regenerate sources/ after a map change
-python -m piiat_mitrecar.timeline <car-dir>               # unified CAR timeline (car.db + superset.db)
-python -m piiat_mitrecar.build_data_model --write out/    # export the models for inspection
+python -m byakugan --in <file-or-dir> --out <dir>   # run one source
+python -m byakugan --batch <processed_dir>          # every source
+python -m byakugan.gen_sources                      # regenerate sources/ after a map change
+python -m byakugan.timeline <car-dir>               # unified CAR timeline (car.db + superset.db)
+python -m byakugan.build_data_model --write out/    # export the models for inspection
 pytest -q                                                 # tests
 ```
+
+The import package was renamed `piiat_mitrecar` → `byakugan`; a full
+`piiat_mitrecar` forwarding shim (modules and `-m` entry points) remains for
+one release only — write new code against `byakugan`.
 
 CI (`.github/workflows/lint.yml`) runs `gen_sources --check`, `spindle --check`
 (the identity registry, its snapshot and the golden vectors), `yamale`,
@@ -62,7 +66,7 @@ CI (`.github/workflows/lint.yml`) runs `gen_sources --check`, `spindle --check`
 1. Add `mappings/<artefact>.py` exporting `MAPPINGS` (+ `PREDICATES` if needed),
    using the `_common` helpers.
 2. Route it in `pipeline.py` (`ROUTES` / `EVTX_MAPS`) if it needs filename routing.
-3. `python -m piiat_mitrecar.gen_sources` and commit the regenerated `sources/`.
+3. `python -m byakugan.gen_sources` and commit the regenerated `sources/`.
 4. A disk-image (l2t/Plaso) map names its row identity: add the entry to
    `spindle.yml` — `object`, `kind` (`record` | `entity`), `scope: intrinsic`,
    `version: 1`, `validated_against: [plaso]`, `stable_across`, the `identity`
