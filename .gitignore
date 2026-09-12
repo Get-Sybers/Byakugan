@@ -7,5 +7,8 @@ car_*.jsonl
 .car_l2t_*/
 .claude/
 *.egg-info/
+# Python packaging build output (`pip wheel .`, `python -m build`, sdist)
+build/
+dist/
 # Go build output
 go/bin/

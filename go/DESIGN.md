@@ -127,7 +127,7 @@ JSON {"tables": {"L2tX": "path"...}, "lines": N} on stdout.
   "adapter": "none"|"winevt"|"jlecmd", "input": "<file>.jsonl"} — the runner discovers dirs.
 - runner: tests/parity/test_go_parity.py — for each manifest: Python side runs the exact
   pre-enrichment reference path (readers/adapters/normalize — via tests/parity/reference/
-  frozen copies of the plumbing that will be deleted (iter_jsonl, l2t_split, winevt, jlecmd),
+  frozen copies of the now-deleted plumbing (iter_jsonl, l2t_split, winevt, jlecmd),
   with the LIVE byakugan.normalize/mappings as the mapping spec) → json.dumps(ev) per event;
   Go side: byakugan-parse parse with the same manifest; assert BYTE-equal line by line.
   Builds the binary once per session via `go build` (pytest skip with clear reason if no Go
