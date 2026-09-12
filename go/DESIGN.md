@@ -114,6 +114,9 @@ JSON {"tables": {"L2tX": "path"...}, "lines": N} on stdout.
 `byakugan-parse ir-check` → validates embedded IR against --in ir.json (optional utility).
 
 ## Parity harness (tests/parity/ in the repo)
+- LAYOUT IS PER-FAMILY — no shared generator, no shared vector file. Every mapping family owns a
+  disjoint set of paths so N agents can port N families in parallel without ever editing the same
+  file (see "Per-family porting recipe" below for the exact contract).
 - fixtures: tests/parity/fixtures/<artefact_or_family>/*.jsonl — REAL raw-shaped records:
   every inline fixture record extracted from the existing test files + authored fixtures for
   the zero-coverage maps (evtx_more variants per its docstring, plaso_fseventsd via
@@ -133,6 +136,58 @@ JSON {"tables": {"L2tX": "path"...}, "lines": N} on stdout.
   readers.iter_jsonl + the three adapters with a frozen-reference header comment.
 - golden vectors: Go unit test over model/spindle/golden.yml equivalents from IR (all 26
   identities + positional + 10 external forms + recipe vector).
+- generators: `tests/parity/genf/<family>.py` — ONE script per mapping family, data-only, over
+  the shared helpers in `tests/parity/genf/_lib.py` (`write_predicate_vectors`,
+  `write_marker_vectors`, `write_fixture`, `j`). `tests/parity/gen_all.py` runs them all (or
+  the families named on its argv), each in its own interpreter. The ENGINE-WIDE vector scripts
+  (`gen_pyjson_vectors.py`, `gen_pyre_vectors.py`, `gen_reader_vectors.py`,
+  `gen_spindle_vectors.py`) are shared files, unchanged, and are NOT run by gen_all.
+- vectors: `go/internal/predicates/testdata/predicate_vectors/<family>.json` and
+  `go/internal/markers/testdata/marker_vectors/<family>.json`. The Go tests GLOB those
+  directories (sorted) and replay every file found, so adding a family is adding a file —
+  never editing one. `marker_vectors/core.json` carries the engine-wide marker coverage (all 24
+  kinds, `_clean_ts`, `parse_ts`, `evtx_payload_field`); a family adds its own marker file only
+  when it needs coverage core does not already give it. A marker family file may carry any
+  subset of the four sections (`resolve`, `clean_ts`, `parse_ts`, `payload_field`).
+
+## Per-family porting recipe (N agents in parallel)
+One agent = one mapping family = one disjoint file set. THE WHOLE POINT is that no two agents
+ever open the same file, so the ONLY files a family agent may create or edit are:
+
+    go/internal/predicates/predicates_<family>.go                    # func init(){Register(...)}
+    go/internal/predicates/testdata/predicate_vectors/<family>.json  # generated, committed
+    go/internal/markers/testdata/marker_vectors/<family>.json        # generated, ONLY if needed
+    tests/parity/fixtures/<family>/ , tests/parity/fixtures/<family>_*/   # generated, committed
+    tests/parity/genf/<family>.py                                    # the generator, data only
+
+NEVER: any shared Go file (`predicates.go`, `normalize.go`, `markers.go`, `ir.go`, another
+family's `predicates_*.go`), any shared test (`predicates_test.go`, `markers_test.go`,
+`test_go_parity.py`, `harness.py`, `conftest.py`), `tests/parity/genf/_lib.py`,
+`tests/parity/gen_all.py`, `go/internal/ir/ir.json`, `go/DESIGN.md`, `go/README.md`, ANY Python
+engine code under `byakugan/` (the mapping tables and normalize are the SPEC — a port that needs
+them changed is a wrong port, report it instead), and NEVER any git command (no add, commit,
+branch, checkout, stash, rebase): the orchestrator commits.
+
+Steps, start to finish:
+1. Read the Python family module `byakugan/mappings/<family>.py` and, for every marker kind it
+   uses, the matching branch of `byakugan/normalize.py`. The Python source wins over this doc.
+2. Write `go/internal/predicates/predicates_<family>.go`: one `func <name>(r *record.Record) bool`
+   per gate in that module's `PREDICATES`, plus a single
+   `func init() { Register("name", name); ... }`. Package-private helper names must be prefixed
+   with the family (`<family>_...` / `<family>Helper`) — the package is shared, the file is not.
+3. Write `tests/parity/genf/<family>.py` as DATA over `_lib`: `PREDICATE_CASES` = (gate name,
+   record) pairs covering every branch and every type edge (absent field, `None`, `""`, `"-"`,
+   `str` vs `int` vs `float`, `bool`, mutation post-state); fixture rows = raw bytes per line.
+   Copy the shape of `genf/core.py` (predicates + markers + two fixtures) or `genf/zeek_conn.py`
+   (predicates + one fixture, mutating gate). Its `main()` may call ONLY
+   `_lib.write_predicate_vectors(FAMILY, ...)`, `_lib.write_marker_vectors(FAMILY, ...)` and
+   `_lib.write_fixture(<family or family_*>, ...)`.
+4. Generate: `python tests/parity/genf/<family>.py` — writes only the family's own paths.
+5. Prove it: `make -C go build test` (the globbing vector tests pick the new file up
+   automatically) and `python -m pytest -q tests/parity` (the new fixture dir is discovered by
+   `test_go_parity.py` automatically). Both must be green before reporting done.
+6. Report: the family, the files created, any deviation found between the Python source and this
+   doc (the Python source wins — the deviation is a note, never a code change to Python).
 
 ## Wiring + deletion (only after parity green)
 pipeline.py: file ingestion goes through the Go binary (resolve: $BYAKUGAN_PARSE_BIN, PATH,

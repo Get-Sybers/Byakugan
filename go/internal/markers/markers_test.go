@@ -2,24 +2,65 @@ package markers
 
 import (
 	"os"
+	"path/filepath"
+	"sort"
 	"testing"
 
 	"github.com/get-sybers/byakugan/go/internal/pyjson"
 	"github.com/get-sybers/byakugan/go/internal/record"
 )
 
-// vectors loads the Python-recorded marker vectors.
-func vectors(t *testing.T) *pyjson.Object {
+// vectorFiles lists the per-family marker vector files. `core.json` carries
+// the engine-wide coverage (all 24 kinds, _clean_ts, parse_ts,
+// evtx_payload_field); a family adds testdata/marker_vectors/<family>.json
+// only when it needs marker coverage core does not already give it — so two
+// agents porting two families never touch the same file.
+func vectorFiles(t *testing.T) []string {
 	t.Helper()
-	raw, err := os.ReadFile("testdata/marker_vectors.json")
+	paths, err := filepath.Glob(filepath.Join("testdata", "marker_vectors", "*.json"))
 	if err != nil {
-		t.Fatalf("read vectors: %v", err)
+		t.Fatalf("glob vectors: %v", err)
 	}
-	v, err := pyjson.Decode(raw)
-	if err != nil {
-		t.Fatalf("decode vectors: %v", err)
+	if len(paths) == 0 {
+		t.Fatal("no marker vector files under testdata/marker_vectors/ " +
+			"(regenerate: python tests/parity/gen_all.py)")
 	}
-	return v.(*pyjson.Object)
+	sort.Strings(paths)
+	return paths
+}
+
+// section concatenates one named section across every family vector file, in
+// file-name order. A family file need not carry every section.
+func section(t *testing.T, key string) []pyjson.Value {
+	t.Helper()
+	var out []pyjson.Value
+	for _, path := range vectorFiles(t) {
+		raw, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("read %s: %v", filepath.Base(path), err)
+		}
+		v, err := pyjson.Decode(raw)
+		if err != nil {
+			t.Fatalf("decode %s: %v", filepath.Base(path), err)
+		}
+		doc, ok := v.(*pyjson.Object)
+		if !ok {
+			t.Fatalf("%s: vector file is not an object", filepath.Base(path))
+		}
+		s, ok := doc.Get(key)
+		if !ok {
+			continue
+		}
+		list, ok := s.([]pyjson.Value)
+		if !ok {
+			t.Fatalf("%s: section %q is not a list", filepath.Base(path), key)
+		}
+		out = append(out, list...)
+	}
+	if len(out) == 0 {
+		t.Fatalf("no %q vectors in any testdata/marker_vectors/*.json", key)
+	}
+	return out
 }
 
 func canon(t *testing.T, v pyjson.Value) string {
@@ -31,18 +72,8 @@ func canon(t *testing.T, v pyjson.Value) string {
 	return s
 }
 
-func getList(t *testing.T, doc *pyjson.Object, key string) []pyjson.Value {
-	t.Helper()
-	v, ok := doc.Get(key)
-	if !ok {
-		t.Fatalf("vectors: no %q section", key)
-	}
-	return v.([]pyjson.Value)
-}
-
 func TestResolveVectors(t *testing.T) {
-	doc := vectors(t)
-	cases := getList(t, doc, "resolve")
+	cases := section(t, "resolve")
 	if len(cases) < 150 {
 		t.Fatalf("suspiciously few resolve vectors: %d", len(cases))
 	}
@@ -65,8 +96,7 @@ func TestResolveVectors(t *testing.T) {
 }
 
 func TestCleanTsVectors(t *testing.T) {
-	doc := vectors(t)
-	for i, cv := range getList(t, doc, "clean_ts") {
+	for i, cv := range section(t, "clean_ts") {
 		pair := cv.([]pyjson.Value)
 		got := CleanTs(pair[0])
 		if canon(t, got) != canon(t, pair[1]) {
@@ -77,8 +107,7 @@ func TestCleanTsVectors(t *testing.T) {
 }
 
 func TestParseTsVectors(t *testing.T) {
-	doc := vectors(t)
-	for i, cv := range getList(t, doc, "parse_ts") {
+	for i, cv := range section(t, "parse_ts") {
 		pair := cv.([]pyjson.Value)
 		sec, us, ok := ParseTs(pair[0])
 		var got pyjson.Value
@@ -93,8 +122,7 @@ func TestParseTsVectors(t *testing.T) {
 }
 
 func TestPayloadFieldVectors(t *testing.T) {
-	doc := vectors(t)
-	for i, cv := range getList(t, doc, "payload_field") {
+	for i, cv := range section(t, "payload_field") {
 		c := cv.(*pyjson.Object)
 		recv, _ := c.Get("rec")
 		namev, _ := c.Get("name")

@@ -1,23 +1,29 @@
-"""Generate the marker parity vectors — the REAL Python resolver's outputs,
-recorded, for go/internal/markers' replay test.
+"""Parity vectors + fixtures for the `core` family (byakugan/mappings/core.py:
+the evtx_security and zeek_http maps and their five gates).
 
-Drives byakugan.normalize._resolve (all 24 marker kinds), _clean_ts,
-parse_ts and mappings._common.evtx_payload_field through representative and
-edge inputs; specs are serialized with export_ir.encode_source (the same
-encoding the IR carries), records and outputs as plain JSON.
+`core` additionally owns the ENGINE-WIDE marker vectors: the 24-kind resolver,
+_clean_ts, parse_ts and the unstripped evtx_payload_field gating view are not
+family-specific, so they are recorded once here rather than duplicated per
+family. A family only adds go/internal/markers/testdata/marker_vectors/
+<family>.json when it needs marker coverage core does not already give it.
 
-    python tests/parity/gen_marker_vectors.py   # writes go/internal/markers/testdata/marker_vectors.json
+    python tests/parity/genf/core.py
+
+Writes ONLY:
+    go/internal/predicates/testdata/predicate_vectors/core.json
+    go/internal/markers/testdata/marker_vectors/core.json
+    tests/parity/fixtures/core_evtx_security/
+    tests/parity/fixtures/zeek_http/
 """
 from __future__ import annotations
 
-import copy
 import json
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
-from byakugan import export_ir, normalize as N  # noqa: E402
-from byakugan.mappings import _common  # noqa: E402
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _lib  # noqa: E402
+
 from byakugan.normalize import (at, basename, concat, const, domain_of,  # noqa: E402
                                 epoch_ts, exe_path, ext, first, hex_int,
                                 host_label, lower, map_value, payload, regex1,
@@ -25,10 +31,40 @@ from byakugan.normalize import (at, basename, concat, const, domain_of,  # noqa:
                                 user_canon, userdata, win_program_name,
                                 win_program_path)
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                   "..", "..", "go", "internal", "markers", "testdata",
-                   "marker_vectors.json")
+FAMILY = "core"
 
+# ---------------------------------------------------------------------------
+# predicate vectors — core.py's gates
+# ---------------------------------------------------------------------------
+PREDICATE_CASES = [
+    # --- evtx_security gates -------------------------------------------------
+    ("is_sec_4624", {"EventId": 4624, "Channel": "Security"}),
+    ("is_sec_4624", {"EventId": 4624, "Channel": "Microsoft-Windows-Security-Auditing"}),
+    ("is_sec_4624", {"EventId": 4624, "Channel": "System"}),
+    ("is_sec_4624", {"EventId": "4624", "Channel": "Security"}),   # str ≠ int
+    ("is_sec_4624", {"EventId": 4624.0, "Channel": "Security"}),   # float == int
+    ("is_sec_4624", {"EventId": 4624}),                            # Channel absent → ""
+    ("is_sec_4624", {"EventId": 4624, "Channel": None}),           # str(None) = "None"
+    ("is_sec_4625", {"EventId": 4625, "Channel": "Security"}),
+    ("is_sec_4625", {"EventId": 4624, "Channel": "Security"}),
+    ("is_sec_4672", {"EventId": 4672, "Channel": "Security"}),
+    # --- zeek_http gates -----------------------------------------------------
+    ("is_http_origin", {"method": "GET"}),
+    ("is_http_origin", {"method": "post"}),
+    ("is_http_origin", {"method": "Put"}),
+    ("is_http_origin", {"method": "HEAD"}),
+    ("is_http_origin", {"method": "CONNECT"}),
+    ("is_http_origin", {}),
+    ("is_http_origin", {"method": None}),          # "NONE" not in the tuple
+    ("is_http_tunnel", {"method": "CONNECT"}),
+    ("is_http_tunnel", {"method": "connect"}),
+    ("is_http_tunnel", {"method": "GET"}),
+    ("is_http_tunnel", {}),
+]
+
+# ---------------------------------------------------------------------------
+# marker vectors — every marker kind, representative + edge inputs
+# ---------------------------------------------------------------------------
 _SEC_PAYLOAD = json.dumps({"EventData": {"Data": [
     {"@Name": "TargetUserName", "#text": "Steve"},
     {"@Name": "Padded", "#text": "  Advapi  "},
@@ -44,7 +80,6 @@ _UD_PAYLOAD = json.dumps({"UserData": {"EventXML": {
 
 _WRAPPED = {"Record": {"file_path": "/tmp/x", "pad": "  y  ", "n": 5, "dash": "-"}}
 
-# (spec, record) pairs — every marker kind, representative + edge inputs.
 RESOLVE_CASES = [
     # plain field names
     ("a", {"a": 1}),
@@ -272,32 +307,101 @@ PAYLOAD_FIELD_CASES = [
     ({"Payload": json.dumps({"EventData": {"Data": "odd"}})}, "X"),
 ]
 
+# ---------------------------------------------------------------------------
+# fixtures — raw-shaped records, extracted from the existing unit tests
+# (tests/test_car.py's inline _SEC_4624 family) plus the reader edge cases
+# (BOM, trailing commas, bad lines, '['/']' wrappers).
+# ---------------------------------------------------------------------------
+j = _lib.j
+
+
+def _sec(event_id: int, payload_data: list[dict], **extra) -> dict:
+    rec = {"EventId": event_id, "Channel": "Security",
+           "Computer": "HOST1.example.com", "EventRecordId": 14,
+           "TimeCreated": "2019-01-28T19:40:32+00:00", "UserName": "x",
+           "Payload": json.dumps({"EventData": {"Data": payload_data}})}
+    rec.update(extra)
+    return rec
+
+
+_SEC_4624 = _sec(4624, [
+    {"@Name": "TargetUserName", "#text": "Steve"},
+    {"@Name": "TargetUserSid", "#text": "S-1-5-21-1-2-3-1001"},
+    {"@Name": "TargetDomainName", "#text": "DESKTOP-8"},
+    {"@Name": "SubjectUserName", "#text": "-"},
+    {"@Name": "AuthenticationPackageName", "#text": "Negotiate  "},
+    {"@Name": "LogonProcessName", "#text": "User32"},
+    {"@Name": "WorkstationName", "#text": "DESKTOP-8"},
+    {"@Name": "TargetLogonId", "#text": "0x338F0"},
+    {"@Name": "LogonType", "#text": "2"},
+    {"@Name": "IpAddress", "#text": "-"},
+    {"@Name": "ProcessId", "#text": "0x244"},
+    {"@Name": "ProcessName", "#text": "C:\\Windows\\System32\\svchost.exe"},
+])
+
+_SEC_4625 = _sec(4625, [
+    {"@Name": "TargetUserName", "#text": "admin"},
+    {"@Name": "SubjectUserName", "#text": "NT AUTHORITY\\SYSTEM"},
+    {"@Name": "Status", "#text": "0xC000006D"},
+    {"@Name": "SubStatus", "#text": "0xC0000064"},
+    {"@Name": "FailureReason", "#text": "%%2313"},
+    {"@Name": "WorkstationName", "#text": ""},
+], EventRecordId=15)
+
+_SEC_4672 = _sec(4672, [
+    {"@Name": "SubjectUserName", "#text": "SYSTEM"},
+    {"@Name": "SubjectUserSid", "#text": "S-1-5-18"},
+    {"@Name": "SubjectDomainName", "#text": "NT AUTHORITY"},
+    {"@Name": "SubjectLogonId", "#text": "0x3E7"},
+    {"@Name": "PrivilegeList", "#text": "SeDebugPrivilege, SeTcbPrivilege"},
+], EventRecordId=16)
+
+_SEC_4688 = _sec(4688, [{"@Name": "NewProcessName", "#text": "C:\\x.exe"}],
+                 EventRecordId=17)
+_SEC_4648 = _sec(4648, [{"@Name": "TargetUserName", "#text": "admin"}],
+                 EventRecordId=18)
+
+_HTTP_GET = {"ts": "2012-07-09T17:51:46.593202Z", "uid": "Cabc", "trans_depth": 1,
+             "id.orig_h": "10.0.0.5", "id.resp_h": "1.2.3.4", "id.orig_p": 1024,
+             "id.resp_p": 80, "method": "GET", "host": "www.example.com",
+             "uri": "/x?q=1", "version": "1.1", "user_agent": "UA",
+             "request_body_len": 0, "response_body_len": 100, "status_code": 200,
+             "referrer": "-", "username": "jd@corp"}
+
 
 def main() -> int:
-    resolve = []
-    for spec, rec in RESOLVE_CASES:
-        out = N._resolve(spec, copy.deepcopy(rec))  # noqa: SLF001
-        resolve.append({"spec": export_ir.encode_source(spec)
-                        if not isinstance(spec, str) else spec,
-                        "rec": rec, "out": out})
-    clean_ts = [[v, N._clean_ts(v)] for v in CLEAN_TS_VALUES]  # noqa: SLF001
-    parse_ts = []
-    for v in PARSE_TS_VALUES:
-        dt = N.parse_ts(v)
-        parse_ts.append([v, None if dt is None else dt.isoformat()])
-    payload_field = []
-    for rec, name in PAYLOAD_FIELD_CASES:
-        payload_field.append({"rec": rec, "name": name,
-                              "out": _common.evtx_payload_field(copy.deepcopy(rec), name)})
-    doc = {"resolve": resolve, "clean_ts": clean_ts, "parse_ts": parse_ts,
-           "payload_field": payload_field}
-    out_path = os.path.abspath(OUT)
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    with open(out_path, "w", encoding="utf-8") as fh:
-        json.dump(doc, fh, indent=1)
-        fh.write("\n")
-    n = len(resolve) + len(clean_ts) + len(parse_ts) + len(payload_field)
-    print(f"wrote {out_path} ({n} vectors)")
+    _lib.write_predicate_vectors(FAMILY, PREDICATE_CASES)
+    _lib.write_marker_vectors(FAMILY, resolve=RESOLVE_CASES,
+                              clean_ts=CLEAN_TS_VALUES,
+                              parse_ts=PARSE_TS_VALUES,
+                              payload_field=PAYLOAD_FIELD_CASES)
+
+    # --- core_evtx_security: the map exemplar + every reader edge -----------
+    _lib.write_fixture("core_evtx_security",
+                       {"artefacts": ["evtx_security"], "host": None,
+                        "adapter": "none", "input": "input.jsonl"},
+                       [b"\xef\xbb\xbf[\n",                    # BOM + '[' wrapper line
+                        j(_SEC_4624) + b",\n",                 # trailing comma
+                        j(_SEC_4625) + b",,\n",                # several trailing commas
+                        b"  " + j(_SEC_4672) + b"  \n",        # padded line
+                        b"{not json\n",                        # bad line: skipped silently
+                        b"\n   \n",                            # blank / whitespace lines
+                        j(_SEC_4688) + b"\n",                  # matched by no variant: dropped
+                        j(_SEC_4648) + b"\n",                  # deliberately unmapped: dropped
+                        b"]\n"])                               # ']' wrapper line
+
+    # --- zeek_http: origin/tunnel variants + host fallback ------------------
+    _lib.write_fixture("zeek_http",
+                       {"artefacts": ["zeek_http"], "host": "vantage1",
+                        "adapter": "none", "input": "input.jsonl"},
+                       [j(_HTTP_GET) + b"\n",
+                        j(dict(_HTTP_GET, method="post", uid="Cpost", status_code=302)) + b"\n",
+                        j(dict(_HTTP_GET, method="CONNECT", uid="Ctun", host="proxy:443",
+                               uri="proxy:443")) + b"\n",
+                        j(dict(_HTTP_GET, method="HEAD", uid="Chead")) + b"\n",     # dropped
+                        j(dict(_HTTP_GET, ts=1341856306.5, uid="Cepoch")) + b"\n",  # epoch ts
+                        j({"uid": "Cnometh", "trans_depth": 2}) + b"\n",            # dropped
+                        j(dict(_HTTP_GET, uid="Cnohost", host=None)) + b"\n"])      # url_full voided
     return 0
 
 

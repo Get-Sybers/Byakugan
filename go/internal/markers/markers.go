@@ -1,8 +1,9 @@
 // Package markers interprets the 24 marker kinds of the IR against a record —
 // the Go side of byakugan/normalize.py _resolve, ported clause by clause.
 // A spec is a plain field-name string or {"!": ["kind", arg...]} (the
-// export_ir encoding); sources recurse. tests/parity/gen_marker_vectors.py
-// records the Python resolver's outputs; markers_test.go replays them.
+// export_ir encoding); sources recurse. tests/parity/genf/<family>.py records
+// the Python resolver's outputs into testdata/marker_vectors/<family>.json
+// (core.json = the engine-wide set); markers_test.go globs and replays them.
 package markers
 
 import (
