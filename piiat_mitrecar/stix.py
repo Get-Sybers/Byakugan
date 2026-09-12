@@ -89,6 +89,9 @@ from .normalize import parse_ts as _parse_ts  # the one tolerant ISO-8601 parser
 
 SPEC = "2.1"
 EPOCH = "1970-01-01T00:00:00.000Z"
+# The producer identity keeps its historical piiat-mitrecar seed and name
+# across the byakugan rename — wire-format constants; a re-export must stay
+# byte-identical to bundles issued before the rename.
 PRODUCER = {"type": "identity", "spec_version": SPEC,
             "id": f"identity--{uuid.uuid5(CAR_NS, 'identity|piiat-mitrecar')}",
             "created": EPOCH, "modified": EPOCH, "name": "PIIAT-MitreCar",

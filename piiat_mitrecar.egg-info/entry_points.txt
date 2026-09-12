@@ -1,2 +1,0 @@
-[console_scripts]
-piiat-mitrecar = piiat_mitrecar.pipeline:main

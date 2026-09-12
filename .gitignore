@@ -6,3 +6,4 @@ car.db
 car_*.jsonl
 .car_l2t_*/
 .claude/
+*.egg-info/

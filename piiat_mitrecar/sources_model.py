@@ -374,10 +374,13 @@ def identity_block(artefact_key: str) -> dict:
 def _version() -> str:
     try:
         from importlib.metadata import PackageNotFoundError, version
-        try:
-            return version("piiat-mitrecar")
-        except PackageNotFoundError:
-            pass
+        # The distribution renamed piiat-mitrecar -> byakugan; an older
+        # installed dist may still carry the historical name.
+        for dist in ("byakugan", "piiat-mitrecar"):
+            try:
+                return version(dist)
+            except PackageNotFoundError:
+                pass
     except Exception:  # noqa: BLE001
         pass
     return "0.1.0"

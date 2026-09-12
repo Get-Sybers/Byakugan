@@ -1,8 +1,13 @@
-# PIIAT-MitreCar
+# Byakugan
 
 **Turn raw DFIR evidence into one MITRE-aligned timeline — normalise every
 artefact into MITRE CAR, relate the objects through proven relationships, and
 (roadmap) flag adversary TTP behaviours — automatically.**
+
+> Formerly **PIIAT-MitreCar**. The repository and distribution are now
+> **byakugan**; the Python package keeps its historical import name
+> `piiat_mitrecar`, and the STIX namespace/producer identity keep their
+> original seeds so previously issued deterministic ids stay stable.
 
 An analyst points it at what their forensic tooling already produces and gets
 back a timeline that is **CAR-normalised**, **relationship-enriched**, and
@@ -18,7 +23,7 @@ not just the events a single detection cares about.
 - **Relates** those objects — owning process, parent, auth↔session (LUID),
   file→process, thread injection — as a granular relationship timeline, typed
   against the MITRE ATT&CK data-sources relationship vocabulary.
-- **Flags TTPs** (roadmap, [#12](https://github.com/Get-Sybers/PIIAT-MitreCar/issues/12)):
+- **Flags TTPs** (roadmap, [#12](https://github.com/Get-Sybers/byakugan/issues/12)):
   CAR/ATT&CK analytics over the objects and relationships surface adversary
   behaviours on the same timeline.
 
@@ -48,7 +53,7 @@ Each evidence **source** becomes two self-contained SQLite stores:
 
 The north-star goal (evidence → CAR → superset relationships → flagged MITRE
 TTPs) and its workstreams are tracked in
-[#12](https://github.com/Get-Sybers/PIIAT-MitreCar/issues/12).
+[#12](https://github.com/Get-Sybers/byakugan/issues/12).
 
 ## Contributing
 
@@ -59,4 +64,4 @@ flow are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Standalone public tooling, consumed by pipelines via the CLI:
 [PIIAT-Mem](https://github.com/Get-Sybers/PIIAT-Mem) (memory → CAR),
-PIIAT-l2t-plugins (log2timeline parsers), PIIAT-MitreCar (processor output → CAR).
+PIIAT-l2t-plugins (log2timeline parsers), Byakugan (processor output → CAR).

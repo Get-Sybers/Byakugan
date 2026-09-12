@@ -31,6 +31,9 @@ output:
     one STIX 2.1 bundle. Objects are ordered (identity, SCOs by type/id, observed-data by time,
     inferred nodes, relationships by time, then the behaviour layer: attack-pattern, indicator,
     sighting) so a re-export is byte-identical.
+  # The producer identity and CAR_NS below keep their original piiat-mitrecar
+  # seeds across the byakugan rename: they are wire-format constants — changing
+  # either would re-mint every deterministic id ever issued.
   producer: identity--<uuid5(CAR_NS, "identity|piiat-mitrecar")> (name PIIAT-MitreCar, identity_class system)
   cli: 'python -m piiat_mitrecar.stix export <car-dir> [--out FILE] [--case ID] [--as-of ISO]'
   pipeline_flag: '--stix (python -m piiat_mitrecar --in/--batch ... --stix): export after the stores are built'

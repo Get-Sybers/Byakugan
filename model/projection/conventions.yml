@@ -1,7 +1,7 @@
 # HAND-AUTHORED contract — validated by `python model/projection/validate.py`.
 # This file is NOT generated: it records boundary DECISIONS (how every CAR
 # common-header field lands in ECS 8.x, and the shape of the Elastic data
-# streams that hold CAR events). PIIAT-MitreCar owns it; the DX_DFIR loader
+# streams that hold CAR events). Byakugan owns it; the DX_DFIR loader
 # consumes it to write CAR events into Elastic as logs-car.<object>-* data
 # streams. Per-object field decisions live in objects/<object>.yml.
 # Change a decision here, then re-run validate.py.

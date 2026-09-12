@@ -6,7 +6,7 @@ The object model is reconstructed live from **pinned submodules**, so clone
 recursively (or init them after):
 
 ```
-git clone --recursive https://github.com/Get-Sybers/PIIAT-MitreCar
+git clone --recursive https://github.com/Get-Sybers/byakugan
 # or, in an existing checkout:
 git submodule update --init --recursive
 pip install -e '.[dev]'

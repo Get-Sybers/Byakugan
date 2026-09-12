@@ -39,6 +39,9 @@ import uuid
 # STIX 2.1 §2.9: the namespace every spec-deterministic SCO id is minted under
 STIX_NS = uuid.UUID("00abedb4-aa42-466c-9c01-fed23315a9b7")
 # the project namespace: case-scoped STIX ids hang off it (case_ns = uuid5(CAR_NS, "case|<case>"))
+# Deliberately still the historical PIIAT-MitreCar URL after the byakugan
+# rename: this string SEEDS every deterministic id the engine mints — changing
+# it would orphan every previously issued id. A seed, not a link.
 CAR_NS_URL = "https://github.com/Get-Sybers/PIIAT-MitreCar/stix"
 CAR_NS = uuid.uuid5(uuid.NAMESPACE_URL, CAR_NS_URL)
 # the CAR row-identity namespace, one level under CAR_NS: a row guid can never

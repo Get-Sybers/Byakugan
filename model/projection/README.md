@@ -1,6 +1,6 @@
 # `model/projection/` — the CAR → ECS boundary contract
 
-**Hand-authored. Validated by `validate.py`. Owned by PIIAT-MitreCar.**
+**Hand-authored. Validated by `validate.py`. Owned by Byakugan.**
 
 This directory is the one place that decides *how a finished MITRE CAR event
 lands in Elastic*: the mapping of every CAR object and every CAR field onto

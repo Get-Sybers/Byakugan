@@ -1,4 +1,4 @@
-# yamale schema for a PIIAT-MitreCar source (sensor) definition.
+# yamale schema for a Byakugan source (sensor) definition.
 #
 # A SUPERSET of MITRE CAR's scripts/sensor_schema.yaml: the CAR sensor fields are
 # preserved verbatim (so a definition is still a valid CAR sensor once the three
@@ -17,7 +17,7 @@ data_model_coverage: str(required=False)
 analytic_coverage: list(include('analytic'), required=False)
 mappings: list(include('mapping'))
 other_coverage: list(str())
-# --- PIIAT-MitreCar provenance extension -------------------------------------
+# --- Byakugan provenance extension --------------------------------------------
 derived_from: str()                       # raw evidence type the extractor consumes
 extractor: include('extractor')           # the wrapper/tool that produces the input
 input_pattern: list(str())                # routing patterns linking output -> map

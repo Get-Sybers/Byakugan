@@ -1,6 +1,6 @@
 """Byakugan — Sigma detection over the CAR entries.
 
-PIIAT-MitreCar cascades many sources into normalised CAR objects. This module
+Byakugan cascades many sources into normalised CAR objects. This module
 lets a **Sigma** rule (the community detection format hayabusa ships thousands
 of, each ATT&CK-tagged) detect off those CAR objects DIRECTLY — no evtx, no
 per-source event shape. A rule's ``logsource.category`` names the CAR object it

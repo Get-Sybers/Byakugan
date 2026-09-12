@@ -3,9 +3,12 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "piiat-mitrecar"
+# The distribution is byakugan (formerly piiat-mitrecar); the import package
+# keeps the historical name piiat_mitrecar — every consumer drives it as
+# `python -m piiat_mitrecar`, and the STIX namespace seeds derive from it.
+name = "byakugan"
 version = "0.1.0"
-description = "Put It In A Timeline (MITRE CAR) — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, PIIAT-Mem) into finished MITRE CAR: per-source databases, an inference cascade, per-object JSON."
+description = "Byakugan (formerly PIIAT-MitreCar) — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, PIIAT-Mem) into finished MITRE CAR: per-source databases, an inference cascade, per-object JSON."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
@@ -17,11 +20,11 @@ dependencies = ["pyyaml>=6"]
 dev = ["pytest>=8", "yamale>=4", "yamllint>=1.30"]
 
 [project.urls]
-Repository = "https://github.com/Get-Sybers/PIIAT-MitreCar"
-Issues = "https://github.com/Get-Sybers/PIIAT-MitreCar/issues"
+Repository = "https://github.com/Get-Sybers/byakugan"
+Issues = "https://github.com/Get-Sybers/byakugan/issues"
 
 [project.scripts]
-piiat-mitrecar = "piiat_mitrecar.pipeline:main"
+byakugan = "piiat_mitrecar.pipeline:main"
 
 [tool.setuptools]
 packages = ["piiat_mitrecar", "piiat_mitrecar.mappings", "piiat_mitrecar.adapters"]
