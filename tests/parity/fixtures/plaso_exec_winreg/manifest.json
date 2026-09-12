@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "plaso_exec_winreg"
+ ],
+ "host": "plaso-fallback",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

@@ -1,0 +1,188 @@
+{
+ "cases": [
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d"
+   },
+   "result": true,
+   "rec_after": {
+    "fingerprint": "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d"
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": "BAC9E9E2D4E38C7716FC17DCD701DD45E226CD9B623F21E9A145921FB5B6DC4D"
+   },
+   "result": true,
+   "rec_after": {
+    "fingerprint": "BAC9E9E2D4E38C7716FC17DCD701DD45E226CD9B623F21E9A145921FB5B6DC4D"
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": "-"
+   },
+   "result": true,
+   "rec_after": {
+    "fingerprint": "-"
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": ""
+   },
+   "result": false,
+   "rec_after": {
+    "fingerprint": ""
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": null
+   },
+   "result": false,
+   "rec_after": {
+    "fingerprint": null
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "certificate.subject": "CN=berylia.org"
+   },
+   "result": false,
+   "rec_after": {
+    "certificate.subject": "CN=berylia.org"
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": 0
+   },
+   "result": false,
+   "rec_after": {
+    "fingerprint": 0
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": 12345
+   },
+   "result": true,
+   "rec_after": {
+    "fingerprint": 12345
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": 0.0
+   },
+   "result": false,
+   "rec_after": {
+    "fingerprint": 0.0
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": 1.5
+   },
+   "result": true,
+   "rec_after": {
+    "fingerprint": 1.5
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": false
+   },
+   "result": false,
+   "rec_after": {
+    "fingerprint": false
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": true
+   },
+   "result": true,
+   "rec_after": {
+    "fingerprint": true
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": []
+   },
+   "result": false,
+   "rec_after": {
+    "fingerprint": []
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": [
+     "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d"
+    ]
+   },
+   "result": true,
+   "rec_after": {
+    "fingerprint": [
+     "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d"
+    ]
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": {}
+   },
+   "result": false,
+   "rec_after": {
+    "fingerprint": {}
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "fingerprint": {
+     "sha256": "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "fingerprint": {
+     "sha256": "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d"
+    }
+   }
+  },
+  {
+   "predicate": "zeek_x509_has_fingerprint",
+   "rec": {
+    "Fingerprint": "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d"
+   },
+   "result": false,
+   "rec_after": {
+    "Fingerprint": "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d"
+   }
+  }
+ ]
+}

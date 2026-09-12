@@ -1,0 +1,15 @@
+{
+ "artefacts": [
+  "evtx_security",
+  "evtx_security_sessions",
+  "evtx_process",
+  "evtx_services",
+  "evtx_sysmon",
+  "evtx_bits",
+  "evtx_rdp",
+  "evtx_more"
+ ],
+ "host": "lonewolf",
+ "adapter": "winevt",
+ "input": "input.jsonl"
+}

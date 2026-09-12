@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "zeek_files"
+ ],
+ "host": "cap",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

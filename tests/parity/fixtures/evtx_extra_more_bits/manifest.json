@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "evtx_bits"
+ ],
+ "host": "WIN-FALLBACK",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

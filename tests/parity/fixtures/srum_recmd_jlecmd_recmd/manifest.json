@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "recmd_batch"
+ ],
+ "host": "DESKTOP-PM6C56D",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

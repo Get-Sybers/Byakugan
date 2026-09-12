@@ -1,0 +1,228 @@
+{
+ "cases": [
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": "CfPiyA3iI3URMDMEfd",
+    "server_name": "scoring-c2.berylia.org"
+   },
+   "result": true,
+   "rec_after": {
+    "uid": "CfPiyA3iI3URMDMEfd",
+    "server_name": "scoring-c2.berylia.org"
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": "CfPiyA3iI3URMDMEfd"
+   },
+   "result": true,
+   "rec_after": {
+    "uid": "CfPiyA3iI3URMDMEfd"
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "server_name": "scoring-c2.berylia.org"
+   },
+   "result": true,
+   "rec_after": {
+    "server_name": "scoring-c2.berylia.org"
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "ts": "2024-04-21T06:34:48Z"
+   },
+   "result": false,
+   "rec_after": {
+    "ts": "2024-04-21T06:34:48Z"
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": "",
+    "server_name": ""
+   },
+   "result": false,
+   "rec_after": {
+    "uid": "",
+    "server_name": ""
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": "",
+    "server_name": "sni.example"
+   },
+   "result": true,
+   "rec_after": {
+    "uid": "",
+    "server_name": "sni.example"
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": "C1",
+    "server_name": ""
+   },
+   "result": true,
+   "rec_after": {
+    "uid": "C1",
+    "server_name": ""
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": null,
+    "server_name": null
+   },
+   "result": false,
+   "rec_after": {
+    "uid": null,
+    "server_name": null
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": "-"
+   },
+   "result": true,
+   "rec_after": {
+    "uid": "-"
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "server_name": "-"
+   },
+   "result": true,
+   "rec_after": {
+    "server_name": "-"
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": 0
+   },
+   "result": false,
+   "rec_after": {
+    "uid": 0
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": 0,
+    "server_name": "sni.example"
+   },
+   "result": true,
+   "rec_after": {
+    "uid": 0,
+    "server_name": "sni.example"
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": 1
+   },
+   "result": true,
+   "rec_after": {
+    "uid": 1
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": false,
+    "server_name": false
+   },
+   "result": false,
+   "rec_after": {
+    "uid": false,
+    "server_name": false
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": true
+   },
+   "result": true,
+   "rec_after": {
+    "uid": true
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": 0.0,
+    "server_name": 0.0
+   },
+   "result": false,
+   "rec_after": {
+    "uid": 0.0,
+    "server_name": 0.0
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": [],
+    "server_name": []
+   },
+   "result": false,
+   "rec_after": {
+    "uid": [],
+    "server_name": []
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": [
+     "C1"
+    ]
+   },
+   "result": true,
+   "rec_after": {
+    "uid": [
+     "C1"
+    ]
+   }
+  },
+  {
+   "predicate": "zeek_ssl_is_tls",
+   "rec": {
+    "uid": {},
+    "server_name": {
+     "a": 1
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "uid": {},
+    "server_name": {
+     "a": 1
+    }
+   }
+  }
+ ]
+}

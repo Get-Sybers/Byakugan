@@ -2,10 +2,11 @@
 // by name in per-family files (predicates_<family>.go, one per Python mapping
 // module) so no shared file is edited as families are ported.
 //
-// Stage B ships the exemplar families (mappings/core.py, mappings/zeek_conn.py);
-// stage C fills the rest. Check() reports IR predicate names with no Go
-// registration — the Go tests and `byakugan-parse ir-check` surface the gap
-// without failing the build while porting is in flight.
+// Every mapping family is ported, so completeness is now a HARD gate:
+// Check() errors on any IR predicate name with no Go registration, and both
+// `byakugan-parse ir-check` (exit 1) and the package's TestRegistryAgainstIR
+// fail on it. Adding a family means adding predicates_<family>.go plus its
+// recorded vectors — never editing this file.
 package predicates
 
 import (
@@ -60,7 +61,7 @@ func Missing(irNames []string) []string {
 }
 
 // Check errors when any IR predicate name has no Go registration — the
-// completeness gate that must pass once every family is ported (stage C).
+// completeness gate — every family is ported, so this must always pass.
 func Check(irNames []string) error {
 	if m := Missing(irNames); len(m) > 0 {
 		return fmt.Errorf("predicates: %d IR predicate(s) not registered in Go: %s",

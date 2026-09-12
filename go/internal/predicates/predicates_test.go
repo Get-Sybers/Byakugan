@@ -85,9 +85,11 @@ func TestPredicateVectors(t *testing.T) {
 			}
 		}
 	}
-	// the stage-B exemplars alone carry 44 cases; a collapse below that means
-	// vector files went missing, not that a family got smaller.
-	if total < 40 {
+	// the full registry carries 816 recorded cases across 14 family files; a
+	// collapse far below that means vector files went missing, not that a
+	// family got smaller. (TestEveryRegisteredPredicateHasAVector is the
+	// per-name gate; this is the blunt "did testdata vanish" one.)
+	if total < 600 {
 		t.Fatalf("suspiciously few predicate vectors in total: %d", total)
 	}
 }
@@ -101,9 +103,12 @@ func mustDumps(t *testing.T, v pyjson.Value) string {
 	return s
 }
 
-// TestRegistryAgainstIR: every REGISTERED predicate must exist in the IR
-// (catches typos and stale registrations); the exemplar families must be
-// complete; the not-yet-ported remainder is reported, not failed (stage C).
+// TestRegistryAgainstIR: the registry and the IR's predicate_names must agree
+// EXACTLY — every registered predicate exists in the IR (catches typos and
+// stale registrations) and every IR predicate is registered in Go. With all
+// mapping families ported this is a HARD gate: an unregistered name is a map
+// variant that would fail at evaluation time, so it fails the test rather than
+// logging (it mirrors `byakugan-parse ir-check`, which exits nonzero on it).
 func TestRegistryAgainstIR(t *testing.T) {
 	doc, err := ir.Load()
 	if err != nil {
@@ -122,15 +127,54 @@ func TestRegistryAgainstIR(t *testing.T) {
 			t.Errorf("predicate %q registered in Go but absent from the IR", reg)
 		}
 	}
-	// stage-B exemplar families must be fully registered
-	for _, want := range []string{"is_sec_4624", "is_sec_4625", "is_sec_4672",
-		"is_http_origin", "is_http_tunnel", "zeek_conn_has_state"} {
-		if _, ok := Lookup(want); !ok {
-			t.Errorf("exemplar predicate %q not registered", want)
+	if len(irNames) == 0 {
+		t.Fatal("IR carries no predicate_names — the completeness gate would be vacuous")
+	}
+	// the completeness gate: every IR predicate name has a Go port
+	if missing := Missing(irNames); len(missing) > 0 {
+		t.Errorf("%d IR predicate(s) not registered in Go: %v\n"+
+			"port each in predicates_<family>.go with vectors "+
+			"(go/DESIGN.md → \"Per-family porting recipe\")", len(missing), missing)
+	}
+	// ...and nothing is registered twice under a different spelling: the two
+	// sets must be the same size once both inclusions above hold.
+	if len(Registered()) != len(inIR) {
+		t.Errorf("registry holds %d predicates, the IR names %d",
+			len(Registered()), len(inIR))
+	}
+}
+
+// TestEveryRegisteredPredicateHasAVector: a port with no recorded Python
+// verdict is unproven. Every registered name must appear in at least one
+// testdata/predicate_vectors/*.json case.
+func TestEveryRegisteredPredicateHasAVector(t *testing.T) {
+	seen := map[string]bool{}
+	for _, path := range vectorFiles(t) {
+		raw, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("read %s: %v", path, err)
+		}
+		doc, err := pyjson.Decode(raw)
+		if err != nil {
+			t.Fatalf("decode %s: %v", path, err)
+		}
+		cases, _ := doc.(*pyjson.Object).Get("cases")
+		list, _ := cases.([]pyjson.Value)
+		for _, cv := range list {
+			if n, ok := cv.(*pyjson.Object).Get("predicate"); ok {
+				seen[n.(string)] = true
+			}
 		}
 	}
-	if missing := Missing(irNames); len(missing) > 0 {
-		t.Logf("stage C to port: %d IR predicates not yet registered: %v",
-			len(missing), missing)
+	var bare []string
+	for _, name := range Registered() {
+		if !seen[name] {
+			bare = append(bare, name)
+		}
+	}
+	if len(bare) > 0 {
+		t.Errorf("%d registered predicate(s) with no recorded vector: %v\n"+
+			"add cases in tests/parity/genf/<family>.py and regenerate",
+			len(bare), bare)
 	}
 }

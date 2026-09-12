@@ -1,0 +1,1104 @@
+{
+ "cases": [
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 1
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "SYSMON",
+    "EventId": 1
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "SYSMON",
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "sysmon",
+    "EventId": 1
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "sysmon",
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "my-sysmon-shim",
+    "EventId": 1
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "my-sysmon-shim",
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "EventId": 1
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "EventId": 1
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": null,
+    "EventId": 1
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": null,
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "",
+    "EventId": 1
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "",
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": 5,
+    "EventId": 1
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": 5,
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": true,
+    "EventId": 1
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": true,
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "1"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "1"
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": " 1 "
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": " 1 "
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 1.0
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 1.0
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 1.9
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 1.9
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": true
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": true
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": false
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": false
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "0x1"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "0x1"
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "1.0"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "1.0"
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "abc"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "abc"
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": ""
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": ""
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": null
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": null
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon"
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": [
+     1
+    ]
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": [
+     1
+    ]
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 0
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 0
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": -1
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": -1
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 10000000000000000000000
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 10000000000000000000000
+   }
+  },
+  {
+   "predicate": "sysmon_proc_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 5
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 5
+   }
+  },
+  {
+   "predicate": "sysmon_proc_terminate",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 5
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 5
+   }
+  },
+  {
+   "predicate": "sysmon_proc_terminate",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "5"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "5"
+   }
+  },
+  {
+   "predicate": "sysmon_proc_terminate",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 1
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_flow_start",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 3
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 3
+   }
+  },
+  {
+   "predicate": "sysmon_flow_start",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 30
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 30
+   }
+  },
+  {
+   "predicate": "sysmon_driver_load",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 6
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 6
+   }
+  },
+  {
+   "predicate": "sysmon_driver_load",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 7
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 7
+   }
+  },
+  {
+   "predicate": "sysmon_module_load",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 7
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 7
+   }
+  },
+  {
+   "predicate": "sysmon_module_load",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 6
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 6
+   }
+  },
+  {
+   "predicate": "sysmon_thread_remote",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 8
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 8
+   }
+  },
+  {
+   "predicate": "sysmon_thread_remote",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 80
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 80
+   }
+  },
+  {
+   "predicate": "sysmon_proc_access",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 10
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 10
+   }
+  },
+  {
+   "predicate": "sysmon_proc_access",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "10"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": "10"
+   }
+  },
+  {
+   "predicate": "sysmon_proc_access",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 1
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 1
+   }
+  },
+  {
+   "predicate": "sysmon_file_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 11
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 11
+   }
+  },
+  {
+   "predicate": "sysmon_file_create",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 23
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 23
+   }
+  },
+  {
+   "predicate": "sysmon_file_delete",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 23
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 23
+   }
+  },
+  {
+   "predicate": "sysmon_file_delete",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 11
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 11
+   }
+  },
+  {
+   "predicate": "sysmon_file_delete",
+   "rec": {
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "EventId": 23
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "EventId": 23
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"CreateKey\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"CreateKey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"CreateValue\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"CreateValue\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"  CreateKey  \"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"  CreateKey  \"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"createkey\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"createkey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"DeleteKey\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"DeleteKey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"Mystery\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"Mystery\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"-\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"-\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": 0}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": 0}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": null}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": null}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": 12}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": 12}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetObject\", \"#text\": \"HKLM\\\\X\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetObject\", \"#text\": \"HKLM\\\\X\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "not json"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "not json"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": ""
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": ""
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": null
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": null
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": 42
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": 42
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "EventType",
+        "#text": "CreateKey"
+       }
+      ]
+     }
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "EventType",
+        "#text": "CreateKey"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": \"odd\"}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": \"odd\"}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": \"odd\"}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": \"odd\"}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"UserData\": {\"X\": {\"EventType\": \"CreateKey\"}}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"UserData\": {\"X\": {\"EventType\": \"CreateKey\"}}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"DeleteKey\"}, {\"@Name\": \"EventType\", \"#text\": \"CreateKey\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"DeleteKey\"}, {\"@Name\": \"EventType\", \"#text\": \"CreateKey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_add",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"CreateKey\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"CreateKey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_remove",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"DeleteKey\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"DeleteKey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_remove",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"DeleteValue\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"DeleteValue\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_remove",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"deletekey\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"deletekey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_remove",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"CreateKey\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"CreateKey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_remove",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 14,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"DeleteKey\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 14,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"DeleteKey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_value_set",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"SetValue\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"SetValue\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_value_set",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"Set\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"Set\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_value_set",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"setvalue\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"setvalue\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_value_set",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"CreateKey\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"CreateKey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_value_set",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"SetValue\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 12,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"SetValue\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_rename",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 14,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"RenameKey\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 14,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"RenameKey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_rename",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 14,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"RenameValue\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 14,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"RenameValue\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_rename",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 14,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"renamekey\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 14,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"renamekey\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_rename",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 14,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"Mystery\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 14,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"Mystery\"}]}}"
+   }
+  },
+  {
+   "predicate": "sysmon_reg_rename",
+   "rec": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"RenameKey\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "Provider": "Microsoft-Windows-Sysmon",
+    "EventId": 13,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"EventType\", \"#text\": \"RenameKey\"}]}}"
+   }
+  }
+ ]
+}

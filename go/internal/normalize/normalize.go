@@ -169,8 +169,9 @@ func Normalize(artefact string, rec *record.Record) (*pyjson.Object, error) {
 }
 
 // selectLeaf is normalize._select: the first matching variant, else the
-// default; a variant-less entry is its own leaf. An unregistered predicate
-// is an error (the family is not yet ported — stage C fills it).
+// default; a variant-less entry is its own leaf. Every IR predicate is
+// registered (predicates.Check is a hard gate), so an unregistered name here
+// means a stale/renamed IR — an error, never a silent non-match.
 func selectLeaf(entry pyjson.Value, rec *record.Record) (*pyjson.Object, error) {
 	eo, ok := entry.(*pyjson.Object)
 	if !ok {
@@ -193,7 +194,8 @@ func selectLeaf(entry pyjson.Value, rec *record.Record) (*pyjson.Object, error) 
 		fn, ok := predicates.Lookup(predName)
 		if !ok {
 			return nil, fmt.Errorf("normalize: predicate %q is not registered in Go "+
-				"(family not yet ported — stage C)", predName)
+				"(run `byakugan-parse ir-check`; port it in "+
+				"go/internal/predicates/predicates_<family>.go)", predName)
 		}
 		if fn(rec) {
 			leaf, _ := pair[1].(*pyjson.Object) // nil sub → row dropped

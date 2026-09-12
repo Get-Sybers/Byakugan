@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "l2t_firefox_cache"
+ ],
+ "host": null,
+ "adapter": "none",
+ "input": "input.jsonl"
+}

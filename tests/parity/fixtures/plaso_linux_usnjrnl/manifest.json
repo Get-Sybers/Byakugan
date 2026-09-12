@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "l2t_usnjrnl"
+ ],
+ "host": "vantage1",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

@@ -283,12 +283,14 @@ wall clock + peak RSS; print a small table. Run once and record results in go/RE
    CPython applies full special casing (e.g. 'İ') and Unicode digits. No
    live field exercises the difference; the marker vectors include a
    container-repr case to pin the common shape.
-10. **Predicate completeness is informational until stage C**: the registry
-    exposes `predicates.Check`; `byakugan-parse ir-check` prints the
-    not-yet-registered IR names as a note (exit 0), the Go tests log them,
-    and an actually-referenced unregistered predicate fails `parse` loudly
-    at evaluation. Once every family is ported, Check's error should be
-    promoted to a hard ir-check failure.
+10. **Predicate completeness is a HARD gate (stage C, done)**: all 77 IR
+    predicate names are registered, so `predicates.Check` now fails the
+    build rather than informing it — `byakugan-parse ir-check` exits 1 and
+    names the gap, `TestRegistryAgainstIR` fails on a name in either
+    direction (IR-but-not-Go, Go-but-not-IR, count mismatch), and
+    `TestEveryRegisteredPredicateHasAVector` fails on a port with no
+    recorded Python verdict. An actually-referenced unregistered predicate
+    still fails `parse` loudly at evaluation, as before.
 11. **Payload parse cache** lives on the Go Record struct (not as a
     `__car_parsed_payload__` key inside the record dict); observable
     behavior is identical because the engine never serializes the raw

@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "evtx_security_sessions"
+ ],
+ "host": "fallback-host",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

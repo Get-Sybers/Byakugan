@@ -1,0 +1,1830 @@
+{
+ "cases": [
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": "Last Visited Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": "Last Visited Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": "Expiration Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": "Expiration Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": "Last Visited"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": "Last Visited"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": "last visited time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": "last visited time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:leak",
+     "timestamp_desc": "Last Visited Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:leak",
+     "timestamp_desc": "Last Visited Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": null
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": ""
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": 0
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": false
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": false
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": [
+      "Last Visited Time"
+     ]
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "msiecf:url",
+     "timestamp_desc": [
+      "Last Visited Time"
+     ]
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "SourceImage": "x"
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "x"
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Record": null
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "Record": 0
+   },
+   "result": false,
+   "rec_after": {
+    "Record": 0
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "Record": ""
+   },
+   "result": false,
+   "rec_after": {
+    "Record": ""
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ie_visit",
+   "rec": {
+    "Record": []
+   },
+   "result": false,
+   "rec_after": {
+    "Record": []
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_cache",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "firefox:cache:record"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "firefox:cache:record"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_cache",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "firefox:cache2:record"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "firefox:cache2:record"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_cache",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": null
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_cache",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": 0
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_cache",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": 42
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": 42
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_cache",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": 4.5
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": 4.5
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_cache",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": true
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": true
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_cache",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "-"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "-"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "firefox:places:page_visited"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "firefox:places:page_visited"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "chrome:history:page_visited"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "chrome:history:page_visited"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "chrome:history:file_downloaded"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "chrome:history:file_downloaded"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "firefox:places:bookmark_annotation"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "firefox:places:bookmark_annotation"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "chrome:history:page_visited "
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "chrome:history:page_visited "
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": ""
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_ff_visit",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "plasoweb_is_javaidx",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "java:download:idx"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "java:download:idx"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_javaidx",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "java:download"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "java:download"
+    }
+   }
+  },
+  {
+   "predicate": "plasoweb_is_javaidx",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "fse_is_record",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "macos:fseventsd:record"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "macos:fseventsd:record"
+    }
+   }
+  },
+  {
+   "predicate": "fse_is_record",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "macos:fseventsd:record "
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "macos:fseventsd:record "
+    }
+   }
+  },
+  {
+   "predicate": "fse_is_record",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "fs:stat"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "fs:stat"
+    }
+   }
+  },
+  {
+   "predicate": "fse_is_record",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": null
+    }
+   }
+  },
+  {
+   "predicate": "fse_is_record",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": 0
+    }
+   }
+  },
+  {
+   "predicate": "fse_is_record",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "fse_is_record",
+   "rec": {
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Record": null
+   }
+  },
+  {
+   "predicate": "fse_is_record",
+   "rec": {
+    "Record": "macos:fseventsd:record"
+   },
+   "result": false,
+   "rec_after": {
+    "Record": "macos:fseventsd:record"
+   }
+  },
+  {
+   "predicate": "fse_is_record",
+   "rec": {
+    "Record": [
+     "macos:fseventsd:record"
+    ]
+   },
+   "result": false,
+   "rec_after": {
+    "Record": [
+     "macos:fseventsd:record"
+    ]
+   }
+  },
+  {
+   "predicate": "fse_is_record",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "creation time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "creation time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "crtime"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "crtime"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Birth Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Birth Time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Content Modification Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Content Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Not a time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Not a time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": null
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": 0
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": 17
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": 17
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:dll_import",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:dll_import",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_compile_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:resource",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:resource",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_table_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Content Modification Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Content Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_table_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "mtime"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "mtime"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_table_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Last Written Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Last Written Time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_table_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "LAST WRITTEN"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "LAST WRITTEN"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_table_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_table_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Content Creation Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Content Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_table_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Not a time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Not a time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_table_stamp",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:dll_import",
+     "timestamp_desc": "Content Modification Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:dll_import",
+     "timestamp_desc": "Content Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_file",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Not a time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file",
+     "timestamp_desc": "Not a time"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_file",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:file"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_file",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:dll_import"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:dll_import"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_file",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:resource"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "pe_coff:resource"
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_file",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": null
+    }
+   }
+  },
+  {
+   "predicate": "pe_is_file",
+   "rec": {
+    "Record": 0
+   },
+   "result": false,
+   "rec_after": {
+    "Record": 0
+   }
+  },
+  {
+   "predicate": "ole_is_create",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_create",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Last Saved Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Last Saved Time"
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_create",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Document Creation Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Document Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_create",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info"
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_create",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": null
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_create",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:item",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:item",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_modify",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Last Saved Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Last Saved Time"
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_modify",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Document Last Printed Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Document Last Printed Time"
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_modify",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_modify",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "crtime"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": "crtime"
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_modify",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info"
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_modify",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": 0
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:summary_info",
+     "timestamp_desc": 0
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_modify",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:item",
+     "timestamp_desc": "Last Saved Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {
+     "data_type": "olecf:item",
+     "timestamp_desc": "Last Saved Time"
+    }
+   }
+  },
+  {
+   "predicate": "ole_is_modify",
+   "rec": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "RecordId": 1,
+    "Timestamp": "2009-11-20T19:13:29.625000Z",
+    "Parser": "x",
+    "Record": {}
+   }
+  }
+ ]
+}

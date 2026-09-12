@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "jlecmd_dest"
+ ],
+ "host": "fallback-host",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

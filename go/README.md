@@ -13,7 +13,7 @@ and must reproduce the Python engine's output byte for byte.
     make -C go test      # go vet + go test ./...
     make -C go fmt
 
-## Layout (stages A + B)
+## Layout
 
 | package            | what                                                              |
 | ------------------ | ----------------------------------------------------------------- |
@@ -24,10 +24,12 @@ and must reproduce the Python engine's output byte for byte.
 | `internal/record`  | the input-record type: ordered object, blank rule, Python str()/truthiness/strip/int()/float(), EvtxECmd Payload lazy parse (stripped view) + `EvtxPayloadField` (unstripped gating view) |
 | `internal/readers` | `iter_jsonl` semantics: utf-8-sig, errors='replace' maximal subparts, universal newlines, line cleaning; byte-level vectors from `tests/parity/gen_reader_vectors.py` |
 | `internal/markers` | the 24-kind resolver (`normalize._resolve`), `parse_ts`, `_clean_ts`, epoch/isoformat rendering; vectors globbed from `testdata/marker_vectors/*.json`, written by `tests/parity/genf/<family>.py` (`core.json` = the engine-wide set) |
-| `internal/predicates` | `Register(name, fn)` registry, per-family files (`predicates_core.go`, `predicates_zeek_conn.go` ported; stage C fills the rest), `Check` completeness gate; vectors globbed from `testdata/predicate_vectors/*.json`, one file per family, written by `tests/parity/genf/<family>.py` |
+| `internal/predicates` | `Register(name, fn)` registry, one `predicates_<family>.go` per Python mapping module — all 77 IR predicates ported; `Check` is a HARD completeness gate (`ir-check` exits 1, `TestRegistryAgainstIR` fails). Vectors globbed from `testdata/predicate_vectors/*.json`, one file per family, written by `tests/parity/genf/<family>.py` |
 | `internal/spindle` | identity resolution over the normalized event + positional fallback + spindle natives; vectors from `tests/parity/gen_spindle_vectors.py` |
 | `internal/normalize` | the orchestrator: variant select → action gate → exact event key order → natives → props → guid LAST |
-| `cmd/byakugan-parse` | CLI: `parse` (adapter `none`) emits PyDumps event lines in input order; `ir-check` byte-compares + reports unported predicates; `split-l2t` + winevt/jlecmd adapters are stage C |
+| `internal/adapt`   | the winevt RULES table (wrapped Plaso winevt/winevtx row → EvtxECmd shape) and the jlecmd DestList flatten, ported from `byakugan/adapters/` |
+| `internal/split`   | the raw-l2t container splitter (`byakugan/adapters/l2t_split.py`): physical-line `RecordId`, `L2t<Camel>` table names, plaso-µs `Timestamp` |
+| `cmd/byakugan-parse` | CLI: `parse` (adapters `none`/`winevt`/`jlecmd`, adapter-route-key fan-out) emits PyDumps event lines in input order; `split-l2t` writes the per-parser table files + a JSON summary; `ir-check` validates the embedded IR, byte-compares `--in`, and FAILS on any unported IR predicate |
 
 ## Parity harness
 
@@ -35,8 +37,9 @@ and must reproduce the Python engine's output byte for byte.
 manifest through BOTH engines (frozen reference plumbing + live Python maps
 vs `byakugan-parse parse`) and asserts per-line byte equality. Fixture dirs
 are discovered by glob, so a newly ported family is picked up with no harness
-edit. Exemplar families proven in stage B: `core_evtx_security`, `zeek_http`,
-`zeek_conn`.
+edit. All 38 IR artefact keys are covered by at least one fixture, across 42
+fixture directories (adapter fan-out included). `tests/parity/test_split_parity.py`
+does the same for `split-l2t` against the frozen reference splitter.
 
 ## Regenerating the IR and vectors
 
@@ -56,7 +59,7 @@ parallel without touching a shared path:
 
     python tests/parity/genf/core.py          # core.py: evtx_security + zeek_http
     python tests/parity/genf/zeek_conn.py     # zeek_conn.py
-    python tests/parity/gen_all.py            # every genf/*.py
+    python tests/parity/gen_all.py            # every genf/*.py (15 families)
     python tests/parity/gen_all.py core       # just these families
 
 A family script writes exactly:
@@ -72,7 +75,10 @@ a family means ADDING files, never editing shared ones. The full contract
 (what a family agent may and may not touch) is the "Per-family porting recipe"
 section of [DESIGN.md](DESIGN.md).
 
-## Known, deliberate deltas from Python (stage A)
+## Known, deliberate deltas from Python
+
+The complete, numbered list is in [DESIGN.md](DESIGN.md) ("Stage A/B adjustments");
+the two that bite most often:
 
 - `pyre`: Go's `\d`/`\w`/`\b` are ASCII-only where Python 3's are
   Unicode-aware. No mapping pattern relies on non-ASCII digits/words; the

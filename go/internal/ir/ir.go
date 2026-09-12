@@ -5,7 +5,7 @@
 // it in step with the Python tables.
 //
 // Stage A exposes the raw pyjson document plus path navigation and a
-// structural validation; stage B adds the typed structs the resolver walks.
+// structural validation; the resolver walks the decoded pyjson values directly.
 package ir
 
 import (
