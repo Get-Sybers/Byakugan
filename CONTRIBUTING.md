@@ -9,8 +9,16 @@ recursively (or init them after):
 git clone --recursive https://github.com/Get-Sybers/byakugan
 # or, in an existing checkout:
 git submodule update --init --recursive
-pip install -e '.[dev]'
+pip install -e '.[dev]'          # loose install, from pyproject's extras
 make -C go build                 # the Go parse engine — REQUIRED to run the pipeline
+```
+
+For the EXACT versions this repo is proven against (what CI and the benchmark
+ran on), install the pinned inventory instead:
+
+```
+pip install -r requirements-dev.txt    # pulls in requirements.txt too
+pip install -e .                       # the package itself, no extras
 ```
 
 - `third_party/car` — the MITRE CAR data model (the 13 CAR objects).
@@ -29,6 +37,31 @@ A model refresh is a **submodule-pin bump**, never a hand-edit — nothing about
 model or the ATT&CK vocabulary is committed as a copy (see
 [docs/DataModel.md](docs/DataModel.md)).
 
+## Dependencies
+
+Every module Byakugan depends on is declared in one of three traced files, so an
+upgrade is a diff in a known place rather than an archaeology exercise:
+
+| file | what | upgrade |
+|---|---|---|
+| [`requirements.txt`](requirements.txt) | runtime (currently just `pyyaml` — everything else is the stdlib) | edit the range here **and** in `pyproject.toml` `[project] dependencies`, then `pip install -r requirements.txt` |
+| [`requirements-dev.txt`](requirements-dev.txt) | the exact `pytest` / `yamale` / `yamllint` versions this repo is proven against (`pyproject`'s `dev` extra keeps the loose floors) | bump the pin, then `pip install -r requirements-dev.txt` |
+| [`go/go.mod`](go/go.mod) | the parse engine — **stdlib-only**, no `require` block and no `go.sum` | bump the `go` directive (+ the CI toolchain version), then `make -C go build test` |
+
+After ANY dependency change, re-prove the repo:
+
+```
+python -m pytest -q
+python model/projection/validate.py && python model/stix/validate.py
+python -m byakugan.gen_sources --check && python -m byakugan.spindle --check
+python -m byakugan.export_ir --check && make -C go build test
+```
+
+`tests/test_requirements_sync.py` keeps the files honest: it fails if
+`requirements.txt` and `pyproject.toml` disagree on a package or a range, if the
+dev pins drift from the `dev` extra or fall below its floors, or if the Go module
+ever gains a third-party dependency.
+
 ## Everyday commands
 
 ```
@@ -39,6 +72,7 @@ python -m byakugan.timeline <car-dir>               # unified CAR timeline (car.
 python -m byakugan.build_data_model --write out/    # export the models for inspection
 python -m byakugan.export_ir                        # re-export the Go engine's IR after a map change
 make -C go build test                               # build the parse engine + go vet/test
+python scripts/bench-parse.py --repeat 3            # Go engine vs the Python path it replaced
 pytest -q                                                 # tests (parity suite included)
 ```
 

@@ -1,0 +1,35 @@
+# Byakugan — DEVELOPMENT dependencies (the test suite and the YAML gates CI runs).
+#
+# Mirrors pyproject.toml's [project.optional-dependencies] dev extra, with the
+# EXACT versions this repo was last proven against rather than the extra's
+# floors: `pip install -e '.[dev]'` is the loose install for contributors,
+# `pip install -r requirements-dev.txt` is the reproducible one for CI and for
+# reproducing a result. tests/test_requirements_sync.py asserts that the two
+# lists hold the same packages and that every pin here satisfies the floor
+# declared in pyproject.toml.
+#
+#     pip install -r requirements-dev.txt     # tooling
+#     pip install -e .                        # the package itself, editable
+#
+# The Go toolchain is a dev prerequisite too and is NOT installable from here:
+# Go >= 1.24 (go/go.mod), then `make -C go build` — the test suite's parity
+# stage builds and runs go/bin/byakugan-parse.
+#
+# TO UPGRADE a tool:
+#   1. bump the pin HERE (and the floor in pyproject.toml only if the new
+#      version is now the minimum that works);
+#   2. pip install -r requirements-dev.txt
+#   3. re-prove the repo:
+#        python -m pytest -q
+#        python model/projection/validate.py
+#        python model/stix/validate.py
+#        python -m byakugan.gen_sources --check
+#        python -m byakugan.spindle --check
+#        python -m byakugan.export_ir --check
+#        make -C go build test
+
+-r requirements.txt
+
+pytest==9.1.1            # the suite (tests/, incl. the Go byte-parity harness)
+yamale==6.1.0            # sources/ validated against byakugan/car_source_schema.yaml
+yamllint==1.38.0         # style gate for sources/ and to-be-validated/

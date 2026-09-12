@@ -1,0 +1,38 @@
+# Byakugan — RUNTIME dependencies (what the installed package needs to run).
+#
+# This file and pyproject.toml's [project] dependencies are ONE list: they are
+# asserted equal — package set AND version range — by
+# tests/test_requirements_sync.py, so a dependency can never be added, dropped
+# or re-ranged in one place only. pyproject.toml is what `pip install byakugan`
+# reads; this file is the traceable inventory to grep, diff and feed to a
+# scanner, and it gives a runnable environment without installing the package:
+#
+#     pip install -r requirements.txt
+#
+# The parse stage is NOT in here: it is the Go engine, whose requirements file
+# is go/go.mod — stdlib-only, no third-party modules, no go.sum (see
+# go/README.md, "Dependencies"). Everything else Byakugan uses is the Python
+# standard library by design (sqlite3, json, uuid, re, argparse, sqlite JSON1);
+# the object model is not a dependency at all — it is reconstructed live from
+# the pinned submodules in third_party/.
+#
+# TO UPGRADE a dependency:
+#   1. edit the range HERE and in pyproject.toml [project] dependencies — both,
+#      or the sync test fails;
+#   2. pip install -r requirements.txt
+#   3. re-prove the repo:
+#        python -m pytest -q
+#        python model/projection/validate.py
+#        python model/stix/validate.py
+#        python -m byakugan.gen_sources --check
+#        python -m byakugan.spindle --check
+#        python -m byakugan.export_ir --check
+#        make -C go build test
+#
+# Python itself: >= 3.10 (pyproject requires-python); proven here on CPython
+# 3.11, and on 3.12 in CI.
+
+# YAML: the source manifests (sources/), the spindle identity registry
+# (byakugan/spindle.yml), the cascade rules and the CAR source schema are all
+# YAML data files loaded at run time.  Proven: PyYAML 6.0.1.
+pyyaml>=6

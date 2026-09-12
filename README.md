@@ -72,6 +72,12 @@ TTPs) and its workstreams are tracked in
 Setup (submodules + dev install), commands, code style, and the branch/release
 flow are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
+Dependencies are traced in three files, each carrying its own upgrade path:
+[`requirements.txt`](requirements.txt) (runtime — the same list as
+`pyproject.toml`, held to it by a test), [`requirements-dev.txt`](requirements-dev.txt)
+(the exact test/lint versions the repo is proven against) and
+[`go/go.mod`](go/go.mod) for the parse engine, which is stdlib-only.
+
 ## The PIIAT family
 
 Standalone public tooling, consumed by pipelines via the CLI:

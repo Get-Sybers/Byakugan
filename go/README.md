@@ -62,6 +62,65 @@ edit. All 38 IR artefact keys are covered by at least one fixture, across 42
 fixture directories (adapter fan-out included). `tests/parity/test_split_parity.py`
 does the same for `split-l2t` against the frozen reference splitter.
 
+## Benchmark
+
+Measured, never estimated. `scripts/bench-parse.py` synthesises a corpus whose
+record shapes are cloned from `tests/parity/fixtures/*/input.jsonl`, proves both
+sides emit **byte-identical output on a head slice of that very corpus** before
+timing anything, then times the frozen pre-migration Python path
+(`tests/parity/reference/` plumbing driving the live maps — the implementation
+this engine replaced) against this binary. Best wall clock of three runs per
+side, both writing to `/dev/null`, each side a fresh child process; CPU time
+from the child's rusage, peak RSS from its `/proc/<pid>/status` VmHWM.
+
+    python scripts/bench-parse.py --repeat 3        # ~3.5 min; the corpus is deleted after
+
+| corpus | input | records | events | Python wall (cpu) | Go wall (cpu) | wall speed-up | peak RSS py / go |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| EvtxECmd Security -> evtx_security | 98 MiB | 200,000 | 120,000 | 7.81 s (7.81) | 6.52 s (9.62) | **1.20x** | 21.5 / 11.9 MiB |
+| Zeek conn.json -> zeek_conn | 63 MiB | 150,000 | 130,000 | 6.09 s (6.08) | 5.26 s (7.93) | **1.16x** | 21.6 / 11.7 MiB |
+| raw l2t container -> split-l2t | 155 MiB | 400,000 | 6 tables | 8.92 s (8.91) | 8.56 s (9.05) | **1.04x** | 18.2 / 10.0 MiB |
+| l2t L2tFilestat table -> l2t_filestat | 48 MiB | 82,155 | 76,678 | 7.85 s (7.83) | 4.11 s (5.78) | **1.91x** | 22.3 / 12.1 MiB |
+
+Host: Intel Xeon @ 2.80GHz, 4 vCPU · Linux 6.18.44 · CPython 3.11.15 · go1.24.7
+— a shared cloud VM, so the absolute seconds are host-specific; the ratios are
+what travels. The Python column carries interpreter start-up and import cost
+(~0.25 s), exactly as the pipeline used to pay it per source.
+
+Read honestly, that is a **modest win, not an order of magnitude**, and the
+shape of it is worth knowing before optimising anything here:
+
+- The margin tracks how much MAPPING work a record carries. The l2t table row
+  (many marker resolutions, predicates and identity per record) is ~1.9x; the
+  `split-l2t` row is JSON decode + re-encode and almost nothing else, so the two
+  implementations are level (1.04x) — Go buys nothing where CPython's C-coded
+  `json` already does the work.
+- Go spends MORE CPU than Python on three of four corpora while finishing sooner
+  in wall clock: the runtime's collector runs on other cores. On a machine with
+  no spare core the wall-clock win would shrink toward the CPU ratio.
+- Peak RSS is roughly halved on every corpus, and both sides stream — neither
+  grows with input size.
+- The ceiling is deliberate: this engine reproduces CPython's `json` and `str()`
+  byte for byte (ordered objects, Python-identical float and escape rendering,
+  a boxed value model — see `internal/pyjson`). Fidelity is the product; speed
+  is the bonus. The honest reason to have moved the stage is that ingestion is
+  now one self-contained, testable binary with a byte-pinned contract, with a
+  ~1.0–1.9x wall-clock and ~2x memory improvement on top.
+
+## Dependencies
+
+`go.mod` is this engine's requirements file and it is **stdlib-only** — no
+`require` block, no third-party modules, and therefore no `go.sum` (CI sets
+`cache: false` for exactly that reason). The mapping tables it needs are not
+fetched either: `internal/ir/ir.json` is embedded at build time. Upgrading the
+Go side means bumping the `go` directive in `go.mod` (and the toolchain version
+in `.github/workflows/lint.yml` + CONTRIBUTING.md), then re-running
+`make -C go build test` and `pytest -q tests/parity`.
+`tests/test_requirements_sync.py::test_go_module_is_stdlib_only` fails the
+moment a third-party module or a `go.sum` appears, so this paragraph cannot go
+stale. The Python side's inventories are `requirements.txt` and
+`requirements-dev.txt` at the repo root.
+
 ## Regenerating the IR and vectors
 
     python -m byakugan.export_ir              # rewrites go/internal/ir/ir.json
