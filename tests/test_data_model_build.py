@@ -5,7 +5,7 @@ CAR objects (from third_party/car), and superset_data_model.json = CAR 13 + ATT&
 data-source objects (from third_party/attack-datasources), plus the ATT&CK
 relationship edge catalogue. These tests keep that derivation honest.
 """
-from piiat_mitrecar import build_data_model
+from byakugan import build_data_model
 
 _CAR_13 = {"authentication", "driver", "email", "file", "flow", "http", "module",
            "process", "registry", "service", "socket", "thread", "user_session"}

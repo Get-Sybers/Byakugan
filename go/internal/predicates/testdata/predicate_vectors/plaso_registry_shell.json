@@ -1,0 +1,1266 @@
+{
+ "cases": [
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": "windows:registry:key_value"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:registry:key_value"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": "windows:registry:service"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:registry:service"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": "windows:registry:bagmru"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:registry:bagmru"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": "windows:registry:"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:registry:"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": "windows:registry"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:registry"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": "WINDOWS:REGISTRY:RUN"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "WINDOWS:REGISTRY:RUN"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": " windows:registry:run"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": " windows:registry:run"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": null
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": ""
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": "-"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "-"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": 0
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": 5
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": 5
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": false
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": false
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": true
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": true
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {
+     "data_type": [
+      "windows:registry:x"
+     ]
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": [
+      "windows:registry:x"
+     ]
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Record": null
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {
+    "Record": []
+   },
+   "result": false,
+   "rec_after": {
+    "Record": []
+   }
+  },
+  {
+   "predicate": "plaso_is_registry",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "crtime"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "crtime"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "CRTIME"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "CRTIME"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Birth Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Birth Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "BIRTH"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "BIRTH"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Content Modification Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Content Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Not a time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Not a time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": null
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": ""
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "-"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "-"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": 5
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": 5
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": true
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": true
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": {
+     "data_type": null,
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": null,
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": "not a dict"
+   },
+   "result": false,
+   "rec_after": {
+    "Record": "not a dict"
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": [
+     "x"
+    ]
+   },
+   "result": false,
+   "rec_after": {
+    "Record": [
+     "x"
+    ]
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Record": null
+   }
+  },
+  {
+   "predicate": "plasoshell_create",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "plasoshell_modify",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Content Modification Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Content Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_modify",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Metadata Modification Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Metadata Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_modify",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "mtime"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "mtime"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_modify",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "MTIME"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "MTIME"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_modify",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_modify",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Last Access Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Last Access Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_modify",
+   "rec": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "Content Modification Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "Content Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Last Access Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Last Access Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "last access"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "last access"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Access Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Access Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "atime"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "atime"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "ATIME"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "ATIME"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Accessed"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Accessed"
+    }
+   }
+  },
+  {
+   "predicate": "plasoshell_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "crtime"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "crtime"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Birth Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Birth Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Not a time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Not a time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": null
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:shell_item:file_entry",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_create",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link:x",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link:x",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_create",
+   "rec": {
+    "Record": "not a dict"
+   },
+   "result": false,
+   "rec_after": {
+    "Record": "not a dict"
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_create",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "plasoart_lnk_modify",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Content Modification Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Content Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_modify",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "mtime"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "mtime"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_modify",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_modify",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Not a time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Not a time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Last Access Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Last Access Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "atime"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "atime"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "access time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "access time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_lnk_read",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Not a time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Not a time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "Content Deletion Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "Content Deletion Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "deletion"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "deletion"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "DELETION TIME"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "DELETION TIME"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "Deleted"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "Deleted"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "Not a time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": "Not a time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": null
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item",
+     "timestamp_desc": 0
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:metadata:deleted_item"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Content Deletion Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:lnk:link",
+     "timestamp_desc": "Content Deletion Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Content Deletion Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Content Deletion Time"
+    }
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Record": null
+   }
+  },
+  {
+   "predicate": "plasoart_recycle_delete",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  }
+ ]
+}

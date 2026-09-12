@@ -1,6 +1,6 @@
 # `model/projection/` — the CAR → ECS boundary contract
 
-**Hand-authored. Validated by `validate.py`. Owned by PIIAT-MitreCar.**
+**Hand-authored. Validated by `validate.py`. Owned by Byakugan.**
 
 This directory is the one place that decides *how a finished MITRE CAR event
 lands in Elastic*: the mapping of every CAR object and every CAR field onto
@@ -139,5 +139,5 @@ exist.
 - Not the Sigma/detection layer: rules are authored against the ECS fields this
   contract produces (and the `car-detections` lookup joins on `event.id`), in a
   later phase.
-- Not a replacement for the existing JSONL/Kusto export (`store.export_jsonl()`)
-  — this is additive until decision D1 retires ADX.
+- Not a replacement for the existing per-object JSONL export
+  (`store.export_jsonl()`) — this is additive.

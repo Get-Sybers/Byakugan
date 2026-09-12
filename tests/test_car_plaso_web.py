@@ -2,7 +2,7 @@
 
 Fixtures mirror REAL M57 record shapes captured during the port.
 """
-from piiat_mitrecar import normalize
+from byakugan import normalize
 
 
 def _wrap(record, ts="2009-11-20T19:13:29.625000Z"):

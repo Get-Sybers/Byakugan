@@ -1,0 +1,592 @@
+{
+ "cases": [
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {
+    "EventId": 4624,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {
+    "EventId": 4624,
+    "Channel": "Microsoft-Windows-Security-Auditing"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": "Microsoft-Windows-Security-Auditing"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {
+    "EventId": 4624,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {
+    "EventId": "4624",
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": "4624",
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {
+    "EventId": 4624.0,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4624.0,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {
+    "EventId": true,
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": true,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {
+    "EventId": null,
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": null,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {
+    "EventId": 4624
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4624
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {
+    "EventId": 4624,
+    "Channel": null
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": null
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {
+    "EventId": 4624,
+    "Channel": ""
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": ""
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {
+    "EventId": 4624,
+    "Channel": 5
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": 5
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4624",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "evtxwin_is_sec_logoff",
+   "rec": {
+    "EventId": 4634,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4634,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_logoff",
+   "rec": {
+    "EventId": 4647,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4647,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_logoff",
+   "rec": {
+    "EventId": 4779,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4779,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_logoff",
+   "rec": {
+    "EventId": 4624,
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_logoff",
+   "rec": {
+    "EventId": 4778,
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4778,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_logoff",
+   "rec": {
+    "EventId": 4647.0,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4647.0,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_logoff",
+   "rec": {
+    "EventId": "4634",
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": "4634",
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_logoff",
+   "rec": {
+    "EventId": 4779,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4779,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_logoff",
+   "rec": {
+    "EventId": 4634
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4634
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_logoff",
+   "rec": {
+    "EventId": null,
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": null,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_logoff",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "evtxwin_is_sec_4778",
+   "rec": {
+    "EventId": 4778,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4778,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4778",
+   "rec": {
+    "EventId": 4778,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4778,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4778",
+   "rec": {
+    "EventId": 4779,
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4779,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4778",
+   "rec": {
+    "EventId": 4778.0,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4778.0,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4778",
+   "rec": {
+    "EventId": "4778",
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": "4778",
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4778",
+   "rec": {
+    "EventId": 4778
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4778
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sys_7045",
+   "rec": {
+    "EventId": 7045,
+    "Channel": "System"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 7045,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sys_7045",
+   "rec": {
+    "EventId": 7045,
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 7045,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sys_7045",
+   "rec": {
+    "EventId": 7045,
+    "Channel": "Windows System Log"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 7045,
+    "Channel": "Windows System Log"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sys_7045",
+   "rec": {
+    "EventId": 7036,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 7036,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sys_7045",
+   "rec": {
+    "EventId": 7045.0,
+    "Channel": "System"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 7045.0,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sys_7045",
+   "rec": {
+    "EventId": "7045",
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": "7045",
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sys_7045",
+   "rec": {
+    "EventId": 7045
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 7045
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sys_7045",
+   "rec": {
+    "EventId": 7045,
+    "Channel": null
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 7045,
+    "Channel": null
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sys_7045",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "evtxwin_is_sec_4697",
+   "rec": {
+    "EventId": 4697,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4697,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4697",
+   "rec": {
+    "EventId": 4697,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4697,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4697",
+   "rec": {
+    "EventId": 7045,
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 7045,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4697",
+   "rec": {
+    "EventId": 4697.0,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4697.0,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4697",
+   "rec": {
+    "EventId": "4697",
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": "4697",
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4697",
+   "rec": {
+    "EventId": 4697
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4697
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4688",
+   "rec": {
+    "EventId": 4688,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4688,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4688",
+   "rec": {
+    "EventId": 4688,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4688,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4688",
+   "rec": {
+    "EventId": 4688.0,
+    "Channel": "Security"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4688.0,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4688",
+   "rec": {
+    "EventId": "4688",
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": "4688",
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4688",
+   "rec": {
+    "EventId": 4688,
+    "Channel": null
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4688,
+    "Channel": null
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4688",
+   "rec": {
+    "EventId": 4688
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4688
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4688",
+   "rec": {
+    "EventId": 4624,
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4624,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "evtxwin_is_sec_4688",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  }
+ ]
+}

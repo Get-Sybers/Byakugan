@@ -6,7 +6,7 @@ with the queried name in `fqdn` and the answers in native. enrich then reads the
 bare connection to 100.101.0.42 reads as scoring-c2.berylia.org (the C2 chain
 the value hunt found, which no CAR field carried).
 """
-from piiat_mitrecar import enrich, normalize
+from byakugan import enrich, normalize
 
 _DNS = {"ts": "2024-04-21T06:35:26.141718Z", "uid": "CEVUbS3iLfbmi3l6Yi",
         "id.orig_h": "10.0.0.5", "id.orig_p": 49389,

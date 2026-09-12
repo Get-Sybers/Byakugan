@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "evtx_services"
+ ],
+ "host": null,
+ "adapter": "none",
+ "input": "input.jsonl"
+}

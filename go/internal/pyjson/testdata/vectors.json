@@ -1,0 +1,684 @@
+{
+ "dumps": [
+  {
+   "value": "1.0",
+   "default": "1.0",
+   "canonical": "1.0"
+  },
+  {
+   "value": "-1.0",
+   "default": "-1.0",
+   "canonical": "-1.0"
+  },
+  {
+   "value": "0.5",
+   "default": "0.5",
+   "canonical": "0.5"
+  },
+  {
+   "value": "0.1",
+   "default": "0.1",
+   "canonical": "0.1"
+  },
+  {
+   "value": "0.2",
+   "default": "0.2",
+   "canonical": "0.2"
+  },
+  {
+   "value": "0.3",
+   "default": "0.3",
+   "canonical": "0.3"
+  },
+  {
+   "value": "1.5",
+   "default": "1.5",
+   "canonical": "1.5"
+  },
+  {
+   "value": "2.5",
+   "default": "2.5",
+   "canonical": "2.5"
+  },
+  {
+   "value": "3.141592653589793",
+   "default": "3.141592653589793",
+   "canonical": "3.141592653589793"
+  },
+  {
+   "value": "1000000000000000.0",
+   "default": "1000000000000000.0",
+   "canonical": "1000000000000000.0"
+  },
+  {
+   "value": "1e+16",
+   "default": "1e+16",
+   "canonical": "1e+16"
+  },
+  {
+   "value": "1e+17",
+   "default": "1e+17",
+   "canonical": "1e+17"
+  },
+  {
+   "value": "1.5e+16",
+   "default": "1.5e+16",
+   "canonical": "1.5e+16"
+  },
+  {
+   "value": "123456789012345.6",
+   "default": "123456789012345.6",
+   "canonical": "123456789012345.6"
+  },
+  {
+   "value": "1234567890123456.8",
+   "default": "1234567890123456.8",
+   "canonical": "1234567890123456.8"
+  },
+  {
+   "value": "0.0001",
+   "default": "0.0001",
+   "canonical": "0.0001"
+  },
+  {
+   "value": "1e-05",
+   "default": "1e-05",
+   "canonical": "1e-05"
+  },
+  {
+   "value": "0.0001",
+   "default": "0.0001",
+   "canonical": "0.0001"
+  },
+  {
+   "value": "1e-05",
+   "default": "1e-05",
+   "canonical": "1e-05"
+  },
+  {
+   "value": "1.5e-05",
+   "default": "1.5e-05",
+   "canonical": "1.5e-05"
+  },
+  {
+   "value": "1e+16",
+   "default": "1e+16",
+   "canonical": "1e+16"
+  },
+  {
+   "value": "1e-300",
+   "default": "1e-300",
+   "canonical": "1e-300"
+  },
+  {
+   "value": "1.5e-300",
+   "default": "1.5e-300",
+   "canonical": "1.5e-300"
+  },
+  {
+   "value": "5e-324",
+   "default": "5e-324",
+   "canonical": "5e-324"
+  },
+  {
+   "value": "1.7976931348623157e+308",
+   "default": "1.7976931348623157e+308",
+   "canonical": "1.7976931348623157e+308"
+  },
+  {
+   "value": "-0.0",
+   "default": "-0.0",
+   "canonical": "-0.0"
+  },
+  {
+   "value": "0.0",
+   "default": "0.0",
+   "canonical": "0.0"
+  },
+  {
+   "value": "-2.5e-10",
+   "default": "-2.5e-10",
+   "canonical": "-2.5e-10"
+  },
+  {
+   "value": "6.02e+23",
+   "default": "6.02e+23",
+   "canonical": "6.02e+23"
+  },
+  {
+   "value": "1e+100",
+   "default": "1e+100",
+   "canonical": "1e+100"
+  },
+  {
+   "value": "-1e-100",
+   "default": "-1e-100",
+   "canonical": "-1e-100"
+  },
+  {
+   "value": "NaN",
+   "default": "NaN",
+   "canonical": "NaN"
+  },
+  {
+   "value": "Infinity",
+   "default": "Infinity",
+   "canonical": "Infinity"
+  },
+  {
+   "value": "-Infinity",
+   "default": "-Infinity",
+   "canonical": "-Infinity"
+  },
+  {
+   "value": "0",
+   "default": "0",
+   "canonical": "0"
+  },
+  {
+   "value": "1",
+   "default": "1",
+   "canonical": "1"
+  },
+  {
+   "value": "-1",
+   "default": "-1",
+   "canonical": "-1"
+  },
+  {
+   "value": "42",
+   "default": "42",
+   "canonical": "42"
+  },
+  {
+   "value": "-42",
+   "default": "-42",
+   "canonical": "-42"
+  },
+  {
+   "value": "2147483648",
+   "default": "2147483648",
+   "canonical": "2147483648"
+  },
+  {
+   "value": "9223372036854775808",
+   "default": "9223372036854775808",
+   "canonical": "9223372036854775808"
+  },
+  {
+   "value": "9223372036854775807",
+   "default": "9223372036854775807",
+   "canonical": "9223372036854775807"
+  },
+  {
+   "value": "-9223372036854775808",
+   "default": "-9223372036854775808",
+   "canonical": "-9223372036854775808"
+  },
+  {
+   "value": "18446744073709551616",
+   "default": "18446744073709551616",
+   "canonical": "18446744073709551616"
+  },
+  {
+   "value": "1180591620717411303424",
+   "default": "1180591620717411303424",
+   "canonical": "1180591620717411303424"
+  },
+  {
+   "value": "123456789012345678901234567890",
+   "default": "123456789012345678901234567890",
+   "canonical": "123456789012345678901234567890"
+  },
+  {
+   "value": "-123456789012345678901234567890",
+   "default": "-123456789012345678901234567890",
+   "canonical": "-123456789012345678901234567890"
+  },
+  {
+   "value": "\"\"",
+   "default": "\"\"",
+   "canonical": "\"\""
+  },
+  {
+   "value": "\"plain\"",
+   "default": "\"plain\"",
+   "canonical": "\"plain\""
+  },
+  {
+   "value": "\"quote \\\" inside\"",
+   "default": "\"quote \\\" inside\"",
+   "canonical": "\"quote \\\" inside\""
+  },
+  {
+   "value": "\"back\\\\slash\"",
+   "default": "\"back\\\\slash\"",
+   "canonical": "\"back\\\\slash\""
+  },
+  {
+   "value": "\"both \\\" and \\\\\"",
+   "default": "\"both \\\" and \\\\\"",
+   "canonical": "\"both \\\" and \\\\\""
+  },
+  {
+   "value": "\"tab\\there\"",
+   "default": "\"tab\\there\"",
+   "canonical": "\"tab\\there\""
+  },
+  {
+   "value": "\"nl\\nhere\"",
+   "default": "\"nl\\nhere\"",
+   "canonical": "\"nl\\nhere\""
+  },
+  {
+   "value": "\"cr\\rhere\"",
+   "default": "\"cr\\rhere\"",
+   "canonical": "\"cr\\rhere\""
+  },
+  {
+   "value": "\"bell\\bhere\"",
+   "default": "\"bell\\bhere\"",
+   "canonical": "\"bell\\bhere\""
+  },
+  {
+   "value": "\"ff\\fhere\"",
+   "default": "\"ff\\fhere\"",
+   "canonical": "\"ff\\fhere\""
+  },
+  {
+   "value": "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\"",
+   "default": "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\"",
+   "canonical": "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\""
+  },
+  {
+   "value": "\"\\u007f\"",
+   "default": "\"\\u007f\"",
+   "canonical": "\"\""
+  },
+  {
+   "value": "\"\\u0080\"",
+   "default": "\"\\u0080\"",
+   "canonical": "\"\""
+  },
+  {
+   "value": "\"\\u00a0\"",
+   "default": "\"\\u00a0\"",
+   "canonical": "\" \""
+  },
+  {
+   "value": "\"\\u00e9\"",
+   "default": "\"\\u00e9\"",
+   "canonical": "\"é\""
+  },
+  {
+   "value": "\"h\\u00e9llo w\\u00f6rld\"",
+   "default": "\"h\\u00e9llo w\\u00f6rld\"",
+   "canonical": "\"héllo wörld\""
+  },
+  {
+   "value": "\"\\u00fcber na\\u00efve fa\\u00e7ade\"",
+   "default": "\"\\u00fcber na\\u00efve fa\\u00e7ade\"",
+   "canonical": "\"über naïve façade\""
+  },
+  {
+   "value": "\"\\u03a9\\u2248\\u00e7\\u221a\\u222b\"",
+   "default": "\"\\u03a9\\u2248\\u00e7\\u221a\\u222b\"",
+   "canonical": "\"Ω≈ç√∫\""
+  },
+  {
+   "value": "\"\\u0440\\u0443\\u0441\\u0441\\u043a\\u0438\\u0439\"",
+   "default": "\"\\u0440\\u0443\\u0441\\u0441\\u043a\\u0438\\u0439\"",
+   "canonical": "\"русский\""
+  },
+  {
+   "value": "\"\\u65e5\\u672c\\u8a9e\\u30c6\\u30b9\\u30c8\"",
+   "default": "\"\\u65e5\\u672c\\u8a9e\\u30c6\\u30b9\\u30c8\"",
+   "canonical": "\"日本語テスト\""
+  },
+  {
+   "value": "\"\\ud83c\\udf89\"",
+   "default": "\"\\ud83c\\udf89\"",
+   "canonical": "\"🎉\""
+  },
+  {
+   "value": "\"emoji \\ud83d\\ude80 rocket\"",
+   "default": "\"emoji \\ud83d\\ude80 rocket\"",
+   "canonical": "\"emoji 🚀 rocket\""
+  },
+  {
+   "value": "\"\\ud83d\\udc68\\u200d\\ud83d\\udc69\\u200d\\ud83d\\udc67\\u200d\\ud83d\\udc66 family\"",
+   "default": "\"\\ud83d\\udc68\\u200d\\ud83d\\udc69\\u200d\\ud83d\\udc67\\u200d\\ud83d\\udc66 family\"",
+   "canonical": "\"👨‍👩‍👧‍👦 family\""
+  },
+  {
+   "value": "\"\\ud83d\\ude00\\ud83d\\ude01\"",
+   "default": "\"\\ud83d\\ude00\\ud83d\\ude01\"",
+   "canonical": "\"😀😁\""
+  },
+  {
+   "value": "\"mixed \\u00e9 \\u65e5\\u672c \\ud83c\\udfaf end\"",
+   "default": "\"mixed \\u00e9 \\u65e5\\u672c \\ud83c\\udfaf end\"",
+   "canonical": "\"mixed é 日本 🎯 end\""
+  },
+  {
+   "value": "\"\\ufeff BOM\"",
+   "default": "\"\\ufeff BOM\"",
+   "canonical": "\"﻿ BOM\""
+  },
+  {
+   "value": "\"\\u2028\\u2029 separators\"",
+   "default": "\"\\u2028\\u2029 separators\"",
+   "canonical": "\"   separators\""
+  },
+  {
+   "value": "\"ends with backslash\\\\\"",
+   "default": "\"ends with backslash\\\\\"",
+   "canonical": "\"ends with backslash\\\\\""
+  },
+  {
+   "value": "\"\\\\\\\"\"",
+   "default": "\"\\\\\\\"\"",
+   "canonical": "\"\\\\\\\"\""
+  },
+  {
+   "value": "\"-\"",
+   "default": "\"-\"",
+   "canonical": "\"-\""
+  },
+  {
+   "value": "\"null\"",
+   "default": "\"null\"",
+   "canonical": "\"null\""
+  },
+  {
+   "value": "\"true\"",
+   "default": "\"true\"",
+   "canonical": "\"true\""
+  },
+  {
+   "value": "null",
+   "default": "null",
+   "canonical": "null"
+  },
+  {
+   "value": "true",
+   "default": "true",
+   "canonical": "true"
+  },
+  {
+   "value": "false",
+   "default": "false",
+   "canonical": "false"
+  },
+  {
+   "value": "[]",
+   "default": "[]",
+   "canonical": "[]"
+  },
+  {
+   "value": "{}",
+   "default": "{}",
+   "canonical": "{}"
+  },
+  {
+   "value": "[1, 2, 3]",
+   "default": "[1, 2, 3]",
+   "canonical": "[1,2,3]"
+  },
+  {
+   "value": "[1.0, \"x\", null, true]",
+   "default": "[1.0, \"x\", null, true]",
+   "canonical": "[1.0,\"x\",null,true]"
+  },
+  {
+   "value": "{\"a\": 1}",
+   "default": "{\"a\": 1}",
+   "canonical": "{\"a\":1}"
+  },
+  {
+   "value": "{\"b\": 1, \"a\": 2}",
+   "default": "{\"b\": 1, \"a\": 2}",
+   "canonical": "{\"a\":2,\"b\":1}"
+  },
+  {
+   "value": "{\"\": \"empty key\"}",
+   "default": "{\"\": \"empty key\"}",
+   "canonical": "{\"\":\"empty key\"}"
+  },
+  {
+   "value": "{\"\\u00e9\": \"e-acute\", \"e\": \"plain\", \"z\": 0}",
+   "default": "{\"\\u00e9\": \"e-acute\", \"e\": \"plain\", \"z\": 0}",
+   "canonical": "{\"e\":\"plain\",\"z\":0,\"é\":\"e-acute\"}"
+  },
+  {
+   "value": "{\"\\u65e5\": 1, \"a\": 2, \"Z\": 3, \"\\ud83c\\udf89\": 4}",
+   "default": "{\"\\u65e5\": 1, \"a\": 2, \"Z\": 3, \"\\ud83c\\udf89\": 4}",
+   "canonical": "{\"Z\":3,\"a\":2,\"日\":1,\"🎉\":4}"
+  },
+  {
+   "value": "{\"outer\": {\"inner\": [1, {\"deep\": \"value \\u00e9\"}, 2.5]}, \"list\": []}",
+   "default": "{\"outer\": {\"inner\": [1, {\"deep\": \"value \\u00e9\"}, 2.5]}, \"list\": []}",
+   "canonical": "{\"list\":[],\"outer\":{\"inner\":[1,{\"deep\":\"value é\"},2.5]}}"
+  },
+  {
+   "value": "[{\"k\": \"v\"}, [[]], [{}]]",
+   "default": "[{\"k\": \"v\"}, [[]], [{}]]",
+   "canonical": "[{\"k\":\"v\"},[[]],[{}]]"
+  },
+  {
+   "value": "{\"nan\": NaN, \"inf\": Infinity}",
+   "default": "{\"nan\": NaN, \"inf\": Infinity}",
+   "canonical": "{\"inf\":Infinity,\"nan\":NaN}"
+  },
+  {
+   "value": "{\"big\": 1180591620717411303424, \"neg\": -9223372036854775808}",
+   "default": "{\"big\": 1180591620717411303424, \"neg\": -9223372036854775808}",
+   "canonical": "{\"big\":1180591620717411303424,\"neg\":-9223372036854775808}"
+  },
+  {
+   "value": "[\"\\u0000\", \"\\u001f\", \" \", \"~\", \"\\u007f\"]",
+   "default": "[\"\\u0000\", \"\\u001f\", \" \", \"~\", \"\\u007f\"]",
+   "canonical": "[\"\\u0000\",\"\\u001f\",\" \",\"~\",\"\"]"
+  }
+ ],
+ "pystr": [
+  {
+   "value": "true",
+   "render_str": "True",
+   "render_json": "true",
+   "str": "True"
+  },
+  {
+   "value": "false",
+   "render_str": "False",
+   "render_json": "false",
+   "str": "False"
+  },
+  {
+   "value": "null",
+   "render_str": "None",
+   "render_json": "null",
+   "str": "None"
+  },
+  {
+   "value": "0",
+   "render_str": "0",
+   "render_json": "0",
+   "str": "0"
+  },
+  {
+   "value": "1",
+   "render_str": "1",
+   "render_json": "1",
+   "str": "1"
+  },
+  {
+   "value": "-1",
+   "render_str": "-1",
+   "render_json": "-1",
+   "str": "-1"
+  },
+  {
+   "value": "42",
+   "render_str": "42",
+   "render_json": "42",
+   "str": "42"
+  },
+  {
+   "value": "9223372036854775808",
+   "render_str": "9223372036854775808",
+   "render_json": "9223372036854775808",
+   "str": "9223372036854775808"
+  },
+  {
+   "value": "1180591620717411303424",
+   "render_str": "1180591620717411303424",
+   "render_json": "1180591620717411303424",
+   "str": "1180591620717411303424"
+  },
+  {
+   "value": "-1180591620717411303424",
+   "render_str": "-1180591620717411303424",
+   "render_json": "-1180591620717411303424",
+   "str": "-1180591620717411303424"
+  },
+  {
+   "value": "1.0",
+   "render_str": "1.0",
+   "render_json": "1.0",
+   "str": "1.0"
+  },
+  {
+   "value": "-0.0",
+   "render_str": "-0.0",
+   "render_json": "-0.0",
+   "str": "-0.0"
+  },
+  {
+   "value": "0.1",
+   "render_str": "0.1",
+   "render_json": "0.1",
+   "str": "0.1"
+  },
+  {
+   "value": "1e+16",
+   "render_str": "1e+16",
+   "render_json": "1e+16",
+   "str": "1e+16"
+  },
+  {
+   "value": "1e-05",
+   "render_str": "1e-05",
+   "render_json": "1e-05",
+   "str": "1e-05"
+  },
+  {
+   "value": "1.5e-300",
+   "render_str": "1.5e-300",
+   "render_json": "1.5e-300",
+   "str": "1.5e-300"
+  },
+  {
+   "value": "NaN",
+   "render_str": "nan",
+   "render_json": "NaN",
+   "str": "nan"
+  },
+  {
+   "value": "Infinity",
+   "render_str": "inf",
+   "render_json": "Infinity",
+   "str": "inf"
+  },
+  {
+   "value": "-Infinity",
+   "render_str": "-inf",
+   "render_json": "-Infinity",
+   "str": "-inf"
+  },
+  {
+   "value": "\"\"",
+   "render_str": "",
+   "render_json": "\"\"",
+   "str": ""
+  },
+  {
+   "value": "\"plain\"",
+   "render_str": "plain",
+   "render_json": "\"plain\"",
+   "str": "plain"
+  },
+  {
+   "value": "\"\\u00e9 \\u65e5\\u672c \\ud83c\\udf89\"",
+   "render_str": "é 日本 🎉",
+   "render_json": "\"é 日本 🎉\"",
+   "str": "é 日本 🎉"
+  },
+  {
+   "value": "\"\\\"quoted\\\"\"",
+   "render_str": "\"quoted\"",
+   "render_json": "\"\\\"quoted\\\"\"",
+   "str": "\"quoted\""
+  },
+  {
+   "value": "\"back\\\\slash\"",
+   "render_str": "back\\slash",
+   "render_json": "\"back\\\\slash\"",
+   "str": "back\\slash"
+  },
+  {
+   "value": "\"\\n\"",
+   "render_str": "\n",
+   "render_json": "\"\\n\"",
+   "str": "\n"
+  },
+  {
+   "value": "\"843\"",
+   "render_str": "843",
+   "render_json": "\"843\"",
+   "str": "843"
+  },
+  {
+   "value": "\"-\"",
+   "render_str": "-",
+   "render_json": "\"-\"",
+   "str": "-"
+  },
+  {
+   "value": "\"0x150\"",
+   "render_str": "0x150",
+   "render_json": "\"0x150\"",
+   "str": "0x150"
+  },
+  {
+   "value": "[1, \"two\", 3.0]",
+   "render_str": "[1,\"two\",3.0]",
+   "render_json": "[1,\"two\",3.0]"
+  },
+  {
+   "value": "[\"\\u00e9\", null, true]",
+   "render_str": "[\"é\",null,true]",
+   "render_json": "[\"é\",null,true]"
+  },
+  {
+   "value": "{\"b\": 1, \"a\": \"\\u00e9\"}",
+   "render_str": "{\"a\":\"é\",\"b\":1}",
+   "render_json": "{\"a\":\"é\",\"b\":1}"
+  },
+  {
+   "value": "{}",
+   "render_str": "{}",
+   "render_json": "{}"
+  },
+  {
+   "value": "[]",
+   "render_str": "[]",
+   "render_json": "[]"
+  },
+  {
+   "value": "{\"nested\": {\"k\": [1, 2]}, \"s\": \"x\"}",
+   "render_str": "{\"nested\":{\"k\":[1,2]},\"s\":\"x\"}",
+   "render_json": "{\"nested\":{\"k\":[1,2]},\"s\":\"x\"}"
+  }
+ ]
+}

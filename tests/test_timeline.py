@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from piiat_mitrecar import store, superset, timeline
+from byakugan import store, superset, timeline
 
 
 def _events():

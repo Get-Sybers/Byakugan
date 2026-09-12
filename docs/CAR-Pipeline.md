@@ -6,10 +6,11 @@ rules) and `car_data_model.json` (the authoritative MITRE model).*
 
 ## 1. What it is
 
-`piiat_mitrecar` turns each ingested evidence **source** into finished
+`byakugan` turns each ingested evidence **source** into finished
 **MITRE CAR** — every extractable record becomes a CAR **object** performing an
 **action** at a **timestamp**, carrying that object's canonical **properties** —
-and emits it as **JSON** for ADX to ingest as `mitre.car_*` tables.
+and emits it as per-object **JSONL** (`car_<object>.jsonl`) for downstream
+ingestion (DX_DFIR ships it to Elastic/SOF-ELK).
 
 The design is deliberately small and **repeatable**. One recipe, run per source:
 
@@ -19,7 +20,7 @@ input source ──▶ artefact map(s) ──▶ normalize ──▶ its own car
     or a dir)      property rules)      CAR event)     table/object)    contained)
                                                                           │
                                                         JSON out ◀────────┘
-                                                   car_<object>.jsonl → ADX
+                                              car_<object>.jsonl → downstream ingest
 ```
 
 It is the pipeline-wide application of what shipped in **PIIAT-Mem v1.0.0** for
@@ -45,23 +46,22 @@ aggregate — never part of the per-source product (see §9, still to build).
 Run it:
 
 ```
-python -m piiat_mitrecar --in <file-or-dir> --out <dir> [--host NAME] [--artefacts k1,k2]
+python -m byakugan --in <file-or-dir> --out <dir> [--host NAME] [--artefacts k1,k2]
 # → <dir>/car.db  +  <dir>/car_<object>.jsonl   (one JSONL per populated object)
 ```
 
-## 3. Components (`piiat_mitrecar/`)
+## 3. Components (`byakugan/`)
 
 | module | role |
 |---|---|
 | `carmodel.py` | loads repo-root `car_data_model.json` — the single source of truth for objects/actions/fields |
 | `mappings/` | per-artefact declarative maps (one file per family; auto-discovered) |
 | `normalize.py` | the marker engine: `normalize(artefact, record) → CAR event`, or `None` if unmapped |
-| `adapters/winevt.py` | Plaso winevt(x) record → EvtxECmd shape, so the evtx maps run unchanged |
-| `adapters/l2t_split.py` | a raw log2timeline json_line container → per-parser wrapped tables (`SourceImage`, `RecordId`, `Timestamp`, `Parser`, `Record`) |
+| `../go/` (`byakugan-parse`) | the **parse engine**: raw file → pre-enrichment CAR events. Holds the line reader, the winevt adapter (Plaso winevt(x) record → EvtxECmd shape, so the evtx maps run unchanged), the jlecmd flatten, the l2t container splitter (→ per-parser wrapped tables: `SourceImage`, `RecordId`, `Timestamp`, `Parser`, `Record`), the marker resolver and the spindle identity — reading the mapping tables through `internal/ir/ir.json` (`python -m byakugan.export_ir`) |
 | `ids.py` | the one id recipe — canonical JSON + the namespaces (`STIX_NS`, `CAR_NS`, `SPINDLE_NS`) — shared by the STIX projection and the spindle row guid |
 | `enrich.py` | the relationship + inheritance cascade (identity, joins, inheritance, dedupe, canonical accounts) |
-| `store.py` | the per-object SQLite CAR store + `export_jsonl()` (the ADX contract) |
-| `sources.py` | source readers: `iter_mapped()` (raw → normalize) and `load_piiat_car()` (memory passthrough) |
+| `store.py` | the per-object SQLite CAR store + `export_jsonl()` (the downstream ingest contract) |
+| `readers.py` | `load_piiat_car()` — the memory passthrough (the only source that is not parsed) |
 | `pipeline.py` | orchestration: route source → normalize → enrich (self-contained) → store → JSON |
 
 ## 4. The CAR data model (13 objects)
@@ -185,7 +185,7 @@ key; `positional`: the per-record fallback, see below); `native.spindle_ref`
 says where the record came from, outside the key.
 
 **Which** fields identify each artefact's row is a rule, not code — declared as
-data in `piiat_mitrecar/spindle.yml`, the registry. Per entry: the CAR object;
+data in `byakugan/spindle.yml`, the registry. Per entry: the CAR object;
 the **kind** (`record` — a record-numbered / journal key that asserts the
 *same record*: `l2t_mft`, `l2t_usnjrnl`, `plaso_fseventsd`; `entity` — a
 content-like key that asserts records that *coincide*: every other entry,
@@ -205,7 +205,7 @@ and maps cannot drift: `spindle.verify_registry()` holds registry ↔ maps ↔
 engine in step; `model/spindle/identity.yml` is the resolved snapshot,
 `model/spindle/record.yml` the spindle's shape and `model/spindle/golden.yml`
 the golden vectors — per entry the key and the guid the engine mints for its
-sample (all `python model/generate.py`; `python -m piiat_mitrecar.spindle
+sample (all `python model/generate.py`; `python -m byakugan.spindle
 --check` in CI). Each generated source manifest (`sources/<map>.yaml`) states
 the identity its guid carries — the registry entries with their kind, scope
 and version, or the external form. The registry today:
@@ -247,7 +247,7 @@ prefetch's eight last-run times, a key's successive snapshots, an $MFT entry's
 $SI and $FN times) the time is part of what identifies the event — so distinct
 events never collapse, and true duplicates (the same record parsed twice) do.
 
-**Positional fallback.** `adapters/l2t_split.py` stamps every wrapped row with
+**Positional fallback.** The container splitter stamps every wrapped row with
 `RecordId` — its physical line in the container, minted from the input like
 the EVTX record id (stable across re-splits of the same json_line file, not
 across a re-run of the parser). A row whose intrinsic identity is incomplete
@@ -294,21 +294,18 @@ confirmed against a multi-tool corpus (cross-tool renderings of
 value-level component) are recorded in `to-be-validated/spindle_identity.yml`;
 until that corpus is processed the component is complete *within Plaso*.
 
-## 8. Output contract (JSON → ADX)
+## 8. Output contract (per-object JSONL)
 
 `store.export_jsonl()` writes one `car_<object>.jsonl` per populated object; each
-line is a flat CAR event (`native` as a JSON object for a dynamic column). ADX
-ingests these as **new `mitre.car_*` tables**, additive — the existing raw tables
-(`host.EvtxEcmdJson`, `memory.VolatilityJson`, `network.ZeekConn`, …) are
-untouched. This is the "minimise changing what's built" contract: add CAR
-tables + repoint the public `Car<Object>()` functions at them.
+line is a flat CAR event (`native` kept as a JSON object). This JSONL is the
+downstream ingest contract: DX_DFIR consumes the files and ships them to
+Elastic/SOF-ELK, additive next to the existing raw evidence — nothing already
+built changes.
 
 ## 9. What is NOT done yet
 
 See epic #86 for the tracked, detailed plan. In short: the CAR stage is
-**standalone** (not yet wired into the ingest lane/CLI); the **ADX
-materialization** (car_* tables + mappings, and collapsing the 1056-line
-query-time `40-mitre.kql` to read them) is not built; **cross-source final
+**standalone** (not yet wired into the ingest lane/CLI); **cross-source final
 enrichment** is deferred behind a capability-determination + data-assessment
 pass; **SRUM/RECmd** is parked pending real output; and a **payload-parse cache**
 is a known perf item.

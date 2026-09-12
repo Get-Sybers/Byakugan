@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "plaso_fseventsd"
+ ],
+ "host": "JO-MACBOOK-FALLBACK",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

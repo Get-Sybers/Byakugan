@@ -1,8 +1,13 @@
-# PIIAT-MitreCar
+# Byakugan
 
 **Turn raw DFIR evidence into one MITRE-aligned timeline — normalise every
 artefact into MITRE CAR, relate the objects through proven relationships, and
 (roadmap) flag adversary TTP behaviours — automatically.**
+
+> Formerly **PIIAT-MitreCar**. Repository, distribution and Python import
+> package are now all **byakugan**; a `piiat_mitrecar` forwarding shim remains
+> for one release. The STIX namespace/producer identity keep their original
+> seeds so previously issued deterministic ids stay stable.
 
 An analyst points it at what their forensic tooling already produces and gets
 back a timeline that is **CAR-normalised**, **relationship-enriched**, and
@@ -18,7 +23,7 @@ not just the events a single detection cares about.
 - **Relates** those objects — owning process, parent, auth↔session (LUID),
   file→process, thread injection — as a granular relationship timeline, typed
   against the MITRE ATT&CK data-sources relationship vocabulary.
-- **Flags TTPs** (roadmap, [#12](https://github.com/Get-Sybers/PIIAT-MitreCar/issues/12)):
+- **Flags TTPs** (roadmap, [#12](https://github.com/Get-Sybers/byakugan/issues/12)):
   CAR/ATT&CK analytics over the objects and relationships surface adversary
   behaviours on the same timeline.
 
@@ -26,10 +31,22 @@ not just the events a single detection cares about.
 
 ```
 git submodule update --init --recursive          # the model comes from pinned submodules
-python -m piiat_mitrecar --in <file-or-dir> --out <dir>   # one source
-python -m piiat_mitrecar --batch <processed_dir>          # every source, isolated
-python -m piiat_mitrecar.timeline <car-dir>               # one property-rich, time-ordered timeline
+make -C go build                                 # the Go parse engine (Go >= 1.24)
+python -m byakugan --in <file-or-dir> --out <dir>   # one source
+python -m byakugan --batch <processed_dir>          # every source, isolated
+python -m byakugan.timeline <car-dir>               # one property-rich, time-ordered timeline
 ```
+
+**The parse stage is Go-accelerated.** Everything from a raw processor file to
+the pre-enrichment CAR event stream — line reading, raw-l2t container splitting,
+the format adapters, the marker resolver, the spindle identity — runs in
+`go/bin/byakugan-parse`, built by `make -C go build` (**prerequisite: Go >=
+1.24**) and byte-for-byte identical to the Python path it replaced
+([go/README.md](go/README.md)). The CLI is unchanged: `python -m byakugan` is
+still the pipeline, and routing, enrichment, the relationship cascade, STIX and
+every mapping table stay Python. The pipeline finds the binary via
+`$BYAKUGAN_PARSE_BIN`, then `go/bin/byakugan-parse`, then `PATH`, and says so
+if it is missing.
 
 Each evidence **source** becomes two self-contained SQLite stores:
 
@@ -48,15 +65,21 @@ Each evidence **source** becomes two self-contained SQLite stores:
 
 The north-star goal (evidence → CAR → superset relationships → flagged MITRE
 TTPs) and its workstreams are tracked in
-[#12](https://github.com/Get-Sybers/PIIAT-MitreCar/issues/12).
+[#12](https://github.com/Get-Sybers/byakugan/issues/12).
 
 ## Contributing
 
 Setup (submodules + dev install), commands, code style, and the branch/release
 flow are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
+Dependencies are traced in three files, each carrying its own upgrade path:
+[`requirements.txt`](requirements.txt) (runtime — the same list as
+`pyproject.toml`, held to it by a test), [`requirements-dev.txt`](requirements-dev.txt)
+(the exact test/lint versions the repo is proven against) and
+[`go/go.mod`](go/go.mod) for the parse engine, which is stdlib-only.
+
 ## The PIIAT family
 
 Standalone public tooling, consumed by pipelines via the CLI:
 [PIIAT-Mem](https://github.com/Get-Sybers/PIIAT-Mem) (memory → CAR),
-PIIAT-l2t-plugins (log2timeline parsers), PIIAT-MitreCar (processor output → CAR).
+PIIAT-l2t-plugins (log2timeline parsers), Byakugan (processor output → CAR).

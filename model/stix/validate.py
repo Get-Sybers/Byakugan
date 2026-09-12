@@ -3,7 +3,7 @@
 
 Asserts that model/stix/{conventions,objects}.yml stay in step with the
 materialized CAR model (model/car/objects) and with the rules the engine
-declares (piiat_mitrecar/relationships.yml, enrich.py, derive.py):
+declares (byakugan/relationships.yml, enrich.py, derive.py):
 
 - objects.yml covers the 13 CAR objects exactly, no orphan;
 - every object_field has exactly one projection entry, no entry names a field
@@ -30,11 +30,11 @@ import yaml
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 CAR_OBJECTS = os.path.join(ROOT, "model", "car", "objects")
-RULES = os.path.join(ROOT, "piiat_mitrecar", "relationships.yml")
-ENGINES = [os.path.join(ROOT, "piiat_mitrecar", "enrich.py"),
-           os.path.join(ROOT, "piiat_mitrecar", "derive.py"),
-           os.path.join(ROOT, "piiat_mitrecar", "normalize.py"),
-           os.path.join(ROOT, "piiat_mitrecar", "spindle.py")]
+RULES = os.path.join(ROOT, "byakugan", "relationships.yml")
+ENGINES = [os.path.join(ROOT, "byakugan", "enrich.py"),
+           os.path.join(ROOT, "byakugan", "derive.py"),
+           os.path.join(ROOT, "byakugan", "normalize.py"),
+           os.path.join(ROOT, "byakugan", "spindle.py")]
 
 SCO_TYPES = {"artifact", "autonomous-system", "directory", "domain-name", "email-addr",
              "email-message", "file", "ipv4-addr", "ipv6-addr", "mac-addr", "mutex",

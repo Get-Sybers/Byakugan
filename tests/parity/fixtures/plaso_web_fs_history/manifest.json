@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "l2t_firefox_places"
+ ],
+ "host": "DESKTOP-FALLBACK",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

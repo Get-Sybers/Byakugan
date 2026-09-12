@@ -3,7 +3,7 @@
 # relationship end on the object resolves to (sro_end), which path its hashes
 # describe (hash_subject), which columns describe the ACTING process (acting),
 # the instance-id key, and every CAR object_field's home. Mirrors
-# piiat_mitrecar/stix.py OBJECTS + the _b_<object> builders; tests/test_stix.py
+# byakugan/stix.py OBJECTS + the _b_<object> builders; tests/test_stix.py
 # holds the two in step. Header fields are in conventions.yml.
 #
 # Property targets read: `<sco>.<property>` (a STIX property on the row's SCO or

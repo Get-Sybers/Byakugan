@@ -16,7 +16,7 @@ stays an honest null.
 """
 from __future__ import annotations
 
-from piiat_mitrecar import normalize
+from byakugan import normalize
 
 
 def _wrap(record, ts="2018-04-05T12:00:00.000000Z"):

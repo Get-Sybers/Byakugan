@@ -46,7 +46,7 @@ inspection:
 
 ```
 git submodule update --init --recursive
-python -m piiat_mitrecar.build_data_model --write out/
+python -m byakugan.build_data_model --write out/
 ```
 
 A model refresh is a **submodule-pin bump**, not a code or data-file edit.

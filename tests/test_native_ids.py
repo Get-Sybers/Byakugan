@@ -6,7 +6,7 @@ synthetic ids, so the strongest real key on a disk image — the globally-unique
 survived only as text in `native`. `native_ids.volume_guids` is the one shared
 extractor; `enrich` lifts it into the queryable `volume_guid` column.
 """
-from piiat_mitrecar import enrich, native_ids, store
+from byakugan import enrich, native_ids, store
 
 
 def test_volume_guids_extracts_case_folds_dedupes():

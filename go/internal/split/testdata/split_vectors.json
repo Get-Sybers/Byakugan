@@ -1,0 +1,460 @@
+{
+ "table_name": [
+  [
+   "filestat",
+   "L2tFilestat"
+  ],
+  [
+   "winreg/appcompatcache",
+   "L2tWinreg"
+  ],
+  [
+   "firefox_cache",
+   "L2tFirefoxCache"
+  ],
+  [
+   "usnjrnl",
+   "L2tUsnjrnl"
+  ],
+  [
+   "mft",
+   "L2tMft"
+  ],
+  [
+   "text/syslog_traditional",
+   "L2tText"
+  ],
+  [
+   "olecf/olecf_automatic_destinations",
+   "L2tOlecf"
+  ],
+  [
+   "winevtx",
+   "L2tWinevtx"
+  ],
+  [
+   "winevt",
+   "L2tWinevt"
+  ],
+  [
+   "sqlite/chrome_27_history",
+   "L2tSqlite"
+  ],
+  [
+   "utmp",
+   "L2tUtmp"
+  ],
+  [
+   "utmpx",
+   "L2tUtmpx"
+  ],
+  [
+   "",
+   "L2tUnknown"
+  ],
+  [
+   "/",
+   "L2tUnknown"
+  ],
+  [
+   "///",
+   "L2tUnknown"
+  ],
+  [
+   "unknown",
+   "L2tUnknown"
+  ],
+  [
+   "UPPER",
+   "L2tUPPER"
+  ],
+  [
+   "a_b-c.d",
+   "L2tABCD"
+  ],
+  [
+   "___",
+   "L2tUnknown"
+  ],
+  [
+   "9lives",
+   "L2t9lives"
+  ],
+  [
+   "esedb/srum",
+   "L2tEsedb"
+  ],
+  [
+   "plist/macosx_bluetooth",
+   "L2tPlist"
+  ],
+  [
+   "recycle_bin",
+   "L2tRecycleBin"
+  ],
+  [
+   "prefetch",
+   "L2tPrefetch"
+  ],
+  [
+   "a b",
+   "L2tAB"
+  ],
+  [
+   "\u00dcn\u00efc\u00f6d\u00e9",
+   "L2tNCD"
+  ],
+  [
+   "x/y/z",
+   "L2tX"
+  ],
+  [
+   "-leading",
+   "L2tLeading"
+  ],
+  [
+   "trailing-",
+   "L2tTrailing"
+  ]
+ ],
+ "rows": [
+  {
+   "rec": {
+    "data_type": "linux:utmp:event",
+    "display_name": "OS:/var/log/wtmp",
+    "hostname": "pits-insec",
+    "username": "insec",
+    "terminal": "pts/0",
+    "ip_address": "156.59.33.60",
+    "pid": 3756,
+    "type": 7,
+    "timestamp_desc": "Start Time",
+    "parser": "utmp",
+    "timestamp": 1600262099805465
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 1,
+   "table": "L2tUtmp",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 1, \"Parser\": \"utmp\", \"Record\": {\"data_type\": \"linux:utmp:event\", \"display_name\": \"OS:/var/log/wtmp\", \"hostname\": \"pits-insec\", \"username\": \"insec\", \"terminal\": \"pts/0\", \"ip_address\": \"156.59.33.60\", \"pid\": 3756, \"type\": 7, \"timestamp_desc\": \"Start Time\", \"parser\": \"utmp\", \"timestamp\": 1600262099805465}, \"Timestamp\": \"2020-09-16T13:14:59.805465Z\"}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft",
+    "timestamp": 1600262070462820
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 4,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 4, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\", \"timestamp\": 1600262070462820}, \"Timestamp\": \"2020-09-16T13:14:30.462820Z\"}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:ntfs:usn_change",
+    "display_name": "NTFS:\\$Extend\\$UsnJrnl:$J",
+    "filename": "a15f3474.tmp",
+    "update_reason_flags": 2147484416,
+    "update_sequence_number": 1048576,
+    "timestamp_desc": "Metadata Modification Time",
+    "parser": "usnjrnl",
+    "timestamp": 1600262070462821
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 5,
+   "table": "L2tUsnjrnl",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 5, \"Parser\": \"usnjrnl\", \"Record\": {\"data_type\": \"fs:ntfs:usn_change\", \"display_name\": \"NTFS:\\\\$Extend\\\\$UsnJrnl:$J\", \"filename\": \"a15f3474.tmp\", \"update_reason_flags\": 2147484416, \"update_sequence_number\": 1048576, \"timestamp_desc\": \"Metadata Modification Time\", \"parser\": \"usnjrnl\", \"timestamp\": 1600262070462821}, \"Timestamp\": \"2020-09-16T13:14:30.462821Z\"}"
+  },
+  {
+   "rec": {
+    "data_type": "linux:utmp:event",
+    "display_name": "OS:/var/log/wtmp",
+    "hostname": "pits-insec",
+    "username": "insec",
+    "terminal": "pts/0",
+    "ip_address": "156.59.33.60",
+    "pid": 3756,
+    "type": 7,
+    "timestamp_desc": "Start Time",
+    "parser": "utmp",
+    "timestamp": 1600262099805465
+   },
+   "source_rel": "img.jsonl",
+   "record_id": null,
+   "table": "L2tUtmp",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"Parser\": \"utmp\", \"Record\": {\"data_type\": \"linux:utmp:event\", \"display_name\": \"OS:/var/log/wtmp\", \"hostname\": \"pits-insec\", \"username\": \"insec\", \"terminal\": \"pts/0\", \"ip_address\": \"156.59.33.60\", \"pid\": 3756, \"type\": 7, \"timestamp_desc\": \"Start Time\", \"parser\": \"utmp\", \"timestamp\": 1600262099805465}, \"Timestamp\": \"2020-09-16T13:14:59.805465Z\"}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft",
+    "timestamp": 0
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 2,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 2, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\", \"timestamp\": 0}}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft",
+    "timestamp": -1
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 3,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 3, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\", \"timestamp\": -1}}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft"
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 6,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 6, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\"}}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft",
+    "timestamp": 1600262070462820.8
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 7,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 7, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\", \"timestamp\": 1600262070462820.8}, \"Timestamp\": \"2020-09-16T13:14:30.462821Z\"}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft",
+    "timestamp": 1
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 8,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 8, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\", \"timestamp\": 1}, \"Timestamp\": \"1970-01-01T00:00:00.000001Z\"}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft",
+    "timestamp": true
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 9,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 9, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\", \"timestamp\": true}, \"Timestamp\": \"1970-01-01T00:00:00.000001Z\"}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft",
+    "timestamp": "1600262070462820"
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 10,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 10, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\", \"timestamp\": \"1600262070462820\"}}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft",
+    "timestamp": null
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 11,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 11, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\", \"timestamp\": null}}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft",
+    "timestamp": 253402300799999999
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 12,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 12, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\", \"timestamp\": 253402300799999999}}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft",
+    "timestamp": 253402300800000000
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 13,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 13, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\", \"timestamp\": 253402300800000000}}"
+  },
+  {
+   "rec": {
+    "data_type": "fs:stat:ntfs",
+    "display_name": "NTFS:\\Windows\\notepad.exe",
+    "path_hints": [
+     "\\Windows\\notepad.exe"
+    ],
+    "file_reference": 281474976727294,
+    "attribute_type": 16,
+    "timestamp_desc": "Creation Time",
+    "parser": "mft",
+    "timestamp": 1000000000000000000000000000000
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 14,
+   "table": "L2tMft",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 14, \"Parser\": \"mft\", \"Record\": {\"data_type\": \"fs:stat:ntfs\", \"display_name\": \"NTFS:\\\\Windows\\\\notepad.exe\", \"path_hints\": [\"\\\\Windows\\\\notepad.exe\"], \"file_reference\": 281474976727294, \"attribute_type\": 16, \"timestamp_desc\": \"Creation Time\", \"parser\": \"mft\", \"timestamp\": 1000000000000000000000000000000}}"
+  },
+  {
+   "rec": {
+    "data_type": "x",
+    "timestamp": 1600262070462820
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 15,
+   "table": "L2tUnknown",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 15, \"Parser\": \"unknown\", \"Record\": {\"data_type\": \"x\", \"timestamp\": 1600262070462820}, \"Timestamp\": \"2020-09-16T13:14:30.462820Z\"}"
+  },
+  {
+   "rec": {
+    "parser": "",
+    "timestamp": 1600262070462820
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 16,
+   "table": "L2tUnknown",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 16, \"Parser\": \"unknown\", \"Record\": {\"parser\": \"\", \"timestamp\": 1600262070462820}, \"Timestamp\": \"2020-09-16T13:14:30.462820Z\"}"
+  },
+  {
+   "rec": {
+    "parser": 42,
+    "timestamp": 1600262070462820
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 17,
+   "table": "L2t42",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 17, \"Parser\": \"42\", \"Record\": {\"parser\": 42, \"timestamp\": 1600262070462820}, \"Timestamp\": \"2020-09-16T13:14:30.462820Z\"}"
+  },
+  {
+   "rec": {
+    "parser": "olecf/olecf_automatic_destinations"
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 18,
+   "table": "L2tOlecf",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 18, \"Parser\": \"olecf/olecf_automatic_destinations\", \"Record\": {\"parser\": \"olecf/olecf_automatic_destinations\"}}"
+  },
+  {
+   "rec": {
+    "parser": "text/syslog",
+    "message": "\u00fcn\u00efc\u00f6d\u00e9 \u2603 \"q\" \\ \n",
+    "timestamp": 1600262070462820
+   },
+   "source_rel": "img.jsonl",
+   "record_id": 19,
+   "table": "L2tText",
+   "line": "{\"SourceImage\": \"img.jsonl\", \"RecordId\": 19, \"Parser\": \"text/syslog\", \"Record\": {\"parser\": \"text/syslog\", \"message\": \"\\u00fcn\\u00efc\\u00f6d\\u00e9 \\u2603 \\\"q\\\" \\\\ \\n\", \"timestamp\": 1600262070462820}, \"Timestamp\": \"2020-09-16T13:14:30.462820Z\"}"
+  },
+  {
+   "rec": {
+    "data_type": "linux:utmp:event",
+    "display_name": "OS:/var/log/wtmp",
+    "hostname": "pits-insec",
+    "username": "insec",
+    "terminal": "pts/0",
+    "ip_address": "156.59.33.60",
+    "pid": 3756,
+    "type": 7,
+    "timestamp_desc": "Start Time",
+    "parser": "utmp",
+    "timestamp": 1600262099805465
+   },
+   "source_rel": "",
+   "record_id": 20,
+   "table": "L2tUtmp",
+   "line": "{\"SourceImage\": \"\", \"RecordId\": 20, \"Parser\": \"utmp\", \"Record\": {\"data_type\": \"linux:utmp:event\", \"display_name\": \"OS:/var/log/wtmp\", \"hostname\": \"pits-insec\", \"username\": \"insec\", \"terminal\": \"pts/0\", \"ip_address\": \"156.59.33.60\", \"pid\": 3756, \"type\": 7, \"timestamp_desc\": \"Start Time\", \"parser\": \"utmp\", \"timestamp\": 1600262099805465}, \"Timestamp\": \"2020-09-16T13:14:59.805465Z\"}"
+  }
+ ]
+}

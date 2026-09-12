@@ -1,6 +1,6 @@
 # `model/stix/` — the CAR → STIX 2.1 projection contract
 
-**Hand-authored. Validated by `validate.py`. Engine: `piiat_mitrecar/stix.py`.**
+**Hand-authored. Validated by `validate.py`. Engine: `byakugan/stix.py`.**
 
 This directory is the one place that decides *how the finished stores become
 STIX 2.1 at export*. The projection is **derived from CAR** — `car.db` (the
@@ -133,8 +133,8 @@ car:reconstructed]`, carrying what the observed records said about it and the
 ```sh
 python model/stix/validate.py                         # the drift check
 pytest -q tests/test_stix.py                          # + the engine/contract lock-step and the smoke export
-python -m piiat_mitrecar.stix export <car-dir> [--out FILE] [--case ID] [--as-of ISO]
-python -m piiat_mitrecar --in <src> --out <dir> --derive --stix   # export as a pipeline step
+python -m byakugan.stix export <car-dir> [--out FILE] [--case ID] [--as-of ISO]
+python -m byakugan --in <src> --out <dir> --derive --stix   # export as a pipeline step
 ```
 
 ## Changing it

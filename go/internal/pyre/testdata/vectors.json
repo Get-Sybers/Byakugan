@@ -1,0 +1,6685 @@
+{
+ "vectors": [
+  {
+   "pattern": "^https?://([^/?#]+)",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^(https?)",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^https?://[^/]+(/[^\\s]*)",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^([^.]+\\..+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": true,
+     "group1": "0.0.0.0"
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": true,
+     "group1": "127.0.0.1"
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": true,
+     "group1": "10.11.12.13"
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "UEME_RUNPATH:E:\\R54402.EXE"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": true,
+     "group1": "HOST1.dom.example.com"
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "C:\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "/Users/jo/Documents/notes.txt"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "\\Users\\jcloudy\\NTUSER.DAT"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "C:\\Windows\\system32\\svchost.exe -k netsvcs"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^(?!S-1-0-0$)(S-.+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": true,
+     "group1": "S-1-5-18"
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": true,
+     "group1": "S-1-5-21-1-2-3-1001"
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0-0",
+     "matched": true,
+     "group1": "S-1-0-0-0"
+    },
+    {
+     "in": "S-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1",
+     "matched": true,
+     "group1": "S-1"
+    },
+    {
+     "in": "X-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0 ",
+     "matched": true,
+     "group1": "S-1-0-0 "
+    }
+   ]
+  },
+  {
+   "pattern": "^(?!LOCAL$)(.+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": true,
+     "group1": "-"
+    },
+    {
+     "in": "x",
+     "matched": true,
+     "group1": "x"
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": true,
+     "group1": "local"
+    },
+    {
+     "in": "0",
+     "matched": true,
+     "group1": "0"
+    },
+    {
+     "in": "1",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "42",
+     "matched": true,
+     "group1": "42"
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": true,
+     "group1": "0.0.0.0"
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": true,
+     "group1": "127.0.0.1"
+    },
+    {
+     "in": "::1",
+     "matched": true,
+     "group1": "::1"
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": true,
+     "group1": "10.11.12.13"
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": true,
+     "group1": "S-1-0-0"
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": true,
+     "group1": "S-1-5-18"
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": true,
+     "group1": "S-1-5-21-1-2-3-1001"
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "UEME_RUNPATH:E:\\R54402.EXE"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": true,
+     "group1": "UEME_CTLSESSION"
+    },
+    {
+     "in": "RUNPATH",
+     "matched": true,
+     "group1": "RUNPATH"
+    },
+    {
+     "in": "value",
+     "matched": true,
+     "group1": "value"
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": true,
+     "group1": "HOST1.dom.example.com"
+    },
+    {
+     "in": "HOST1",
+     "matched": true,
+     "group1": "HOST1"
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "C:\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "/Users/jo/Documents/notes.txt"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "\\Users\\jcloudy\\NTUSER.DAT"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "C:\\Windows\\system32\\svchost.exe -k netsvcs"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": true,
+     "group1": "0000abcdef0123456789abcdef0123456789abcdef"
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": true,
+     "group1": "prefix LOCAL suffix"
+    },
+    {
+     "in": "  spaced  ",
+     "matched": true,
+     "group1": "  spaced  "
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": true,
+     "group1": "é-日本-🎉"
+    },
+    {
+     "in": "LOCALX",
+     "matched": true,
+     "group1": "LOCALX"
+    },
+    {
+     "in": "XLOCAL",
+     "matched": true,
+     "group1": "XLOCAL"
+    },
+    {
+     "in": "LOCA",
+     "matched": true,
+     "group1": "LOCA"
+    },
+    {
+     "in": "LOCAL ",
+     "matched": true,
+     "group1": "LOCAL "
+    },
+    {
+     "in": " LOCAL",
+     "matched": true,
+     "group1": " LOCAL"
+    },
+    {
+     "in": "L",
+     "matched": true,
+     "group1": "L"
+    }
+   ]
+  },
+  {
+   "pattern": "^(?!(?:::1|127\\.0\\.0\\.1|LOCAL)$)(.+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": true,
+     "group1": "-"
+    },
+    {
+     "in": "x",
+     "matched": true,
+     "group1": "x"
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": true,
+     "group1": "local"
+    },
+    {
+     "in": "0",
+     "matched": true,
+     "group1": "0"
+    },
+    {
+     "in": "1",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "42",
+     "matched": true,
+     "group1": "42"
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": true,
+     "group1": "0.0.0.0"
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": true,
+     "group1": "10.11.12.13"
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": true,
+     "group1": "S-1-0-0"
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": true,
+     "group1": "S-1-5-18"
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": true,
+     "group1": "S-1-5-21-1-2-3-1001"
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "UEME_RUNPATH:E:\\R54402.EXE"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": true,
+     "group1": "UEME_CTLSESSION"
+    },
+    {
+     "in": "RUNPATH",
+     "matched": true,
+     "group1": "RUNPATH"
+    },
+    {
+     "in": "value",
+     "matched": true,
+     "group1": "value"
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": true,
+     "group1": "HOST1.dom.example.com"
+    },
+    {
+     "in": "HOST1",
+     "matched": true,
+     "group1": "HOST1"
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "C:\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "/Users/jo/Documents/notes.txt"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "\\Users\\jcloudy\\NTUSER.DAT"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "C:\\Windows\\system32\\svchost.exe -k netsvcs"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": true,
+     "group1": "0000abcdef0123456789abcdef0123456789abcdef"
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": true,
+     "group1": "prefix LOCAL suffix"
+    },
+    {
+     "in": "  spaced  ",
+     "matched": true,
+     "group1": "  spaced  "
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": true,
+     "group1": "é-日本-🎉"
+    },
+    {
+     "in": "::11",
+     "matched": true,
+     "group1": "::11"
+    },
+    {
+     "in": "127.0.0.10",
+     "matched": true,
+     "group1": "127.0.0.10"
+    },
+    {
+     "in": "127a0b0c1",
+     "matched": true,
+     "group1": "127a0b0c1"
+    },
+    {
+     "in": "fe80::1",
+     "matched": true,
+     "group1": "fe80::1"
+    }
+   ]
+  },
+  {
+   "pattern": "^(?!0$)(\\d+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "42",
+     "matched": true,
+     "group1": "42"
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "00",
+     "matched": true,
+     "group1": "00"
+    },
+    {
+     "in": "01",
+     "matched": true,
+     "group1": "01"
+    },
+    {
+     "in": "10",
+     "matched": true,
+     "group1": "10"
+    },
+    {
+     "in": "0x10",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "7",
+     "matched": true,
+     "group1": "7"
+    }
+   ]
+  },
+  {
+   "pattern": "^(.+\\..+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": true,
+     "group1": "0.0.0.0"
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": true,
+     "group1": "127.0.0.1"
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": true,
+     "group1": "10.11.12.13"
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "UEME_RUNPATH:E:\\R54402.EXE"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": true,
+     "group1": "HOST1.dom.example.com"
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "C:\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "/Users/jo/Documents/notes.txt"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "\\Users\\jcloudy\\NTUSER.DAT"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "C:\\Windows\\system32\\svchost.exe -k netsvcs"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "(?i)\\bMD5=([0-9A-Fa-f]+)",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "(?i)\\bSHA1=([0-9A-Fa-f]+)",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "(?i)\\bSHA256=([0-9A-Fa-f]+)",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "(?i)\\bIMPHASH=([0-9A-Fa-f]+)",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "\\A[A-Z0-9]+:(.*)\\Z",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "\\Windows\\system32\\svchost.exe -k netsvcs"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^HTTP:(.+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^(https?)://",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^https?://([^/?#:]+)",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "\\s(\\d{3})\\s",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^(\\S+)",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": true,
+     "group1": "-"
+    },
+    {
+     "in": "x",
+     "matched": true,
+     "group1": "x"
+    },
+    {
+     "in": "LOCAL",
+     "matched": true,
+     "group1": "LOCAL"
+    },
+    {
+     "in": "local",
+     "matched": true,
+     "group1": "local"
+    },
+    {
+     "in": "0",
+     "matched": true,
+     "group1": "0"
+    },
+    {
+     "in": "1",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "42",
+     "matched": true,
+     "group1": "42"
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": true,
+     "group1": "0.0.0.0"
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": true,
+     "group1": "127.0.0.1"
+    },
+    {
+     "in": "::1",
+     "matched": true,
+     "group1": "::1"
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": true,
+     "group1": "10.11.12.13"
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": true,
+     "group1": "S-1-0-0"
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": true,
+     "group1": "S-1-5-18"
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": true,
+     "group1": "S-1-5-21-1-2-3-1001"
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "UEME_RUNPATH:E:\\R54402.EXE"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": true,
+     "group1": "UEME_CTLSESSION"
+    },
+    {
+     "in": "RUNPATH",
+     "matched": true,
+     "group1": "RUNPATH"
+    },
+    {
+     "in": "value",
+     "matched": true,
+     "group1": "value"
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": true,
+     "group1": "HOST1.dom.example.com"
+    },
+    {
+     "in": "HOST1",
+     "matched": true,
+     "group1": "HOST1"
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "C:\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "/Users/jo/Documents/notes.txt"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "\\Users\\jcloudy\\NTUSER.DAT"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "C:\\Windows\\system32\\svchost.exe"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": true,
+     "group1": "0000abcdef0123456789abcdef0123456789abcdef"
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": true,
+     "group1": "prefix"
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": true,
+     "group1": "multi"
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": true,
+     "group1": "é-日本-🎉"
+    }
+   ]
+  },
+  {
+   "pattern": "^(?:<[^>]+>\\s*)?(.+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": true,
+     "group1": "-"
+    },
+    {
+     "in": "x",
+     "matched": true,
+     "group1": "x"
+    },
+    {
+     "in": "LOCAL",
+     "matched": true,
+     "group1": "LOCAL"
+    },
+    {
+     "in": "local",
+     "matched": true,
+     "group1": "local"
+    },
+    {
+     "in": "0",
+     "matched": true,
+     "group1": "0"
+    },
+    {
+     "in": "1",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "42",
+     "matched": true,
+     "group1": "42"
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": true,
+     "group1": "0.0.0.0"
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": true,
+     "group1": "127.0.0.1"
+    },
+    {
+     "in": "::1",
+     "matched": true,
+     "group1": "::1"
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": true,
+     "group1": "10.11.12.13"
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": true,
+     "group1": "S-1-0-0"
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": true,
+     "group1": "S-1-5-18"
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": true,
+     "group1": "S-1-5-21-1-2-3-1001"
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "UEME_RUNPATH:E:\\R54402.EXE"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": true,
+     "group1": "UEME_CTLSESSION"
+    },
+    {
+     "in": "RUNPATH",
+     "matched": true,
+     "group1": "RUNPATH"
+    },
+    {
+     "in": "value",
+     "matched": true,
+     "group1": "value"
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": true,
+     "group1": "HOST1.dom.example.com"
+    },
+    {
+     "in": "HOST1",
+     "matched": true,
+     "group1": "HOST1"
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "C:\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "/Users/jo/Documents/notes.txt"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "\\Users\\jcloudy\\NTUSER.DAT"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "C:\\Windows\\system32\\svchost.exe -k netsvcs"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": true,
+     "group1": "0000abcdef0123456789abcdef0123456789abcdef"
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": true,
+     "group1": "prefix LOCAL suffix"
+    },
+    {
+     "in": "  spaced  ",
+     "matched": true,
+     "group1": "  spaced  "
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": true,
+     "group1": "é-日本-🎉"
+    }
+   ]
+  },
+  {
+   "pattern": "(?i)[/\\\\]Users[/\\\\]([^/\\\\]+)[/\\\\]",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "jdoe"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "jo"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "jcloudy"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^Visited:\\s*[^@]*@(.+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "(?i)\\$Recycle\\.Bin[/\\\\](S-1-[0-9-]+)",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^(\\\\Device\\\\.+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^(S-1-[0-9-]+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": true,
+     "group1": "S-1-0-0"
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": true,
+     "group1": "S-1-5-18"
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": true,
+     "group1": "S-1-5-21-1-2-3-1001"
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "\\A(?!(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|::1)\\Z)(.+)\\Z",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": true,
+     "group1": "-"
+    },
+    {
+     "in": "x",
+     "matched": true,
+     "group1": "x"
+    },
+    {
+     "in": "LOCAL",
+     "matched": true,
+     "group1": "LOCAL"
+    },
+    {
+     "in": "local",
+     "matched": true,
+     "group1": "local"
+    },
+    {
+     "in": "0",
+     "matched": true,
+     "group1": "0"
+    },
+    {
+     "in": "1",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "42",
+     "matched": true,
+     "group1": "42"
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": true,
+     "group1": "10.11.12.13"
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": true,
+     "group1": "S-1-0-0"
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": true,
+     "group1": "S-1-5-18"
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": true,
+     "group1": "S-1-5-21-1-2-3-1001"
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "UEME_RUNPATH:E:\\R54402.EXE"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": true,
+     "group1": "UEME_CTLSESSION"
+    },
+    {
+     "in": "RUNPATH",
+     "matched": true,
+     "group1": "RUNPATH"
+    },
+    {
+     "in": "value",
+     "matched": true,
+     "group1": "value"
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": true,
+     "group1": "HOST1.dom.example.com"
+    },
+    {
+     "in": "HOST1",
+     "matched": true,
+     "group1": "HOST1"
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "C:\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "/Users/jo/Documents/notes.txt"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "\\Users\\jcloudy\\NTUSER.DAT"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "C:\\Windows\\system32\\svchost.exe -k netsvcs"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": true,
+     "group1": "0000abcdef0123456789abcdef0123456789abcdef"
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": true,
+     "group1": "prefix LOCAL suffix"
+    },
+    {
+     "in": "  spaced  ",
+     "matched": true,
+     "group1": "  spaced  "
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": true,
+     "group1": "é-日本-🎉"
+    },
+    {
+     "in": "0.0.0.00",
+     "matched": true,
+     "group1": "0.0.0.00"
+    },
+    {
+     "in": "1.2.3.4",
+     "matched": true,
+     "group1": "1.2.3.4"
+    },
+    {
+     "in": "0.0.0.0\n",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x\n",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^(/\\S+)",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "/Users/jo/Documents/notes.txt"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "(?i)^0000([0-9a-f]{40})$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^UEME_RUNPATH:(.+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "E:\\R54402.EXE"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^(?!UEME_)(.+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": true,
+     "group1": "-"
+    },
+    {
+     "in": "x",
+     "matched": true,
+     "group1": "x"
+    },
+    {
+     "in": "LOCAL",
+     "matched": true,
+     "group1": "LOCAL"
+    },
+    {
+     "in": "local",
+     "matched": true,
+     "group1": "local"
+    },
+    {
+     "in": "0",
+     "matched": true,
+     "group1": "0"
+    },
+    {
+     "in": "1",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "42",
+     "matched": true,
+     "group1": "42"
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": true,
+     "group1": "0.0.0.0"
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": true,
+     "group1": "127.0.0.1"
+    },
+    {
+     "in": "::1",
+     "matched": true,
+     "group1": "::1"
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": true,
+     "group1": "10.11.12.13"
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": true,
+     "group1": "S-1-0-0"
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": true,
+     "group1": "S-1-5-18"
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": true,
+     "group1": "S-1-5-21-1-2-3-1001"
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": true,
+     "group1": "RUNPATH"
+    },
+    {
+     "in": "value",
+     "matched": true,
+     "group1": "value"
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": true,
+     "group1": "HOST1.dom.example.com"
+    },
+    {
+     "in": "HOST1",
+     "matched": true,
+     "group1": "HOST1"
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "C:\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "/Users/jo/Documents/notes.txt"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "\\Users\\jcloudy\\NTUSER.DAT"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "C:\\Windows\\system32\\svchost.exe -k netsvcs"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": true,
+     "group1": "0000abcdef0123456789abcdef0123456789abcdef"
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": true,
+     "group1": "prefix LOCAL suffix"
+    },
+    {
+     "in": "  spaced  ",
+     "matched": true,
+     "group1": "  spaced  "
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": true,
+     "group1": "é-日本-🎉"
+    },
+    {
+     "in": "UEME_",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:X",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME",
+     "matched": true,
+     "group1": "UEME"
+    },
+    {
+     "in": "ueme_x",
+     "matched": true,
+     "group1": "ueme_x"
+    },
+    {
+     "in": "XUEME_Y",
+     "matched": true,
+     "group1": "XUEME_Y"
+    }
+   ]
+  },
+  {
+   "pattern": "^(.*[\\\\/].*)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "UEME_RUNPATH:E:\\R54402.EXE"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "C:\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "/Users/jo/Documents/notes.txt"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "\\Users\\jcloudy\\NTUSER.DAT"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "C:\\Windows\\system32\\svchost.exe -k netsvcs"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^[^:]+:(.+)$",
+   "live": true,
+   "cases": [
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "E:\\R54402.EXE"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "\\Windows\\system32\\svchost.exe -k netsvcs"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "(?i)[/\\\\]Users[/\\\\]([^/\\\\]+)[/\\\\]",
+   "live": false,
+   "cases": [
+    {
+     "in": "C:\\USERS\\Bob\\x",
+     "matched": true,
+     "group1": "Bob"
+    },
+    {
+     "in": "/users/alice/f",
+     "matched": true,
+     "group1": "alice"
+    },
+    {
+     "in": "\\Users\\jo\\",
+     "matched": true,
+     "group1": "jo"
+    },
+    {
+     "in": "Users\\jo\\x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jo",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "jdoe"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "jo"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "jcloudy"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "(\\d+)",
+   "live": false,
+   "cases": [
+    {
+     "in": "abc 12 def 34",
+     "matched": true,
+     "group1": "12"
+    },
+    {
+     "in": "no digits",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": true,
+     "group1": "0"
+    },
+    {
+     "in": "x9",
+     "matched": true,
+     "group1": "9"
+    },
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "42",
+     "matched": true,
+     "group1": "42"
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": true,
+     "group1": "0"
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": true,
+     "group1": "127"
+    },
+    {
+     "in": "::1",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": true,
+     "group1": "10"
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "54402"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "HOST1",
+     "matched": true,
+     "group1": "1"
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "32"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": true,
+     "group1": "0000"
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^([^.]+\\..+)$",
+   "live": false,
+   "cases": [
+    {
+     "in": "HOST1.dom.com",
+     "matched": true,
+     "group1": "HOST1.dom.com"
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": ".x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "a.b",
+     "matched": true,
+     "group1": "a.b"
+    },
+    {
+     "in": "a.",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": true,
+     "group1": "0.0.0.0"
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": true,
+     "group1": "127.0.0.1"
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": true,
+     "group1": "10.11.12.13"
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": true,
+     "group1": "UEME_RUNPATH:E:\\R54402.EXE"
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": true,
+     "group1": "HOST1.dom.example.com"
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": true,
+     "group1": "C:\\Users\\jdoe\\file.txt"
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": true,
+     "group1": "/Users/jo/Documents/notes.txt"
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": true,
+     "group1": "\\Users\\jcloudy\\NTUSER.DAT"
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": true,
+     "group1": "C:\\Windows\\system32\\svchost.exe -k netsvcs"
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "(?i)^0000([0-9a-f]{40})$",
+   "live": false,
+   "cases": [
+    {
+     "in": "0000abababababababababababababababababababab",
+     "matched": true,
+     "group1": "abababababababababababababababababababab"
+    },
+    {
+     "in": "0000ABABABABABABABABABABABABABABABABABABABAB",
+     "matched": true,
+     "group1": "ABABABABABABABABABABABABABABABABABABABAB"
+    },
+    {
+     "in": "0001abababababababababababababababababababab",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000ababababababababababababababababababab",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "a(b)?c",
+   "live": false,
+   "cases": [
+    {
+     "in": "ac",
+     "matched": true,
+     "group1": null
+    },
+    {
+     "in": "abc",
+     "matched": true,
+     "group1": "b"
+    },
+    {
+     "in": "axc",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": true,
+     "group1": "b"
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": true,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "(?:x)(?:y)",
+   "live": false,
+   "cases": [
+    {
+     "in": "xy",
+     "matched": true,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "a.c",
+   "live": false,
+   "cases": [
+    {
+     "in": "abc",
+     "matched": true,
+     "group1": null
+    },
+    {
+     "in": "a\nc",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "axc",
+     "matched": true,
+     "group1": null
+    },
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": true,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "^x",
+   "live": false,
+   "cases": [
+    {
+     "in": "x",
+     "matched": true,
+     "group1": null
+    },
+    {
+     "in": "yx",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "y\nx",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  },
+  {
+   "pattern": "x$",
+   "live": false,
+   "cases": [
+    {
+     "in": "x",
+     "matched": true,
+     "group1": null
+    },
+    {
+     "in": "xy",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "x\n",
+     "matched": true,
+     "group1": null
+    },
+    {
+     "in": "x\ny",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "-",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "LOCAL",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "local",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "42",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0.0.0.0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "127.0.0.1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "::1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "10.11.12.13",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-0-0",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-18",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "S-1-5-21-1-2-3-1001",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_RUNPATH:E:\\R54402.EXE",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "UEME_CTLSESSION",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "RUNPATH",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "value",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1.dom.example.com",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "HOST1",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Users\\jdoe\\file.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "/Users/jo/Documents/notes.txt",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "\\Users\\jcloudy\\NTUSER.DAT",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "0000abcdef0123456789abcdef0123456789abcdef",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "prefix LOCAL suffix",
+     "matched": true,
+     "group1": null
+    },
+    {
+     "in": "  spaced  ",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "multi\nline\nLOCAL\nend",
+     "matched": false,
+     "group1": null
+    },
+    {
+     "in": "é-日本-🎉",
+     "matched": false,
+     "group1": null
+    }
+   ]
+  }
+ ]
+}

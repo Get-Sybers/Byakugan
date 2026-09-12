@@ -1,6 +1,6 @@
 """Zeek smtp -> email (gated) and files -> file, and zeek-as-one-source (epic #86)."""
 import json, os
-from piiat_mitrecar import normalize, pipeline
+from byakugan import normalize, pipeline
 
 
 def test_smtp_starttls_stays_raw_but_content_maps_to_email():

@@ -6,8 +6,8 @@ prototype mangled), the field|modifier leaf matching, logsource->CAR-object
 mapping, ATT&CK-tag coverage, and end-to-end flagging into BehaviourHits that
 carry the same shape the CAR analytics emit.
 """
-from piiat_mitrecar import sigma as S
-from piiat_mitrecar.analytics import BehaviourHit
+from byakugan import sigma as S
+from byakugan.analytics import BehaviourHit
 
 
 # -- condition parser ---------------------------------------------------------
@@ -178,7 +178,7 @@ def test_maps_retain_pe_metadata_under_sysmon_names():
     # a Sigma process_creation rule most references (OriginalFileName leads the
     # whole corpus) are now RETAINED natively under their Sysmon names, without
     # disturbing the canonical props the CAR output already carries.
-    from piiat_mitrecar.mappings import MAPPINGS
+    from byakugan.mappings import MAPPINGS
     eid1 = dict(MAPPINGS["evtx_sysmon"]["variants"])["sysmon_proc_create"]
     native = eid1["native_extract"]
     for f in ("OriginalFileName", "Company", "Product", "Description",
@@ -267,5 +267,5 @@ def test_create_stream_hash_category_is_runnable():
     assert an.runnable is True
     assert an.car_object == "file" and an.car_action == "create"
     # the action is a real CAR action for the object
-    from piiat_mitrecar import carmodel
+    from byakugan import carmodel
     assert an.car_action in carmodel.actions(an.car_object)

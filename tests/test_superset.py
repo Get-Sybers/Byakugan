@@ -6,7 +6,7 @@ timestamped edge linking car.db rows by guid (the granular relationship timeline
 """
 import os
 
-from piiat_mitrecar import superset
+from byakugan import superset
 
 
 def _proc(guid, host="H", ts="2020-01-01T00:00:00Z", **kw):
@@ -46,7 +46,7 @@ def test_edges_from_cascade_links():
 
 
 def test_no_process_owner_self_loops():
-    from piiat_mitrecar import superset
+    from byakugan import superset
     # a process event's owning_guid is itself -> must NOT emit a self-loop edge
     edges = superset.edges_from_events([
         {"car_object": "process", "car_action": "create", "guid": "P1",
@@ -58,7 +58,7 @@ def test_no_process_owner_self_loops():
 
 
 def test_process_access_edges_source_to_target():
-    from piiat_mitrecar import superset
+    from byakugan import superset
     # Sysmon 10: source --accessed--> TARGET (target_guid), not the record guid
     edges = superset.edges_from_events([
         {"car_object": "process", "car_action": "access", "guid": "REC1",
@@ -72,7 +72,7 @@ def test_process_access_edges_source_to_target():
 def test_all_emittable_verbs_are_attack_vocabulary():
     """Every relationship verb the cascade can emit must be a real ATT&CK verb
     (in the seeded catalogue) — the 'typed edge' contract, self-enforcing."""
-    from piiat_mitrecar import build_data_model, superset
+    from byakugan import build_data_model, superset
     _, rels = build_data_model.build_superset()
     vocab = {r["relationship"] for r in rels}
     # exercise every edge branch to collect the verbs actually emitted

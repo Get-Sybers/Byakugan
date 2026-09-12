@@ -1,6 +1,6 @@
 """SRUM (via Plaso esedb/srum) -> flow/process and RECmd batch JSON -> registry.
 Fixtures mirror REAL LoneWolf shapes (SRUDB.dat 17,928 rows; hives 7,493)."""
-from piiat_mitrecar import normalize
+from byakugan import normalize
 
 
 def _srum(dt, **extra):

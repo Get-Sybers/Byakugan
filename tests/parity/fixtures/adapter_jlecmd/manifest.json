@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "jlecmd_dest"
+ ],
+ "host": null,
+ "adapter": "jlecmd",
+ "input": "input.jsonl"
+}

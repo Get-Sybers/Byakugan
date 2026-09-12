@@ -1,0 +1,19 @@
+{"ts": 1341856306.0, "fuid": "FdEQ", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208}
+{"ts": 1341856306.0, "fuid": "FdEQnamed", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208, "filename": "evil.exe"}
+{"ts": 1341856306.0, "fuid": "Fhash", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208, "filename": "payload.DLL", "md5": "D41D8CD98F00B204E9800998ECF8427E", "sha1": "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709", "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855", "total_bytes": 94208, "is_orig": false, "analyzers": ["MD5", "SHA1", "SHA256", "PE"]}
+{"ts": 1341856306.0, "fuid": "Ftar", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208, "filename": "archive.tar.GZ"}
+{"ts": 1341856306.0, "fuid": "Fnoext", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208, "filename": "README"}
+{"ts": 1341856306.0, "fuid": "Fdot", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208, "filename": ".bashrc"}
+{"ts": 1341856306.0, "fuid": "Fpath", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208, "filename": "C:\\Users\\jcloudy\\x.exe"}
+{"ts": 1341856306.0, "fuid": "Fposix", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208, "filename": "/var/tmp/a.bin"}
+{"ts": 1341856306.0, "fuid": "Fblankname", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208, "filename": "-"}
+{"ts": 1341856306.0, "fuid": "Femptyname", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208, "filename": ""}
+{"ts": 1341856306.0, "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208}
+{"ts": 1341856306.0, "fuid": "", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208}
+{"ts": 1341856306.0, "fuid": null, "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208}
+{"ts": 1341856306.0, "fuid": "-", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208}
+{"ts": "2012-07-09T17:51:46.593202Z", "fuid": "Fiso", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208}
+{"ts": "1341856306.5", "fuid": "Fepochstr", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208}
+{"fuid": "Fonts", "uid": "Cno6", "source": "HTTP", "mime_type": "application/x-dosexec", "seen_bytes": 94208}
+{"fuid": "Fbare"}
+{"ts": 1341856306.0, "fuid": "Fnomime", "uid": "Cno6", "source": "SMTP", "mime_type": "-", "seen_bytes": 0, "id.orig_h": "10.0.0.5", "id.resp_h": "1.2.3.4"}

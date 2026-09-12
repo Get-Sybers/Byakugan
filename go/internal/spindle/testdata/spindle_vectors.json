@@ -1,0 +1,244 @@
+{
+ "cases": [
+  {
+   "name": "l2t_filestat",
+   "object": "file",
+   "rec": {
+    "SourceImage": "image.jsonl",
+    "RecordId": 57,
+    "Parser": "filestat"
+   },
+   "event": {
+    "car_object": "file",
+    "timestamp": "2020-01-01T00:00:00Z",
+    "file_path": "/tmp/x",
+    "_native": {}
+   },
+   "guid": "06a168bf-ed13-50f6-819c-3a237502dbf3",
+   "natives": {
+    "spindle_key": {
+     "_obj": "file",
+     "_v": 1,
+     "file_path": "/tmp/x",
+     "event_time": "2020-01-01T00:00:00Z"
+    },
+    "spindle_scope": "intrinsic",
+    "spindle_ref": {
+     "SourceImage": "image.jsonl",
+     "RecordId": 57
+    }
+   }
+  },
+  {
+   "name": "l2t_filestat",
+   "object": "file",
+   "rec": {
+    "SourceImage": "image.jsonl",
+    "RecordId": 57,
+    "Parser": "filestat"
+   },
+   "event": {
+    "car_object": "file",
+    "timestamp": null,
+    "file_path": "/tmp/x",
+    "_native": {}
+   },
+   "guid": "f7e4b5b4-6c07-5916-b2aa-9ce9b91ab597",
+   "natives": {
+    "spindle_key": {
+     "_obj": "file",
+     "_v": 1,
+     "SourceImage": "image.jsonl",
+     "RecordId": "57"
+    },
+    "spindle_scope": "positional",
+    "spindle_ref": {
+     "SourceImage": "image.jsonl",
+     "RecordId": 57
+    }
+   }
+  },
+  {
+   "name": "l2t_filestat",
+   "object": "file",
+   "rec": {
+    "SourceImage": "image.jsonl",
+    "RecordId": 57,
+    "Parser": "filestat"
+   },
+   "event": {
+    "car_object": "file",
+    "timestamp": "-",
+    "file_path": "/tmp/x",
+    "_native": {}
+   },
+   "guid": "f7e4b5b4-6c07-5916-b2aa-9ce9b91ab597",
+   "natives": {
+    "spindle_key": {
+     "_obj": "file",
+     "_v": 1,
+     "SourceImage": "image.jsonl",
+     "RecordId": "57"
+    },
+    "spindle_scope": "positional",
+    "spindle_ref": {
+     "SourceImage": "image.jsonl",
+     "RecordId": 57
+    }
+   }
+  },
+  {
+   "name": "l2t_filestat",
+   "object": "file",
+   "rec": {
+    "SourceImage": "image.jsonl"
+   },
+   "event": {
+    "car_object": "file",
+    "timestamp": null,
+    "file_path": "/tmp/x",
+    "_native": {}
+   },
+   "guid": null,
+   "natives": {}
+  },
+  {
+   "name": "l2t_filestat",
+   "object": "file",
+   "rec": {
+    "SourceImage": "image.jsonl",
+    "RecordId": ""
+   },
+   "event": {
+    "car_object": "file",
+    "timestamp": null,
+    "file_path": "/tmp/x",
+    "_native": {}
+   },
+   "guid": null,
+   "natives": {}
+  },
+  {
+   "name": "l2t_usnjrnl",
+   "object": "file",
+   "rec": {
+    "SourceImage": "image.jsonl",
+    "RecordId": 57,
+    "Parser": "usnjrnl"
+   },
+   "event": {
+    "car_object": "file",
+    "_native": {
+     "update_sequence_number": 1234567,
+     "file_reference": 843
+    }
+   },
+   "guid": "f07d40f2-945c-52b9-80a6-ff0cf9d98486",
+   "natives": {
+    "spindle_key": {
+     "_obj": "file",
+     "_v": 1,
+     "usn": "1234567",
+     "file_reference": "843"
+    },
+    "spindle_scope": "intrinsic",
+    "spindle_ref": {
+     "SourceImage": "image.jsonl",
+     "RecordId": 57
+    }
+   }
+  },
+  {
+   "name": "l2t_filestat",
+   "object": "file",
+   "rec": {
+    "SourceImage": "img",
+    "RecordId": "57"
+   },
+   "event": {
+    "car_object": "file",
+    "timestamp": null,
+    "file_path": "/x",
+    "_native": {}
+   },
+   "guid": "a7d40237-f001-5030-9225-66cc7085fd52",
+   "natives": {
+    "spindle_key": {
+     "_obj": "file",
+     "_v": 1,
+     "SourceImage": "img",
+     "RecordId": "57"
+    },
+    "spindle_scope": "positional",
+    "spindle_ref": {
+     "SourceImage": "img",
+     "RecordId": "57"
+    }
+   }
+  },
+  {
+   "name": "l2t_firefox_cache",
+   "object": "http",
+   "rec": {
+    "SourceImage": "image.jsonl",
+    "RecordId": 57,
+    "Parser": "filestat"
+   },
+   "event": {
+    "car_object": "http",
+    "_native": {
+     "artefact_file": "v0"
+    },
+    "url_full": "v1",
+    "timestamp": "v2"
+   },
+   "guid": "42038fe8-7e68-53cc-b9b0-8eaa43317382",
+   "natives": {
+    "spindle_key": {
+     "_obj": "http",
+     "_v": 1,
+     "db_path": "v0",
+     "url": "v1",
+     "visit_time": "v2"
+    },
+    "spindle_scope": "intrinsic",
+    "spindle_ref": {
+     "SourceImage": "image.jsonl",
+     "RecordId": 57
+    }
+   }
+  },
+  {
+   "name": "l2t_firefox_places",
+   "object": "http",
+   "rec": {
+    "SourceImage": "image.jsonl",
+    "RecordId": 57,
+    "Parser": "filestat"
+   },
+   "event": {
+    "car_object": "http",
+    "_native": {
+     "artefact_file": "v0"
+    },
+    "url_full": "v1",
+    "timestamp": "v2"
+   },
+   "guid": "42038fe8-7e68-53cc-b9b0-8eaa43317382",
+   "natives": {
+    "spindle_key": {
+     "_obj": "http",
+     "_v": 1,
+     "db_path": "v0",
+     "url": "v1",
+     "visit_time": "v2"
+    },
+    "spindle_scope": "intrinsic",
+    "spindle_ref": {
+     "SourceImage": "image.jsonl",
+     "RecordId": 57
+    }
+   }
+  }
+ ]
+}

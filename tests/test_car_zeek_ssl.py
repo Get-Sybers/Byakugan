@@ -8,7 +8,7 @@ the bare conn flow of the same uid, so the connection to 100.101.0.42 reads as
 scoring-c2.berylia.org from its own TLS handshake (the other half of the DNS
 work: DNS gives domain↔IP, the SNI gives the domain directly on the flow).
 """
-from piiat_mitrecar import enrich, normalize
+from byakugan import enrich, normalize
 
 # a real ssl.json record shape (DFIRdump FOR_200 capture): the berylia.org C2
 _SSL = {"ts": "2024-04-21T06:34:48.868246Z", "uid": "CfPiyA3iI3URMDMEfd",

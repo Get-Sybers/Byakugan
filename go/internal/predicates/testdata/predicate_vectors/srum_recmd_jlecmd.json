@@ -1,0 +1,908 @@
+{
+ "cases": [
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": "windows:srum:network_usage"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:srum:network_usage"
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": "windows:srum:application_usage"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:srum:application_usage"
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": "windows:srum:network_connectivity"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:srum:network_connectivity"
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": "windows:srum:network_usage:x"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:srum:network_usage:x"
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": "windows:srum:network_"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:srum:network_"
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": "WINDOWS:SRUM:NETWORK_USAGE"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "WINDOWS:SRUM:NETWORK_USAGE"
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": " windows:srum:network_usage"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": " windows:srum:network_usage"
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": null
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": ""
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": "-"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "-"
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": 0
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": 5
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": 5
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": 5.0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": 5.0
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": false
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": false
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": true
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": true
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": [
+      "windows:srum:network_usage"
+     ]
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": [
+      "windows:srum:network_usage"
+     ]
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Record": null
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": []
+   },
+   "result": false,
+   "rec_after": {
+    "Record": []
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": 0
+   },
+   "result": false,
+   "rec_after": {
+    "Record": 0
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": ""
+   },
+   "result": false,
+   "rec_after": {
+    "Record": ""
+   }
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "srum_is_network_usage",
+   "rec": {
+    "Record": {
+     "data_type": "windows:srum:network_usage",
+     "application": "DiagTrack",
+     "bytes_received": 251792,
+     "bytes_sent": 372082,
+     "user_identifier": "S-1-5-21-1-2-3-1001",
+     "interface_luid": 19985273102270464
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:srum:network_usage",
+     "application": "DiagTrack",
+     "bytes_received": 251792,
+     "bytes_sent": 372082,
+     "user_identifier": "S-1-5-21-1-2-3-1001",
+     "interface_luid": 19985273102270464
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {
+    "Record": {
+     "data_type": "windows:srum:application_usage"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:srum:application_usage"
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {
+    "Record": {
+     "data_type": "windows:srum:network_usage"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:srum:network_usage"
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {
+    "Record": {
+     "data_type": "windows:srum:network_connectivity"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:srum:network_connectivity"
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {
+    "Record": {
+     "data_type": "windows:srum:application_usage "
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:srum:application_usage "
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {
+    "Record": {
+     "data_type": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": null
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {
+    "Record": {
+     "data_type": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": ""
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {
+    "Record": {
+     "data_type": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": 0
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {
+    "Record": {
+     "data_type": true
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": true
+    }
+   }
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Record": null
+   }
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "srum_is_application_usage",
+   "rec": {
+    "Record": {
+     "data_type": "windows:srum:application_usage",
+     "application": "\\Device\\HarddiskVolume4\\Windows\\System32\\LogonUI.exe",
+     "user_identifier": "S-1-5-18",
+     "foreground_cycle_time": 3680219664
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:srum:application_usage",
+     "application": "\\Device\\HarddiskVolume4\\Windows\\System32\\LogonUI.exe",
+     "user_identifier": "S-1-5-18",
+     "foreground_cycle_time": 3680219664
+    }
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "S-1-5-21-1_Classes\\...\\MuiCache",
+    "Deleted": false
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": "S-1-5-21-1_Classes\\...\\MuiCache",
+    "Deleted": false
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "Software\\Foo",
+    "Deleted": true
+   },
+   "result": false,
+   "rec_after": {
+    "KeyPath": "Software\\Foo",
+    "Deleted": true
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "Software\\Foo"
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": "Software\\Foo"
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "Software\\Foo",
+    "Deleted": null
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": "Software\\Foo",
+    "Deleted": null
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "K",
+    "Deleted": 1
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": "K",
+    "Deleted": 1
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "K",
+    "Deleted": 1.0
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": "K",
+    "Deleted": 1.0
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "K",
+    "Deleted": "true"
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": "K",
+    "Deleted": "true"
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "K",
+    "Deleted": "True"
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": "K",
+    "Deleted": "True"
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "K",
+    "Deleted": [
+     "x"
+    ]
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": "K",
+    "Deleted": [
+     "x"
+    ]
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "K",
+    "Deleted": 0
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": "K",
+    "Deleted": 0
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "K",
+    "Deleted": ""
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": "K",
+    "Deleted": ""
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "-",
+    "Deleted": false
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": "-",
+    "Deleted": false
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": "",
+    "Deleted": false
+   },
+   "result": false,
+   "rec_after": {
+    "KeyPath": "",
+    "Deleted": false
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": null,
+    "Deleted": false
+   },
+   "result": false,
+   "rec_after": {
+    "KeyPath": null,
+    "Deleted": false
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "Deleted": false
+   },
+   "result": false,
+   "rec_after": {
+    "Deleted": false
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": 0
+   },
+   "result": false,
+   "rec_after": {
+    "KeyPath": 0
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": 5
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": 5
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": false
+   },
+   "result": false,
+   "rec_after": {
+    "KeyPath": false
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": true
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": true
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": []
+   },
+   "result": false,
+   "rec_after": {
+    "KeyPath": []
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": [
+     "a"
+    ]
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": [
+     "a"
+    ]
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": {}
+   },
+   "result": false,
+   "rec_after": {
+    "KeyPath": {}
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {
+    "KeyPath": {
+     "a": 1
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "KeyPath": {
+     "a": 1
+    }
+   }
+  },
+  {
+   "predicate": "recmd_is_value_record",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": "C:\\Users\\jcloudy\\Desktop\\Planning.docx"
+   },
+   "result": true,
+   "rec_after": {
+    "Path": "C:\\Users\\jcloudy\\Desktop\\Planning.docx"
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": "-"
+   },
+   "result": true,
+   "rec_after": {
+    "Path": "-"
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": ""
+   },
+   "result": false,
+   "rec_after": {
+    "Path": ""
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": null
+   },
+   "result": false,
+   "rec_after": {
+    "Path": null
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": 0
+   },
+   "result": false,
+   "rec_after": {
+    "Path": 0
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": 5
+   },
+   "result": true,
+   "rec_after": {
+    "Path": 5
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": 0.0
+   },
+   "result": false,
+   "rec_after": {
+    "Path": 0.0
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": false
+   },
+   "result": false,
+   "rec_after": {
+    "Path": false
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": true
+   },
+   "result": true,
+   "rec_after": {
+    "Path": true
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": []
+   },
+   "result": false,
+   "rec_after": {
+    "Path": []
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": [
+     "x"
+    ]
+   },
+   "result": true,
+   "rec_after": {
+    "Path": [
+     "x"
+    ]
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Path": {}
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "Path": {
+     "a": 1
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Path": {
+     "a": 1
+    }
+   }
+  },
+  {
+   "predicate": "jl_is_dest_entry",
+   "rec": {
+    "path": "lower-case key"
+   },
+   "result": false,
+   "rec_after": {
+    "path": "lower-case key"
+   }
+  }
+ ]
+}

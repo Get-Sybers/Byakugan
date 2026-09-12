@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "plaso_registry"
+ ],
+ "host": "fallback-host",
+ "adapter": "none",
+ "input": "input.jsonl"
+}
