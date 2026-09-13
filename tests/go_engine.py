@@ -35,26 +35,29 @@ _binary_path: str | None = None
 
 
 def _binary() -> str:
-    """Path to a built `byakugan-parse`, built once per test session.
+    """Path to a built `byakugan-parse`, (re)built once per test session.
 
-    Mirrors tests/parity/conftest.py: skip (never silently pass) when no Go
-    toolchain is present so a missing `go` locally is loud but not a red build;
-    a failing BUILD is a hard failure. CI always has `go` and builds it before
-    pytest, so this is a no-op fast path there.
+    Mirrors tests/parity/conftest.py: whenever a Go toolchain is present, run
+    `make -C go build` once per session — it is incremental (a no-op when
+    nothing changed), so a LOCAL Go edit is always picked up rather than the
+    tests silently exercising a stale binary. A failing build is a hard failure,
+    never a skip. Only when `go` is missing AND no prebuilt binary exists do we
+    skip (loud but not a red build); a prebuilt binary with no toolchain (a CI
+    artefact) is used as-is.
     """
     global _binary_path
     if _binary_path is not None:
         return _binary_path
     binary = os.path.join(_REPO, "go", "bin", "byakugan-parse")
-    if not os.path.isfile(binary):
-        if shutil.which("go") is None:
-            pytest.skip("Go toolchain not installed — the CAR tests run the Go "
-                        "engine (build target: make -C go build)")
+    if shutil.which("go") is not None:
         proc = subprocess.run(["make", "-C", os.path.join(_REPO, "go"), "build"],
                               capture_output=True, text=True)
         if proc.returncode != 0:
             pytest.fail(f"make -C go build failed:\n{proc.stdout}\n{proc.stderr}",
                         pytrace=False)
+    elif not os.path.isfile(binary):
+        pytest.skip("Go toolchain not installed and no prebuilt byakugan-parse — "
+                    "the CAR tests run the Go engine (build target: make -C go build)")
     assert os.path.isfile(binary), binary
     _binary_path = binary
     return binary

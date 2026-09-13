@@ -254,7 +254,7 @@ def test_real_cross_feed_yields_nothing_wrong():
     assert pipeline.parse_events(_SYSTEM, ["evtx_security_sessions"]) == []
 
 
-def _sec_4688(**over):
+def _sec_4688_parent(**over):
     import json
     data = [
         {"@Name": "SubjectUserSid", "#text": "S-1-5-18"},
@@ -277,8 +277,10 @@ def _sec_4688(**over):
     return rec
 
 
-def test_sec_4688_is_process_create():
-    ev = go_normalize("evtx_process", _sec_4688())
+def test_sec_4688_maps_parent_process_and_subject_user():
+    # the parent-process + subject-user facets of the 4688 map (this fixture
+    # carries ParentProcessName and a named SubjectUserName)
+    ev = go_normalize("evtx_process", _sec_4688_parent())
     assert ev["car_object"] == "process" and ev["car_action"] == "create"
     assert ev["pid"] == 336 and ev["ppid"] == 4          # NewProcessId=0x150, parent=ProcessId
     assert ev["exe"] == "smss.exe" and ev["image_path"] == r"C:\Windows\System32\smss.exe"
@@ -290,7 +292,7 @@ def test_sec_4688_is_process_create():
     assert ev["parent_pid"] == "0x4"                     # raw for enrich's hex-aware join
     assert ev["_native"]["SubjectLogonId"] == "0x3E7"    # process -> user_session key
     # a process running AS a distinct target user keeps that user, not the creator
-    ev2 = go_normalize("evtx_process", _sec_4688(Payload=__import__("json").dumps(
+    ev2 = go_normalize("evtx_process", _sec_4688_parent(Payload=__import__("json").dumps(
         {"EventData": {"Data": [
             {"@Name": "SubjectUserSid", "#text": "S-1-5-18"},
             {"@Name": "NewProcessId", "#text": "0x10"}, {"@Name": "ProcessId", "#text": "0x4"},
@@ -300,10 +302,10 @@ def test_sec_4688_is_process_create():
     assert ev2["user"] == "alice" and ev2["sid"] == "S-1-5-21-1-1-1-1001"
 
 
-def test_sec_4688_not_claimed_by_other_evtx_maps():
-    assert go_normalize("evtx_security", _sec_4688()) is None       # not auth
-    assert go_normalize("evtx_security_sessions", _sec_4688()) is None
-    assert go_normalize("evtx_services", _sec_4688()) is None
+def test_sec_4688_parent_not_claimed_by_other_maps():
+    assert go_normalize("evtx_security", _sec_4688_parent()) is None       # not auth
+    assert go_normalize("evtx_security_sessions", _sec_4688_parent()) is None
+    assert go_normalize("evtx_services", _sec_4688_parent()) is None
 
 
 def _sec_4688(**over):
