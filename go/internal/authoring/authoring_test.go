@@ -39,7 +39,8 @@ func TestRegisteredMapsMatchCommittedIR(t *testing.T) {
 			if err != nil {
 				t.Fatalf("canonical(want): %v", err)
 			}
-			gc, err := pyjson.Canonical(Registry[key].Encode())
+			e, _ := Lookup(key)
+			gc, err := pyjson.Canonical(e.Encode())
 			if err != nil {
 				t.Fatalf("canonical(go): %v", err)
 			}
@@ -58,7 +59,7 @@ func TestAllIRMapsAreAuthoredInGo(t *testing.T) {
 	m := irMappings(t)
 	var missing []string
 	for _, key := range m.Keys() {
-		if _, ok := Registry[key]; !ok {
+		if _, ok := Lookup(key); !ok {
 			missing = append(missing, key)
 		}
 	}

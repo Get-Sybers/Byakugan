@@ -4,7 +4,7 @@ package authoring
 // (Go-native port of byakugan/mappings/plaso_srum.py). Two sub-keyed spindle
 // variants: network_usage → flow/message, application_usage → process/create.
 // Predicates srum_is_network_usage / srum_is_application_usage are already in
-// go/internal/predicates. (plr is defined in maps_plaso_linux.go.)
+// go/internal/predicates. (plr is defined in maps_plasolinux.go.)
 
 // a real SID, never an SRUM-internal numeric index.
 func srumSid() Src { return Regex1(plr("user_identifier"), `^(S-1-[0-9-]+)$`) }

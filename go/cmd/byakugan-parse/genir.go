@@ -13,8 +13,10 @@ import (
 // serializes the Go-authored IR (authoring.BuildIR) to ir.json byte-identically
 // to the old Python output (indent=1, ensure_ascii=False, trailing newline).
 //
-//	byakugan-parse gen-ir --out go/internal/ir/ir.json      # (re)write the file
-//	byakugan-parse gen-ir --out go/internal/ir/ir.json --check   # CI: fail if stale
+//	byakugan-parse gen-ir --out go/internal/ir/ir.json        # (re)write the file
+//	byakugan-parse gen-ir --check go/internal/ir/ir.json      # CI: fail if the file is stale
+//
+// --out and --check are alternatives, each taking the ir.json path.
 func cmdGenIR(args []string) int {
 	fs := flag.NewFlagSet("gen-ir", flag.ExitOnError)
 	out := fs.String("out", "", "path to write ir.json (required)")

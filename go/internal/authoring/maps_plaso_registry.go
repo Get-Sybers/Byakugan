@@ -4,7 +4,7 @@ package authoring
 // byakugan/mappings/plaso_registry.py). Every windows:registry:* data_type is
 // claimed as a registry/key_edit event; the values LIST and every join key ride
 // in native_extract. Predicate plaso_is_registry is already in
-// go/internal/predicates. (plr is defined in maps_plaso_linux.go.)
+// go/internal/predicates. (plr is defined in maps_plasolinux.go.)
 
 // the owning account named by a Vista+ per-user hive path (\Users\<name>\).
 func userFromPath(s Src) Src { return Regex1(s, `(?i)[/\\]Users[/\\]([^/\\]+)[/\\]`) }

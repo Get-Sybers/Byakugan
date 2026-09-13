@@ -1,6 +1,6 @@
 // Code generated from ir.json (phase-3 bootstrap of the non-map IR sections).
 // The static IR data byakugan/{spindle.yml,pipeline.py,normalize.py} used to
-// source, now authored in Go. Regenerate with tools/gen_ir_sections (bootstrap
+// source, now authored in Go. Regenerate with scripts/gen_ir_sections.py (bootstrap
 // only — hand-maintained thereafter). DO NOT edit the Python sources for these.
 
 package authoring
