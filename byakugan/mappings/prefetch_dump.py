@@ -1,0 +1,62 @@
+"""prefetch_dump → CAR — the Get-Sybers EZ-Tools Windows Prefetch data source.
+
+`prefetch_dump` (the Get-Sybers/EZTools-Docker `get-sybers/prefetch` container, Go
+on Velociraptor's go-prefetch) parses Windows `.pf` natively on Linux — the Linux
+substitute for PECmd, which carries a blanket non-Windows startup guard (verified:
+it refuses even uncompressed XP prefetch off-Windows). It emits one JSONL record
+per `.pf`: `Executable`, `Path` (the run-from device path), `Hash`, `Version`,
+`RunCount`, `LastRun` + `PreviousRuns[]` (up to eight run times a `.pf` retains),
+and `FilesAccessed[]`.
+
+**Prefetch is prefetch regardless of parser** (docs: artefact ≠ processor), so
+this links to the SAME CAR object the Plaso prefetch map does —
+**windows:prefetch:execution → process/create** (execution evidence: the program
+demonstrably ran) — but as its OWN MITRE data source with its OWN positional row
+identity (EZ-tool maps carry a `{"fields": …}` guid; the Plaso spindle registry
+is Plaso-only). Verified against real `.pf`: `Executable`/`Hash` match Plaso
+(`0x4E6085D4` == 1314948564), one execution per `.pf`.
+
+- `exe` is the `Executable` name; `image_path` is the full run-from `Path` where
+  the `.pf` records it, an honest null otherwise (the PIIAT-Mem process
+  convention — a bare name never fabricates a path).
+- Timestamped at `LastRun` (the most recent run); the earlier `PreviousRuns` and
+  the run count / accessed files / volume metadata stay native.
+
+Row identity (positional, this-source-only): the executable + the `.pf` path hash
+— the pair the `.pf` filename itself is keyed on (one execution artefact per file).
+"""
+from __future__ import annotations
+
+from ..normalize import first, win_program_name, win_program_path  # noqa: F401
+
+
+def prefetch_dump_is_execution(rec) -> bool:
+    """A parsed `.pf` execution record — it names an executable."""
+    return bool(rec.get("Executable"))
+
+
+PREDICATES = {"prefetch_dump_is_execution": prefetch_dump_is_execution}
+
+# the run-from path convention (parity with plaso_exec_prefetch): image_path is
+# the FULL path where provable, exe its name; a bare name leaves image_path null.
+_IMAGE = win_program_path("Path")
+_EXE = first(win_program_name("Path"), "Executable")
+
+MAPPINGS = {
+    "prefetch_dump": {
+        "variants": [
+            ("prefetch_dump_is_execution", {
+                "object": "process", "action": "create", "ts": "LastRun",
+                "guid": {"fields": ["Executable", "Hash"]},
+                "props": {
+                    "exe": _EXE,
+                    "image_path": _IMAGE,
+                },
+                "keep": ["SourceFilename", "SourceModified", "Executable", "Path",
+                         "Hash", "Version", "FileSize", "RunCount", "LastRun",
+                         "PreviousRuns", "FilesAccessed"],
+            }),
+        ],
+        "default": None,
+    },
+}

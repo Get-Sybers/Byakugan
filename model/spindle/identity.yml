@@ -755,6 +755,35 @@ identities:
     - RecordId
     version: 1
 external:
+- name: esedump_srum_application
+  kind: record
+  form:
+    fields:
+    - AppId
+    - UserId
+    - TimeStamp
+  maps:
+  - esedump_srum
+  car_object:
+  - process
+  stable_across: 'one SRUM ApplicationResourceUsage row (ese_dump): the app + user + the recorded time
+    — the aggregate''s own key'
+- name: esedump_srum_network
+  kind: record
+  form:
+    fields:
+    - AppId
+    - UserId
+    - InterfaceLuid
+    - TimeStamp
+    - BytesSent
+    - BytesRecvd
+  maps:
+  - esedump_srum
+  car_object:
+  - flow
+  stable_across: 'one SRUM NetworkDataUsage aggregate row (ese_dump): the app + user + interface + the
+    recorded time + the byte counts — the aggregate''s own key'
 - name: evtx_record
   kind: record
   form:
@@ -804,6 +833,18 @@ external:
   car_object:
   - process
   stable_across: one memory image — the _EPROCESS offset PIIAT-Mem mints proc-<hex> from
+- name: prefetch_dump_pf
+  kind: entity
+  form:
+    fields:
+    - Executable
+    - Hash
+  maps:
+  - prefetch_dump
+  car_object:
+  - process
+  stable_across: 'one Windows Prefetch file (prefetch_dump): the executable + the .pf path hash — the
+    pair the .pf filename itself is keyed on'
 - name: recmd_value
   kind: record
   form:

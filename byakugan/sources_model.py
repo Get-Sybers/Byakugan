@@ -148,6 +148,17 @@ DERIVATIONS: dict[str, Derivation] = {
     "jlecmd_dest": Derivation("JLECmd", _EZ, "https://github.com/EricZimmerman/JLECmd",
                               "Jump Lists (AutomaticDestinations)",
                               "disk image (Jump List OLE files)"),
+    # The Linux-native Go substitutes for the Windows-bound EZ tools
+    # (Get-Sybers/EZTools-Docker): ese_dump replaces SrumECmd, prefetch_dump
+    # replaces PECmd. Same artefacts as their Plaso maps, their own data source.
+    "esedump_srum": Derivation("ese_dump", _EZ,
+                               "https://github.com/Get-Sybers/EZTools-Docker",
+                               "SRUM (SRUDB.dat ESE database)",
+                               "disk image (SRUDB.dat ESE database)"),
+    "prefetch_dump": Derivation("prefetch_dump", _EZ,
+                                "https://github.com/Get-Sybers/EZTools-Docker",
+                                "Windows Prefetch (.pf)",
+                                "disk image (Windows Prefetch)"),
     # ---- Zeek ----------------------------------------------------------------
     "zeek_conn": Derivation("Zeek", "The Zeek Project", "https://zeek.org",
                             "conn.log", "network capture (pcap / live traffic)"),
