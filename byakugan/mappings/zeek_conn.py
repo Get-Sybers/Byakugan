@@ -69,8 +69,6 @@ from __future__ import annotations
 
 import datetime as _dt
 
-from ..normalize import const, epoch_ts, first, map_value  # noqa: F401
-
 
 # --- derivation helpers (arithmetic the marker set cannot express) ----------
 
@@ -122,51 +120,3 @@ def zeek_conn_has_state(rec) -> bool:
 
 
 PREDICATES = {"zeek_conn_has_state": zeek_conn_has_state}
-
-
-# --- the map ----------------------------------------------------------------
-
-# the view's case(): terminal states → end, pure attempt → start, any other
-# observed state → message (see module docstring for the Zeek state glossary)
-_ACTIONS = {"SF": "end", "REJ": "end", "RSTO": "end", "RSTR": "end",
-            "S0": "start"}
-
-MAPPINGS = {
-    "zeek_conn": {
-        "variants": [
-            ("zeek_conn_has_state", {
-                "object": "flow",
-                # unmapped-but-present states fall through to "message"
-                "action": first(map_value("conn_state", _ACTIONS),
-                                const("message")),
-                "ts": epoch_ts("ts"),
-                # the sensor-minted connection identity — run-scoped (see
-                # module docstring); shared verbatim with http/files events
-                "guid": {"field": "uid"},
-                "props": {
-                    # the 5-tuple, src = originator by convention
-                    "src_ip": "id.orig_h", "src_port": "id.orig_p",
-                    "dest_ip": "id.resp_h", "dest_port": "id.resp_p",
-                    "transport_protocol": "proto",       # tcp/udp/icmp
-                    # exact home for zeek `service` in the refreshed model;
-                    # proto_info (ADDITIONAL info) stays null — near-miss
-                    "application_protocol": "service",
-                    # zeek state-history letters — recorded, not a TCP bitmask
-                    "tcp_flags": "history",
-                    # src = originator ⇒ out = originator-sent payload bytes,
-                    # in = responder-sent; ip_bytes are NOT a fallback
-                    "out_bytes": "orig_bytes",
-                    "in_bytes": "resp_bytes",
-                    "start_time": epoch_ts("ts"),
-                    "end_time": "_zc_end_time",          # ts + duration
-                    "packet_count": "_zc_packet_count",  # only when counted
-                },
-                # native evidence + join keys (owner-directed list): uid (the
-                # flow↔http/files join), service, conn_state (the raw action
-                # evidence), missed_bytes (capture-loss caveat on the counters)
-                "keep": ["uid", "service", "conn_state", "missed_bytes"],
-            }),
-        ],
-        "default": None,   # no conn_state → no canonical action → stays raw
-    },
-}

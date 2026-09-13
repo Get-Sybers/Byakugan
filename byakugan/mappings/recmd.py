@@ -21,8 +21,6 @@ the real LoneWolf hives (7,493 records).
 """
 from __future__ import annotations
 
-from ..normalize import basename, first, payload, regex1, replace, user_canon  # noqa: F401
-
 
 def recmd_is_value_record(rec) -> bool:
     """A live (non-deleted) batch record with a real key path."""
@@ -30,34 +28,3 @@ def recmd_is_value_record(rec) -> bool:
 
 
 PREDICATES = {"recmd_is_value_record": recmd_is_value_record}
-
-MAPPINGS = {
-    "recmd_batch": {
-        "variants": [
-            ("recmd_is_value_record", {
-                "object": "registry", "action": "value_edit",
-                # RECmd renders '2018-04-02 01:15:16.9540407' — normalised to
-                # ISO 'T' form so timestamps sort with every other source
-                "ts": replace("LastWriteTimestamp", " ", "T"),
-                "guid": {"fields": ["HivePath", "KeyPath", "ValueName"]},
-                "props": {
-                    "hive": "HiveType",
-                    "key": "KeyPath",
-                    "value": "ValueName",
-                    "data": first("ValueData", "ValueData2", "ValueData3"),
-                    # model registry.type — RECmd's ValueType (RegSz/RegDword/…);
-                    # promoted from native to the canonical column
-                    "type": "ValueType",
-                    # for a value snapshot the current content IS its content —
-                    # parity with the Sysmon registry map (data + new_content)
-                    "new_content": first("ValueData", "ValueData2", "ValueData3"),
-                    # a per-user hive names its user (hive-path convention)
-                    "user": user_canon(regex1("HivePath", r"(?i)[/\\]Users[/\\]([^/\\]+)[/\\]")),
-                },
-                "keep": ["HivePath", "HiveType", "Category", "Description",
-                         "Comment", "ValueType", "Deleted", "Recursive"],
-            }),
-        ],
-        "default": None,   # Deleted records: the deletion time is unknowable -> raw
-    },
-}

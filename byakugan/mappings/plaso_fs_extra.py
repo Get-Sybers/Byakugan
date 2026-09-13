@@ -49,7 +49,6 @@ def _td(rec) -> str:
 
 _TD_CREATE = re.compile(r"(?i)creation|crtime|birth")
 _TD_MODIFY = re.compile(r"(?i)modification|mtime|last written|content")
-_TD_READ = re.compile(r"(?i)last access|atime|access time")
 
 # strip a Plaso display_name volume prefix ("NTFS:\path", "GZIP:\path") -> "\path"
 _PATH = first(regex1(_R("display_name"), r"^[^:]+:(.+)$"), _R("display_name"))
@@ -157,48 +156,3 @@ def _ole_map(action):
             **_PROV,
         },
     }
-
-
-MAPPINGS = {
-    "plaso_fseventsd": {
-        "variants": [
-            ("fse_is_record", {
-                "object": "file", "action": "modify", "ts": "Timestamp",
-                # the journal's own record id + the path it names (spindle.yml)
-                "guid": _spindle("plaso_fseventsd"), "host": _HOST,
-                "props": {
-                    "file_path": _R("path"),
-                    "file_name": basename(_R("path")),
-                    "extension": ext(_R("path")),
-                    "hostname": _R("image_hostname"),
-                },
-                "keep": [],
-                "native_extract": {
-                    "data_type": _R("data_type"), "flags": _R("flags"),
-                    "event_identifier": _R("event_identifier"),
-                    "node_identifier": _R("node_identifier"),
-                    "timestamp_desc": _R("timestamp_desc"),
-                    "artefact_sha256": _R("sha256_hash"),   # the fsevents DB hash
-                    "disk_id": _R("disk_id"), "volume_id": _R("volume_id"),
-                },
-            }),
-        ],
-        "default": None,
-    },
-    "plaso_pecoff": {
-        "variants": [
-            ("pe_is_compile_stamp", _pe_map("compile_time")),
-            ("pe_is_table_stamp", _pe_map("pe_table_time")),
-            # the undated placeholder: still a real PE file on disk -> record
-            ("pe_is_file", _pe_map(None)),
-        ],
-        "default": None,   # pe_coff:dll_import / pe_coff:resource -> raw
-    },
-    "plaso_olecf": {
-        "variants": [
-            ("ole_is_create", _ole_map("create")),
-            ("ole_is_modify", _ole_map("modify")),
-        ],
-        "default": None,   # olecf:item -> raw
-    },
-}

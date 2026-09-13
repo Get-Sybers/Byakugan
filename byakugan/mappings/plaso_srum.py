@@ -27,11 +27,6 @@ key — application + user (+ interface for network usage) at its recorded time.
 """
 from __future__ import annotations
 
-import re
-
-from ..normalize import basename, ext, first, payload, regex1  # noqa: F401
-from ._common import R as _r, spindle as _spindle
-
 
 def _dt(rec) -> str:
     r = rec.get("Record")
@@ -49,56 +44,4 @@ def srum_is_application_usage(rec) -> bool:
 PREDICATES = {
     "srum_is_network_usage": srum_is_network_usage,
     "srum_is_application_usage": srum_is_application_usage,
-}
-
-# a real SID, never an SRUM-internal numeric index
-_SID = regex1(_r("user_identifier"), r"^(S-1-[0-9-]+)$")
-# a device path carries the executable; a bare name is only the exe
-_IMAGE = regex1(_r("application"), r"^(\\Device\\.+)$")
-_EXE = first(basename(_IMAGE), _r("application"))
-
-_KEEP_NATIVE = {
-    "data_type": _r("data_type"),
-    "identifier": _r("identifier"),
-    "interface_luid": _r("interface_luid"),
-    "user_identifier": _r("user_identifier"),
-    # the raw application string (device path OR bare service name) — exe /
-    # image_path split it; the row identity keys on it whole (spindle.yml)
-    "application": _r("application"),
-}
-
-MAPPINGS = {
-    "l2t_srum": {
-        "variants": [
-            ("srum_is_network_usage", {
-                "object": "flow", "action": "message", "ts": "Timestamp",
-                "guid": _spindle("l2t_srum/network_usage"),
-                "props": {
-                    "exe": _EXE,
-                    "image_path": _IMAGE,
-                    "in_bytes": _r("bytes_received"),
-                    "out_bytes": _r("bytes_sent"),
-                    "uid": _SID,
-                },
-                "keep": [], "native_extract": _KEEP_NATIVE,
-            }),
-            ("srum_is_application_usage", {
-                "object": "process", "action": "create", "ts": "Timestamp",
-                "guid": _spindle("l2t_srum/application_usage"),
-                "props": {
-                    "exe": _EXE,
-                    "image_path": _IMAGE,
-                    "sid": _SID,
-                },
-                "keep": [],
-                "native_extract": dict(_KEEP_NATIVE,
-                                       foreground_cycle_time=_r("foreground_cycle_time"),
-                                       foreground_bytes_read=_r("foreground_bytes_read"),
-                                       foreground_bytes_written=_r("foreground_bytes_written"),
-                                       face_time=_r("face_time")),
-            }),
-            # network_connectivity: SRUM-internal indexes only -> raw
-        ],
-        "default": None,
-    },
 }

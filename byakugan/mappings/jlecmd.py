@@ -12,34 +12,9 @@ per-entry interaction times — routed to [] explicitly (raw), not mapped.
 """
 from __future__ import annotations
 
-from ..normalize import basename, ext, first  # noqa: F401
-
 
 def jl_is_dest_entry(rec) -> bool:
     return bool(rec.get("Path"))
 
 
 PREDICATES = {"jl_is_dest_entry": jl_is_dest_entry}
-
-MAPPINGS = {
-    "jlecmd_dest": {
-        "variants": [
-            ("jl_is_dest_entry", {
-                "object": "file", "action": "read", "ts": "LastModified",
-                # a stable per-entry identity within the source
-                "guid": {"fields": ["SourceFile", "EntryNumber"]},
-                "host": "Hostname",
-                "props": {
-                    "file_path": "Path",
-                    "file_name": basename("Path"),
-                    "extension": ext("Path"),
-                    "hostname": "Hostname",
-                },
-                "keep": ["AppId", "AppDescription", "InteractionCount",
-                         "CreatedOn", "EntryNumber", "MRUPosition", "Pinned",
-                         "MacAddress", "VolumeDroid", "SourceFile"],
-            }),
-        ],
-        "default": None,
-    },
-}
