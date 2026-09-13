@@ -22,9 +22,6 @@ flow by `uid` at the cascade stage, but they are not CAR objects and stay raw.
 """
 from __future__ import annotations
 
-from ..normalize import (basename, const, domain_of, epoch_ts, ext, first,  # noqa: F401
-                         host_label, lower, map_value, regex1)
-
 
 def zeek_is_smtp_message(rec) -> bool:
     """An SMTP row with real message content — not an encrypted STARTTLS shell."""
@@ -38,52 +35,4 @@ def zeek_is_file(rec) -> bool:
 PREDICATES = {
     "zeek_is_smtp_message": zeek_is_smtp_message,
     "zeek_is_file": zeek_is_file,
-}
-
-MAPPINGS = {
-    # ---- smtp.log → email (only when message content is present) -------------
-    "zeek_smtp": {
-        "variants": [
-            ("zeek_is_smtp_message", {
-                "object": "email", "action": const("deliver"), "ts": epoch_ts("ts"),
-                "guid": {"fields": ["uid", "trans_depth"]},
-                "props": {
-                    "src_ip": "id.orig_h", "src_port": "id.orig_p",
-                    "dest_ip": "id.resp_h", "dest_port": "id.resp_p",
-                    # envelope (MAIL FROM / RCPT TO) is the real sender/recipient;
-                    # from/to are the forgeable header display values
-                    "src_address": first("mailfrom", "from"),
-                    "dest_address": first("rcptto", "to"),
-                    "src_domain": domain_of(first("mailfrom", "from")),
-                    "from": "from", "to": "to", "subject": "subject", "date": "date",
-                },
-                "keep": ["uid", "trans_depth", "helo", "path", "tls", "fuids",
-                         "last_reply", "id.orig_p", "id.resp_p"],
-            }),
-        ],
-        "default": None,   # STARTTLS / contentless sessions -> raw
-    },
-    # ---- files.log → file (a network-observed file object) -------------------
-    "zeek_files": {
-        "variants": [
-            ("zeek_is_file", {
-                "object": "file", "action": const("create"), "ts": epoch_ts("ts"),
-                "guid": {"fields": ["fuid"]},
-                "props": {
-                    "file_name": "filename",
-                    "extension": ext("filename"),
-                    "mime_type": "mime_type",
-                    # canonicalised to LOWERCASE (one hash format across sources)
-                    "md5_hash": lower("md5"), "sha1_hash": lower("sha1"),
-                    "sha256_hash": lower("sha256"),
-                },
-                # uid ties the file to its flow; source (HTTP/SMTP/...) + fuid tie
-                # it to the transaction; bytes/analyzers are the transfer evidence
-                "keep": ["fuid", "uid", "source", "seen_bytes", "total_bytes",
-                         "is_orig", "analyzers", "id.orig_h", "id.resp_h",
-                         "mime_type"],
-            }),
-        ],
-        "default": None,
-    },
 }

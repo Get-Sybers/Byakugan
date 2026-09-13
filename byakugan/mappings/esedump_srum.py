@@ -37,7 +37,6 @@ AppId + UserId (+ interface for network usage) at its recorded TimeStamp.
 """
 from __future__ import annotations
 
-from ..normalize import basename, first, regex1  # noqa: F401
 
 _TABLE_NETWORK = "NetworkDataUsage"
 _TABLE_APPLICATION = "ApplicationResourceUsage"
@@ -54,52 +53,4 @@ def esedump_srum_is_application_usage(rec) -> bool:
 PREDICATES = {
     "esedump_srum_is_network_usage": esedump_srum_is_network_usage,
     "esedump_srum_is_application_usage": esedump_srum_is_application_usage,
-}
-
-# a device path carries the executable; a bare service name is only the exe
-_IMAGE = regex1("AppIdName", r"(?i)^(\\Device\\.+)$")
-_EXE = first(basename(_IMAGE), "AppIdName")
-# a real SID, never an SRUM-internal numeric index
-_SID = regex1("UserIdName", r"^(S-1-[0-9-]+)$")
-
-# the raw ESE columns kept verbatim on every SRUM row (the decoded id names ride
-# too — exe/uid/sid split them; the positional identity keys on the raw indices)
-_KEEP_COMMON = ["Table", "TableAlias", "AppId", "UserId", "AppIdName",
-                "UserIdName", "TimeStamp"]
-
-MAPPINGS = {
-    "esedump_srum": {
-        "variants": [
-            ("esedump_srum_is_network_usage", {
-                "object": "flow", "action": "message", "ts": "TimeStamp",
-                "guid": {"fields": ["AppId", "UserId", "InterfaceLuid",
-                                    "TimeStamp", "BytesSent", "BytesRecvd"]},
-                "props": {
-                    "exe": _EXE,
-                    "image_path": _IMAGE,
-                    "in_bytes": "BytesRecvd",
-                    "out_bytes": "BytesSent",
-                    "uid": _SID,
-                },
-                "keep": _KEEP_COMMON + ["InterfaceLuid", "L2ProfileId",
-                                        "L2ProfileFlags", "BytesSent", "BytesRecvd"],
-            }),
-            ("esedump_srum_is_application_usage", {
-                "object": "process", "action": "create", "ts": "TimeStamp",
-                "guid": {"fields": ["AppId", "UserId", "TimeStamp"]},
-                "props": {
-                    "exe": _EXE,
-                    "image_path": _IMAGE,
-                    "sid": _SID,
-                },
-                "keep": _KEEP_COMMON + ["ForegroundCycleTime", "BackgroundCycleTime",
-                                        "FaceTime", "ForegroundBytesRead",
-                                        "ForegroundBytesWritten", "BackgroundBytesRead",
-                                        "BackgroundBytesWritten"],
-            }),
-            # NetworkConnectivityUsage and the other provider tables: SRUM-internal
-            # indexes only -> no honest CAR object, stay raw.
-        ],
-        "default": None,
-    },
 }

@@ -27,8 +27,6 @@ Row identity (positional, this-source-only): the executable + the `.pf` path has
 """
 from __future__ import annotations
 
-from ..normalize import first, win_program_name, win_program_path  # noqa: F401
-
 
 def prefetch_dump_is_execution(rec) -> bool:
     """A parsed `.pf` execution record — it names an executable."""
@@ -36,27 +34,3 @@ def prefetch_dump_is_execution(rec) -> bool:
 
 
 PREDICATES = {"prefetch_dump_is_execution": prefetch_dump_is_execution}
-
-# the run-from path convention (parity with plaso_exec_prefetch): image_path is
-# the FULL path where provable, exe its name; a bare name leaves image_path null.
-_IMAGE = win_program_path("Path")
-_EXE = first(win_program_name("Path"), "Executable")
-
-MAPPINGS = {
-    "prefetch_dump": {
-        "variants": [
-            ("prefetch_dump_is_execution", {
-                "object": "process", "action": "create", "ts": "LastRun",
-                "guid": {"fields": ["Executable", "Hash"]},
-                "props": {
-                    "exe": _EXE,
-                    "image_path": _IMAGE,
-                },
-                "keep": ["SourceFilename", "SourceModified", "Executable", "Path",
-                         "Hash", "Version", "FileSize", "RunCount", "LastRun",
-                         "PreviousRuns", "FilesAccessed"],
-            }),
-        ],
-        "default": None,
-    },
-}

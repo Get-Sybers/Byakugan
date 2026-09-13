@@ -98,15 +98,3 @@ def _shell_map(action):
             "artefact_sha256": _R("sha256_hash"),
         },
     }
-
-
-MAPPINGS = {
-    "plaso_shellitem": {
-        "variants": [
-            ("plasoshell_create", _shell_map("create")),
-            ("plasoshell_modify", _shell_map("modify")),
-            ("plasoshell_read", _shell_map("read")),
-        ],
-        "default": None,
-    },
-}

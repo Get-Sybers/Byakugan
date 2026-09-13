@@ -21,8 +21,6 @@ one connection.
 """
 from __future__ import annotations
 
-from ..normalize import const, epoch_ts  # noqa: F401
-
 
 def zeek_dns_is_query(rec) -> bool:
     """A dns.log row is CAR-worthy once it names a query (the resolved name);
@@ -31,39 +29,3 @@ def zeek_dns_is_query(rec) -> bool:
 
 
 PREDICATES = {"zeek_dns_is_query": zeek_dns_is_query}
-
-MAPPINGS = {
-    "zeek_dns": {
-        "variants": [
-            ("zeek_dns_is_query", {
-                "object": "flow",
-                # a DNS query/response is an observation of the connection, not
-                # its start or teardown -> the flow `message` action
-                "action": const("message"),
-                "ts": epoch_ts("ts"),
-                # a DNS transaction identity: the connection uid + the DNS
-                # transaction id, because one UDP :53 connection carries MANY
-                # queries — uid alone would fold distinct resolutions into one
-                # (mirrors zeek_http's uid+trans_depth). uid still ties it to the
-                # conn flow; trans_id keeps each query/answer a distinct row.
-                "guid": {"fields": ["uid", "trans_id"]},
-                "props": {
-                    # the 5-tuple, src = originator (the querying client)
-                    "src_ip": "id.orig_h", "src_port": "id.orig_p",
-                    "dest_ip": "id.resp_h", "dest_port": "id.resp_p",
-                    "transport_protocol": "proto",
-                    "application_protocol": const("dns"),
-                    # the queried name this flow resolves — the domain half of the
-                    # domain↔IP map enrich builds
-                    "fqdn": "query",
-                    "start_time": epoch_ts("ts"),
-                },
-                # the resolution evidence + join key: uid (flow↔conn), the answers
-                # (the IP half of the map), and the query metadata
-                "keep": ["uid", "query", "qtype_name", "rcode_name", "answers",
-                         "trans_id"],
-            }),
-        ],
-        "default": None,   # no query → no canonical flow → stays raw
-    },
-}

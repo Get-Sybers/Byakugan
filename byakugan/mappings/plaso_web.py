@@ -88,11 +88,7 @@ PREDICATES = {
 }
 
 # IE history renders "Visited: user@<url>"; plain cache rows carry the bare url.
-_IE_URL = first(regex1(_r("url"), r"^Visited:\s*[^@]*@(.+)$"), _r("url"))
 # firefox cache prefixes the url with "HTTP:".
-_FFC_URL = first(regex1(_r("url"), r"^HTTP:(.+)$"), _r("url"))
-
-_HOST = host_label(_r("image_hostname"))
 
 
 def _http_props(url_marker):
@@ -105,94 +101,3 @@ def _http_props(url_marker):
         # the imaged endpoint IS the vantage these artefacts were seen on
         "hostname": _r("image_hostname"),
     }
-
-
-MAPPINGS = {
-    # ---- IE index.dat visits → http/get -------------------------------------
-    "l2t_msiecf": {
-        "variants": [
-            ("plasoweb_is_ie_visit", {
-                "object": "http", "action": "get", "ts": "Timestamp",
-                "guid": _spindle("l2t_msiecf"), "host": _HOST,
-                "props": _http_props(_IE_URL),
-                "keep": [],
-                "native_extract": {"data_type": _r("data_type"),
-                                   "raw_url": _r("url"),
-                                   "number_of_hits": _r("number_of_hits"),
-                                   "artefact_file": _r("display_name")},
-            }),
-        ],
-        "default": None,   # Expiration rows, msiecf:leak / cached objects: raw
-    },
-    # ---- Firefox cache → http (recorded method + status) ---------------------
-    "l2t_firefox_cache": {
-        "variants": [
-            ("plasoweb_is_ff_cache", {
-                "object": "http",
-                "action": map_value(_r("request_method"),
-                                    {"GET": "get", "POST": "post", "PUT": "put"},
-                                    upper=True),
-                "ts": "Timestamp",
-                "guid": _spindle("l2t_firefox_cache"), "host": _HOST,
-                "props": dict(_http_props(_FFC_URL),
-                              response_status_code=hex_int(
-                                  regex1(_r("response_code"), r"\s(\d{3})\s"))),
-                "keep": [],
-                "native_extract": {"data_type": _r("data_type"),
-                                   "fetch_count": _r("fetch_count"),
-                                   "data_size": _r("data_size"),
-                                   "artefact_file": _r("display_name")},
-            }),
-        ],
-        "default": None,   # a method outside the CAR action set stays raw
-    },
-    # ---- Firefox places page visits (sqlite table) → http/get ----------------
-    "l2t_firefox_places": {
-        "variants": [
-            ("plasoweb_is_ff_visit", {
-                "object": "http", "action": "get", "ts": "Timestamp",
-                "guid": _spindle("l2t_firefox_places"), "host": _HOST,
-                "props": dict(_http_props(_r("url")),
-                              # from_visit is the recorded referring page —
-                              # "url (host)" rendered; keep the url part only
-                              request_referrer=first(
-                                  regex1(_r("from_visit"), r"^(\S+)"),
-                                  _r("from_visit")),
-                              # a chrome:history:file_downloaded row records the
-                              # bytes actually received — the response body size
-                              # (null on plain page_visited rows). total_bytes
-                              # (the expected size) rides native.
-                              response_body_bytes=_r("received_bytes")),
-                "keep": [],
-                "native_extract": {"data_type": _r("data_type"),
-                                   "title": _r("title"),
-                                   "visit_count": _r("visit_count"),
-                                   "visit_type": _r("visit_type"),
-                                   "typed": _r("typed"),
-                                   # download rows: the expected total size and
-                                   # the local target the browser saved it to
-                                   "total_bytes": _r("total_bytes"),
-                                   "full_path": _r("full_path"),
-                                   "artefact_file": _r("display_name")},
-            }),
-        ],
-        "default": None,   # bookmarks/annotations/other sqlite plugins: raw
-    },
-    # ---- Java download cache (IDX) → http/get --------------------------------
-    "l2t_javaidx": {
-        "variants": [
-            ("plasoweb_is_javaidx", {
-                "object": "http", "action": "get", "ts": "Timestamp",
-                "guid": _spindle("l2t_javaidx"), "host": _HOST,
-                "props": _http_props(_r("url")),
-                "keep": [],
-                # the SERVER ip the cache recorded — CAR http has no dest_ip
-                "native_extract": {"data_type": _r("data_type"),
-                                   "ip_address": _r("ip_address"),
-                                   "idx_version": _r("idx_version"),
-                                   "artefact_file": _r("display_name")},
-            }),
-        ],
-        "default": None,
-    },
-}

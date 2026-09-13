@@ -393,7 +393,10 @@ def test_other_syslog_lines_stay_raw():
 
 def test_all_mapped_props_exist_on_the_model_objects():
     model = _cm.load()
-    from byakugan.mappings import plaso_exec
+    # the map DATA is now Go-authored (decoded from ir.json into the aggregate
+    # registry); this module owns these three keys.
+    from byakugan.mappings import MAPPINGS
+    plaso_exec_keys = ("plaso_exec_prefetch", "plaso_exec_winreg", "plaso_exec_cron")
 
     def maps(entry):
         for _, sub in entry.get("variants", []):
@@ -401,7 +404,8 @@ def test_all_mapped_props_exist_on_the_model_objects():
                 yield sub
 
     objects = set()
-    for key, entry in plaso_exec.MAPPINGS.items():
+    for key in plaso_exec_keys:
+        entry = MAPPINGS[key]
         for m in maps(entry):
             spec = model[m["object"]]
             objects.add(m["object"])

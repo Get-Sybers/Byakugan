@@ -157,16 +157,12 @@ _KEEP = ["SourceImage", "Parser"]   # the KQL SourceFile roll-up identity
 # filestat/usnjrnl file_path (the KQL's shared _fn/_dn logic): filename, else
 # display_name with its "TYPE:" prefix stripped (GZIP:\x → \x, OS:/y → /y),
 # else display_name as-is (replace_regex leaves a non-matching string alone).
-_FN_DN_PATH = first(_r("filename"),
-                    regex1(_r("display_name"), r"\A[A-Z0-9]+:(.*)\Z"),
-                    _r("display_name"))
 
 # mft: the file the entry DESCRIBES. The KQL prefers Record.path_hints[0] (the
 # reconstructed full path); the marker set has no list-index, so the hints list
 # is preserved verbatim in _native and file_path falls back to Record.name —
 # the KQL's own next-preferred source (then filename). Reported upstream: an
 # index marker would make path_hints[0] expressible.
-_MFT_PATH = first(_r("name"), _r("filename"))
 
 # unset/loopback source is NOT a remote origin — src_ip stays null. \A/\Z
 # anchor the lookahead so re.search cannot slide past it and match a suffix.
@@ -221,54 +217,12 @@ def _file_map(action, path_marker, hashes=False, posix=False, native=None, ident
 
 # EWF/partition provenance — WHERE on disk the record was found; preserved on
 # every disk-image source (the "preserve everything" directive).
-_PROV = {
-    "disk_id": _r("disk_id"), "volume_id": _r("volume_id"),
-    "volume_offset": _r("volume_offset"),
-}
-_FILESTAT_NATIVE = {
-    "timestamp_desc": _r("timestamp_desc"), "data_type": _r("data_type"),
-    "file_entry_type": _r("file_entry_type"), "file_size": _r("file_size"),
-    "file_system_type": _r("file_system_type"),
-    "is_allocated": _r("is_allocated"), "inode": _r("inode"),
-    # hard-link count — forensically meaningful (a >1 count flags hard links);
-    # no CAR file field, so it stays native rather than a faked column
-    "number_of_links": _r("number_of_links"),
-    "display_name": _r("display_name"), **_PROV,
-}
-_MFT_NATIVE = {
-    "timestamp_desc": _r("timestamp_desc"), "data_type": _r("data_type"),
-    # the described path candidates the KQL indexes as path_hints[0]
-    "path_hints": _r("path_hints"),
-    # NTFS entry identity — the usnjrnl↔mft equality key (join candidate)
-    "file_reference": _r("file_reference"),
-    "parent_file_reference": _r("parent_file_reference"),
-    "is_allocated": _r("is_allocated"),
-    "file_attribute_flags": _r("file_attribute_flags"),
-    "display_name": _r("display_name"), **_PROV,
-}
-_USN_NATIVE = {
-    "timestamp_desc": _r("timestamp_desc"), "data_type": _r("data_type"),
-    # the raw reason/source bits the action was decided from — evidence
-    "update_reason_flags": _r("update_reason_flags"),
-    "update_source_flags": _r("update_source_flags"),
-    "update_sequence_number": _r("update_sequence_number"),
-    # NTFS entry identity — the usnjrnl↔mft equality key (join candidate)
-    "file_reference": _r("file_reference"),
-    "parent_file_reference": _r("parent_file_reference"),
-    "file_attribute_flags": _r("file_attribute_flags"),
-    "display_name": _r("display_name"),
-    "offset": _r("offset"), **_PROV,
-}
 
 
 # the row identities are RULES (byakugan/spindle.yml; docs/CAR-Pipeline.md
 # §7.1 lists every artefact's): what an entry/record IS in the artefact, plus
 # the event time where one entry has several same-action rows (an $MFT entry's
 # $SI and $FN times, a path's MACB). A leaf only names its registry entry.
-_FILESTAT_IDENTITY = _spindle("l2t_filestat")
-_MFT_IDENTITY = _spindle("l2t_mft")
-_USN_IDENTITY = _spindle("l2t_usnjrnl")
-_SSH_IDENTITY = _spindle("l2t_text")
 
 
 def _macb_entry(path_marker, hashes, native, identity, posix=False):
@@ -320,17 +274,6 @@ _UTMP_NATIVE = {
     "exit_status": _r("exit_status"),
 }
 
-_SSH_NATIVE = {
-    "data_type": _r("data_type"),
-    # how the login authenticated (password/publickey) — no CAR home
-    "authentication_method": _r("authentication_method"),
-    "protocol": _r("protocol"),          # ssh2 — native, not CAR's transport_protocol
-    "reporter": _r("reporter"),
-    # the syslog reporter's hostname — recorded, not the CAR hostname
-    # (which is the imaged host, per the vetted view)
-    "hostname": _r("hostname"),
-}
-
 
 # utmp and utmpx carry the same typed fields — one map shape serves both tables
 # (the KQL unions L2tUtmp/L2tUtmpx into one view); each names its own registry entry.
@@ -345,41 +288,3 @@ def _utmp_entry(spindle_name):
         # rows stay raw (the KQL's `where _lt in (6, 7, 8)`)
         "default": None,
     }
-
-
-MAPPINGS = {
-    # ---- Plaso filesystem MACB → file events (CarFile_Plaso) ----------------
-    "l2t_filestat": _macb_entry(_FN_DN_PATH, hashes=True, posix=True,
-                                native=_FILESTAT_NATIVE,
-                                identity=_FILESTAT_IDENTITY),
-    "l2t_mft": _macb_entry(_MFT_PATH, hashes=False, native=_MFT_NATIVE,
-                           identity=_MFT_IDENTITY),
-    "l2t_usnjrnl": {
-        # every USN row is stamped "Metadata Modification" — the real action
-        # is in the reason bits; create/delete take precedence over modify
-        "variants": [
-            ("l2t_usn_create", _file_map("create", _FN_DN_PATH, native=_USN_NATIVE,
-                                         identity=_USN_IDENTITY)),
-            ("l2t_usn_delete", _file_map("delete", _FN_DN_PATH, native=_USN_NATIVE,
-                                         identity=_USN_IDENTITY)),
-        ],
-        "default": _file_map("modify", _FN_DN_PATH, native=_USN_NATIVE,
-                             identity=_USN_IDENTITY),
-    },
-    # ---- Linux utmp/wtmp → user_session events (CarUserSession_Utmp) --------
-    "l2t_utmp": _utmp_entry("l2t_utmp"),
-    "l2t_utmpx": _utmp_entry("l2t_utmpx"),
-    # ---- syslog SSH logins → user_session events (CarUserSession_Ssh) -------
-    "l2t_text": {
-        "variants": [
-            ("l2t_text_ssh_login", _session_map(
-                # a typed sshd "Accepted …" line IS a completed login
-                "login",
-                extra_props={"src_port": _r("port")},
-                native=_SSH_NATIVE, identity=_SSH_IDENTITY)),
-        ],
-        # every other text/syslog row (cron, dpkg, plain lines) has no
-        # canonical user_session semantics — stays raw
-        "default": None,
-    },
-}
