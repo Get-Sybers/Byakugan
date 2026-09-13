@@ -37,6 +37,7 @@ func usage() {
   byakugan-parse parse --in FILE --artefacts k1,k2 [--host H] [--adapter none|winevt|jlecmd]
   byakugan-parse split-l2t --in RAW.jsonl --out-dir DIR
   byakugan-parse ir-check [--in ir.json]
+  byakugan-parse gen-ir (--out ir.json | --check ir.json)
 `)
 }
 

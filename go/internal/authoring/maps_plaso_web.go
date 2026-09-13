@@ -4,7 +4,7 @@ package authoring
 // byakugan/mappings/plaso_web.py). Endpoint-side records that a URL was
 // requested (IE index.dat, Firefox cache, browser history, Java download cache).
 // Predicates plasoweb_is_ie_visit / _ff_cache / _ff_visit / _javaidx are already
-// in go/internal/predicates. (plr is defined in maps_plaso_linux.go.)
+// in go/internal/predicates. (plr is defined in maps_plasolinux.go.)
 
 // httpProps: the shared derivations for an endpoint-recorded URL request.
 func plasoWebHTTPProps(urlMarker Src) []Prop {

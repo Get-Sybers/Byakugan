@@ -1,6 +1,7 @@
 package authoring
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/get-sybers/byakugan/go/internal/predicates"
@@ -12,11 +13,21 @@ import (
 const IRVersion = 1
 
 // po builds an insertion-ordered pyjson object from alternating (string key,
-// value) pairs — the compact literal form the generated ir_sections.go uses.
+// value) pairs — the compact literal form the generated ir_sections.go uses. A
+// malformed call (odd argument count, or a non-string key) is a programming
+// error in the generated tables, so it panics rather than silently dropping a
+// pair or mis-typing a key.
 func po(kv ...pyjson.Value) *pyjson.Object {
+	if len(kv)%2 != 0 {
+		panic("authoring.po: odd number of arguments (keys and values must pair up)")
+	}
 	o := pyjson.NewObject()
-	for i := 0; i+1 < len(kv); i += 2 {
-		o.Set(kv[i].(string), kv[i+1])
+	for i := 0; i < len(kv); i += 2 {
+		k, ok := kv[i].(string)
+		if !ok {
+			panic(fmt.Sprintf("authoring.po: key %d is %T, want string", i, kv[i]))
+		}
+		o.Set(k, kv[i+1])
 	}
 	return o
 }
@@ -29,7 +40,11 @@ func pa(vs ...pyjson.Value) []pyjson.Value { return vs }
 func mappingsSection() *pyjson.Object {
 	o := pyjson.NewObject()
 	for _, k := range Keys() {
-		o.Set(k, Registry[k].Encode())
+		e, ok := Lookup(k)
+		if !ok { // Keys() derives from the registry, so this is an unreachable invariant break
+			panic("authoring: Keys() lists " + k + " but Lookup() has no entry")
+		}
+		o.Set(k, e.Encode())
 	}
 	return o
 }
