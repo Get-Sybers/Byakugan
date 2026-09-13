@@ -12,7 +12,8 @@ import os
 
 import pytest
 
-from byakugan import enrich, normalize, pipeline
+from byakugan import enrich, pipeline
+from go_engine import go_normalize
 
 _SAMPLES = os.path.join(os.path.dirname(__file__), "..", "..", "data_store",
                         "processed", "windows_logs", "sysmon-attack-samples")
@@ -39,7 +40,7 @@ _HASHES = ("SHA1=8CC66ED54FBEFF205151898D65F6415400124553,"
 
 
 def test_eid1_process_create_full_extraction():
-    ev = normalize.normalize("evtx_sysmon", _rec(1, {
+    ev = go_normalize("evtx_sysmon", _rec(1, {
         "UtcTime": "2019-05-26 04:01:42.375", "ProcessGuid": _GUID,
         "ProcessId": "3836", "Image": r"C:\Users\IEUser\Desktop\jjs.exe",
         "CommandLine": '"C:\\Users\\IEUser\\Desktop\\jjs.exe" ',
@@ -73,7 +74,7 @@ def test_eid1_process_create_full_extraction():
 
 
 def test_eid5_terminate_shares_the_create_guid():
-    ev = normalize.normalize("evtx_sysmon", _rec(5, {
+    ev = go_normalize("evtx_sysmon", _rec(5, {
         "UtcTime": "2019-05-26 04:02:00.000", "ProcessGuid": _GUID,
         "ProcessId": "3836", "Image": r"C:\Users\IEUser\Desktop\jjs.exe"}))
     assert ev["car_object"] == "process" and ev["car_action"] == "terminate"
@@ -83,7 +84,7 @@ def test_eid5_terminate_shares_the_create_guid():
 
 
 def test_eid3_flow_with_direction_and_transport_protocol():
-    ev = normalize.normalize("evtx_sysmon", _rec(3, {
+    ev = go_normalize("evtx_sysmon", _rec(3, {
         "UtcTime": "2019-05-26 15:47:58.815", "ProcessGuid": _GUID,
         "ProcessId": "3388", "Image": r"C:\Windows\System32\notepad.exe",
         "User": "IIS APPPOOL\\DefaultAppPool", "Protocol": "tcp",
@@ -102,7 +103,7 @@ def test_eid3_flow_with_direction_and_transport_protocol():
 
 
 def test_eid11_file_create_and_eid23_delete_hashes():
-    create = normalize.normalize("evtx_sysmon", _rec(11, {
+    create = go_normalize("evtx_sysmon", _rec(11, {
         "UtcTime": "2020-02-10 08:28:12.876", "ProcessGuid": _GUID,
         "ProcessId": "2780", "Image": r"C:\Windows\Explorer.EXE",
         "TargetFilename": r"C:\Users\IEUser\Desktop\dummy.sys",
@@ -120,7 +121,7 @@ def test_eid11_file_create_and_eid23_delete_hashes():
     assert create["_native"]["overwrite"] is True
     assert create.get("md5_hash") is None           # EID 11 carries no hashes
     # EID 23: SYNTHETIC ONLY — no real FileDelete sample exists in data_store
-    delete = normalize.normalize("evtx_sysmon", _rec(23, {
+    delete = go_normalize("evtx_sysmon", _rec(23, {
         "UtcTime": "2020-02-10 08:30:00.000", "ProcessGuid": _GUID,
         "ProcessId": "2780", "User": "IEWIN7\\IEUser",
         "Image": r"C:\Windows\System32\cmd.exe",
@@ -132,7 +133,7 @@ def test_eid11_file_create_and_eid23_delete_hashes():
 
 
 def test_eid11_fresh_create_is_not_an_overwrite_and_missing_stamp_is_null():
-    fresh = normalize.normalize("evtx_sysmon", _rec(11, {
+    fresh = go_normalize("evtx_sysmon", _rec(11, {
         "UtcTime": "2020-02-10 08:28:12.876", "ProcessGuid": _GUID,
         "ProcessId": "2780", "Image": r"C:\Windows\Explorer.EXE",
         "TargetFilename": r"C:\Users\IEUser\Desktop\new.txt",
@@ -140,7 +141,7 @@ def test_eid11_fresh_create_is_not_an_overwrite_and_missing_stamp_is_null():
     assert fresh["creation_time"] == "2020-02-10T08:28:12.876"
     assert fresh["_native"]["overwrite"] is False   # same instant: a fresh create
     # no CreationUtcTime at all: an honest null, and no verdict
-    bare = normalize.normalize("evtx_sysmon", _rec(11, {
+    bare = go_normalize("evtx_sysmon", _rec(11, {
         "UtcTime": "2020-02-10 08:28:12.876", "ProcessGuid": _GUID,
         "ProcessId": "2780", "Image": r"C:\Windows\Explorer.EXE",
         "TargetFilename": r"C:\Users\IEUser\Desktop\new.txt"}))
@@ -152,27 +153,27 @@ def test_eid11_fresh_create_is_not_an_overwrite_and_missing_stamp_is_null():
 def test_registry_actions_are_authoritative_never_bare_edit():
     base = {"UtcTime": "2019-05-16 14:17:15.763", "ProcessGuid": _GUID,
             "ProcessId": "3132", "Image": r"C:\Windows\regedit.exe"}
-    add = normalize.normalize("evtx_sysmon", _rec(12, dict(
+    add = go_normalize("evtx_sysmon", _rec(12, dict(
         base, EventType="CreateKey",
         TargetObject=r"HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\policies\system")))
     assert add["car_object"] == "registry" and add["car_action"] == "add"
     assert add.get("value") is None                 # a key event names no value
-    rem = normalize.normalize("evtx_sysmon", _rec(12, dict(
+    rem = go_normalize("evtx_sysmon", _rec(12, dict(
         base, EventType="DeleteKey", TargetObject=r"HKU\S-1-5-21-1\Software\X")))
     assert rem["car_action"] == "remove"
-    st = normalize.normalize("evtx_sysmon", _rec(13, dict(
+    st = go_normalize("evtx_sysmon", _rec(13, dict(
         base, EventType="SetValue",
         TargetObject=r"HKLM\SOFTWARE\...\system\EnableLUA",
         Details="DWORD (0x00000000)")))
     assert st["car_action"] == "value_edit"         # authoritative, not "edit"
     assert st["value"] == "EnableLUA" and st["data"] == "DWORD (0x00000000)"
-    rn = normalize.normalize("evtx_sysmon", _rec(14, dict(
+    rn = go_normalize("evtx_sysmon", _rec(14, dict(
         base, EventType="RenameKey", TargetObject=r"HKLM\SOFTWARE\A",
         NewName=r"HKLM\SOFTWARE\B")))
     assert rn["car_action"] == "key_edit"
     assert rn["_native"]["NewName"] == r"HKLM\SOFTWARE\B"
     # an EID 12 with an unrecognized EventType has no canonical action — raw
-    assert normalize.normalize("evtx_sysmon", _rec(12, dict(
+    assert go_normalize("evtx_sysmon", _rec(12, dict(
         base, EventType="Mystery", TargetObject=r"HKLM\X"))) is None
     for e in (add, rem, st, rn):
         assert e.get("type") is None and e.get("hive") is None  # Sysmon gives neither
@@ -180,7 +181,7 @@ def test_registry_actions_are_authoritative_never_bare_edit():
 
 
 def test_eid7_module_and_eid6_driver_signature_semantics():
-    mod = normalize.normalize("evtx_sysmon", _rec(7, {
+    mod = go_normalize("evtx_sysmon", _rec(7, {
         "UtcTime": "2020-02-10 08:28:13.147", "ProcessGuid": _GUID,
         "ProcessId": "2780", "Image": r"C:\tools\loader.exe",
         "ImageLoaded": r"C:\Windows\System32\version.dll", "Hashes": _HASHES,
@@ -193,7 +194,7 @@ def test_eid7_module_and_eid6_driver_signature_semantics():
     assert mod["signer"] == "Microsoft Windows"
     assert mod["signature_valid"] is True
     assert mod["owning_guid_native"] == _GUID
-    drv = normalize.normalize("evtx_sysmon", _rec(6, {
+    drv = go_normalize("evtx_sysmon", _rec(6, {
         "UtcTime": "2020-02-10 08:28:12.981",
         "ImageLoaded": r"C:\Windows\System32\drivers\VBoxDrv.sys",
         "Hashes": _HASHES, "Signed": "true",
@@ -207,7 +208,7 @@ def test_eid7_module_and_eid6_driver_signature_semantics():
 
 
 def test_eid8_remote_thread_owner_is_the_source():
-    ev = normalize.normalize("evtx_sysmon", _rec(8, {
+    ev = go_normalize("evtx_sysmon", _rec(8, {
         "UtcTime": "2019-05-26 04:01:43.567", "SourceProcessGuid": _GUID,
         "SourceProcessId": "3836", "SourceImage": r"C:\Users\IEUser\Desktop\jjs.exe",
         "TargetProcessGuid": _PGUID, "TargetProcessId": "2996",
@@ -228,14 +229,14 @@ def test_eid8_remote_thread_owner_is_the_source():
 
 def test_non_sysmon_provider_and_unported_eids_stay_raw():
     r = _rec(1, {"ProcessGuid": _GUID, "Image": "x"})
-    assert normalize.normalize("evtx_sysmon", dict(r, Provider="Microsoft-Windows-Security-Auditing")) is None
+    assert go_normalize("evtx_sysmon", dict(r, Provider="Microsoft-Windows-Security-Auditing")) is None
     for eid in (2, 4, 9, 15, 22):
-        assert normalize.normalize("evtx_sysmon", _rec(eid, {"ProcessGuid": _GUID})) is None
+        assert go_normalize("evtx_sysmon", _rec(eid, {"ProcessGuid": _GUID})) is None
 
 
 def test_sysmon_eid10_process_access():
     """EID 10 ProcessAccess → process/access, owner = the SOURCE process."""
-    ev = normalize.normalize("evtx_sysmon", _rec(10, {
+    ev = go_normalize("evtx_sysmon", _rec(10, {
         "SourceProcessId": "111", "SourceProcessGUID": _GUID,
         "SourceImage": r"C:\w3wp.exe",
         "TargetProcessId": "222", "TargetProcessGUID": _PGUID,
@@ -249,13 +250,13 @@ def test_sysmon_eid10_process_access():
 
 
 def test_enrich_links_sysmon_spokes_definitively():
-    proc = normalize.normalize("evtx_sysmon", _rec(1, {
+    proc = go_normalize("evtx_sysmon", _rec(1, {
         "ProcessGuid": _GUID, "ProcessId": "3836",
         "Image": r"C:\evil.exe", "CommandLine": "evil -x",
         "User": "IEWIN7\\IEUser", "Hashes": _HASHES,
         "ParentProcessGuid": _PGUID, "ParentProcessId": "1372",
         "ParentImage": r"C:\Windows\explorer.exe"}))
-    flow = normalize.normalize("evtx_sysmon", _rec(3, dict(
+    flow = go_normalize("evtx_sysmon", _rec(3, dict(
         {"ProcessGuid": _GUID, "ProcessId": "3836", "Protocol": "tcp",
          "Initiated": "True", "SourceIp": "10.0.0.9", "SourcePort": "1024",
          "DestinationIp": "1.2.3.4", "DestinationPort": "443"}), record_id="4858"))

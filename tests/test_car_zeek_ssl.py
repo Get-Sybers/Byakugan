@@ -8,7 +8,8 @@ the bare conn flow of the same uid, so the connection to 100.101.0.42 reads as
 scoring-c2.berylia.org from its own TLS handshake (the other half of the DNS
 work: DNS gives domain↔IP, the SNI gives the domain directly on the flow).
 """
-from byakugan import enrich, normalize
+from byakugan import enrich
+from go_engine import go_normalize
 
 # a real ssl.json record shape (DFIRdump FOR_200 capture): the berylia.org C2
 _SSL = {"ts": "2024-04-21T06:34:48.868246Z", "uid": "CfPiyA3iI3URMDMEfd",
@@ -23,7 +24,7 @@ _SSL = {"ts": "2024-04-21T06:34:48.868246Z", "uid": "CfPiyA3iI3URMDMEfd",
 
 
 def test_ssl_record_maps_to_a_flow_with_the_sni_in_dest_fqdn():
-    ev = normalize.normalize("zeek_ssl", dict(_SSL))
+    ev = go_normalize("zeek_ssl", dict(_SSL))
     assert ev["car_object"] == "flow" and ev["car_action"] == "message"
     assert ev["application_protocol"] == "tls"
     # THE decisive datum: the SNI is the destination fqdn on the encrypted flow
@@ -44,16 +45,16 @@ def test_ssl_record_maps_to_a_flow_with_the_sni_in_dest_fqdn():
 
 
 def test_transport_protocol_prefers_a_present_proto():
-    ev = normalize.normalize("zeek_ssl", dict(_SSL, proto="tcp"))
+    ev = go_normalize("zeek_ssl", dict(_SSL, proto="tcp"))
     assert ev["transport_protocol"] == "tcp"           # the sensor's own value when present
 
 
 def test_a_row_with_neither_uid_nor_sni_stays_raw():
-    assert normalize.normalize("zeek_ssl", {"ts": "2024-04-21T06:34:48Z"}) is None
+    assert go_normalize("zeek_ssl", {"ts": "2024-04-21T06:34:48Z"}) is None
 
 
 def test_enrich_stamps_the_sni_onto_the_connection_by_uid():
-    ssl = normalize.normalize("zeek_ssl", dict(_SSL))
+    ssl = go_normalize("zeek_ssl", dict(_SSL))
     ssl["source_host"] = "cap"
     # the bare conn flow of the SAME connection (shared uid) — no fqdn of its own,
     # a terminal action so it does not fold with the ssl `message` row
@@ -69,7 +70,7 @@ def test_enrich_stamps_the_sni_onto_the_connection_by_uid():
 
 
 def test_enrich_never_overwrites_an_existing_dest_fqdn():
-    ssl = normalize.normalize("zeek_ssl", dict(_SSL))
+    ssl = go_normalize("zeek_ssl", dict(_SSL))
     ssl["source_host"] = "cap"
     conn = {"car_object": "flow", "car_action": "end", "guid": "CfPiyA3iI3URMDMEfd",
             "source_host": "cap", "timestamp": "2024-04-21T06:34:50Z",

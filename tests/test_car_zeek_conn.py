@@ -3,7 +3,10 @@ import os
 
 import pytest
 
-from byakugan import normalize, pipeline
+from byakugan import pipeline
+# phase 4c: the CAR assertions run against the GO engine (byakugan-parse), the
+# same path pipeline.parse_events drives — not the retired Python normalize().
+from go_engine import go_normalize
 # the raw line reader moved to Go with the rest of the parse stage; its
 # frozen reference copy is what a raw-row count is counted with
 from reference_plumbing import iter_jsonl
@@ -25,7 +28,7 @@ _SF = {
 
 
 def test_sf_row_is_flow_end_with_full_fields():
-    ev = normalize.normalize("zeek_conn", dict(_SF))
+    ev = go_normalize("zeek_conn", dict(_SF))
     assert ev["car_object"] == "flow" and ev["car_action"] == "end"
     assert ev["timestamp"] == "2012-07-09T17:50:11.834184Z"   # ISO passthrough
     assert ev["src_ip"] == "10.10.1.116" and ev["src_port"] == 49207
@@ -38,12 +41,12 @@ def test_sf_row_is_flow_end_with_full_fields():
 
 
 def test_end_time_is_ts_plus_duration_in_same_style():
-    ev = normalize.normalize("zeek_conn", dict(_SF))
+    ev = go_normalize("zeek_conn", dict(_SF))
     assert ev["end_time"] == "2012-07-09T17:50:13.334184Z"    # +1.5s, Z style
 
 
 def test_byte_direction_src_is_originator():
-    ev = normalize.normalize("zeek_conn", dict(_SF))
+    ev = go_normalize("zeek_conn", dict(_SF))
     assert ev["out_bytes"] == 350     # orig_bytes: payload OUT of src
     assert ev["in_bytes"] == 4200     # resp_bytes: payload INTO src
     # ip-level counters must never leak into the payload-byte columns
@@ -51,12 +54,12 @@ def test_byte_direction_src_is_originator():
 
 
 def test_packet_count_sums_both_counters():
-    ev = normalize.normalize("zeek_conn", dict(_SF))
+    ev = go_normalize("zeek_conn", dict(_SF))
     assert ev["packet_count"] == 11
 
 
 def test_guid_is_the_zeek_uid_and_native_keeps_join_keys():
-    ev = normalize.normalize("zeek_conn", dict(_SF))
+    ev = go_normalize("zeek_conn", dict(_SF))
     assert ev["guid"] == "CtEReq24zLXEGt4V67"     # run-scoped connection id
     assert ev["_native"] == {"uid": "CtEReq24zLXEGt4V67", "service": "http",
                              "conn_state": "SF", "missed_bytes": 0}
@@ -75,7 +78,7 @@ def test_s0_attempt_starts_and_fabricates_nothing():
            "missed_bytes": 0, "history": "D",
            "orig_pkts": 1, "orig_ip_bytes": 78,
            "resp_pkts": 0, "resp_ip_bytes": 0, "ip_proto": 17}
-    ev = normalize.normalize("zeek_conn", rec)
+    ev = go_normalize("zeek_conn", rec)
     assert ev["car_action"] == "start"
     assert ev["end_time"] is None                 # no measured duration
     assert ev["in_bytes"] is None and ev["out_bytes"] is None  # absent ≠ 0
@@ -84,30 +87,30 @@ def test_s0_attempt_starts_and_fabricates_nothing():
 
 def test_terminal_and_message_states_follow_the_view_case():
     for state in ("REJ", "RSTO", "RSTR"):
-        assert normalize.normalize("zeek_conn", dict(_SF, conn_state=state))[
+        assert go_normalize("zeek_conn", dict(_SF, conn_state=state))[
             "car_action"] == "end"
     for state in ("S1", "S2", "OTH", "RSTRH", "SHR"):
-        assert normalize.normalize("zeek_conn", dict(_SF, conn_state=state))[
+        assert go_normalize("zeek_conn", dict(_SF, conn_state=state))[
             "car_action"] == "message"
 
 
 def test_missing_conn_state_stays_raw():
     rec = dict(_SF)
     del rec["conn_state"]
-    assert normalize.normalize("zeek_conn", rec) is None
-    assert normalize.normalize("zeek_conn", dict(_SF, conn_state="")) is None
+    assert go_normalize("zeek_conn", rec) is None
+    assert go_normalize("zeek_conn", dict(_SF, conn_state="")) is None
 
 
 def test_packet_count_null_when_no_counter_present():
     rec = dict(_SF)
     del rec["orig_pkts"], rec["resp_pkts"]
-    assert normalize.normalize("zeek_conn", rec)["packet_count"] is None
+    assert go_normalize("zeek_conn", rec)["packet_count"] is None
 
 
 def test_epoch_seconds_ts_also_supported():
     # raw zeek json (no lane conversion) stamps epoch seconds
     rec = dict(_SF, ts=1341856211.834184)
-    ev = normalize.normalize("zeek_conn", rec)
+    ev = go_normalize("zeek_conn", rec)
     assert ev["timestamp"].startswith("2012-07-09T17:50:11")
     assert ev["end_time"].startswith("2012-07-09T17:50:13")
 

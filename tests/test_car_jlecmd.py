@@ -2,12 +2,11 @@
 
 The flatten step runs in the Go parse engine now (go/internal/adapt); the
 behaviour asserted here — one record per DestListEntry, app context merged in,
-/Date(ms)/ rendered ISO — is the artefact contract, held byte-identical by
-tests/parity (fixture adapter_jlecmd) and stated by the frozen reference copy
-these tests drive.
+/Date(ms)/ rendered ISO — is the artefact contract, exercised end-to-end through
+the Go engine's own jlecmd adapter (phase 4c) and held byte-identical by
+tests/parity (fixture adapter_jlecmd).
 """
-from byakugan import normalize
-from reference_plumbing import jlecmd
+from go_engine import go_events
 
 
 _RECORD = {
@@ -23,17 +22,21 @@ _RECORD = {
 
 
 def test_flatten_and_dotnet_dates():
-    flats = list(jlecmd.flatten(_RECORD))
-    assert len(flats) == 1
-    f = flats[0]
-    assert f["AppDescription"] == "Microsoft Word 2016 64-bit"
-    assert f["LastModified"].startswith("2018-04-05T")     # /Date(ms)/ -> ISO
-    assert f["CreatedOn"].startswith("2018-03-27T")
-    assert list(jlecmd.flatten({"AppId": {}, "DestListEntries": []})) == []
+    # the Go jlecmd adapter fans one jump list out to one event per DestListEntry,
+    # merges the app context, and renders both /Date(ms)/ stamps ISO
+    evs = go_events("jlecmd_dest", _RECORD, adapter="jlecmd")
+    assert len(evs) == 1
+    ev = evs[0]
+    assert ev["_native"]["AppDescription"] == "Microsoft Word 2016 64-bit"
+    assert ev["timestamp"].startswith("2018-04-05T")            # LastModified ISO
+    assert ev["_native"]["CreatedOn"].startswith("2018-03-27T")  # /Date(ms)/ -> ISO
+    # an empty jump list produces no rows
+    assert go_events("jlecmd_dest", {"AppId": {}, "DestListEntries": []},
+                     adapter="jlecmd") == []
 
 
 def test_dest_entry_is_file_read():
-    ev = normalize.normalize("jlecmd_dest", next(jlecmd.flatten(_RECORD)))
+    ev = go_events("jlecmd_dest", _RECORD, adapter="jlecmd")[0]
     assert ev["car_object"] == "file" and ev["car_action"] == "read"
     assert ev["file_name"] == "Planning.docx" and ev["extension"] == "docx"
     assert ev["hostname"] == "desktop-pm6c56d"

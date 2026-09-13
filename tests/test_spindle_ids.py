@@ -17,12 +17,13 @@ import uuid
 
 import pytest
 
-from byakugan import (derive, enrich, ids, mappings, normalize, pipeline, sources_model,
+from byakugan import (derive, enrich, ids, mappings, pipeline, sources_model,
                             spindle, stix, store, superset)
+from go_engine import go_events, go_normalize
 # the container splitter and the two format adapters run in the Go parse
 # engine now; their frozen reference copies (tests/parity/reference/, proven
 # byte-identical to the engine) are what these identity assertions drive
-from reference_plumbing import jlecmd, l2t_split, winevt as winevt_adapter
+from reference_plumbing import l2t_split
 from byakugan.mappings import _common
 
 _TS = "2020-09-16T13:14:30.462820Z"
@@ -120,8 +121,8 @@ def test_minting_is_deterministic_and_order_and_rendering_free():
     assert ids.mint("file", {"n": 843}, 1, {"n": "json"})[1]["n"] == "843"
     assert ids.mint("file", {"s": "x"}, 1, {"s": "json"})[1]["s"] == '"x"'
     # and through the map: two normalizations of one record agree with the recipe
-    a = normalize.normalize("l2t_mft", _wrap("mft", _MFT))
-    b = normalize.normalize("l2t_mft", _wrap("mft", _MFT))
+    a = go_normalize("l2t_mft", _wrap("mft", _MFT))
+    b = go_normalize("l2t_mft", _wrap("mft", _MFT))
     assert a["guid"] == b["guid"] == want
     assert uuid.UUID(a["guid"]).version == 5
     # the readable key + its scope ride native; nothing else about the row changed
@@ -136,22 +137,22 @@ def test_minting_is_deterministic_and_order_and_rendering_free():
 # cross-tool convergence: position, container and parser name are not hashed
 # --------------------------------------------------------------------------- #
 def test_same_identity_converges_across_position_source_and_parser():
-    one = normalize.normalize("l2t_usnjrnl", _wrap("usnjrnl", _USN, source="plaso-run-1.jsonl",
+    one = go_normalize("l2t_usnjrnl", _wrap("usnjrnl", _USN, source="plaso-run-1.jsonl",
                                                    record_id=3))
-    two = normalize.normalize("l2t_usnjrnl", _wrap("usnjrnl/other-tool", _USN,
+    two = go_normalize("l2t_usnjrnl", _wrap("usnjrnl/other-tool", _USN,
                                                    source="another-tool.jsonl", record_id=9000))
     assert one["guid"] == two["guid"] == _canonical_uuid(
         "file", {"usn": "1048576", "file_reference": "281474976727294"})
     key = one["_native"]["spindle_key"]
     assert set(key) == {"_obj", "_v", "usn", "file_reference"}   # no SourceImage / Parser / RecordId
     # a different USN record of the same entry is another event
-    other = normalize.normalize("l2t_usnjrnl", _wrap("usnjrnl", dict(_USN, update_sequence_number=1048608)))
+    other = go_normalize("l2t_usnjrnl", _wrap("usnjrnl", dict(_USN, update_sequence_number=1048608)))
     assert other["guid"] != one["guid"]
     # a Plaso prefetch run: exe + hash + THIS run time (a .pf holds up to eight)
-    p1 = normalize.normalize("plaso_exec_prefetch", _wrap("prefetch", _PREFETCH, record_id=1))
-    p2 = normalize.normalize("plaso_exec_prefetch", _wrap("prefetch", _PREFETCH, record_id=2,
+    p1 = go_normalize("plaso_exec_prefetch", _wrap("prefetch", _PREFETCH, record_id=1))
+    p2 = go_normalize("plaso_exec_prefetch", _wrap("prefetch", _PREFETCH, record_id=2,
                                                           source="other.jsonl"))
-    p3 = normalize.normalize("plaso_exec_prefetch", _wrap("prefetch", _PREFETCH,
+    p3 = go_normalize("plaso_exec_prefetch", _wrap("prefetch", _PREFETCH,
                                                           ts="2009-11-20T09:31:29.671875Z"))
     assert p1["guid"] == p2["guid"] != p3["guid"]
     assert p1["_native"]["spindle_key"] == {"_obj": "process", "_v": 1, "exe": "SVCHOST.EXE",
@@ -168,8 +169,8 @@ def test_different_objects_and_field_names_never_collide():
     assert ids.mint("file", {"a": "1", "b": "2"}, 1)[0] != ids.mint("file", {"a": "2", "b": "1"}, 1)[0]
     # through the maps: a registry key row and a shell-item file row that share
     # the same key_path/path string and time are two identities
-    reg = normalize.normalize("plaso_registry", _wrap("winreg/winreg_default", _REGISTRY))
-    shell = normalize.normalize("plaso_shellitem", _wrap("lnk/shell_items", {
+    reg = go_normalize("plaso_registry", _wrap("winreg/winreg_default", _REGISTRY))
+    shell = go_normalize("plaso_shellitem", _wrap("lnk/shell_items", {
         "data_type": "windows:shell_item:file_entry", "timestamp_desc": "Creation Time",
         "origin": _REGISTRY["display_name"], "shell_item_path": _REGISTRY["key_path"],
         "image_hostname": "M57-JO"}))
@@ -183,8 +184,8 @@ def test_different_objects_and_field_names_never_collide():
 # dedupe: duplicate disk rows collapse, distinct ones never do
 # --------------------------------------------------------------------------- #
 def test_dedupe_collapses_duplicate_disk_rows():
-    dupes = [normalize.normalize("l2t_usnjrnl", _wrap("usnjrnl", _USN, record_id=i)) for i in (1, 2)]
-    other = normalize.normalize("l2t_usnjrnl", _wrap(
+    dupes = [go_normalize("l2t_usnjrnl", _wrap("usnjrnl", _USN, record_id=i)) for i in (1, 2)]
+    other = go_normalize("l2t_usnjrnl", _wrap(
         "usnjrnl", dict(_USN, update_sequence_number=1048608), record_id=3))
     assert all(e["guid"] for e in dupes + [other])
     out = enrich.enrich(dupes + [other])
@@ -193,9 +194,9 @@ def test_dedupe_collapses_duplicate_disk_rows():
     assert len(derive.coalesce(dupes)) == 1
     # an $MFT entry's $SI and $FN rows at the SAME time are one observation; at
     # different times (the timestomp tell) they both survive
-    si = normalize.normalize("l2t_mft", _wrap("mft", _MFT, record_id=10))
-    fn = normalize.normalize("l2t_mft", _wrap("mft", dict(_MFT, name=None), record_id=11))
-    stomped = normalize.normalize("l2t_mft", _wrap("mft", _MFT, ts="2019-01-01T00:00:00.000000Z"))
+    si = go_normalize("l2t_mft", _wrap("mft", _MFT, record_id=10))
+    fn = go_normalize("l2t_mft", _wrap("mft", dict(_MFT, name=None), record_id=11))
+    stomped = go_normalize("l2t_mft", _wrap("mft", _MFT, ts="2019-01-01T00:00:00.000000Z"))
     assert len(enrich.enrich([si, fn, stomped])) == 2
 
 
@@ -207,7 +208,7 @@ def test_additive_fold_keeps_every_contribution_and_counts_the_contributors():
     most-populated fold stays selectable."""
     pe = {"data_type": "pe_coff:file", "display_name": "NTFS:\\Windows\\System32\\evil.dll",
           "image_hostname": "M57-JO", "sha256_hash": "b5de10a0" + "0" * 56}
-    rows = [normalize.normalize("plaso_pecoff", _wrap("pe", dict(pe, timestamp_desc=desc), ts=ts, record_id=i))
+    rows = [go_normalize("plaso_pecoff", _wrap("pe", dict(pe, timestamp_desc=desc), ts=ts, record_id=i))
             for i, (desc, ts) in enumerate([("Creation Time", "2019-06-01T12:34:56.000000Z"),
                                             ("Content Modification Time", "2019-06-01T12:35:00.000000Z"),
                                             ("Not a time", "1970-01-01T00:00:00.000000Z")], 1)]
@@ -229,26 +230,26 @@ def test_additive_fold_keeps_every_contribution_and_counts_the_contributors():
     assert nat["spindle_ref"] == {"SourceImage": "M57-JO.jsonl", "RecordId": 1}
     assert spindle.validate_record(one) == []
     # the $MFT entry's $SI and $FN rows at the SAME time: one row, both natives, two contributors
-    si = normalize.normalize("l2t_mft", _wrap("mft", _MFT, record_id=10))
-    fn = normalize.normalize("l2t_mft", _wrap("mft", dict(_MFT, name=None), record_id=11))
+    si = go_normalize("l2t_mft", _wrap("mft", _MFT, record_id=10))
+    fn = go_normalize("l2t_mft", _wrap("mft", dict(_MFT, name=None), record_id=11))
     (m,) = enrich.enrich([si, fn])
     assert m["file_path"] == "notes.txt" and m["_native"]["contributions"] == 2
     assert m["_native"]["coalesced_conflicts"]["file_path"] == [{"source_artefact": "l2t_mft", "value": "\\$MFT"}]
     assert [c["spindle_ref"]["RecordId"] for c in m["_native"]["contributed_by"]] == [10, 11]
     # distinct positional rows never fold; a lone row is not stamped
     rec = {k: v for k, v in _MFT.items() if k != "file_reference"}
-    out = enrich.enrich([normalize.normalize("l2t_mft", _wrap("mft", rec, record_id=42)),
-                         normalize.normalize("l2t_mft", _wrap("mft", rec, record_id=43))])
+    out = enrich.enrich([go_normalize("l2t_mft", _wrap("mft", rec, record_id=42)),
+                         go_normalize("l2t_mft", _wrap("mft", rec, record_id=43))])
     assert len(out) == 2 and all("contributions" not in e["_native"] for e in out)
     # a second fold over an already-folded row keeps counting, never double-lists
-    again = normalize.normalize("plaso_pecoff", _wrap("pe", dict(pe, timestamp_desc="Not a time"),
+    again = go_normalize("plaso_pecoff", _wrap("pe", dict(pe, timestamp_desc="Not a time"),
                                                       ts="1970-01-01T00:00:00.000000Z", record_id=4))
     (refold,) = enrich.fold([one, again])
     assert refold["_native"]["contributions"] == 4 and len(refold["_native"]["contributed_by"]) == 4
     # the fold is a RULE: additive is the default; most_populated stays selectable
     assert enrich.dedupe_rules()["fold"] == enrich.FOLD_ADDITIVE == "additive"
     assert enrich.dedupe_key() == ["source_host", "car_object", "guid", "car_action", "target_guid", "access_level"]
-    fresh = [normalize.normalize("plaso_pecoff", _wrap("pe", dict(pe, timestamp_desc=d), ts=t, record_id=i))
+    fresh = [go_normalize("plaso_pecoff", _wrap("pe", dict(pe, timestamp_desc=d), ts=t, record_id=i))
              for i, (d, t) in enumerate([("Creation Time", "2019-06-01T12:34:56.000000Z"),
                                          ("Content Modification Time", "2019-06-01T12:35:00.000000Z")], 1)]
     (best,) = enrich.fold(fresh, enrich.FOLD_MOST_POPULATED)
@@ -263,10 +264,10 @@ def test_additive_fold_keeps_every_contribution_and_counts_the_contributors():
 # relationships: an edge between two disk rows now has guids to name
 # --------------------------------------------------------------------------- #
 def test_edge_between_two_disk_rows_materialises():
-    proc = normalize.normalize("plaso_exec_winreg", _wrap("amcache", _AMCACHE, record_id=1))
+    proc = go_normalize("plaso_exec_winreg", _wrap("amcache", _AMCACHE, record_id=1))
     on_disk = dict(_FILESTAT, filename=_AMCACHE["full_path"], sha1_hash=_AMCACHE["sha1"],
                    timestamp_desc="Creation Time")
-    file = normalize.normalize("l2t_filestat", _wrap("filestat", on_disk, record_id=2))
+    file = go_normalize("l2t_filestat", _wrap("filestat", on_disk, record_id=2))
     assert proc["guid"] and file["guid"]
     events = enrich.enrich([proc, file])
     f = next(e for e in events if e["car_object"] == "file")
@@ -290,22 +291,22 @@ def test_edge_between_two_disk_rows_materialises():
 def test_positional_fallback_is_stable_and_flagged_when_no_identity():
     rec = dict(_MFT)
     del rec["file_reference"]                    # the intrinsic identity is incomplete
-    a = normalize.normalize("l2t_mft", _wrap("mft", rec, record_id=42))
-    b = normalize.normalize("l2t_mft", _wrap("mft", rec, record_id=42))
+    a = go_normalize("l2t_mft", _wrap("mft", rec, record_id=42))
+    b = go_normalize("l2t_mft", _wrap("mft", rec, record_id=42))
     want = _canonical_uuid("file", {"SourceImage": "M57-JO.jsonl", "RecordId": "42"})
     assert a["guid"] == b["guid"] == want
     assert a["_native"]["spindle_scope"] == "positional"
     assert a["_native"]["spindle_key"] == {"_obj": "file", "_v": 1, "SourceImage": "M57-JO.jsonl",
                                            "RecordId": "42"}
     # another line of the container is another row; so is the same line of another container
-    assert normalize.normalize("l2t_mft", _wrap("mft", rec, record_id=43))["guid"] != want
-    assert normalize.normalize("l2t_mft", _wrap("mft", rec, source="other.jsonl",
+    assert go_normalize("l2t_mft", _wrap("mft", rec, record_id=43))["guid"] != want
+    assert go_normalize("l2t_mft", _wrap("mft", rec, source="other.jsonl",
                                                 record_id=42))["guid"] != want
     # a blank component (a zeroed timestamp) also falls back, never a half identity
-    z = normalize.normalize("l2t_mft", _wrap("mft", _MFT, ts=None, record_id=5))
+    z = go_normalize("l2t_mft", _wrap("mft", _MFT, ts=None, record_id=5))
     assert z["timestamp"] is None and z["_native"]["spindle_scope"] == "positional"
     # no per-record index at all (a bare wrapped row): honestly no guid, nothing minted
-    bare = normalize.normalize("l2t_mft", {"SourceImage": "x", "Parser": "mft",
+    bare = go_normalize("l2t_mft", {"SourceImage": "x", "Parser": "mft",
                                            "Record": rec, "Timestamp": _TS})
     assert bare["guid"] is None and "spindle_key" not in bare["_native"]
 
@@ -331,7 +332,7 @@ def test_split_l2t_stamps_the_physical_line_as_record_id(tmp_path):
     row = first["L2tUsnjrnl"][0]
     assert list(row) == ["SourceImage", "RecordId", "Parser", "Record", "Timestamp"]
     # the wrapped row feeds the map: the intrinsic identity wins, RecordId stays out of it
-    ev = normalize.normalize("l2t_usnjrnl", row)
+    ev = go_normalize("l2t_usnjrnl", row)
     assert ev["_native"]["spindle_scope"] == "intrinsic" and "RecordId" not in ev["_native"]["spindle_key"]
     # a caller with no index (the dry-run table scan) still gets the old shape
     _table, line = l2t_split._l2t_row(dict(_USN, parser="usnjrnl"), "img.jsonl")
@@ -352,18 +353,19 @@ def _sysmon(eid, data, record_id="4857"):
 def test_sysmon_and_evtx_guids_are_unchanged_and_never_wrapped():
     guid = "365abb72-0fa6-5cea-0000-001049b50a00"
     assert _common.EVTX_RECORD_GUID == {"fields": ["Computer", "Channel", "EventRecordId"]}
-    proc = normalize.normalize("evtx_sysmon", _sysmon(1, {"ProcessGuid": guid, "ProcessId": "3836",
+    proc = go_normalize("evtx_sysmon", _sysmon(1, {"ProcessGuid": guid, "ProcessId": "3836",
                                                           "Image": r"C:\x.exe"}))
     assert proc["guid"] == guid and "spindle_key" not in proc["_native"]      # raw ProcessGuid
-    flow = normalize.normalize("evtx_sysmon", _sysmon(3, {"ProcessGuid": guid, "Protocol": "tcp"}))
+    flow = go_normalize("evtx_sysmon", _sysmon(3, {"ProcessGuid": guid, "Protocol": "tcp"}))
     assert flow["guid"] == "flow-IEWIN7-Microsoft-Windows-Sysmon/Operational-4857"
-    auth = normalize.normalize("evtx_security", {
+    auth = go_normalize("evtx_security", {
         "EventId": 4624, "Channel": "Security", "Computer": "HOST1.example.com", "EventRecordId": 14,
         "TimeCreated": "2019-01-28T19:40:32+00:00",
         "Payload": json.dumps({"EventData": {"Data": [{"@Name": "TargetUserName", "#text": "Steve"}]}})})
     assert auth["guid"] == "authentication-HOST1.example.com-Security-14"
-    # Plaso's parse of the same log (the l2t_winevt route) keeps the EVTX record guid
-    shaped = winevt_adapter.adapt({
+    # Plaso's parse of the same log (the l2t_winevt route, via the Go engine's own
+    # winevt adapter) keeps the EVTX record guid
+    ev = go_events("evtx_process", {
         "SourceImage": "LoneWolf.E01", "RecordId": 77, "Timestamp": "2018-03-27T12:11:42.0Z",
         "Parser": "winevtx",
         "Record": {"data_type": "windows:evtx:record", "event_identifier": 4688,
@@ -372,16 +374,16 @@ def test_sysmon_and_evtx_guids_are_unchanged_and_never_wrapped():
                    "xml_string": "<Event><System><Channel>Security</Channel>"
                                  "<Computer>WIN-1M3263ACE5D</Computer></System></Event>",
                    "source_name": "Microsoft-Windows-Security-Auditing", "record_number": 2623,
-                   "hostname": "WIN-1M3263ACE5D"}})
-    ev = normalize.normalize("evtx_process", shaped)
+                   "hostname": "WIN-1M3263ACE5D"}}, adapter="winevt")[0]
     assert ev["guid"] == "process-WIN-1M3263ACE5D-Security-2623" and "spindle_key" not in ev["_native"]
-    # the EZ-tool maps that are not l2t-fed keep their field guids
-    jl = normalize.normalize("jlecmd_dest", next(jlecmd.flatten({
+    # the EZ-tool maps that are not l2t-fed keep their field guids (Go jlecmd adapter)
+    jl = go_events("jlecmd_dest", {
         "AppId": {"AppId": "fb3b", "Description": "Word"}, "SourceFile": "/in/fb3b.automaticDestinations-ms",
         "DestListEntries": [{"Path": r"C:\Users\j\Planning.docx", "EntryNumber": 1,
-                             "LastModified": "/Date(1522917168677)/", "Hostname": "desktop-1"}]})))
+                             "LastModified": "/Date(1522917168677)/", "Hostname": "desktop-1"}]},
+        adapter="jlecmd")[0]
     assert jl["guid"] == "file-/in/fb3b.automaticDestinations-ms-1"
-    rc = normalize.normalize("recmd_batch", {
+    rc = go_normalize("recmd_batch", {
         "HivePath": "/in/UsrClass.dat", "HiveType": "UsrClass", "KeyPath": r"S-1-5-21-1_Classes\X",
         "ValueName": "LangID", "ValueType": "RegBinary", "ValueData": "(Binary data)",
         "Deleted": False, "LastWriteTimestamp": "2018-04-02 01:15:16.9540407"})
@@ -412,9 +414,9 @@ def test_every_plaso_map_leaf_names_a_registry_entry_and_evtx_never_does():
 # --------------------------------------------------------------------------- #
 def test_stix_observation_and_entity_key_off_the_spindle_guid(tmp_path):
     events = enrich.enrich([
-        normalize.normalize("plaso_exec_prefetch", _wrap("prefetch", _PREFETCH, record_id=1,
+        go_normalize("plaso_exec_prefetch", _wrap("prefetch", _PREFETCH, record_id=1,
                                                          ts="2009-11-20T09:31:29.671875Z")),
-        normalize.normalize("l2t_filestat", _wrap("filestat", _FILESTAT, record_id=2))])
+        go_normalize("l2t_filestat", _wrap("filestat", _FILESTAT, record_id=2))])
     st = store.CarStore(str(tmp_path / "car.db"))
     st.insert_events(events)
     st.close()

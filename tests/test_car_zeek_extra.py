@@ -1,16 +1,17 @@
 """Zeek smtp -> email (gated) and files -> file, and zeek-as-one-source (epic #86)."""
 import json, os
-from byakugan import normalize, pipeline
+from byakugan import pipeline
+from go_engine import go_normalize
 
 
 def test_smtp_starttls_stays_raw_but_content_maps_to_email():
     encrypted = {"ts": 1341856306.0, "uid": "Cs", "trans_depth": 1,
                  "id.orig_h": "10.0.0.5", "id.resp_h": "1.2.3.4",
                  "helo": "mail", "tls": True, "last_reply": "220 ready"}
-    assert normalize.normalize("zeek_smtp", encrypted) is None   # no content -> raw
+    assert go_normalize("zeek_smtp", encrypted) is None   # no content -> raw
     withmsg = dict(encrypted, mailfrom="a@evil.com", rcptto="v@corp.com",
                    **{"from": "A <a@evil.com>", "to": "v@corp.com"}, subject="hi")
-    ev = normalize.normalize("zeek_smtp", withmsg)
+    ev = go_normalize("zeek_smtp", withmsg)
     assert ev["car_object"] == "email" and ev["car_action"] == "deliver"
     assert ev["src_address"] == "a@evil.com" and ev["dest_address"] == "v@corp.com"
     assert ev["src_domain"] == "evil.com" and ev["subject"] == "hi"
@@ -19,14 +20,14 @@ def test_smtp_starttls_stays_raw_but_content_maps_to_email():
 def test_files_is_network_observed_file_with_mime_and_flow_link():
     rec = {"ts": 1341856306.0, "fuid": "FdEQ", "uid": "Cno6", "source": "HTTP",
            "mime_type": "application/x-dosexec", "seen_bytes": 94208}
-    ev = normalize.normalize("zeek_files", rec)
+    ev = go_normalize("zeek_files", rec)
     assert ev["car_object"] == "file" and ev["car_action"] == "create"
     assert ev["guid"] == "file-FdEQ"
     assert ev["mime_type"] == "application/x-dosexec"
     assert ev["file_name"] is None                    # unnamed on the wire -> honest null
     assert ev["_native"]["uid"] == "Cno6"             # ties to its flow (cascade)
     assert ev["_native"]["source"] == "HTTP"
-    named = normalize.normalize("zeek_files", dict(rec, filename="evil.exe"))
+    named = go_normalize("zeek_files", dict(rec, filename="evil.exe"))
     assert named["file_name"] == "evil.exe" and named["extension"] == "exe"
 
 
