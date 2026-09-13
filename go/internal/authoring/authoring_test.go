@@ -1,7 +1,6 @@
 package authoring
 
 import (
-	"os"
 	"sort"
 	"testing"
 
@@ -51,15 +50,11 @@ func TestRegisteredMapsMatchCommittedIR(t *testing.T) {
 	}
 }
 
-// Completeness: every map in the committed IR is authored in Go. This fails
-// while the port is in progress (a partial worktree has only a subset), so it
-// is gated behind BYAKUGAN_AUTHORING_COMPLETE=1 — set it once all maps are
-// ported to make "the Go layer is complete" a CI invariant. It also lists what
-// is still missing, to drive the remaining work.
+// Completeness: every map in the committed IR is authored in Go. The full map
+// layer is now ported, so this is a hard invariant — a new Python/IR map with no
+// Go authoring fails CI, keeping the Go layer complete until it becomes the sole
+// source of truth (phase 3/4). Lists any missing maps to drive the fix.
 func TestAllIRMapsAreAuthoredInGo(t *testing.T) {
-	if os.Getenv("BYAKUGAN_AUTHORING_COMPLETE") != "1" {
-		t.Skip("port in progress — set BYAKUGAN_AUTHORING_COMPLETE=1 to enforce completeness")
-	}
 	m := irMappings(t)
 	var missing []string
 	for _, key := range m.Keys() {
