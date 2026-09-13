@@ -663,6 +663,37 @@ external:
       source: synthetic
       object: registry
       values: {HivePath: /in/UsrClass.dat, KeyPath: 'S-1-5-21-1_Classes\X', ValueName: LangID}
+  esedump_srum_network:
+    kind: record
+    form: {fields: [AppId, UserId, InterfaceLuid, TimeStamp, BytesSent, BytesRecvd]}
+    stable_across: >-
+      one SRUM NetworkDataUsage aggregate row (ese_dump): the app + user + interface
+      + the recorded time + the byte counts — the aggregate's own key
+    golden:                     # real: LoneWolf SRUDB.dat NetworkDataUsage (scratchpad stage3-parity)
+      source: real
+      object: flow
+      values: {AppId: 102, UserId: 8, InterfaceLuid: 1689399632855040,
+               TimeStamp: '2024-02-20T07:50:00Z', BytesSent: 2100, BytesRecvd: 1440}
+  esedump_srum_application:
+    kind: record
+    form: {fields: [AppId, UserId, TimeStamp]}
+    stable_across: >-
+      one SRUM ApplicationResourceUsage row (ese_dump): the app + user + the
+      recorded time — the aggregate's own key
+    golden:                     # real: LoneWolf SRUDB.dat ApplicationResourceUsage
+      source: real
+      object: process
+      values: {AppId: 388, UserId: 951, TimeStamp: '2024-02-20T07:50:59Z'}
+  prefetch_dump_pf:
+    kind: entity
+    form: {fields: [Executable, Hash]}
+    stable_across: >-
+      one Windows Prefetch file (prefetch_dump): the executable + the .pf path hash —
+      the pair the .pf filename itself is keyed on
+    golden:                     # real: LoneWolf ADDINUTIL.EXE-4E6085D4.pf
+      source: real
+      object: process
+      values: {Executable: ADDINUTIL.EXE, Hash: '0x4E6085D4'}
   memory_proc_offset:
     kind: entity
     form: {form: 'proc-{hex}'}

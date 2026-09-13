@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "prefetch_dump"
+ ],
+ "host": "lonewolf",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

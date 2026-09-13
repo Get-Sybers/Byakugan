@@ -1,0 +1,8 @@
+{
+ "artefacts": [
+  "esedump_srum"
+ ],
+ "host": "lonewolf",
+ "adapter": "none",
+ "input": "input.jsonl"
+}

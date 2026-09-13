@@ -25,6 +25,178 @@
   "win_program_path"
  ],
  "mappings": {
+  "esedump_srum": {
+   "variants": [
+    [
+     "esedump_srum_is_network_usage",
+     {
+      "object": "flow",
+      "action": "message",
+      "ts": "TimeStamp",
+      "guid": {
+       "fields": [
+        "AppId",
+        "UserId",
+        "InterfaceLuid",
+        "TimeStamp",
+        "BytesSent",
+        "BytesRecvd"
+       ]
+      },
+      "host": null,
+      "owning_pid": null,
+      "owning_guid": null,
+      "parent_pid": null,
+      "props": [
+       [
+        "exe",
+        {
+         "!": [
+          "first",
+          {
+           "!": [
+            "basename",
+            {
+             "!": [
+              "regex1",
+              "AppIdName",
+              "(?i)^(\\\\Device\\\\.+)$"
+             ]
+            }
+           ]
+          },
+          "AppIdName"
+         ]
+        }
+       ],
+       [
+        "image_path",
+        {
+         "!": [
+          "regex1",
+          "AppIdName",
+          "(?i)^(\\\\Device\\\\.+)$"
+         ]
+        }
+       ],
+       [
+        "in_bytes",
+        "BytesRecvd"
+       ],
+       [
+        "out_bytes",
+        "BytesSent"
+       ],
+       [
+        "uid",
+        {
+         "!": [
+          "regex1",
+          "UserIdName",
+          "^(S-1-[0-9-]+)$"
+         ]
+        }
+       ]
+      ],
+      "keep": [
+       "Table",
+       "TableAlias",
+       "AppId",
+       "UserId",
+       "AppIdName",
+       "UserIdName",
+       "TimeStamp",
+       "InterfaceLuid",
+       "L2ProfileId",
+       "L2ProfileFlags",
+       "BytesSent",
+       "BytesRecvd"
+      ],
+      "native_extract": []
+     }
+    ],
+    [
+     "esedump_srum_is_application_usage",
+     {
+      "object": "process",
+      "action": "create",
+      "ts": "TimeStamp",
+      "guid": {
+       "fields": [
+        "AppId",
+        "UserId",
+        "TimeStamp"
+       ]
+      },
+      "host": null,
+      "owning_pid": null,
+      "owning_guid": null,
+      "parent_pid": null,
+      "props": [
+       [
+        "exe",
+        {
+         "!": [
+          "first",
+          {
+           "!": [
+            "basename",
+            {
+             "!": [
+              "regex1",
+              "AppIdName",
+              "(?i)^(\\\\Device\\\\.+)$"
+             ]
+            }
+           ]
+          },
+          "AppIdName"
+         ]
+        }
+       ],
+       [
+        "image_path",
+        {
+         "!": [
+          "regex1",
+          "AppIdName",
+          "(?i)^(\\\\Device\\\\.+)$"
+         ]
+        }
+       ],
+       [
+        "sid",
+        {
+         "!": [
+          "regex1",
+          "UserIdName",
+          "^(S-1-[0-9-]+)$"
+         ]
+        }
+       ]
+      ],
+      "keep": [
+       "Table",
+       "TableAlias",
+       "AppId",
+       "UserId",
+       "AppIdName",
+       "UserIdName",
+       "TimeStamp",
+       "ForegroundCycleTime",
+       "BackgroundCycleTime",
+       "FaceTime",
+       "ForegroundBytesRead",
+       "ForegroundBytesWritten",
+       "BackgroundBytesRead",
+       "BackgroundBytesWritten"
+      ],
+      "native_extract": []
+     }
+    ]
+   ],
+   "default": null
+  },
   "evtx_bits": {
    "variants": [
     [
@@ -16948,6 +17120,69 @@
    ],
    "default": null
   },
+  "prefetch_dump": {
+   "variants": [
+    [
+     "prefetch_dump_is_execution",
+     {
+      "object": "process",
+      "action": "create",
+      "ts": "LastRun",
+      "guid": {
+       "fields": [
+        "Executable",
+        "Hash"
+       ]
+      },
+      "host": null,
+      "owning_pid": null,
+      "owning_guid": null,
+      "parent_pid": null,
+      "props": [
+       [
+        "exe",
+        {
+         "!": [
+          "first",
+          {
+           "!": [
+            "win_program_name",
+            "Path"
+           ]
+          },
+          "Executable"
+         ]
+        }
+       ],
+       [
+        "image_path",
+        {
+         "!": [
+          "win_program_path",
+          "Path"
+         ]
+        }
+       ]
+      ],
+      "keep": [
+       "SourceFilename",
+       "SourceModified",
+       "Executable",
+       "Path",
+       "Hash",
+       "Version",
+       "FileSize",
+       "RunCount",
+       "LastRun",
+       "PreviousRuns",
+       "FilesAccessed"
+      ],
+      "native_extract": []
+     }
+    ]
+   ],
+   "default": null
+  },
   "recmd_batch": {
    "variants": [
     [
@@ -18054,6 +18289,24 @@
    ]
   ],
   [
+   "NetworkDataUsage",
+   [
+    "esedump_srum"
+   ]
+  ],
+  [
+   "ApplicationResourceUsage",
+   [
+    "esedump_srum"
+   ]
+  ],
+  [
+   "PrefetchDump_Output",
+   [
+    "prefetch_dump"
+   ]
+  ],
+  [
    ".L2tUtmp",
    [
     "l2t_utmp"
@@ -18813,6 +19066,8 @@
   "em_is_winlogon_7001",
   "em_is_winlogon_7002",
   "em_is_wmi_5857",
+  "esedump_srum_is_application_usage",
+  "esedump_srum_is_network_usage",
   "evtxwin_is_sec_4624",
   "evtxwin_is_sec_4688",
   "evtxwin_is_sec_4697",
@@ -18861,6 +19116,7 @@
   "plasoweb_is_ff_visit",
   "plasoweb_is_ie_visit",
   "plasoweb_is_javaidx",
+  "prefetch_dump_is_execution",
   "recmd_is_value_record",
   "srum_is_application_usage",
   "srum_is_network_usage",
