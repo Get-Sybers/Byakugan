@@ -1,9 +1,18 @@
 GO ?= go
 
-.PHONY: build test vet fmt clean
+.PHONY: build test vet fmt clean gen-ir gen-ir-check
 
 build:
 	$(GO) build -o bin/byakugan-parse ./cmd/byakugan-parse
+
+# Regenerate the embedded ir.json from the Go authoring layer (the Go-native
+# replacement for `python -m byakugan.export_ir`). Byte-identical output.
+gen-ir: build
+	./bin/byakugan-parse gen-ir --out internal/ir/ir.json
+
+# CI gate: fail if ir.json has drifted from the Go authoring tables.
+gen-ir-check: build
+	./bin/byakugan-parse gen-ir --check internal/ir/ir.json
 
 test:
 	$(GO) vet ./...

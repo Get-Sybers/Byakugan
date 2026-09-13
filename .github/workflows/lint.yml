@@ -42,6 +42,8 @@ jobs:
         run: make -C go build test
       - name: Go engine completeness (every IR predicate is ported)
         run: ./go/bin/byakugan-parse ir-check --in go/internal/ir/ir.json
+      - name: ir.json is in sync with the Go authoring tables (gen-ir)
+        run: ./go/bin/byakugan-parse gen-ir --check go/internal/ir/ir.json
       - name: Tests
         # the Go binary is on disk, so tests/parity runs for real here — a
         # SKIPPED parity suite means the toolchain step above did not run.
