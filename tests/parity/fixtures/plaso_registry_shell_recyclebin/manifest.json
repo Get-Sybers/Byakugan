@@ -1,8 +1,0 @@
-{
- "artefacts": [
-  "l2t_recyclebin"
- ],
- "host": "fallback-host",
- "adapter": "none",
- "input": "input.jsonl"
-}

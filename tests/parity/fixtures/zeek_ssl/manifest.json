@@ -1,8 +1,0 @@
-{
- "artefacts": [
-  "zeek_ssl"
- ],
- "host": "cap",
- "adapter": "none",
- "input": "input.jsonl"
-}

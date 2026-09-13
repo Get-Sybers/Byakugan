@@ -1,8 +1,0 @@
-{
- "artefacts": [
-  "zeek_http"
- ],
- "host": "vantage1",
- "adapter": "none",
- "input": "input.jsonl"
-}

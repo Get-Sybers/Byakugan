@@ -1,14 +1,18 @@
-"""Normalize a raw artefact record into a MITRE CAR event (epic #86).
+"""Marker constructors + value resolvers for the CAR maps (epic #86).
 
-The same declarative-map + marker engine proven in PIIAT-Mem, generalized for
-the DX_DFIR artefacts. A per-artefact map (see `mappings.py`) says which CAR
-object/action a record is, its timestamp, the identity that becomes `guid`, and
-how each raw field maps to a canonical CAR property. Markers (nestable) do the
-small transforms; a canonical column is left null rather than filled with a
-near-miss — never faked.
+The record-to-CAR-event map ENGINE is now the Go parse engine
+(go/internal/normalize, run via byakugan-parse); the Python reference engine
+(normalize()/_select/_identity/_spindle) was retired once the tests were
+re-anchored onto Go (phase 4c). What remains here is the still-shared library:
 
-`normalize(artefact, record)` returns one CAR event dict, or None if the record
-matches no map (unmapped rows are dropped, not guessed at).
+- the marker CONSTRUCTORS (first/basename/regex1/payload/…) that name the small
+  transforms — imported by byakugan/mappings and exercised by the map tests;
+- `parse_ts`, the one tolerant ISO-8601 parser (timeline.py, stix.py, ts_before);
+- the resolver `_resolve` and guid builder `_guid`, still used by spindle.py's
+  external_vector to render a map's guid form; and the `_canon_user` well-known
+  tables readers.py folds a principal through.
+
+A canonical column is left null rather than filled with a near-miss — never faked.
 """
 from __future__ import annotations
 
@@ -16,11 +20,6 @@ import ntpath
 import posixpath
 import re
 from datetime import datetime, timedelta, timezone
-
-from . import ids, spindle
-
-_EPOCH_ZERO = re.compile(r"^(1601-01-01|1970-01-01|0001-01-01|1600-12-)")
-
 
 # --- marker constructors (also importable by mappings.py) -------------------
 
@@ -214,13 +213,6 @@ def parse_ts(value):
 
 def _blank(v) -> bool:
     return v is None or v == "" or v == "-"
-
-
-def _clean_ts(v):
-    if _blank(v):
-        return None
-    s = str(v)
-    return None if _EPOCH_ZERO.match(s) else s
 
 
 def _basename(v):
@@ -526,133 +518,3 @@ def _guid(spec, obj, rec):
     if any(p is None for p in parts):
         return None
     return f"{obj}-" + "-".join(str(p) for p in parts)
-
-
-def _lookup(event, path):
-    """A value off the normalized event by path — native.<key>, else a CAR /
-    header field: the path convention relationships.yml `derived` uses."""
-    if path.startswith("native."):
-        return (event.get("_native") or {}).get(path[len("native."):])
-    return event.get(path)
-
-
-def _spindle(name, obj, rec, event):
-    """The spindle guid form — {"spindle": "<registry entry>"} — minted the
-    way stix.py mints §2.9 ids: uuid5(SPINDLE_NS, canonical_json({"_obj": obj,
-    name: value, ...})) over the record's OWN stable-identity values, keyed by
-    name (ids.py). WHICH values is a rule, not code: spindle.yml declares each
-    entry's identity as paths on the normalized event, so a map never spells
-    fields and the registry cannot drift from the code (spindle.verify_registry).
-    The source / parser / artefact name is never hashed, so two tools parsing
-    the same artefact converge on one guid. A blank component voids the
-    intrinsic identity and the row falls back to its POSITIONAL one — the
-    registry's per-record index fields on the raw wrapped row (the l2t
-    container + RecordId) — flagged positional, because that identity holds
-    only inside this source (never equated across sources). Every minted row
-    also carries its PROVENANCE — spindle_ref, the container + record index
-    the row came from — OUTSIDE the key: an intrinsic guid never depends on
-    it, and the fold lists it per contributor. Returns (guid, native extras):
-    the readable key (spindle_key), its scope (spindle_scope: intrinsic |
-    positional) and the provenance (spindle_ref)."""
-    entry = spindle.entry(name)
-    if entry.get("object") != obj:
-        raise ValueError(f"spindle identity {name!r} is declared for {entry.get('object')!r}, not {obj!r}")
-    ref = {f: rec.get(f) for f in spindle.positional()}
-    identity, modes = {}, {}
-    for ident_name, source, mode in spindle.identity_fields(entry):
-        v = _lookup(event, source)
-        if _blank(v):
-            identity = None
-            break
-        identity[ident_name] = v
-        if mode is not None:
-            modes[ident_name] = mode
-    if identity:
-        guid, key = ids.mint(obj, identity, entry["version"], modes)
-        return guid, {spindle.NATIVE_KEY: key, spindle.NATIVE_SCOPE: spindle.INTRINSIC,
-                      spindle.NATIVE_REF: ref}
-    positional = {}
-    for f in spindle.positional():
-        v = rec.get(f)
-        if _blank(v):
-            return None, {}            # no per-record index either: genuinely absent
-        positional[f] = v
-    if not positional:
-        return None, {}
-    guid, key = ids.mint(obj, positional, spindle.positional_version())
-    return guid, {spindle.NATIVE_KEY: key, spindle.NATIVE_SCOPE: spindle.POSITIONAL,
-                  spindle.NATIVE_REF: ref}
-
-
-def _identity(spec, obj, rec, event):
-    """(guid, native extras) for a map's guid spec: the spindle form mints and
-    describes its identity; every other form is _guid, with nothing to add."""
-    if spec and "spindle" in spec:
-        return _spindle(spec["spindle"], obj, rec, event)
-    return _guid(spec, obj, rec), {}
-
-
-def _select(entry, rec):
-    """The map for a record: the first matching variant, else the default/self."""
-    from . import mappings  # deferred: mappings imports this module's markers
-    if "variants" not in entry:
-        return entry
-    for pred_name, sub in entry["variants"]:
-        if mappings.PREDICATES[pred_name](rec):
-            return sub
-    return entry.get("default")
-
-
-def normalize(artefact: str, rec: dict) -> dict | None:
-    """One raw record -> one CAR event, or None if unmapped."""
-    from . import mappings  # deferred: mappings imports this module's markers
-    entry = mappings.MAPPINGS.get(artefact)
-    if entry is None:
-        return None
-    m = _select(entry, rec)
-    if m is None:
-        return None
-    obj = m["object"]
-    action = _resolve(m["action"], rec) if not isinstance(m["action"], str) else m["action"]
-    if action is None:
-        # a matched variant whose action marker resolves to nothing (e.g. an
-        # HTTP method outside CAR's get/post/put/tunnel) is NOT a CAR event —
-        # the row stays raw, never an action-less phantom.
-        return None
-    props = {car: _resolve(sp, rec) for car, sp in m["props"].items()}
-    event = {
-        "car_object": obj,
-        "car_action": action,
-        "timestamp": None if m.get("ts") is None else _clean_ts(_resolve(m["ts"], rec)),
-        # the row identity — filled LAST (below): a spindle id is minted from
-        # the event's own canonical values, which have to be in place first
-        "guid": None,
-        # process-context links, resolved by enrich (docs: car-store §3 logic).
-        # An artefact that natively carries the owning process's GUID (Sysmon's
-        # ProcessGuid) links DEFINITIVELY; a bare PID gets the create-time-window
-        # heuristic join.
-        "owning_pid": _resolve(m["owning_pid"], rec) if m.get("owning_pid") else None,
-        "owning_guid_native": _resolve(m["owning_guid"], rec) if m.get("owning_guid") else None,
-        "parent_pid": _resolve(m["parent_pid"], rec) if m.get("parent_pid") else None,
-        "owning_guid": None,
-        "parent_guid": None,
-        "link_confidence": None,
-        "source_artefact": artefact,
-        # the enrich scope key: a map may derive it per record (e.g. Computer);
-        # the pipeline fills a caller-supplied default where the map does not.
-        "source_host": _resolve(m["host"], rec) if m.get("host") else None,
-        "_native": {k: rec.get(k) for k in m.get("keep", []) if k in rec},
-    }
-    # parsed values promoted into _native (join keys the raw blob buries —
-    # e.g. an EvtxECmd payload's TargetLogonId); never CAR-canonical columns.
-    for name, spec in (m.get("native_extract") or {}).items():
-        v = _resolve(spec, rec)
-        if v is not None:
-            event["_native"][name] = v
-    event.update(props)
-    # the identity: an existing field / marker / <object>-<fields>, or a MINTED
-    # spindle id over the event's own values (the registry names them by path);
-    # a minted guid is opaque, so its readable tuple + scope ride native
-    event["guid"], identity_native = _identity(m.get("guid"), obj, rec, event)
-    event["_native"].update(identity_native)
-    return event

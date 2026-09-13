@@ -6,10 +6,7 @@ import pytest
 from byakugan import pipeline
 # phase 4c: the CAR assertions run against the GO engine (byakugan-parse), the
 # same path pipeline.parse_events drives — not the retired Python normalize().
-from go_engine import go_normalize
-# the raw line reader moved to Go with the rest of the parse stage; its
-# frozen reference copy is what a raw-row count is counted with
-from reference_plumbing import iter_jsonl
+from go_engine import go_normalize, iter_jsonl
 
 _ZEEK_DIR = os.path.join(os.path.dirname(__file__), "..", "..",
                          "data_store", "processed", "zeek")

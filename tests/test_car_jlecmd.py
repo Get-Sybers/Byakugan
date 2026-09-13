@@ -3,8 +3,8 @@
 The flatten step runs in the Go parse engine now (go/internal/adapt); the
 behaviour asserted here — one record per DestListEntry, app context merged in,
 /Date(ms)/ rendered ISO — is the artefact contract, exercised end-to-end through
-the Go engine's own jlecmd adapter (phase 4c) and held byte-identical by
-tests/parity (fixture adapter_jlecmd).
+the Go engine's own jlecmd adapter (phase 4c); the adapter's field-level shaping
+is additionally covered by the Go adapter's unit tests (go/internal/adapt).
 """
 from go_engine import go_events
 

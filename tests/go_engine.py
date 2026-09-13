@@ -37,7 +37,7 @@ _binary_path: str | None = None
 def _binary() -> str:
     """Path to a built `byakugan-parse`, (re)built once per test session.
 
-    Mirrors tests/parity/conftest.py: whenever a Go toolchain is present, run
+    Whenever a Go toolchain is present, run
     `make -C go build` once per session — it is incremental (a no-op when
     nothing changed), so a LOCAL Go edit is always picked up rather than the
     tests silently exercising a stale binary. A failing build is a hard failure,
@@ -101,6 +101,43 @@ def go_normalize(artefact: str, rec: dict) -> dict | None:
             f"{artefact!r} emitted {len(events)} events for one record; use "
             "go_events() for an adapter that fans one record out to many")
     return events[0]
+
+
+def go_split(raw_path: str, out_dir: str) -> dict[str, list[dict]]:
+    """Split a raw log2timeline json_line container into per-parser wrapped-row
+    tables via the Go engine (`byakugan-parse split-l2t`), returning
+    {table_name: [wrapped rows]}. Each wrapped row carries RecordId = its physical
+    input line (blank/bad lines are counted, not emitted) — the shape the l2t maps
+    consume. Replaces the frozen Python split_l2t reference (phase 4c-2)."""
+    os.makedirs(out_dir, exist_ok=True)
+    proc = subprocess.run([_binary(), "split-l2t", "--in", raw_path, "--out-dir", out_dir],
+                          capture_output=True)
+    if proc.returncode != 0:
+        raise RuntimeError(
+            f"byakugan-parse split-l2t exited {proc.returncode}: "
+            f"{proc.stderr.decode(errors='replace')}")
+    tables = json.loads(proc.stdout.decode("utf-8"))["tables"]
+    out: dict[str, list[dict]] = {}
+    for name, path in tables.items():
+        with open(path, encoding="utf-8") as fh:
+            out[name] = [json.loads(line) for line in fh if line.strip()]
+    return out
+
+
+def iter_jsonl(path: str):
+    """Yield each JSON object from a JSONL file — a small test-side reader for
+    counting/inspecting fixture rows (the frozen readers.iter_jsonl reference,
+    kept verbatim after phase 4c-2 retired tests/parity). Tolerant of a UTF-8 BOM
+    (EvtxECmd stamps one), a trailing comma, bare `[`/`]`, and unparseable lines."""
+    with open(path, encoding="utf-8-sig", errors="replace") as fh:
+        for line in fh:
+            line = line.strip().rstrip(",")
+            if not line or line in ("[", "]"):
+                continue
+            try:
+                yield json.loads(line)
+            except json.JSONDecodeError:
+                continue
 
 
 def go_events(artefacts, rec: dict, adapter: str = "none") -> list[dict]:

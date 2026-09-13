@@ -30,8 +30,6 @@ jobs:
         run: yamale -s byakugan/car_source_schema.yaml sources/
       - name: yamllint
         run: yamllint -c .yamllint sources/ to-be-validated/
-      - name: Go IR snapshot is in sync with the live mapping tables
-        run: python -m byakugan.export_ir --check
       - name: gofmt
         run: |
           unformatted=$(gofmt -l go/cmd go/internal)
@@ -45,6 +43,6 @@ jobs:
       - name: ir.json is in sync with the Go authoring tables (gen-ir)
         run: ./go/bin/byakugan-parse gen-ir --check go/internal/ir/ir.json
       - name: Tests
-        # the Go binary is on disk, so tests/parity runs for real here — a
-        # SKIPPED parity suite means the toolchain step above did not run.
+        # the Go binary is on disk, so the CAR map tests (tests/go_engine.py)
+        # exercise the real engine here rather than skipping.
         run: pytest -q

@@ -1,8 +1,0 @@
-{
- "artefacts": [
-  "plaso_exec_cron"
- ],
- "host": "plaso-fallback",
- "adapter": "none",
- "input": "input.jsonl"
-}

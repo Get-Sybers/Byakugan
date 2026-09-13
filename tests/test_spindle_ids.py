@@ -19,11 +19,7 @@ import pytest
 
 from byakugan import (derive, enrich, ids, mappings, pipeline, sources_model,
                             spindle, stix, store, superset)
-from go_engine import go_events, go_normalize
-# the container splitter and the two format adapters run in the Go parse
-# engine now; their frozen reference copies (tests/parity/reference/, proven
-# byte-identical to the engine) are what these identity assertions drive
-from reference_plumbing import l2t_split
+from go_engine import go_events, go_normalize, go_split
 from byakugan.mappings import _common
 
 _TS = "2020-09-16T13:14:30.462820Z"
@@ -320,12 +316,7 @@ def test_split_l2t_stamps_the_physical_line_as_record_id(tmp_path):
              json.dumps(dict(_USN, parser="usnjrnl", timestamp=1600262070462821))]
     raw.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    def split(out):
-        out.mkdir()
-        tables = l2t_split.split_l2t(str(raw), "img.jsonl", str(out), "img.jsonl")
-        return {t: [json.loads(x) for x in open(p, encoding="utf-8")] for t, p in tables.items()}
-
-    first, again = split(tmp_path / "a"), split(tmp_path / "b")
+    first, again = go_split(str(raw), str(tmp_path / "a")), go_split(str(raw), str(tmp_path / "b"))
     assert first == again                                    # stable across re-splits
     assert [r["RecordId"] for r in first["L2tUsnjrnl"]] == [1, 5]
     assert [r["RecordId"] for r in first["L2tMft"]] == [4]
@@ -334,9 +325,6 @@ def test_split_l2t_stamps_the_physical_line_as_record_id(tmp_path):
     # the wrapped row feeds the map: the intrinsic identity wins, RecordId stays out of it
     ev = go_normalize("l2t_usnjrnl", row)
     assert ev["_native"]["spindle_scope"] == "intrinsic" and "RecordId" not in ev["_native"]["spindle_key"]
-    # a caller with no index (the dry-run table scan) still gets the old shape
-    _table, line = l2t_split._l2t_row(dict(_USN, parser="usnjrnl"), "img.jsonl")
-    assert "RecordId" not in json.loads(line)
 
 
 # --------------------------------------------------------------------------- #
