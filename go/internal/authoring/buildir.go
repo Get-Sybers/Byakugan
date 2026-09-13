@@ -40,7 +40,10 @@ func pa(vs ...pyjson.Value) []pyjson.Value { return vs }
 func mappingsSection() *pyjson.Object {
 	o := pyjson.NewObject()
 	for _, k := range Keys() {
-		e, _ := Lookup(k)
+		e, ok := Lookup(k)
+		if !ok { // Keys() derives from the registry, so this is an unreachable invariant break
+			panic("authoring: Keys() lists " + k + " but Lookup() has no entry")
+		}
 		o.Set(k, e.Encode())
 	}
 	return o

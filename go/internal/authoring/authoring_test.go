@@ -39,7 +39,10 @@ func TestRegisteredMapsMatchCommittedIR(t *testing.T) {
 			if err != nil {
 				t.Fatalf("canonical(want): %v", err)
 			}
-			e, _ := Lookup(key)
+			e, ok := Lookup(key)
+			if !ok {
+				t.Fatalf("Keys() lists %q but Lookup() has no such entry", key)
+			}
 			gc, err := pyjson.Canonical(e.Encode())
 			if err != nil {
 				t.Fatalf("canonical(go): %v", err)

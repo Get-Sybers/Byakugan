@@ -4,9 +4,11 @@ import "sort"
 
 // registry is the Go-native equivalent of byakugan.mappings.MAPPINGS: each map
 // module registers its entries in an init(). It is UNEXPORTED so callers cannot
-// bypass register()'s duplicate-key guard or mutate entries in place; read
-// access is through Keys()/Lookup(). A duplicate key is a programming error
-// (mirrors the Python __init__ hard ImportError on collision).
+// add/replace entries or bypass register()'s duplicate-key guard; read access is
+// through Keys()/Lookup(). (Lookup returns the Entry by value; since Entry holds
+// slices/pointers that copy is shallow, so callers must treat a returned Entry as
+// read-only rather than mutate its fields.) A duplicate key is a programming
+// error (mirrors the Python __init__ hard ImportError on collision).
 var registry = map[string]Entry{}
 
 func register(key string, e Entry) {
