@@ -1,8 +1,0 @@
-{
- "artefacts": [
-  "plaso_pecoff"
- ],
- "host": "PE-FALLBACK",
- "adapter": "none",
- "input": "input.jsonl"
-}

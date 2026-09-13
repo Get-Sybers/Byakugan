@@ -1,8 +1,0 @@
-{
- "artefacts": [
-  "zeek_smtp"
- ],
- "host": "cap",
- "adapter": "none",
- "input": "input.jsonl"
-}

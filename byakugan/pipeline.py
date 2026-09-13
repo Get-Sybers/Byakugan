@@ -20,8 +20,9 @@ between them is legitimately self-contained).
 **The parse stage is the Go engine.** Everything from a raw processor file to
 the pre-enrichment CAR event stream — line reading, raw-l2t container splitting,
 the winevt/jlecmd format adapters, the marker resolver and the spindle identity
-— runs in `go/bin/byakugan-parse` (build: `make -C go build`), proven
-byte-identical to the Python path it replaced (tests/parity). Routing, the
+— runs in `go/bin/byakugan-parse` (build: `make -C go build`); the CAR map
+tests (tests/test_car_*.py, via tests/go_engine.py) drive this engine directly.
+Routing, the
 per-source layout, enrichment and everything after it stay here in Python; the
 PIIAT-Mem car.db passthrough is Python too (it never parsed anything).
 """
@@ -192,8 +193,8 @@ def parse_events(path: str, artefacts: list[str], adapter: str = "none",
     engine running every map per record — the file is read ONCE).
 
     The engine emits one `json.dumps(event)` line per event, so `json.loads`
-    rebuilds exactly the dicts the Python parse path used to build (proven
-    byte-for-byte by tests/parity)."""
+    rebuilds a plain CAR event dict — the shape the CAR map tests assert on
+    (tests/test_car_*.py drive this same engine through tests/go_engine.py)."""
     argv = ["parse", "--in", path, "--artefacts", ",".join(artefacts),
             "--adapter", adapter]
     if default_host:

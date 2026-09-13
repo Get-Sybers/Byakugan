@@ -7,10 +7,7 @@ vetted against — {"SourceImage","Timestamp","Parser","Record"} as emitted by
 for filestat/usnjrnl; no real mft rows exist, so those are synthetic per the
 Plaso mft parser's documented fields).
 """
-from go_engine import go_normalize
-# the splitter runs in the Go engine now (go/internal/split); its frozen
-# reference copy states the wrapped-row shape this module shape-locks
-from reference_plumbing import l2t_split as prepare
+from go_engine import go_normalize, go_split
 
 
 def _wrap(parser, record, ts="2020-09-16T13:14:30.462820Z",
@@ -223,13 +220,16 @@ def test_other_text_rows_stay_raw():
         "text/syslog_traditional", plain)) is None
 
 
-# ---- shape lock: the maps consume exactly what split_l2t emits --------------
+# ---- shape lock: the maps consume exactly what split-l2t emits --------------
 
-def test_wrapped_shape_matches_prepare_l2t_row():
+def test_wrapped_shape_matches_split_l2t(tmp_path):
     import json
     raw = dict(_UTMP, parser="utmp", timestamp=1600262099805465)
-    table, line = prepare._l2t_row(raw, "dualserver_logs.jsonl")
-    assert table == "L2tUtmp"
-    ev = go_normalize("l2t_utmp", json.loads(line))
+    p = tmp_path / "dualserver_logs.jsonl"
+    p.write_text(json.dumps(raw) + "\n", encoding="utf-8")
+    tables = go_split(str(p), str(tmp_path / "out"))
+    assert list(tables) == ["L2tUtmp"]
+    (row,) = tables["L2tUtmp"]
+    ev = go_normalize("l2t_utmp", row)
     assert ev["car_action"] == "login"
     assert ev["timestamp"].startswith("2020-09-16T")

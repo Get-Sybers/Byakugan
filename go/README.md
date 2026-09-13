@@ -2,10 +2,10 @@
 
 The parsing-hot seam of the Byakugan pipeline — raw processor files →
 pre-enrichment CAR event stream — implemented in Go against the design
-contract in [DESIGN.md](DESIGN.md). Python keeps the mapping tables and
-everything after normalize; this engine EMBEDS a JSON snapshot of those
-tables (`internal/ir/ir.json`, written by `python -m byakugan.export_ir`)
-and must reproduce the Python engine's output byte for byte.
+contract in [DESIGN.md](DESIGN.md). The map tables are authored in Go
+(`internal/authoring`) and serialized to the embedded `internal/ir/ir.json` by
+`byakugan-parse gen-ir`; Python keeps everything after normalize (routing,
+enrichment, spindle, STIX) and decodes those same tables from ir.json.
 
 ## Build
 
@@ -121,39 +121,20 @@ moment a third-party module or a `go.sum` appears, so this paragraph cannot go
 stale. The Python side's inventories are `requirements.txt` and
 `requirements-dev.txt` at the repo root.
 
-## Regenerating the IR and vectors
+## Regenerating the IR
 
-    python -m byakugan.export_ir              # rewrites go/internal/ir/ir.json
-    python -m byakugan.export_ir --check      # CI drift gate
+The map tables live in `internal/authoring`; regenerate the embedded ir.json
+from them (byte-identical, committed) and gate drift in CI with:
 
-Engine-wide vectors (shared files, one script each):
+    make -C go gen-ir          # rewrites internal/ir/ir.json from the authoring layer
+    make -C go gen-ir-check    # CI drift gate (byakugan-parse gen-ir --check)
 
-    python tests/parity/gen_pyjson_vectors.py
-    python tests/parity/gen_pyre_vectors.py
-    python tests/parity/gen_reader_vectors.py
-    python tests/parity/gen_spindle_vectors.py
-
-Per-family predicate vectors, marker vectors and fixtures — ONE script per
-mapping family, each writing only its OWN files so families can be ported in
-parallel without touching a shared path:
-
-    python tests/parity/genf/core.py          # core.py: evtx_security + zeek_http
-    python tests/parity/genf/zeek_conn.py     # zeek_conn.py
-    python tests/parity/gen_all.py            # every genf/*.py (15 families)
-    python tests/parity/gen_all.py core       # just these families
-
-A family script writes exactly:
-
-    go/internal/predicates/testdata/predicate_vectors/<family>.json
-    go/internal/markers/testdata/marker_vectors/<family>.json   (only if needed)
-    tests/parity/fixtures/<family>/ , tests/parity/fixtures/<family>_*/
-
-The Go tests GLOB `testdata/predicate_vectors/*.json` and
-`testdata/marker_vectors/*.json` and replay every file, and
-`tests/parity/test_go_parity.py` discovers every fixture directory — so adding
-a family means ADDING files, never editing shared ones. The full contract
-(what a family agent may and may not touch) is the "Per-family porting recipe"
-section of [DESIGN.md](DESIGN.md).
+The Go predicate/marker replay vectors under
+`go/internal/predicates/testdata/` and `go/internal/markers/testdata/` are
+committed static fixtures (the Python↔Go parity harness that once generated them
+was retired in phase 4c once the CAR tests moved onto the Go engine). The CAR
+behaviour is exercised end to end by the Python map tests, which now drive
+`byakugan-parse` directly (tests/go_engine.py).
 
 ## Known, deliberate deltas from Python
 

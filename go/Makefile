@@ -5,8 +5,8 @@ GO ?= go
 build:
 	$(GO) build -o bin/byakugan-parse ./cmd/byakugan-parse
 
-# Regenerate the embedded ir.json from the Go authoring layer (the Go-native
-# replacement for `python -m byakugan.export_ir`). Byte-identical output.
+# Regenerate the embedded ir.json from the Go authoring layer
+# (go/internal/authoring) — the single source of truth for the map tables.
 gen-ir: build
 	./bin/byakugan-parse gen-ir --out internal/ir/ir.json
 

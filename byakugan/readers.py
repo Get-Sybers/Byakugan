@@ -3,8 +3,8 @@
 Mapped artefacts (files whose rows go through a per-artefact map) are read and
 normalized by the GO PARSE ENGINE now — `go/bin/byakugan-parse`, driven by
 `pipeline.parse_events`; the Python line reader (`iter_jsonl`/`iter_mapped`)
-that used to do it is gone, its frozen reference copy living on as the parity
-harness's authority (tests/parity/reference/readers_iter_jsonl.py).
+that used to do it is gone. (A small `iter_jsonl` test-side reader lives on in
+tests/go_engine.py for counting/inspecting fixture rows.)
 
 What stays here is the one source that was never parsed:
 

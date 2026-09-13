@@ -6,8 +6,8 @@ named field, per (channel, EventId), and that the unchanged evtx maps consume th
 result. Phase 4c drives it end-to-end through the Go engine's own winevt adapter
 (go_events(..., adapter="winevt")): a raw wrapped Plaso row is reshaped and mapped
 in one pass, so the CAR values below prove the positional->named placement. The
-adapter's field-level shaping is additionally held byte-identical by tests/parity
-(fixture adapter_winevt).
+adapter's field-level shaping is additionally covered by the Go adapter's own
+unit tests (go/internal/adapt).
 """
 from go_engine import go_events
 

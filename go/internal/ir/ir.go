@@ -1,8 +1,8 @@
-// Package ir loads the embedded intermediate representation — the JSON
-// snapshot of the live Python parse tables that `python -m byakugan.export_ir`
-// serializes to ir.json (the committed file this package embeds). The IR is
-// the single source of truth the Go engine parses from; `--check` in CI holds
-// it in step with the Python tables.
+// Package ir loads the embedded intermediate representation — the JSON that the
+// Go authoring layer (go/internal/authoring) serializes to ir.json via
+// `byakugan-parse gen-ir` (the committed file this package embeds). The IR is
+// the single source of truth the Go engine parses from; `gen-ir --check` in CI
+// holds it in step with the authoring tables.
 //
 // Stage A exposes the raw pyjson document plus path navigation and a
 // structural validation; the resolver walks the decoded pyjson values directly.

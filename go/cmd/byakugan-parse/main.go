@@ -284,7 +284,7 @@ func cmdIrCheck(args []string) int {
 	names, ok := ir.Get(doc, "predicate_names").([]pyjson.Value)
 	if !ok {
 		fmt.Fprintln(os.Stderr, "byakugan-parse ir-check: embedded IR has no "+
-			"predicate_names list (rebuild: python -m byakugan.export_ir)")
+			"predicate_names list (rebuild: byakugan-parse gen-ir --out go/internal/ir/ir.json)")
 		return 1
 	}
 	irNames := make([]string, 0, len(names))
@@ -311,7 +311,7 @@ func cmdIrCheck(args []string) int {
 		}
 		if !bytes.Equal(data, ir.Raw()) {
 			fmt.Fprintf(os.Stderr, "byakugan-parse ir-check: %s differs from the embedded IR "+
-				"(rebuild: python -m byakugan.export_ir && make -C go build)\n", *in)
+				"(rebuild: byakugan-parse gen-ir --out go/internal/ir/ir.json && make -C go build)\n", *in)
 			return 1
 		}
 	}

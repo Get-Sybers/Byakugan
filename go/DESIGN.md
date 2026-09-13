@@ -17,7 +17,9 @@ adapters/jlecmd.py — the whole `byakugan/adapters/` package.
 readers.load_piiat_car (sqlite passthrough) stays in Python.
 
 ## Single source of truth: the IR
-`byakugan/export_ir.py` (new) serializes the live Python tables to `go/internal/ir/ir.json`:
+The Go authoring layer (`go/internal/authoring`) is the source of truth for the map
+tables and serializes them to `go/internal/ir/ir.json` (Python `mappings/_from_ir.py`
+decodes the same file). The IR document:
 - mappings: per artefact key {object, action, ts, guid, host, owning_pid, owning_guid, parent_pid,
   props: [[col, marker]...] (ordered pairs), keep: [...], native_extract: [[name, marker]...],
   variants: [[predicate_name, submap]...], default: submap|null}. Markers serialize as nested
@@ -26,10 +28,10 @@ readers.load_piiat_car (sqlite passthrough) stays in Python.
 - routes: ordered [substring_pattern, [keys]] pairs + evtx_maps list (content-routed set).
 - spindle: full registry parsed from spindle.yml re-serialized as JSON (entries: identity field
   paths, version ints, scope, external forms, positional fallback [SourceImage, RecordId] v1).
-- canon_user: the _canon_user well-known tables from normalize.py.
+- canon_user: the _canon_user well-known tables (mirrored in normalize.py).
 - predicate_names: sorted list (Go completeness check: every name must be registered in Go).
-CLI: `python -m byakugan.export_ir [--out go/internal/ir/ir.json] [--check]`. `--check` byte-compares
-(CI gate, like gen_sources --check). ir.json is committed; Go embeds it via go:embed.
+CLI: `byakugan-parse gen-ir [--out go/internal/ir/ir.json | --check PATH]` (or `make -C go gen-ir`).
+`--check` byte-compares (CI gate). ir.json is committed; Go embeds it via go:embed.
 The exporter must serialize markers by structure (tuples), never by repr.
 MARKER ENCODING must be unambiguous (JSON loses Python's tuple-vs-list distinction):
 a marker tuple ("kind", args...) serializes as {"!": ["kind", <arg>...]} where each arg is
@@ -215,8 +217,8 @@ source / --batch (+idempotent skip, --force) / --derive --stix / explicit --arte
 memory passthrough) produced byte-identical `car_<object>.jsonl`, `sources.yaml`,
 `stix_bundle.json`, car.db + superset.db SQL dumps, summary JSON lines and exit codes against a
 worktree of the pre-wiring commit — 211/211 files identical.
-CI (lint.yml): go toolchain setup, `python -m byakugan.export_ir --check`, gofmt,
-`make -C go build test`, `ir-check`, parity tests inside pytest — all in place.
+CI (lint.yml): go toolchain setup, gofmt, `make -C go build test`, `ir-check`,
+`gen-ir --check`, and the CAR map tests (which drive byakugan-parse) inside pytest.
 
 ## Benchmark (report numbers honestly)
 scripts/bench-parse.py: synthesize 500k-line EvtxECmd JSONL, 1M-line raw l2t container,

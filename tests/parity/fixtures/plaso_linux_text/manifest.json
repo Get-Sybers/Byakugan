@@ -1,8 +1,0 @@
-{
- "artefacts": [
-  "l2t_text"
- ],
- "host": "dualserver",
- "adapter": "none",
- "input": "input.jsonl"
-}
