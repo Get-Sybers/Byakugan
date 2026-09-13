@@ -6,7 +6,8 @@ with the queried name in `fqdn` and the answers in native. enrich then reads the
 bare connection to 100.101.0.42 reads as scoring-c2.berylia.org (the C2 chain
 the value hunt found, which no CAR field carried).
 """
-from byakugan import enrich, normalize
+from byakugan import enrich
+from go_engine import go_normalize
 
 _DNS = {"ts": "2024-04-21T06:35:26.141718Z", "uid": "CEVUbS3iLfbmi3l6Yi",
         "id.orig_h": "10.0.0.5", "id.orig_p": 49389,
@@ -16,7 +17,7 @@ _DNS = {"ts": "2024-04-21T06:35:26.141718Z", "uid": "CEVUbS3iLfbmi3l6Yi",
 
 
 def test_dns_record_maps_to_a_flow_with_the_query_and_answers():
-    ev = normalize.normalize("zeek_dns", dict(_DNS))
+    ev = go_normalize("zeek_dns", dict(_DNS))
     assert ev["car_object"] == "flow" and ev["car_action"] == "message"
     assert ev["application_protocol"] == "dns"
     assert ev["fqdn"] == "scoring-c2.berylia.org"          # the queried name
@@ -27,13 +28,13 @@ def test_dns_record_maps_to_a_flow_with_the_query_and_answers():
 
 
 def test_two_queries_on_one_connection_are_distinct_rows():
-    a = normalize.normalize("zeek_dns", dict(_DNS, trans_id=1, query="a.example"))
-    b = normalize.normalize("zeek_dns", dict(_DNS, trans_id=2, query="b.example"))
+    a = go_normalize("zeek_dns", dict(_DNS, trans_id=1, query="a.example"))
+    b = go_normalize("zeek_dns", dict(_DNS, trans_id=2, query="b.example"))
     assert a["guid"] != b["guid"]                          # not folded into one
 
 
 def test_enrich_stamps_the_resolved_domain_onto_the_connection():
-    dns = normalize.normalize("zeek_dns", dict(_DNS))
+    dns = go_normalize("zeek_dns", dict(_DNS))
     dns["source_host"] = "cap"
     # a bare conn flow to the resolved IP — no fqdn of its own
     conn = {"car_object": "flow", "car_action": "end", "guid": "conn-1",
@@ -45,7 +46,7 @@ def test_enrich_stamps_the_resolved_domain_onto_the_connection():
 
 
 def test_enrich_ignores_cname_answers_only_ips_resolve():
-    dns = normalize.normalize("zeek_dns", dict(
+    dns = go_normalize("zeek_dns", dict(
         _DNS, query="www.example.com", answers=["cdn.example.net"]))   # a CNAME, not an IP
     dns["source_host"] = "cap"
     conn = {"car_object": "flow", "car_action": "end", "guid": "conn-2",

@@ -13,7 +13,8 @@ import os
 
 import pytest
 
-from byakugan import normalize, pipeline
+from byakugan import pipeline
+from go_engine import go_normalize
 
 _EVIDENCE = ("/opt/github/DX_DFIR/data_store/processed/windows_logs/lonewolf"
              "/Windows/System32/winevt/Logs")
@@ -47,7 +48,7 @@ _4624_DATA = {
 
 
 def test_4624_interactive_login():
-    ev = normalize.normalize("evtx_security_sessions", _evtx(4624, "Security", _4624_DATA))
+    ev = go_normalize("evtx_security_sessions", _evtx(4624, "Security", _4624_DATA))
     assert ev["car_object"] == "user_session" and ev["car_action"] == "login"
     assert ev["login_type"] == "interactive"                 # LogonType 2
     assert ev["login_successful"] is True                    # the event's own assertion
@@ -68,7 +69,7 @@ def test_4624_login_type_vocabulary():
     # LogonType 3 → remote; 10 → rdp; unlisted ints (0/5/11/...) → honest null
     for lt, expected in (("3", "remote"), ("10", "rdp"), ("0", None),
                          ("5", None), ("11", None)):
-        ev = normalize.normalize("evtx_security_sessions",
+        ev = go_normalize("evtx_security_sessions",
                                  _evtx(4624, "Security", dict(_4624_DATA, LogonType=lt)))
         assert ev["car_action"] == "login" and ev["login_type"] == expected, lt
 
@@ -76,7 +77,7 @@ def test_4624_login_type_vocabulary():
 def test_4624_logon_type_7_is_unlock_action_not_a_type():
     # LogonType 7 = "workstation was unlocked": the canonical unlock ACTION.
     # login_type stays null — unlock relogons occur on console AND rdp alike.
-    ev = normalize.normalize("evtx_security_sessions",
+    ev = go_normalize("evtx_security_sessions",
                              _evtx(4624, "Security", dict(_4624_DATA, LogonType="7")))
     assert ev["car_action"] == "unlock" and ev["login_type"] is None
     assert ev["login_successful"] is True
@@ -84,15 +85,15 @@ def test_4624_logon_type_7_is_unlock_action_not_a_type():
 
 def test_4624_network_logon_src_endpoint():
     data = dict(_4624_DATA, LogonType="3", IpAddress="10.0.0.9", IpPort="49731")
-    ev = normalize.normalize("evtx_security_sessions", _evtx(4624, "Security", data))
+    ev = go_normalize("evtx_security_sessions", _evtx(4624, "Security", data))
     assert ev["src_ip"] == "10.0.0.9" and ev["src_port"] == "49731"
     # loopback origins carry no origin information — nulled per the view
     for ip in ("127.0.0.1", "::1"):
-        ev = normalize.normalize("evtx_security_sessions",
+        ev = go_normalize("evtx_security_sessions",
                                  _evtx(4624, "Security", dict(data, IpAddress=ip)))
         assert ev["src_ip"] is None, ip
     # port "0" means no port
-    ev = normalize.normalize("evtx_security_sessions",
+    ev = go_normalize("evtx_security_sessions",
                              _evtx(4624, "Security", dict(data, IpPort="0")))
     assert ev["src_port"] is None
 
@@ -103,12 +104,12 @@ def test_4634_and_4647_are_logout():
     data = {"TargetUserSid": "S-1-5-21-1-2-3-1000", "TargetUserName": "defaultuser0",
             "TargetDomainName": "DESKTOP-PM6C56D", "TargetLogonId": "0x18846",
             "LogonType": "2"}
-    ev = normalize.normalize("evtx_security_sessions", _evtx(4634, "Security", data))
+    ev = go_normalize("evtx_security_sessions", _evtx(4634, "Security", data))
     assert ev["car_action"] == "logout" and ev["login_id"] == "0x18846"
     assert ev["login_type"] == "interactive"     # the session that ended was one
     assert ev.get("login_successful") is None    # a logoff records no login decision
     del data["LogonType"]                        # 4647 carries no LogonType
-    ev = normalize.normalize("evtx_security_sessions", _evtx(4647, "Security", data))
+    ev = go_normalize("evtx_security_sessions", _evtx(4647, "Security", data))
     assert ev["car_action"] == "logout" and ev["login_type"] is None
 
 
@@ -119,7 +120,7 @@ def test_4779_disconnect_is_logout_with_477x_field_names():
     data = {"AccountName": "jcloudy", "AccountDomain": "DESKTOP-PM6C56D",
             "LogonID": "0x2A5E1", "SessionName": "RDP-Tcp#1",
             "ClientName": "ATTACKER-PC", "ClientAddress": "192.168.1.50"}
-    ev = normalize.normalize("evtx_security_sessions", _evtx(4779, "Security", data))
+    ev = go_normalize("evtx_security_sessions", _evtx(4779, "Security", data))
     assert ev["car_object"] == "user_session" and ev["car_action"] == "logout"
     assert ev["user"] == "jcloudy" and ev["login_id"] == "0x2A5E1"
     assert ev["src_ip"] == "192.168.1.50"
@@ -133,10 +134,10 @@ def test_4778_reconnect_and_local_console_address():
     data = {"AccountName": "jcloudy", "LogonID": "0x2A5E1",
             "SessionName": "Console", "ClientName": "WIN-1M3263ACE5D",
             "ClientAddress": "LOCAL"}
-    ev = normalize.normalize("evtx_security_sessions", _evtx(4778, "Security", data))
+    ev = go_normalize("evtx_security_sessions", _evtx(4778, "Security", data))
     assert ev["car_action"] == "reconnect"
     assert ev["src_ip"] is None                  # "LOCAL" is not an IP — nulled
-    ev = normalize.normalize("evtx_security_sessions",
+    ev = go_normalize("evtx_security_sessions",
                              _evtx(4778, "Security", dict(data, ClientAddress="10.4.4.4")))
     assert ev["src_ip"] == "10.4.4.4"
 
@@ -147,9 +148,9 @@ def test_failures_and_non_session_events_stay_raw():
     # 4625: a FAILED logon opens no session; 4648: issuance, no outcome;
     # 4800/4801 lock events are outside this artefact's scope; wrong channel.
     for eid in (4625, 4648, 4688, 4800, 4801):
-        assert normalize.normalize("evtx_security_sessions",
+        assert go_normalize("evtx_security_sessions",
                                    _evtx(eid, "Security", _4624_DATA)) is None, eid
-    assert normalize.normalize("evtx_security_sessions",
+    assert go_normalize("evtx_security_sessions",
                                _evtx(4624, "System", _4624_DATA)) is None
 
 
@@ -160,7 +161,7 @@ def test_7045_service_create():
             "ImagePath": "C:\\Windows\\system32\\svchost.exe -k netsvcs",
             "ServiceType": "user mode service", "StartType": "auto start",
             "AccountName": "LocalSystem"}
-    ev = normalize.normalize("evtx_services",
+    ev = go_normalize("evtx_services",
                              _evtx(7045, "System", data, UserId="S-1-5-18"))
     assert ev["car_object"] == "service" and ev["car_action"] == "create"
     assert ev["name"] == "EvilSvc"
@@ -189,7 +190,7 @@ def test_4697_service_create_field_names():
             "ServiceName": "PwnSvc", "ServiceFileName": "C:\\Tools\\pwn.exe",
             "ServiceType": "0x10", "ServiceStartType": "2",
             "ServiceAccount": "LocalSystem"}
-    ev = normalize.normalize("evtx_services", _evtx(4697, "Security", data))
+    ev = go_normalize("evtx_services", _evtx(4697, "Security", data))
     assert ev["car_action"] == "create" and ev["name"] == "PwnSvc"
     assert ev["image_path"] == "C:\\Tools\\pwn.exe" and ev["exe"] == "pwn.exe"
     assert ev["command_line"] == "C:\\Tools\\pwn.exe"
@@ -200,16 +201,16 @@ def test_4697_service_create_field_names():
 
 def test_service_fqdn_when_computer_is_one():
     data = {"ServiceName": "S", "ImagePath": "C:\\x.exe"}
-    ev = normalize.normalize("evtx_services",
+    ev = go_normalize("evtx_services",
                              _evtx(7045, "System", data, Computer="HOST1.example.com"))
     assert ev["fqdn"] == "HOST1.example.com" and ev["hostname"] == "HOST1"
 
 
 def test_service_wrong_channel_and_ids_stay_raw():
     data = {"ServiceName": "S", "ImagePath": "C:\\x.exe"}
-    assert normalize.normalize("evtx_services", _evtx(7045, "Security", data)) is None
-    assert normalize.normalize("evtx_services", _evtx(4697, "System", data)) is None
-    assert normalize.normalize("evtx_services", _evtx(7036, "System", data)) is None
+    assert go_normalize("evtx_services", _evtx(7045, "Security", data)) is None
+    assert go_normalize("evtx_services", _evtx(4697, "System", data)) is None
+    assert go_normalize("evtx_services", _evtx(7036, "System", data)) is None
 
 
 # --- real evidence (lonewolf) ------------------------------------------------
@@ -253,7 +254,7 @@ def test_real_cross_feed_yields_nothing_wrong():
     assert pipeline.parse_events(_SYSTEM, ["evtx_security_sessions"]) == []
 
 
-def _sec_4688(**over):
+def _sec_4688_parent(**over):
     import json
     data = [
         {"@Name": "SubjectUserSid", "#text": "S-1-5-18"},
@@ -276,9 +277,10 @@ def _sec_4688(**over):
     return rec
 
 
-def test_sec_4688_is_process_create():
-    from byakugan import normalize
-    ev = normalize.normalize("evtx_process", _sec_4688())
+def test_sec_4688_maps_parent_process_and_subject_user():
+    # the parent-process + subject-user facets of the 4688 map (this fixture
+    # carries ParentProcessName and a named SubjectUserName)
+    ev = go_normalize("evtx_process", _sec_4688_parent())
     assert ev["car_object"] == "process" and ev["car_action"] == "create"
     assert ev["pid"] == 336 and ev["ppid"] == 4          # NewProcessId=0x150, parent=ProcessId
     assert ev["exe"] == "smss.exe" and ev["image_path"] == r"C:\Windows\System32\smss.exe"
@@ -290,7 +292,7 @@ def test_sec_4688_is_process_create():
     assert ev["parent_pid"] == "0x4"                     # raw for enrich's hex-aware join
     assert ev["_native"]["SubjectLogonId"] == "0x3E7"    # process -> user_session key
     # a process running AS a distinct target user keeps that user, not the creator
-    ev2 = normalize.normalize("evtx_process", _sec_4688(Payload=__import__("json").dumps(
+    ev2 = go_normalize("evtx_process", _sec_4688_parent(Payload=__import__("json").dumps(
         {"EventData": {"Data": [
             {"@Name": "SubjectUserSid", "#text": "S-1-5-18"},
             {"@Name": "NewProcessId", "#text": "0x10"}, {"@Name": "ProcessId", "#text": "0x4"},
@@ -300,11 +302,10 @@ def test_sec_4688_is_process_create():
     assert ev2["user"] == "alice" and ev2["sid"] == "S-1-5-21-1-1-1-1001"
 
 
-def test_sec_4688_not_claimed_by_other_evtx_maps():
-    from byakugan import normalize
-    assert normalize.normalize("evtx_security", _sec_4688()) is None       # not auth
-    assert normalize.normalize("evtx_security_sessions", _sec_4688()) is None
-    assert normalize.normalize("evtx_services", _sec_4688()) is None
+def test_sec_4688_parent_not_claimed_by_other_maps():
+    assert go_normalize("evtx_security", _sec_4688_parent()) is None       # not auth
+    assert go_normalize("evtx_security_sessions", _sec_4688_parent()) is None
+    assert go_normalize("evtx_services", _sec_4688_parent()) is None
 
 
 def _sec_4688(**over):
@@ -330,8 +331,7 @@ def _sec_4688(**over):
 
 
 def test_sec_4688_is_process_create():
-    from byakugan import normalize
-    ev = normalize.normalize("evtx_process", _sec_4688())
+    ev = go_normalize("evtx_process", _sec_4688())
     assert ev["car_object"] == "process" and ev["car_action"] == "create"
     assert ev["pid"] == 0x150 and ev["ppid"] == 4        # NewProcessId / ProcessId(parent), hex->int
     assert ev["exe"] == "smss.exe"
@@ -352,12 +352,11 @@ def test_sec_4688_is_process_create():
         {"@Name": "TargetUserSid", "#text": "S-1-5-21-1-2-3-1001"},
         {"@Name": "TargetUserName", "#text": "alice"},
     ]}})
-    r2 = normalize.normalize("evtx_process", runas)
+    r2 = go_normalize("evtx_process", runas)
     assert r2["user"] == "alice" and r2["sid"] == "S-1-5-21-1-2-3-1001"
 
 
 def test_sec_4688_not_claimed_by_other_evtx_maps():
-    from byakugan import normalize
     # a 4688 is a process, not a session/service/auth
-    assert normalize.normalize("evtx_security_sessions", _sec_4688()) is None
-    assert normalize.normalize("evtx_services", _sec_4688()) is None
+    assert go_normalize("evtx_security_sessions", _sec_4688()) is None
+    assert go_normalize("evtx_services", _sec_4688()) is None

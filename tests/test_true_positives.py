@@ -13,7 +13,8 @@ produces for the same event.
 import json
 import os
 
-from byakugan import enrich, normalize
+from byakugan import enrich
+from go_engine import go_normalize
 
 _FIX = os.path.join(os.path.dirname(__file__), "fixtures")
 
@@ -50,7 +51,7 @@ def test_createremotethread_guid_cascade():
     m = json.load(open(os.path.join(_FIX, "CAR-2013-10-002-mordor-01-snippet.json")))
     assert m["event_id"] == 8
 
-    thread = normalize.normalize("evtx_sysmon", _mordor_thread_to_evtxecmd(m))
+    thread = go_normalize("evtx_sysmon", _mordor_thread_to_evtxecmd(m))
     assert thread is not None
     assert thread["car_object"] == "thread"
     assert thread["car_action"] == "remote_create"
@@ -59,10 +60,10 @@ def test_createremotethread_guid_cascade():
     assert thread["_native"]["TargetProcessGuid"] == m["process_target_guid"]
 
     # give the cascade the two processes this event names, then enrich
-    src = normalize.normalize("evtx_sysmon", _evtxecmd(2, 1, "Microsoft-Windows-Sysmon", {
+    src = go_normalize("evtx_sysmon", _evtxecmd(2, 1, "Microsoft-Windows-Sysmon", {
         "ProcessGuid": m["process_guid"], "ProcessId": m["process_id"],
         "Image": m["process_path"]}))
-    tgt = normalize.normalize("evtx_sysmon", _evtxecmd(3, 1, "Microsoft-Windows-Sysmon", {
+    tgt = go_normalize("evtx_sysmon", _evtxecmd(3, 1, "Microsoft-Windows-Sysmon", {
         "ProcessGuid": m["process_target_guid"], "ProcessId": m["process_target_id"],
         "Image": m["process_target_path"]}))
     out = enrich.enrich([thread, src, tgt])

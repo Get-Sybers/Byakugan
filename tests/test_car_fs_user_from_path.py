@@ -16,7 +16,7 @@ stays an honest null.
 """
 from __future__ import annotations
 
-from byakugan import normalize
+from go_engine import go_normalize
 
 
 def _wrap(record, ts="2018-04-05T12:00:00.000000Z"):
@@ -32,7 +32,7 @@ def test_registry_derives_user_from_per_user_hive_path():
            "key_path": r"HKEY_CURRENT_USER\Software\Foo",
            "display_name": r"VSS2:NTFS:\Users\jcloudy\NTUSER.DAT",
            "image_hostname": "DESKTOP-PM6C56D", "username": "-"}
-    ev = normalize.normalize("plaso_registry", _wrap(rec))
+    ev = go_normalize("plaso_registry", _wrap(rec))
     assert ev is not None and ev["car_object"] == "registry"
     assert ev["user"] == "jcloudy"
     # the retired dead SID extract must not reappear
@@ -44,7 +44,7 @@ def test_registry_system_hive_has_no_user():
            "key_path": r"HKEY_LOCAL_MACHINE\System\ControlSet001\Services\foo",
            "display_name": r"NTFS:\Windows\System32\config\SYSTEM",
            "image_hostname": "DESKTOP-PM6C56D", "username": "-"}
-    ev = normalize.normalize("plaso_registry", _wrap(rec))
+    ev = go_normalize("plaso_registry", _wrap(rec))
     assert ev is not None and ev.get("user") is None      # honest null
 
 
@@ -54,7 +54,7 @@ def test_registry_real_username_wins_over_path():
            "key_path": r"HKEY_CURRENT_USER\Software\Foo",
            "display_name": r"NTFS:\Users\jcloudy\NTUSER.DAT",
            "image_hostname": "DESKTOP-PM6C56D", "username": "REALDOM\\real"}
-    ev = normalize.normalize("plaso_registry", _wrap(rec))
+    ev = go_normalize("plaso_registry", _wrap(rec))
     assert ev["user"] == "REALDOM\\real"
 
 
@@ -70,7 +70,7 @@ def test_shellitem_derives_user_from_artefact_path():
            "shell_item_path": r"<My Computer> C:\Windows\System32\cmd.exe",
            "long_name": "cmd.exe", "name": "cmd.exe",
            "image_hostname": "DESKTOP-PM6C56D"}
-    ev = normalize.normalize("plaso_shellitem", _wrap(rec))
+    ev = go_normalize("plaso_shellitem", _wrap(rec))
     assert ev is not None and ev["car_object"] == "file"
     assert ev["user"] == "jcloudy"
 
@@ -84,7 +84,7 @@ def test_shellitem_system_origin_has_no_user():
            "shell_item_path": r"<My Computer> C:\Windows\SysWOW64\cmd.exe",
            "long_name": "cmd.exe", "name": "cmd.exe",
            "image_hostname": "DESKTOP-PM6C56D"}
-    ev = normalize.normalize("plaso_shellitem", _wrap(rec))
+    ev = go_normalize("plaso_shellitem", _wrap(rec))
     assert ev is not None and ev.get("user") is None
 
 
@@ -96,7 +96,7 @@ def test_lnk_derives_user_from_recent_folder_path():
            "display_name": (r"NTFS:\Users\jcloudy\AppData\Roaming\Microsoft"
                             r"\Windows\Recent\notepad.lnk"),
            "image_hostname": "DESKTOP-PM6C56D", "username": "-"}
-    ev = normalize.normalize("l2t_lnk", _wrap(rec))
+    ev = go_normalize("l2t_lnk", _wrap(rec))
     assert ev is not None and ev["car_object"] == "file"
     assert ev["user"] == "jcloudy"
 
@@ -113,7 +113,7 @@ def test_recyclebin_derives_user_and_sid_uid_from_path():
                             r"\$IQAU6NQ"),
            "file_size": 5092043, "record_index": 1,
            "image_hostname": "DESKTOP-PM6C56D", "username": "-"}
-    ev = normalize.normalize("l2t_recyclebin", _wrap(rec))
+    ev = go_normalize("l2t_recyclebin", _wrap(rec))
     assert ev is not None and ev["car_action"] == "delete"
     # the original path names the owning user…
     assert ev["user"] == "jcloudy"
@@ -130,7 +130,7 @@ def test_user_from_path_is_case_insensitive():
            "key_path": r"HKEY_CURRENT_USER\Software\Foo",
            "display_name": r"NTFS:\users\jcloudy\ntuser.dat",   # lower-case \users\
            "image_hostname": "DESKTOP-PM6C56D", "username": "-"}
-    ev = normalize.normalize("plaso_registry", _wrap(rec))
+    ev = go_normalize("plaso_registry", _wrap(rec))
     # matched despite the casing; the captured name keeps its own case
     assert ev["user"] == "jcloudy"
 
@@ -144,6 +144,6 @@ def test_recyclebin_sid_uid_is_case_insensitive():
                             r"\$IQAU6NQ"),
            "file_size": 1, "record_index": 1,
            "image_hostname": "DESKTOP-PM6C56D", "username": "-"}
-    ev = normalize.normalize("l2t_recyclebin", _wrap(rec))
+    ev = go_normalize("l2t_recyclebin", _wrap(rec))
     assert ev["user"] == "jcloudy"
     assert ev["uid"] == "S-1-5-21-2734969515-1644526556-1039763013-1001"

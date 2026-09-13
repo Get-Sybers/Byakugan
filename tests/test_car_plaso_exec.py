@@ -14,7 +14,8 @@ from __future__ import annotations
 import json
 import os
 
-from byakugan import normalize, pipeline
+from byakugan import pipeline
+from go_engine import go_normalize
 
 from byakugan import carmodel as _cm
 
@@ -169,7 +170,7 @@ _CRON = {
 # --- prefetch ---------------------------------------------------------------
 
 def test_prefetch_execution_maps_to_process_create():
-    ev = normalize.normalize("plaso_exec_prefetch", _PREFETCH_EXEC)
+    ev = go_normalize("plaso_exec_prefetch", _PREFETCH_EXEC)
     assert ev is not None
     assert ev["car_object"] == "process" and ev["car_action"] == "create"
     assert ev["timestamp"] == "2009-11-20T09:31:29.671875Z"
@@ -186,13 +187,13 @@ def test_prefetch_execution_maps_to_process_create():
 
 
 def test_prefetch_volume_creation_stays_raw():
-    assert normalize.normalize("plaso_exec_prefetch", _PREFETCH_VOLUME) is None
+    assert go_normalize("plaso_exec_prefetch", _PREFETCH_VOLUME) is None
 
 
 # --- winreg family ----------------------------------------------------------
 
 def test_appcompatcache_maps_path_verbatim():
-    ev = normalize.normalize("plaso_exec_winreg", _APPCOMPAT)
+    ev = go_normalize("plaso_exec_winreg", _APPCOMPAT)
     assert ev is not None
     assert ev["car_action"] == "create"
     assert ev["image_path"] == "\\??\\C:\\WINDOWS\\system32\\hkcmd.exe"
@@ -202,7 +203,7 @@ def test_appcompatcache_maps_path_verbatim():
 
 
 def test_appcompatcache_execution_is_labelled_inferred():
-    ev = normalize.normalize("plaso_exec_winreg", _APPCOMPAT)
+    ev = go_normalize("plaso_exec_winreg", _APPCOMPAT)
     # the row is KEPT (analysts expect it): process create at the cached
     # file's $SI mtime — but never as a bare assertion of a run at that time
     assert ev["car_object"] == "process" and ev["car_action"] == "create"
@@ -218,14 +219,14 @@ def test_appcompatcache_execution_is_labelled_inferred():
             ("", "cache entry timestamp (see timestamp_desc), not run time")):
         rec = json.loads(json.dumps(_APPCOMPAT))
         rec["Record"]["timestamp_desc"] = desc
-        ev = normalize.normalize("plaso_exec_winreg", rec)
+        ev = go_normalize("plaso_exec_winreg", rec)
         assert ev["car_action"] == "create" and ev["timestamp"], desc
         assert ev["_native"]["execution_inferred"] is True, desc
         assert ev["_native"]["time_meaning"] == meaning, desc
 
 
 def test_userassist_runpath_maps_and_derives_user_from_hive_path():
-    ev = normalize.normalize("plaso_exec_winreg", _USERASSIST_RUNPATH)
+    ev = go_normalize("plaso_exec_winreg", _USERASSIST_RUNPATH)
     assert ev is not None
     assert ev["exe"] == "R54402.EXE"
     assert ev["image_path"] == "E:\\R54402.EXE"
@@ -246,7 +247,7 @@ def test_userassist_counters_and_pidl_stay_raw():
                "UEME_RUNPATH", ""):
         rec = json.loads(json.dumps(_USERASSIST_RUNPATH))
         rec["Record"]["value_name"] = vn
-        assert normalize.normalize("plaso_exec_winreg", rec) is None, vn
+        assert go_normalize("plaso_exec_winreg", rec) is None, vn
 
 
 def test_userassist_decoded_bare_name_gets_exe_but_no_image_path():
@@ -254,12 +255,12 @@ def test_userassist_decoded_bare_name_gets_exe_but_no_image_path():
     # full image_path
     rec = json.loads(json.dumps(_USERASSIST_RUNPATH))
     rec["Record"]["value_name"] = "notepad.exe"
-    ev = normalize.normalize("plaso_exec_winreg", rec)
+    ev = go_normalize("plaso_exec_winreg", rec)
     assert ev["exe"] == "notepad.exe" and ev.get("image_path") is None
 
 
 def test_amcache_program_hash_not_hive_hash_and_no_filename_leak():
-    ev = normalize.normalize("plaso_exec_winreg", _AMCACHE)
+    ev = go_normalize("plaso_exec_winreg", _AMCACHE)
     assert ev is not None
     assert ev["car_object"] == "process" and ev["car_action"] == "create"
     assert ev["timestamp"] == "2023-05-01T10:00:00.000000Z"   # the key write
@@ -274,7 +275,7 @@ def test_amcache_program_hash_not_hive_hash_and_no_filename_leak():
 
 
 def test_amcache_link_time_is_a_compile_stamp_never_an_execution():
-    ev = normalize.normalize("plaso_exec_winreg", _AMCACHE_LINK)
+    ev = go_normalize("plaso_exec_winreg", _AMCACHE_LINK)
     assert ev is not None
     # a Link Time is when the binary was COMPILED: never a process create,
     # and never an event at that time — a timestamp-less file record instead
@@ -298,7 +299,7 @@ def test_amcache_link_time_is_a_compile_stamp_never_an_execution():
     assert set(ev["_native"]["spindle_key"]) == {"_obj", "_v", "file_path", "sha1"}
     # nothing on the whole L2tWinreg route turns the compile stamp into a run
     for key in pipeline.route("host.L2tWinreg"):
-        out = normalize.normalize(key, _AMCACHE_LINK)
+        out = go_normalize(key, _AMCACHE_LINK)
         assert out is None or out["car_object"] != "process", key
 
 
@@ -307,19 +308,19 @@ def test_amcache_sha1_ignores_a_malformed_file_identifier():
     # SHA-1 (never a truncated/garbage hash)
     rec = json.loads(json.dumps(_AMCACHE))
     rec["Record"]["file_identifier"] = "deadbeef"           # wrong shape
-    ev = normalize.normalize("plaso_exec_winreg", rec)
+    ev = go_normalize("plaso_exec_winreg", rec)
     assert ev.get("sha1_hash") is None
     # an empty CompanyName is an honest null, not ""
     rec2 = json.loads(json.dumps(_AMCACHE_LINK))
     rec2["Record"]["company_name"] = ""
-    ev2 = normalize.normalize("plaso_exec_winreg", rec2)
+    ev2 = go_normalize("plaso_exec_winreg", rec2)
     assert ev2.get("company") is None
 
 
 def test_amcache_link_time_without_full_path_is_still_no_execution():
     rec = json.loads(json.dumps(_AMCACHE_LINK))
     del rec["Record"]["full_path"]
-    ev = normalize.normalize("plaso_exec_winreg", rec)
+    ev = go_normalize("plaso_exec_winreg", rec)
     assert ev["car_object"] == "file" and ev["timestamp"] is None
     assert ev.get("file_path") is None and ev.get("file_name") is None
 
@@ -327,7 +328,7 @@ def test_amcache_link_time_without_full_path_is_still_no_execution():
 def test_amcache_without_full_path_leaves_paths_null():
     rec = json.loads(json.dumps(_AMCACHE))
     del rec["Record"]["full_path"]
-    ev = normalize.normalize("plaso_exec_winreg", rec)
+    ev = go_normalize("plaso_exec_winreg", rec)
     # filename ("Amcache.hve") is the ARTEFACT — the KQL's fallback onto it is
     # deliberately dropped; null over near-miss
     assert ev is not None
@@ -335,7 +336,7 @@ def test_amcache_without_full_path_leaves_paths_null():
 
 
 def test_bam_maps_sid_natively():
-    ev = normalize.normalize("plaso_exec_winreg", _BAM)
+    ev = go_normalize("plaso_exec_winreg", _BAM)
     assert ev is not None
     assert ev["exe"] == "notepad.exe"
     assert ev["image_path"] == \
@@ -349,13 +350,13 @@ def test_programscache_and_plain_winreg_stay_raw():
         rec = {"SourceImage": "x.jsonl", "Parser": parser,
                "Record": {"parser": parser, "key_path": "HKLM\\X",
                           "image_hostname": "M57-JO"}}
-        assert normalize.normalize("plaso_exec_winreg", rec) is None, parser
+        assert go_normalize("plaso_exec_winreg", rec) is None, parser
 
 
 # --- cron -------------------------------------------------------------------
 
 def test_cron_task_run_maps_command_pid_user():
-    ev = normalize.normalize("plaso_exec_cron", _CRON)
+    ev = go_normalize("plaso_exec_cron", _CRON)
     assert ev is not None
     assert ev["car_object"] == "process" and ev["car_action"] == "create"
     assert ev["command_line"].startswith("test -x /etc/cron.daily/")
@@ -371,7 +372,7 @@ def test_cron_task_run_maps_command_pid_user():
 def test_cron_rooted_first_token_fills_image_path():
     rec = json.loads(json.dumps(_CRON))
     rec["Record"]["command"] = "/usr/lib/php/sessionclean 2>/dev/null"
-    ev = normalize.normalize("plaso_exec_cron", rec)
+    ev = go_normalize("plaso_exec_cron", rec)
     assert ev["image_path"] == "/usr/lib/php/sessionclean"
     assert ev["exe"] == "sessionclean"
 
@@ -379,14 +380,14 @@ def test_cron_rooted_first_token_fills_image_path():
 def test_cron_image_hostname_wins_when_present():
     rec = json.loads(json.dumps(_CRON))
     rec["Record"]["image_hostname"] = "webserver01"
-    ev = normalize.normalize("plaso_exec_cron", rec)
+    ev = go_normalize("plaso_exec_cron", rec)
     assert ev["hostname"] == "webserver01"
 
 
 def test_other_syslog_lines_stay_raw():
     rec = json.loads(json.dumps(_CRON))
     rec["Record"]["data_type"] = "syslog:line"
-    assert normalize.normalize("plaso_exec_cron", rec) is None
+    assert go_normalize("plaso_exec_cron", rec) is None
 
 
 # --- model conformance ------------------------------------------------------

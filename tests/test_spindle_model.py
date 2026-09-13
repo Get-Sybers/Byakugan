@@ -18,7 +18,8 @@ import uuid
 import pytest
 import yaml
 
-from byakugan import enrich, ids, mappings, normalize, pipeline, sources_model, spindle, store
+from byakugan import enrich, ids, mappings, pipeline, sources_model, spindle, store
+from go_engine import go_normalize
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MODEL_SPINDLE = ROOT / "model" / "spindle"
@@ -209,7 +210,7 @@ def test_snapshot_registry_materializes_the_resolved_identities():
     assert doc["equality"]["never"] == "positional"
     # a minted row's key reads _obj, _v, then the entry's declared order, values as strings
     for name, (parser, rec) in _ROWS.items():
-        ev = normalize.normalize(name, _wrap(parser, rec))
+        ev = go_normalize(name, _wrap(parser, rec))
         entry = next(e for e in doc["identities"]
                      if e["map"] == name and set(ev["_native"]["spindle_key"]) - {"_obj", "_v"}
                      == {i["name"] for i in e["identity"]})
@@ -240,17 +241,17 @@ def test_golden_vectors_pin_the_mint_and_gate_the_change_protocol(tmp_path, monk
                                  "key": {"_obj": "file", "_v": 1, "SourceImage": "M57-JO.jsonl", "RecordId": "42"},
                                  "guid": ids.mint("file", {"SourceImage": "M57-JO.jsonl", "RecordId": 42}, 1)[0]}
     # the engine mints the SAME guid for a row carrying the sample (the real M57 rows)
-    usn = normalize.normalize("l2t_usnjrnl", _wrap(*_ROWS["l2t_usnjrnl"]))
+    usn = go_normalize("l2t_usnjrnl", _wrap(*_ROWS["l2t_usnjrnl"]))
     assert usn["guid"] == entries["l2t_usnjrnl"]["guid"]
-    pf = normalize.normalize("plaso_exec_prefetch", _wrap("prefetch", _ROWS["plaso_exec_prefetch"][1],
+    pf = go_normalize("plaso_exec_prefetch", _wrap("prefetch", _ROWS["plaso_exec_prefetch"][1],
                                                           ts="2009-11-20T09:31:29.671875Z"))
     assert pf["guid"] == entries["plaso_exec_prefetch"]["guid"]
-    fs = normalize.normalize("l2t_filestat", _wrap("filestat", {
+    fs = go_normalize("l2t_filestat", _wrap("filestat", {
         "data_type": "fs:stat", "display_name": "NTFS:\\Program Files\\app\\FPEXT.MSG",
         "filename": "\\Program Files\\app\\FPEXT.MSG", "image_hostname": "M57-JO",
         "timestamp_desc": "Content Modification Time"}))
     assert fs["guid"] == entries["l2t_filestat"]["guid"]
-    pos = normalize.normalize("l2t_mft", _wrap("mft", {k: v for k, v in _ROWS["l2t_mft"][1].items()
+    pos = go_normalize("l2t_mft", _wrap("mft", {k: v for k, v in _ROWS["l2t_mft"][1].items()
                                                        if k != "file_reference"}, record_id=42))
     assert pos["guid"] == doc["positional"]["guid"]
     # the gate: against a committed table, a sample (or identity) that moves
@@ -325,7 +326,7 @@ def test_external_forms_are_exactly_the_raw_guid_forms_the_maps_carry():
         assert e["guid"] == spindle.external_vector(spindle.externals()[e["name"]])
         assert e["kind"] == spindle.externals()[e["name"]]["kind"] and e["source"] in ("real", "synthetic")
     # through the maps: the Sysmon row carries the ProcessGuid form, the EVTX record form
-    ev = normalize.normalize("evtx_process", {
+    ev = go_normalize("evtx_process", {
         "EventId": 4688, "Channel": "Security", "Computer": "WIN-1M3263ACE5D", "EventRecordId": 2623,
         "TimeCreated": "2018-03-27T12:11:42Z",
         "Payload": json.dumps({"EventData": {"Data": [{"@Name": "NewProcessName", "#text": r"C:\smss.exe"},
@@ -367,17 +368,17 @@ def test_external_and_equality_drift_is_caught(monkeypatch):
 # the #41 predicate: what may be equated across sources
 # --------------------------------------------------------------------------- #
 def test_equatable_across_sources_is_intrinsic_record_or_entity_or_an_external_form():
-    intrinsic = normalize.normalize("l2t_usnjrnl", _wrap(*_ROWS["l2t_usnjrnl"]))
+    intrinsic = go_normalize("l2t_usnjrnl", _wrap(*_ROWS["l2t_usnjrnl"]))
     assert spindle.entry_of(intrinsic) is spindle.entry("l2t_usnjrnl")
     assert spindle.equatable_across_sources(intrinsic)
     # its stored form too
     assert spindle.equatable_across_sources(dict(intrinsic, native=intrinsic["_native"], _native=None))
     # an entity-kind spindle (a PE, no time) is equatable; a positional row never is
-    pe = normalize.normalize("plaso_pecoff", _wrap("pe", {
+    pe = go_normalize("plaso_pecoff", _wrap("pe", {
         "data_type": "pe_coff:file", "display_name": "NTFS:\\Windows\\System32\\evil.dll",
         "image_hostname": "M57-JO", "sha256_hash": "b5de10a0" + "0" * 56, "timestamp_desc": "Creation Time"}))
     assert spindle.entry_of(pe)["kind"] == "entity" and spindle.equatable_across_sources(pe)
-    pos = normalize.normalize("l2t_mft", _wrap("mft", {k: v for k, v in _ROWS["l2t_mft"][1].items()
+    pos = go_normalize("l2t_mft", _wrap("mft", {k: v for k, v in _ROWS["l2t_mft"][1].items()
                                                        if k != "file_reference"}))
     assert pos["_native"]["spindle_scope"] == "positional" and spindle.entry_of(pos) is None
     assert not spindle.equatable_across_sources(pos)
@@ -415,15 +416,15 @@ def test_record_shape_is_the_car_row_plus_the_two_native_keys():
 
 def test_rows_validate_against_the_record_shape_and_tampering_is_caught():
     for name, (parser, rec) in _ROWS.items():
-        ev = normalize.normalize(name, _wrap(parser, rec))
+        ev = go_normalize(name, _wrap(parser, rec))
         assert spindle.validate_record(ev) == [], name
         # the stored form (native, not _native) validates the same way
         stored = dict(ev, native=ev["_native"])
         del stored["_native"]
         assert spindle.validate_record(stored) == [], name
-    ev = normalize.normalize("l2t_mft", _wrap(*_ROWS["l2t_mft"]))
+    ev = go_normalize("l2t_mft", _wrap(*_ROWS["l2t_mft"]))
     # a positional row validates too
-    pos = normalize.normalize("l2t_mft", _wrap("mft", {k: v for k, v in _ROWS["l2t_mft"][1].items()
+    pos = go_normalize("l2t_mft", _wrap("mft", {k: v for k, v in _ROWS["l2t_mft"][1].items()
                                                        if k != "file_reference"}))
     assert pos["_native"]["spindle_scope"] == "positional" and spindle.validate_record(pos) == []
     # tampering: a non-v5 guid, a foreign v5 guid, a wrong scope, a key naming no entry, a wrong object

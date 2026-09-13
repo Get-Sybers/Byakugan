@@ -12,7 +12,8 @@ from __future__ import annotations
 import json
 import uuid
 
-from byakugan import normalize, pipeline
+from byakugan import pipeline
+from go_engine import go_normalize
 
 _PE_HEADER = {  # synthetic; the header TimeDateStamp row (compile/link time)
     "SourceImage": "log2timeline/jsonl/synth.jsonl",
@@ -44,7 +45,7 @@ def _row(desc=None, data_type=None, ts="2019-06-01T12:34:56.000000Z"):
 
 
 def test_pe_header_stamp_is_a_compile_time_not_a_file_create_event():
-    ev = normalize.normalize("plaso_pecoff", _PE_HEADER)
+    ev = go_normalize("plaso_pecoff", _PE_HEADER)
     assert ev is not None
     assert ev["car_object"] == "file" and ev["car_action"] == "create"
     # the compile time is NOT when the file was created on the host: no
@@ -69,19 +70,19 @@ def test_pe_header_stamp_is_a_compile_time_not_a_file_create_event():
 
 
 def test_pe_table_stamps_and_placeholder_are_records_without_a_time():
-    table = normalize.normalize("plaso_pecoff", _row("Content Modification Time",
+    table = go_normalize("plaso_pecoff", _row("Content Modification Time",
                                                      ts="2019-06-01T12:35:00.000000Z"))
     assert table["car_object"] == "file" and table["car_action"] == "create"
     assert table["timestamp"] is None
     assert table["_native"]["pe_table_time"] == "2019-06-01T12:35:00.000000Z"
     assert "compile_time" not in table["_native"]
     # the placeholder plaso emits for a PE it could not date at all
-    holder = normalize.normalize("plaso_pecoff", _row("Not a time", ts="1970-01-01T00:00:00.000000Z"))
+    holder = go_normalize("plaso_pecoff", _row("Not a time", ts="1970-01-01T00:00:00.000000Z"))
     assert holder["car_object"] == "file" and holder["timestamp"] is None
     assert "compile_time" not in holder["_native"] and "pe_table_time" not in holder["_native"]
     assert holder["sha256_hash"].startswith("b5de10a0")
     # the three rows of ONE PE differ only in native: one entity identity
-    header = normalize.normalize("plaso_pecoff", _PE_HEADER)
+    header = go_normalize("plaso_pecoff", _PE_HEADER)
     assert header["guid"] == table["guid"] == holder["guid"]
 
 
@@ -91,11 +92,11 @@ def test_pe_compile_time_never_yields_a_timestamped_file_event():
     stamped = [_PE_HEADER, _row("Content Modification Time"), _row("Not a time")]
     for key in pipeline.route("host.L2tPe"):
         for rec in stamped:
-            ev = normalize.normalize(key, rec)
+            ev = go_normalize(key, rec)
             assert ev is None or ev["timestamp"] is None, (key, rec["Record"]["timestamp_desc"])
-        assert normalize.normalize(key, _PE_HEADER)["car_action"] != "modify"
+        assert go_normalize(key, _PE_HEADER)["car_action"] != "modify"
 
 
 def test_pe_import_and_resource_rows_stay_raw():
-    assert normalize.normalize("plaso_pecoff", _row(data_type="pe_coff:dll_import")) is None
-    assert normalize.normalize("plaso_pecoff", _row(data_type="pe_coff:resource")) is None
+    assert go_normalize("plaso_pecoff", _row(data_type="pe_coff:dll_import")) is None
+    assert go_normalize("plaso_pecoff", _row(data_type="pe_coff:resource")) is None

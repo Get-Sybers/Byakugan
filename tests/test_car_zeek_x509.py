@@ -2,7 +2,8 @@
 link (B2). The cert's fingerprint IS a SHA-256, so it becomes the file's
 sha256_hash — giving free content-hash convergence — and enrich surfaces the
 cert subject on the TLS flow that presented it (via ssl's cert_chain_fps)."""
-from byakugan import crosssource, enrich, normalize, store
+from byakugan import crosssource, enrich, store
+from go_engine import go_normalize
 
 _FP = "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d"
 _X509 = {"ts": "2024-04-21T06:34:48.870004Z", "fingerprint": _FP,
@@ -14,7 +15,7 @@ _X509 = {"ts": "2024-04-21T06:34:48.870004Z", "fingerprint": _FP,
 
 
 def test_x509_maps_to_a_file_with_the_fingerprint_as_sha256():
-    ev = normalize.normalize("zeek_x509", dict(_X509))
+    ev = go_normalize("zeek_x509", dict(_X509))
     assert ev["car_object"] == "file" and ev["car_action"] == "create"
     assert ev["sha256_hash"] == _FP                    # fingerprint IS the content hash
     assert ev["guid"] == _FP                            # the cert's stable identity
@@ -26,7 +27,7 @@ def test_x509_maps_to_a_file_with_the_fingerprint_as_sha256():
 def test_cert_converges_with_matching_content_by_hash(tmp_path):
     d = str(tmp_path)
     # the cert (x509 -> file, sha256 = fingerprint)
-    ev = normalize.normalize("zeek_x509", dict(_X509))
+    ev = go_normalize("zeek_x509", dict(_X509))
     ev["source_host"] = "cap"
     dd = f"{d}/x509"; import os; os.makedirs(dd)
     st = store.CarStore(f"{dd}/car.db"); st.insert_events([ev]); st.close()
@@ -41,7 +42,7 @@ def test_cert_converges_with_matching_content_by_hash(tmp_path):
 
 
 def test_enrich_surfaces_the_cert_subject_on_the_tls_flow():
-    cert = normalize.normalize("zeek_x509", dict(_X509))
+    cert = go_normalize("zeek_x509", dict(_X509))
     cert["source_host"] = "cap"
     # the TLS flow that presented it — names the fingerprint in cert_chain_fps
     ssl_flow = {"car_object": "flow", "car_action": "message", "guid": "CfPiyA",

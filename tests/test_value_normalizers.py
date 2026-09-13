@@ -11,6 +11,7 @@ byakugan/normalize.py:
 import json
 
 from byakugan import normalize
+from go_engine import go_normalize
 from byakugan.normalize import (lower, user_canon, win_program_name,
                                        win_program_path)
 
@@ -78,7 +79,7 @@ def _sysmon_rec(data):
 def test_sysmon_hash_columns_lowercased_end_to_end():
     # a real Sysmon Hashes string is UPPERCASE; the map stores every hash column
     # (and the native Imphash a Sigma rule tests) LOWERCASE
-    ev = normalize.normalize("evtx_sysmon", _sysmon_rec({
+    ev = go_normalize("evtx_sysmon", _sysmon_rec({
         "UtcTime": "2020-01-01 00:00:00.000", "ProcessGuid": "{g}",
         "ProcessId": "4", "Image": r"C:\x.exe",
         "Hashes": "MD5=AB12CD,SHA1=00FF,SHA256=DEADBEEF,IMPHASH=FF00AA"}))
