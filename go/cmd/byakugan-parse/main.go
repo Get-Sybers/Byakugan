@@ -52,6 +52,8 @@ func run(args []string) int {
 		return cmdSplitL2t(args[1:])
 	case "ir-check":
 		return cmdIrCheck(args[1:])
+	case "gen-ir":
+		return cmdGenIR(args[1:])
 	case "-h", "--help", "help":
 		usage()
 		return 0

@@ -27,6 +27,77 @@ func Canonical(v Value) (string, error) {
 	return b.String(), nil
 }
 
+// DumpsIndent encodes v byte-identically to Python
+// json.dumps(v, indent=n, ensure_ascii=False): each element on its own line,
+// n spaces of indent per depth, ": " after each key, document key order, empty
+// containers inline ({} / []), no trailing whitespace. The form ir.json is
+// committed in (n=1).
+func DumpsIndent(v Value, n int) (string, error) {
+	var b strings.Builder
+	if err := encodeIndent(&b, v, 0, n); err != nil {
+		return "", err
+	}
+	return b.String(), nil
+}
+
+func writeIndent(b *strings.Builder, depth, n int) {
+	for i := 0; i < depth*n; i++ {
+		b.WriteByte(' ')
+	}
+}
+
+func encodeIndent(b *strings.Builder, v Value, depth, n int) error {
+	switch x := v.(type) {
+	case []Value:
+		if len(x) == 0 {
+			b.WriteString("[]")
+			return nil
+		}
+		b.WriteByte('[')
+		for i, e := range x {
+			if i > 0 {
+				b.WriteByte(',')
+			}
+			b.WriteByte('\n')
+			writeIndent(b, depth+1, n)
+			if err := encodeIndent(b, e, depth+1, n); err != nil {
+				return err
+			}
+		}
+		b.WriteByte('\n')
+		writeIndent(b, depth, n)
+		b.WriteByte(']')
+		return nil
+	case *Object:
+		if x.Len() == 0 {
+			b.WriteString("{}")
+			return nil
+		}
+		b.WriteByte('{')
+		for i, k := range x.keys {
+			if i > 0 {
+				b.WriteByte(',')
+			}
+			b.WriteByte('\n')
+			writeIndent(b, depth+1, n)
+			encodeString(b, k, false)
+			b.WriteString(": ")
+			val, _ := x.Get(k)
+			if err := encodeIndent(b, val, depth+1, n); err != nil {
+				return err
+			}
+		}
+		b.WriteByte('\n')
+		writeIndent(b, depth, n)
+		b.WriteByte('}')
+		return nil
+	default:
+		// scalars (nil/bool/string/int/*big.Int/float64): the compact form,
+		// which for a scalar emits no separators.
+		return encode(b, v, ",", ": ", false, false)
+	}
+}
+
 func encode(b *strings.Builder, v Value, item, kv string, ascii, sortKeys bool) error {
 	switch x := v.(type) {
 	case nil:
