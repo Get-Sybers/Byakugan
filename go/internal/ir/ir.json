@@ -18937,6 +18937,29 @@
    }
   },
   "external": {
+   "esedump_srum_application": {
+    "object": "process",
+    "form": {
+     "fields": [
+      "AppId",
+      "UserId",
+      "TimeStamp"
+     ]
+    }
+   },
+   "esedump_srum_network": {
+    "object": "flow",
+    "form": {
+     "fields": [
+      "AppId",
+      "UserId",
+      "InterfaceLuid",
+      "TimeStamp",
+      "BytesSent",
+      "BytesRecvd"
+     ]
+    }
+   },
    "evtx_record": {
     "object": "process",
     "form": {
@@ -18960,6 +18983,15 @@
     "object": "process",
     "form": {
      "form": "proc-{hex}"
+    }
+   },
+   "prefetch_dump_pf": {
+    "object": "process",
+    "form": {
+     "fields": [
+      "Executable",
+      "Hash"
+     ]
     }
    },
    "recmd_value": {
@@ -19534,6 +19566,33 @@
   ],
   "external": [
    {
+    "name": "esedump_srum_application",
+    "kind": "record",
+    "source": "real",
+    "car_object": "process",
+    "values": {
+     "AppId": 388,
+     "UserId": 951,
+     "TimeStamp": "2024-02-20T07:50:59Z"
+    },
+    "guid": "process-388-951-2024-02-20T07:50:59Z"
+   },
+   {
+    "name": "esedump_srum_network",
+    "kind": "record",
+    "source": "real",
+    "car_object": "flow",
+    "values": {
+     "AppId": 102,
+     "UserId": 8,
+     "InterfaceLuid": 1689399632855040,
+     "TimeStamp": "2024-02-20T07:50:00Z",
+     "BytesSent": 2100,
+     "BytesRecvd": 1440
+    },
+    "guid": "flow-102-8-1689399632855040-2024-02-20T07:50:00Z-2100-1440"
+   },
+   {
     "name": "evtx_record",
     "kind": "record",
     "source": "real",
@@ -19565,6 +19624,17 @@
      "offset": 6699
     },
     "guid": "proc-1a2b"
+   },
+   {
+    "name": "prefetch_dump_pf",
+    "kind": "entity",
+    "source": "real",
+    "car_object": "process",
+    "values": {
+     "Executable": "ADDINUTIL.EXE",
+     "Hash": "0x4E6085D4"
+    },
+    "guid": "process-ADDINUTIL.EXE-0x4E6085D4"
    },
    {
     "name": "recmd_value",
