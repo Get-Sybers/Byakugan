@@ -27,6 +27,10 @@ Issues = "https://github.com/Get-Sybers/byakugan/issues"
 
 [project.scripts]
 byakugan = "byakugan.pipeline:main"
+# One-release compat alias for the pre-rename console script, pointing at the
+# same entry point, so existing `piiat-mitrecar` CLI users aren't broken. Removed
+# together with the piiat_mitrecar shim after this release.
+piiat-mitrecar = "byakugan.pipeline:main"
 
 [tool.setuptools]
 # byakugan.adapters is gone: the winevt/jlecmd/l2t-split plumbing it held now
@@ -34,6 +38,13 @@ byakugan = "byakugan.pipeline:main"
 # piiat_mitrecar.adapters went with it.
 packages = ["byakugan", "byakugan.mappings",
             "piiat_mitrecar", "piiat_mitrecar.mappings"]
+
+[tool.pytest.ini_options]
+# tests/ holds shared helpers (reference_plumbing.py) that the test modules
+# import as top-level modules (`from reference_plumbing import ...`). Put tests/
+# on sys.path explicitly so collection works regardless of pytest's import mode
+# or the directory pytest is invoked from.
+pythonpath = ["tests"]
 
 [tool.setuptools.package-data]
 # the CAR/superset models + ATT&CK relationships are reconstructed live from the

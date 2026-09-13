@@ -1,9 +1,20 @@
 """Compat shim for the ``piiat_mitrecar`` -> ``byakugan`` import-package rename.
 
 The repository, distribution, console script and import package are all named
-**byakugan** now (issue #71). This package forwards every module and ``-m``
-entry point to :mod:`byakugan` so existing imports and invocations keep working
-for ONE release; it will then be removed — switch to ``import byakugan``.
+**byakugan** now (issue #71). For ONE release this shim preserves the old
+surface so existing users aren't broken:
+
+* ``import piiat_mitrecar`` / ``from piiat_mitrecar import ...`` re-export
+  everything from :mod:`byakugan` (via the ``from byakugan import *`` below);
+* ``python -m piiat_mitrecar`` forwards to the byakugan pipeline CLI (see
+  ``piiat_mitrecar/__main__.py``);
+* the ``piiat-mitrecar`` console script survives as an alias for ``byakugan``
+  (declared in pyproject ``[project.scripts]``).
+
+One thing does NOT carry over: the old ``piiat_mitrecar.adapters`` submodule is
+gone — its EvtxECmd/jlecmd/log2timeline-split plumbing now lives in the Go parse
+engine (``go/internal/{adapt,split}``) — so ``import piiat_mitrecar.adapters``
+fails. Switch to ``import byakugan``; the shim is removed after this release.
 
 Wire-format constants (``CAR_NS_URL``, the STIX producer identity seed) live
 inside ``byakugan/ids.py`` and ``byakugan/stix.py`` and never depended on the
