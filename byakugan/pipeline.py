@@ -102,7 +102,7 @@ ROUTES = [
     ("jlecmd_CustomDestinations", []),  # pin-centric, no interaction times -> raw
     ("_LECmd_Output", []),              # lnk: the l2t lnk map is canonical (artefact != processor)
     ("recmd_batch.json", ["recmd_batch"]),
-    # Get-Sybers EZ-Tools Go substitutes (zimmerman lane): ese_dump writes one
+    # Get-Sybers Go parsers (godfir-toolz lane): ese_dump writes one
     # JSONL per SRUM provider table (only Network/Application usage carry a CAR
     # object — the map leaves the rest raw); prefetch_dump writes one output file.
     ("NetworkDataUsage", ["esedump_srum"]),        # ese_dump SRUM -> flow (network usage)

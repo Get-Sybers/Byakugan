@@ -16,8 +16,9 @@ not just the events a single detection cares about.
 
 ## What it does
 
-- **Normalises** processor output — EvtxECmd, log2timeline (Plaso), Zeek, RECmd,
-  SRUM, [PIIAT-Mem](https://github.com/Get-Sybers/PIIAT-Mem) memory — into
+- **Normalises** processor output — goevtx event logs, log2timeline (Plaso),
+  Zeek, gore registry batches, ese_dump SRUM,
+  [PIIAT-Mem](https://github.com/Get-Sybers/PIIAT-Mem) memory — into
   finished [MITRE CAR](https://car.mitre.org/) objects. Every record carrying a
   valid CAR object + canonical action is mapped; honest nulls, nothing faked.
 - **Relates** those objects — owning process, parent, auth↔session (LUID),
