@@ -317,7 +317,7 @@ def test_external_forms_are_exactly_the_raw_guid_forms_the_maps_carry():
         "zeek_cert_fp": "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d",
         "jlecmd_entry": "file-/in/fb3b.automaticDestinations-ms-1",
         "recmd_value": "registry-/in/UsrClass.dat-S-1-5-21-1_Classes\\X-LangID",
-        # the Get-Sybers EZ-Tools Go substitutes (ese_dump / prefetch_dump)
+        # the Get-Sybers Go parsers (ese_dump / prefetch_dump)
         "esedump_srum_network": "flow-102-8-1689399632855040-2024-02-20T07:50:00Z-2100-1440",
         "esedump_srum_application": "process-388-951-2024-02-20T07:50:59Z",
         "prefetch_dump_pf": "process-ADDINUTIL.EXE-0x4E6085D4",

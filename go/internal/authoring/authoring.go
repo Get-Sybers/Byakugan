@@ -76,8 +76,9 @@ func Const(v pyjson.Value) Src { return env("const", v) }
 
 // --- guid forms (export_ir._encode_guid) -------------------------------------
 
-// GuidFields is the positional identity {"fields": [...]} EZ-tool/zeek/evtx maps
-// carry (never the Plaso spindle registry — that is plaso-only).
+// GuidFields is the positional identity {"fields": [...]} non-Plaso maps
+// (zeek/evtx/tool-native) carry (never the Plaso spindle registry — that is
+// plaso-only).
 func GuidFields(fields ...string) pyjson.Value {
 	arr := make([]pyjson.Value, len(fields))
 	for i, f := range fields {

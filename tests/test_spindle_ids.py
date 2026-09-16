@@ -364,7 +364,7 @@ def test_sysmon_and_evtx_guids_are_unchanged_and_never_wrapped():
                    "source_name": "Microsoft-Windows-Security-Auditing", "record_number": 2623,
                    "hostname": "WIN-1M3263ACE5D"}}, adapter="winevt")[0]
     assert ev["guid"] == "process-WIN-1M3263ACE5D-Security-2623" and "spindle_key" not in ev["_native"]
-    # the EZ-tool maps that are not l2t-fed keep their field guids (Go jlecmd adapter)
+    # the non-Plaso maps that are not l2t-fed keep their field guids (Go jlecmd adapter)
     jl = go_events("jlecmd_dest", {
         "AppId": {"AppId": "fb3b", "Description": "Word"}, "SourceFile": "/in/fb3b.automaticDestinations-ms",
         "DestListEntries": [{"Path": r"C:\Users\j\Planning.docx", "EntryNumber": 1,

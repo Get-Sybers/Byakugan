@@ -3,7 +3,7 @@
 The pipeline-wide application of the PIIAT-Mem approach: an owned normalization
 stage turns each artefact's raw records into finished **MITRE CAR** events and
 emits per-object JSONL (`car_<object>.jsonl`), which downstream ingestion
-consumes (DX_DFIR ships it to Elastic/SOF-ELK) — so the query layer
+consumes (DX_DFIR ships it to Elastic) — so the query layer
 just reads the model instead of re-deriving it. The mapping engine (markers +
 `normalize`) and the `carmodel` loader are the same design proven in PIIAT-Mem
 v1.0.0; the memory artefact reuses PIIAT-Mem's already-finished CAR directly.
