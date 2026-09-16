@@ -10,7 +10,7 @@ rules) and `car_data_model.json` (the authoritative MITRE model).*
 **MITRE CAR** — every extractable record becomes a CAR **object** performing an
 **action** at a **timestamp**, carrying that object's canonical **properties** —
 and emits it as per-object **JSONL** (`car_<object>.jsonl`) for downstream
-ingestion (DX_DFIR ships it to Elastic/SOF-ELK).
+ingestion (DX_DFIR ships it to Elastic).
 
 The design is deliberately small and **repeatable**. One recipe, run per source:
 
@@ -299,7 +299,7 @@ until that corpus is processed the component is complete *within Plaso*.
 `store.export_jsonl()` writes one `car_<object>.jsonl` per populated object; each
 line is a flat CAR event (`native` kept as a JSON object). This JSONL is the
 downstream ingest contract: DX_DFIR consumes the files and ships them to
-Elastic/SOF-ELK, additive next to the existing raw evidence — nothing already
+Elastic, additive next to the existing raw evidence — nothing already
 built changes.
 
 ## 9. What is NOT done yet

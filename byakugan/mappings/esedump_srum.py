@@ -10,8 +10,9 @@ name; a SID or an SRUM-internal index).
 **The SRUM artefact maps the same regardless of parser** (docs: artefact ≠
 processor), so this links to the SAME CAR objects the Plaso SRUM map does —
 NetworkDataUsage → flow/message, ApplicationResourceUsage → process/create — but
-as its OWN MITRE data source with its OWN positional row identity (EZ-tool maps
-carry a `{"fields": …}` guid; the Plaso spindle registry is Plaso-only). Verified
+as its OWN MITRE data source with its OWN positional row identity (a
+`{"fields": …}` guid, the spindle external form every non-Plaso map carries
+verbatim; the Plaso spindle registry is Plaso-only). Verified
 against a real 12 MB SRUDB.dat (2,485 network + 17,173 application rows): the
 decoded application/user/interface/bytes match Plaso's exactly; esedump keeps
 SECOND-precision timestamps (Plaso rounds to the minute), so it is kept whole.

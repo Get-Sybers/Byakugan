@@ -11,7 +11,7 @@ object's canonical properties as nullable columns:
 The store is the pipeline artifact (car.db under the processed tree); the
 **JSON output** is the downstream ingest contract: `export_jsonl()` writes one
 `car_<object>.jsonl` per populated object, each line a flat event object —
-consumed by downstream ingestion (DX_DFIR ships it to Elastic/SOF-ELK).
+consumed by downstream ingestion (DX_DFIR ships it to Elastic).
 """
 from __future__ import annotations
 
