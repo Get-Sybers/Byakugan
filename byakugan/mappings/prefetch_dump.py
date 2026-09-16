@@ -12,8 +12,9 @@ and `FilesAccessed[]`.
 this links to the SAME CAR object the Plaso prefetch map does —
 **windows:prefetch:execution → process/create** (execution evidence: the program
 demonstrably ran) — but as its OWN MITRE data source with its OWN positional row
-identity (EZ-tool maps carry a `{"fields": …}` guid; the Plaso spindle registry
-is Plaso-only). Verified against real `.pf`: `Executable`/`Hash` match Plaso
+identity (a `{"fields": …}` guid, the spindle external form every non-Plaso map
+carries verbatim; the Plaso spindle registry is Plaso-only). Verified against
+real `.pf`: `Executable`/`Hash` match Plaso
 (`0x4E6085D4` == 1314948564), one execution per `.pf`.
 
 - `exe` is the `Executable` name; `image_path` is the full run-from `Path` where
