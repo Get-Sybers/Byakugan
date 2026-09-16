@@ -141,22 +141,22 @@ DERIVATIONS: dict[str, Derivation] = {
                           "disk image (OLE compound documents)"),
     "plaso_pecoff": _plaso("pe (PE/COFF metadata)",
                            "disk image (PE/COFF executables)"),
-    # ---- Zimmerman EZ tools --------------------------------------------------
+    # ---- Registry batch + Jump List sources ----------------------------------
     "recmd_batch": Derivation("RECmd", _EZ, "https://github.com/EricZimmerman/RECmd",
                               "Registry (--json batch output)",
                               "disk image (Windows registry hives)"),
     "jlecmd_dest": Derivation("JLECmd", _EZ, "https://github.com/EricZimmerman/JLECmd",
                               "Jump Lists (AutomaticDestinations)",
                               "disk image (Jump List OLE files)"),
-    # The Linux-native Go substitutes for the Windows-bound EZ tools
-    # (Get-Sybers/EZTools-Docker): ese_dump replaces SrumECmd, prefetch_dump
-    # replaces PECmd. Same artefacts as their Plaso maps, their own data source.
-    "esedump_srum": Derivation("ese_dump", _EZ,
-                               "https://github.com/Get-Sybers/EZTools-Docker",
+    # The Linux-native Go parsers (Get-Sybers/GoDFIR-toolz): ese_dump parses
+    # SRUM ESE databases, prefetch_dump parses Windows Prefetch. Same artefacts
+    # as their Plaso maps, their own data source.
+    "esedump_srum": Derivation("ese_dump", "Get-Sybers",
+                               "https://github.com/Get-Sybers/GoDFIR-toolz",
                                "SRUM (SRUDB.dat ESE database)",
                                "disk image (SRUDB.dat ESE database)"),
-    "prefetch_dump": Derivation("prefetch_dump", _EZ,
-                                "https://github.com/Get-Sybers/EZTools-Docker",
+    "prefetch_dump": Derivation("prefetch_dump", "Get-Sybers",
+                                "https://github.com/Get-Sybers/GoDFIR-toolz",
                                 "Windows Prefetch (.pf)",
                                 "disk image (Windows Prefetch)"),
     # ---- Zeek ----------------------------------------------------------------

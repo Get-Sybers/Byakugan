@@ -1,5 +1,5 @@
-// The variant gates of the Get-Sybers EZ-Tools Go substitutes — the Linux-native
-// SRUM and Prefetch parsers (Get-Sybers/EZTools-Docker), each its own artefact
+// The variant gates of the Get-Sybers Go parsers — the Linux-native
+// SRUM and Prefetch parsers (Get-Sybers/GoDFIR-toolz), each its own artefact
 // key / map:
 //
 //	byakugan/mappings/esedump_srum.py   → esedump_srum_is_network_usage,

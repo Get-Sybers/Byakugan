@@ -3,15 +3,15 @@
 # (extractor/input_pattern). Regenerate after any map change.
 sensor_name: prefetch_dump
 sensor_version: 0.1.0
-sensor_developer: Eric Zimmerman (EZ Tools)
-sensor_url: https://github.com/Get-Sybers/EZTools-Docker
+sensor_developer: Get-Sybers
+sensor_url: https://github.com/Get-Sybers/GoDFIR-toolz
 sensor_description: CAR events derived by prefetch_dump (Windows Prefetch (.pf)). Coverage is generated
   by introspecting this repo's map `prefetch_dump` (byakugan.mappings); regenerate after any map change.
 derived_from: disk image (Windows Prefetch)
 extractor:
   tool: prefetch_dump
   parser: Windows Prefetch (.pf)
-  url: https://github.com/Get-Sybers/EZTools-Docker
+  url: https://github.com/Get-Sybers/GoDFIR-toolz
 input_pattern:
 - PrefetchDump_Output
 identity:

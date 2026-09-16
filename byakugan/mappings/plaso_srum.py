@@ -1,10 +1,9 @@
 """Plaso SRUM (System Resource Usage Monitor) → CAR (un-parked).
 
-SRUM is parsed with **Plaso's `esedb/srum` parser** — SrumECmd itself cannot
-run on Linux (it P/Invokes the Windows-only ESE native libraries; verified on
-the real tool), and the artefact≠processor rule means the SRUM *artefact* maps
-the same regardless of parser. Field shapes verified against the real LoneWolf
-SRUDB.dat (17,928 rows).
+SRUM is parsed with **Plaso's `esedb/srum` parser** — the artefact≠processor
+rule means the SRUM *artefact* maps the same regardless of parser (ese_dump
+covers the same database as its own data source). Field shapes verified
+against the real LoneWolf SRUDB.dat (17,928 rows).
 
 - **windows:srum:network_usage → flow/message**: an HOURLY AGGREGATE of bytes
   an application moved on an interface — application + user attribution with

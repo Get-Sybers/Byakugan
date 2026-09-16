@@ -3,15 +3,15 @@
 # (extractor/input_pattern). Regenerate after any map change.
 sensor_name: esedump_srum
 sensor_version: 0.1.0
-sensor_developer: Eric Zimmerman (EZ Tools)
-sensor_url: https://github.com/Get-Sybers/EZTools-Docker
+sensor_developer: Get-Sybers
+sensor_url: https://github.com/Get-Sybers/GoDFIR-toolz
 sensor_description: CAR events derived by ese_dump (SRUM (SRUDB.dat ESE database)). Coverage is generated
   by introspecting this repo's map `esedump_srum` (byakugan.mappings); regenerate after any map change.
 derived_from: disk image (SRUDB.dat ESE database)
 extractor:
   tool: ese_dump
   parser: SRUM (SRUDB.dat ESE database)
-  url: https://github.com/Get-Sybers/EZTools-Docker
+  url: https://github.com/Get-Sybers/GoDFIR-toolz
 input_pattern:
 - ApplicationResourceUsage
 - NetworkDataUsage
