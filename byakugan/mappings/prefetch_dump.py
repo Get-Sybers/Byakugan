@@ -2,7 +2,8 @@
 
 `prefetch_dump` (the Get-Sybers/GoDFIR-toolz `get-sybers/goprefetch` container,
 Go on Velociraptor's go-prefetch) parses Windows `.pf` natively on Linux —
-XP through Win11, MAM decompression included. It emits one JSONL record
+Windows XP through Windows 11, including the Xpress-Huffman (MAM) compression
+Windows 8+ prefetch uses. It emits one JSONL record
 per `.pf`: `Executable`, `Path` (the run-from device path), `Hash`, `Version`,
 `RunCount`, `LastRun` + `PreviousRuns[]` (up to eight run times a `.pf` retains),
 and `FilesAccessed[]`.
