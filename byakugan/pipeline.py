@@ -375,7 +375,8 @@ def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
     - zeek/<capture>/: each capture directory (one source, all protocol logs);
     - log2timeline/jsonl/<image>.jsonl: each raw l2t container (one source);
     - godfir-toolz/<host>/: each Go-parser output directory (ese_dump SRUM
-      tables, prefetch_dump) — one source, dir name as the fallback host;
+      tables, prefetch_dump) — one source, upper-cased dir name as the
+      fallback host;
     - volatility/<image>/car.db: PIIAT-Mem finished CAR (passthrough).
     """
     out: list[tuple[str, str, str | None]] = []
