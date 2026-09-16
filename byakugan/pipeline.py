@@ -374,6 +374,8 @@ def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
       one host's event-log export (one source);
     - zeek/<capture>/: each capture directory (one source, all protocol logs);
     - log2timeline/jsonl/<image>.jsonl: each raw l2t container (one source);
+    - godfir-toolz/<host>/: each Go-parser output directory (ese_dump SRUM
+      tables, prefetch_dump) — one source, dir name as the fallback host;
     - volatility/<image>/car.db: PIIAT-Mem finished CAR (passthrough).
     """
     out: list[tuple[str, str, str | None]] = []
@@ -397,12 +399,12 @@ def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
         for name in sorted(os.listdir(l2t)):
             if name.endswith(".jsonl"):
                 out.append((f"l2t_{name[:-6]}", os.path.join(l2t, name), None))
-    zm = os.path.join(processed_dir, "zimmerman")
-    if os.path.isdir(zm):
-        for name in sorted(os.listdir(zm)):
-            d = os.path.join(zm, name)
+    gt = os.path.join(processed_dir, "godfir-toolz")
+    if os.path.isdir(gt):
+        for name in sorted(os.listdir(gt)):
+            d = os.path.join(gt, name)
             if os.path.isdir(d):
-                out.append((f"zimmerman_{name}", d, name.upper()))
+                out.append((f"godfir_toolz_{name}", d, name.upper()))
     vol = os.path.join(processed_dir, "volatility")
     if os.path.isdir(vol):
         for name in sorted(os.listdir(vol)):

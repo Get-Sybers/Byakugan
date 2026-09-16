@@ -40,7 +40,8 @@ def test_one_file_one_enriched_db(tmp_path):
 def test_batch_discovery_and_isolation(tmp_path):
     import json as _json
     from byakugan import pipeline
-    # a mini processed tree: one evtx host dir + one zeek capture dir
+    # a mini processed tree: one evtx host dir + one zeek capture dir + one
+    # godfir-toolz Go-parser dir (DX_DFIR's data_store/processed lane leaf)
     (tmp_path / "windows_logs" / "hostA").mkdir(parents=True)
     (tmp_path / "windows_logs" / "hostA" / "Security_EvtxECmd_Output.json").write_text(
         _json.dumps({"EventId": 4624, "Channel": "Security", "Computer": "HOSTA",
@@ -53,14 +54,21 @@ def test_batch_discovery_and_isolation(tmp_path):
         {"ts": "2020-01-01T00:00:01Z", "uid": "C1", "id.orig_h": "10.0.0.1",
          "id.orig_p": 1, "id.resp_h": "10.0.0.2", "id.resp_p": 80,
          "proto": "tcp", "conn_state": "SF"}) + "\n")
+    (tmp_path / "godfir-toolz" / "hostB").mkdir(parents=True)
+    (tmp_path / "godfir-toolz" / "hostB" / "PrefetchDump_Output.json").write_text(
+        _json.dumps({"Executable": "EVIL.EXE",
+                     "Path": "\\VOLUME{guid}\\TEMP\\EVIL.EXE",
+                     "Hash": "0x4E6085D4", "RunCount": 3,
+                     "LastRun": "2020-01-01T00:00:02Z"}) + "\n")
     srcs = {n for n, _p, _h in pipeline.discover_sources(str(tmp_path))}
-    assert srcs == {"windows_logs_hostA", "zeek_cap1"}
+    assert srcs == {"windows_logs_hostA", "zeek_cap1", "godfir_toolz_hostB"}
     out = tmp_path / "car"
     results = pipeline.run_batch(str(tmp_path), str(out))
     assert all("error" not in r for r in results)
     # ISOLATION: each source got its OWN car.db
     assert (out / "windows_logs_hostA" / "car.db").is_file()
     assert (out / "zeek_cap1" / "car.db").is_file()
+    assert (out / "godfir_toolz_hostB" / "car.db").is_file()
     # idempotent: second run skips both
     again = pipeline.run_batch(str(tmp_path), str(out))
     assert all(r.get("skipped") == "exists" for r in again)
