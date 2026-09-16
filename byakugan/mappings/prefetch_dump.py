@@ -1,9 +1,9 @@
-"""prefetch_dump → CAR — the Get-Sybers EZ-Tools Windows Prefetch data source.
+"""prefetch_dump → CAR — the Get-Sybers Windows Prefetch data source.
 
-`prefetch_dump` (the Get-Sybers/EZTools-Docker `get-sybers/prefetch` container, Go
-on Velociraptor's go-prefetch) parses Windows `.pf` natively on Linux — the Linux
-substitute for PECmd, which carries a blanket non-Windows startup guard (verified:
-it refuses even uncompressed XP prefetch off-Windows). It emits one JSONL record
+`prefetch_dump` (the Get-Sybers/GoDFIR-toolz `get-sybers/goprefetch` container,
+Go on Velociraptor's go-prefetch) parses Windows `.pf` natively on Linux —
+Windows XP through Windows 11, including the Xpress-Huffman (MAM) compression
+Windows 8+ prefetch uses. It emits one JSONL record
 per `.pf`: `Executable`, `Path` (the run-from device path), `Hash`, `Version`,
 `RunCount`, `LastRun` + `PreviousRuns[]` (up to eight run times a `.pf` retains),
 and `FilesAccessed[]`.

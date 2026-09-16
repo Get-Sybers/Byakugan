@@ -1,9 +1,8 @@
-"""esedump (ese_dump) SRUM → CAR — the Get-Sybers EZ-Tools SRUM data source.
+"""esedump (ese_dump) SRUM → CAR — the Get-Sybers SRUM data source.
 
-`ese_dump` (the Get-Sybers/EZTools-Docker `get-sybers/esedump` container, Go on
-Velociraptor's go-ese) parses `SRUDB.dat` natively on Linux — the Linux
-substitute for SrumECmd, which is .NET/Windows-only (it P/Invokes the Windows
-ESE engine). It emits one JSONL file PER SRUM provider table; each row carries
+`ese_dump` (the Get-Sybers/GoDFIR-toolz `get-sybers/goese` container, Go on
+Velociraptor's go-ese) parses `SRUDB.dat` natively on Linux.
+It emits one JSONL file PER SRUM provider table; each row carries
 the raw ESE columns plus `TableAlias` (the friendly provider name) and the
 SruDbIdMapTable-decoded `AppIdName` / `UserIdName` (a device path or service
 name; a SID or an SRUM-internal index).
