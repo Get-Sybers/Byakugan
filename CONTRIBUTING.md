@@ -76,9 +76,8 @@ python scripts/bench-parse.py --repeat 3            # Go engine vs the Python pa
 pytest -q                                                 # tests (parity suite included)
 ```
 
-The import package was renamed `piiat_mitrecar` → `byakugan`; a full
-`piiat_mitrecar` forwarding shim (modules and `-m` entry points) remains for
-one release only — write new code against `byakugan`.
+The import package was renamed `piiat_mitrecar` → `byakugan` (the one-release
+compat shim has since been removed) — write all code against `byakugan`.
 
 CI (`.github/workflows/lint.yml`) runs `gen_sources --check`, `spindle --check`
 (the identity registry, its snapshot and the golden vectors), `export_ir --check`,

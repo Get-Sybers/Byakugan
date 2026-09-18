@@ -1,6 +1,6 @@
 # Byakugan Go parse engine — design contract (v1)
 
-Repo: /home/user/Byakugan (import package now `byakugan` after the rename; shim `piiat_mitrecar` exists).
+Repo: /home/user/Byakugan (import package now `byakugan` after the rename).
 Go module: `github.com/get-sybers/byakugan/go` (Go 1.24), lives at `go/` in the repo, mirroring DX_DFIR's layout.
 Binary: `go/cmd/byakugan-parse` → built to `go/bin/byakugan-parse` by `go/Makefile` (`make -C go build`).
 
