@@ -311,6 +311,14 @@ ingest contract: a downstream consumer — e.g. DX_DFIR, which ships it to Elast
 reads the files additive next to the existing raw evidence, so nothing already
 built changes.
 
+**Correctness gate.** `python -m byakugan.verify <car-dir>` is the run-through
+over a materialised CAR tree: each exercised object populated, values sane
+(IPs/ports/SIDs, `car_action` in the model's own vocabulary), every row traceable
+to one artefact, relationship edges naming real endpoints. It exits non-zero on a
+failed check (2 when no CAR is present). The vocabulary is the engine's own model,
+so the object model never leaves the engine — a consumer runs the gate inside the
+image rather than reimplementing it.
+
 ## 9. What is NOT done yet
 
 **Cross-source final enrichment** — the optional aggregate stage that correlates
