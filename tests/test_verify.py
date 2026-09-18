@@ -58,7 +58,9 @@ def test_unpopulated_and_insane_values_fail(tmp_path):
         _row("process", "delete"),                             # not in the model's vocabulary
     ])
     _write(tmp_path, "s", "flow", [
-        _row("flow", "start", src_ip="999.example", dest_ip="::1", dest_port="70000")])
+        # 999.999.999.999 is numeric-looking but not a real IPv4 — a charset regex
+        # would wrongly pass it; the ipaddress-based check must reject it.
+        _row("flow", "start", src_ip="999.999.999.999", dest_ip="::1", dest_port="70000")])
     c = verify.run(str(tmp_path))
     failed = _failures(c)
     assert any("source_artefact" in line for line in failed)
@@ -115,3 +117,5 @@ def test_value_helpers():
     assert verify.empty(None) and verify.empty("  ") and not verify.empty("0")
     assert verify.has_term("piiat_memory_pslist", "memory")
     assert not verify.has_term("memoryless", "memory")
+    assert verify._is_ip_literal("10.0.0.1") and verify._is_ip_literal("fe80::1")
+    assert not verify._is_ip_literal("999.999.999.999") and not verify._is_ip_literal("12345")

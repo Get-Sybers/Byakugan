@@ -23,6 +23,7 @@ current directory); exits 1 on a failed check, 2 when no CAR is present.
 """
 from __future__ import annotations
 
+import ipaddress
 import json
 import os
 import re
@@ -37,8 +38,6 @@ _OBJECTS = ("authentication", "driver", "email", "file", "flow", "http",
 RELATIONSHIPS = "relationships"
 # The cross-object timeline: the union of every object's rows.
 CAR = "*"
-
-_IP = re.compile(r"^[0-9a-fA-F:.]+$")
 
 Row = dict
 Pred = Callable[[Row], bool]
@@ -119,6 +118,17 @@ def has_term(value, term: str) -> bool:
     'piiat_memory_pslist' but not in 'memoryless'."""
     return re.search(rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])",
                      str(value or ""), re.I) is not None
+
+
+def _is_ip_literal(v) -> bool:
+    """True iff v is a real IPv4/IPv6 literal. Uses the stdlib parser, not a
+    charset regex — a numeric-looking string like ``999.999.999.999`` or
+    ``12345`` is rejected, so the flow IP check cannot pass a malformed address."""
+    try:
+        ipaddress.ip_address(str(v).strip())
+        return True
+    except ValueError:
+        return False
 
 
 def _port_out_of_range(v) -> bool:
@@ -237,9 +247,9 @@ def run(car_dir: str = ".") -> _Checker:
                "process: pid is numeric where present")
     if c.has_rows("flow"):
         c.section("flow — value sanity")
-        c.zero("flow", lambda r: not empty(r.get("src_ip")) and not _IP.match(str(r["src_ip"])),
+        c.zero("flow", lambda r: not empty(r.get("src_ip")) and not _is_ip_literal(r["src_ip"]),
                "flow: src_ip is a valid IP literal")
-        c.zero("flow", lambda r: not empty(r.get("dest_ip")) and not _IP.match(str(r["dest_ip"])),
+        c.zero("flow", lambda r: not empty(r.get("dest_ip")) and not _is_ip_literal(r["dest_ip"]),
                "flow: dest_ip is a valid IP literal")
         c.zero("flow", lambda r: not empty(r.get("dest_port")) and _port_out_of_range(r["dest_port"]),
                "flow: dest_port within 0..65535")
