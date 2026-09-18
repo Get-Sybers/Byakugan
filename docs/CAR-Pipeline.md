@@ -1,8 +1,10 @@
-# The DX_DFIR CAR pipeline — how it works
+# The CAR pipeline — how it works
 
-*Epic: [Get-Sybers/DX_DFIR#86](https://github.com/Get-Sybers/DX_DFIR/issues/86).
-Companion docs: `CAR-Relations.md` (per-object identity/join/inheritance/limit
-rules) and `car_data_model.json` (the authoritative MITRE model).*
+*Companion docs: [CAR-Relations.md](CAR-Relations.md) (per-object
+identity/join/inheritance/limit rules), [CAR-Extraction-Rules.md](CAR-Extraction-Rules.md)
+(the extraction principles), [CAR-CrossSource.md](CAR-CrossSource.md) (the deferred
+cross-source aggregate stage) and [DataModel.md](DataModel.md) (the CAR + ATT&CK
+superset, reconstructed live from the pinned CAR + ATT&CK model).*
 
 ## 1. What it is
 
@@ -54,20 +56,26 @@ python -m byakugan --in <file-or-dir> --out <dir> [--host NAME] [--artefacts k1,
 
 | module | role |
 |---|---|
-| `carmodel.py` | loads repo-root `car_data_model.json` — the single source of truth for objects/actions/fields |
+| `carmodel.py` | the 13 CAR objects, reconstructed live via `build_data_model` from the pinned CAR model — no committed copy |
+| `build_data_model.py` | builds the CAR (13) + the CAR+ATT&CK superset (~38) + the relationship catalogue live from the pinned CAR + ATT&CK model — no committed copy |
 | `mappings/` | per-artefact declarative maps (one file per family; auto-discovered) |
 | `normalize.py` | the marker engine: `normalize(artefact, record) → CAR event`, or `None` if unmapped |
 | `../go/` (`byakugan-parse`) | the **parse engine**: raw file → pre-enrichment CAR events. Holds the line reader, the winevt adapter (Plaso winevt(x) record → EvtxECmd shape, so the evtx maps run unchanged), the jlecmd flatten, the l2t container splitter (→ per-parser wrapped tables: `SourceImage`, `RecordId`, `Timestamp`, `Parser`, `Record`), the marker resolver and the spindle identity — reading the mapping tables through `internal/ir/ir.json` (`python -m byakugan.export_ir`) |
 | `ids.py` | the one id recipe — canonical JSON + the namespaces (`STIX_NS`, `CAR_NS`, `SPINDLE_NS`) — shared by the STIX projection and the spindle row guid |
 | `enrich.py` | the relationship + inheritance cascade (identity, joins, inheritance, dedupe, canonical accounts) |
 | `store.py` | the per-object SQLite CAR store + `export_jsonl()` (the downstream ingest contract) |
+| `superset.py` | the `superset.db`: the CAR+ATT&CK superset model + the relationship-instance timeline linking the car.db rows |
 | `readers.py` | `load_piiat_car()` — the memory passthrough (the only source that is not parsed) |
-| `pipeline.py` | orchestration: route source → normalize → enrich (self-contained) → store → JSON |
+| `pipeline.py` | orchestration: route source → normalize → enrich (self-contained) → store (car.db + superset.db) → JSON |
 
 ## 4. The CAR data model (13 objects)
 
-`car_data_model.json` is a **verified exact match** to `car.mitre.org` — every
-object, action, and field (diffed 13/13, 0 missing, 0 extra). The 13 objects:
+The CAR object/field/action set is a **verified exact match** to `car.mitre.org`
+— every object, action, and field (diffed 13/13, 0 missing, 0 extra),
+reconstructed live from the pinned CAR model — no committed copy. That model is
+materialised inside the hardened `get-sybers/byakugan` image at build time (a
+recursive clone; see [GoDFIR-toolz/byakugan](https://github.com/Get-Sybers/GoDFIR-toolz/tree/main/byakugan)),
+so there is no host model checkout at runtime. The 13 objects:
 authentication, driver, email, file, flow, http, module, process, registry,
 service, socket, thread, user_session.
 
@@ -88,6 +96,7 @@ faked into a canonical column.
 | **Zeek** | `zeek_conn`, `zeek_http`, `zeek_smtp`, `zeek_files` | flow, http, email, file |
 | **Plaso execution** | `plaso_exec_prefetch/winreg/cron` | process |
 | **Plaso filesystem + Linux** | `l2t_filestat/mft/usnjrnl/utmp/utmpx/text` | file, user_session |
+| **Registry batch + SRUM + Prefetch** (gore / goese / goprefetch output) | `recmd`, `esedump_srum`, `prefetch_dump` | registry, flow, process |
 | **Memory** (PIIAT-Mem) | passthrough | all 10 memory objects (finished CAR) |
 
 Windows event-log EventIds covered: 4624/4625/4634/4647/4672/4688 (Security),
@@ -99,8 +108,7 @@ including definitive Sysmon ProcessGuid links).
 
 Honest non-coverage: `email` has no live source yet (the only smtp capture is
 STARTTLS-encrypted); Zeek dns/ssl/x509/dhcp/ntp/snmp/ocsp/weird/pe have no
-dedicated CAR object (flow-detail, routed to `[]` explicitly); SRUM/RECmd is
-**parked** pending real Velociraptor/EZ output.
+dedicated CAR object (flow-detail, routed to `[]` explicitly).
 
 ## 6. The mapping engine
 
@@ -296,16 +304,17 @@ until that corpus is processed the component is complete *within Plaso*.
 
 ## 8. Output contract (per-object JSONL)
 
-`store.export_jsonl()` writes one `car_<object>.jsonl` per populated object; each
-line is a flat CAR event (`native` kept as a JSON object). This JSONL is the
-downstream ingest contract: DX_DFIR consumes the files and ships them to
-Elastic, additive next to the existing raw evidence — nothing already
+`store.export_jsonl()` writes one `car_<object>.jsonl` per populated object (plus
+`car_relationships.jsonl` for the `superset.db` relationship edges); each line is
+a flat CAR event (`native` kept as a JSON object). This JSONL is the downstream
+ingest contract: a downstream consumer — e.g. DX_DFIR, which ships it to Elastic —
+reads the files additive next to the existing raw evidence, so nothing already
 built changes.
 
 ## 9. What is NOT done yet
 
-See epic #86 for the tracked, detailed plan. In short: the CAR stage is
-**standalone** (not yet wired into the ingest lane/CLI); **cross-source final
-enrichment** is deferred behind a capability-determination + data-assessment
-pass; **SRUM/RECmd** is parked pending real output; and a **payload-parse cache**
-is a known perf item.
+**Cross-source final enrichment** — the optional aggregate stage that correlates
+memory + disk + network across the per-source stores — is deferred behind a
+capability-determination + data-assessment pass (see
+[CAR-CrossSource.md](CAR-CrossSource.md)). A **payload-parse cache** is a known
+performance item.
