@@ -63,6 +63,10 @@ Each evidence **source** becomes two self-contained SQLite stores:
 | [docs/DataModel.md](docs/DataModel.md) | CAR (13) + the CAR+ATT&CK superset (38), reconstructed live from pinned submodules |
 | [docs/CAR-Pipeline.md](docs/CAR-Pipeline.md) | how the pipeline works end to end |
 | [docs/CAR-Relations.md](docs/CAR-Relations.md) | per-object rules and the enrichment-cascade reasoning |
+| [docs/CAR-Extraction-Rules.md](docs/CAR-Extraction-Rules.md) | the four extraction principles every CAR object is built by |
+| [docs/CAR-CrossSource.md](docs/CAR-CrossSource.md) | the deferred cross-source aggregate stage (correlating across per-source stores) |
+| [docs/car-provenance/](docs/car-provenance/README.md) | the property-provenance catalogue: every CAR field → every artefact that can supply it |
+| [docs/research/cross-source-linkage/](docs/research/cross-source-linkage/README.md) | the research arc — resolving entities across sources and lining detections up against them |
 
 The north-star goal (evidence → CAR → superset relationships → flagged MITRE
 TTPs) and its workstreams are tracked in
