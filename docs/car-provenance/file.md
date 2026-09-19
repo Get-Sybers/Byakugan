@@ -31,7 +31,7 @@ Authoritative "find once, done" map of **every canonical field → every artefac
 | S13 | **evtx_sysmon EID 23** (FileDelete) | Sysmon Operational | delete | `sysmon.py:369` |
 | S14 | **evtx_more 4907** (SACL change, ObjectType=File) | Security log | acl_modify | `byakugan/byakugan/mappings/evtx_more.py:98` |
 | S15 | **zeek_files** (files.log) | network pcap — Zeek file analyzer | create ("first seen on wire") | `byakugan/byakugan/mappings/zeek_extra.py:67` |
-| S16 | **windows.mftscan.MFTScan** | memory image — Volatility `$MFT` pages (Anamnesis, finished-CAR passthrough) | create | `third_party/piiat-mem/piiat_mem/mappings.py:192` (+ merge `enrich.py:154`) |
+| S16 | **windows.mftscan.MFTScan** | memory image — `$MFT` pages (Anamnesis, finished-CAR passthrough) | create | `third_party/piiat-mem/piiat_mem/mappings.py:192` (+ merge `enrich.py:154`) |
 | S17 | **windows.piiat.files** | memory image — handle-enumerated files with owner | (action None — inventory) | `piiat-mem/piiat_mem/mappings.py:236` |
 | S18 | **windows.filescan** | memory image — `FILE_OBJECT` pool scan | (action None — inventory) | `piiat-mem/piiat_mem/mappings.py:300` |
 

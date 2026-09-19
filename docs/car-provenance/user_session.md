@@ -16,7 +16,7 @@ Authoritative "find once, done" map of **every canonical field × every artefact
 | S3 | `evtx_more` | EvtxECmd (System / Winlogon) | 7001; 7002 | login; logout | `byakugan/byakugan/mappings/evtx_more.py` | `sources/evtx_more.yaml` |
 | S4 | `l2t_utmp` / `l2t_utmpx` | Plaso utmp / utmpx (Linux/macOS login DB, incl. wtmp) | record-type 6/7; 8 | login; logout | `byakugan/byakugan/mappings/plaso_linux.py` | `sources/l2t_utmp.yaml`, `l2t_utmpx.yaml` |
 | S5 | `l2t_text` | Plaso syslog (`syslog:ssh:login`) | sshd "Accepted" | login | `byakugan/byakugan/mappings/plaso_linux.py` | `sources/l2t_text.yaml` |
-| S6 | `windows.piiat.sessions` | Volatility3 (Anamnesis custom plugin) | per-process token LUID | login | `third_party/piiat-mem/piiat_mem/mappings.py` (+ `plugins/windows/piiat/sessions.py`) | `sources/memory.yaml` |
+| S6 | `windows.piiat.sessions` | Anamnesis custom plugin | per-process token LUID | login | `third_party/piiat-mem/piiat_mem/mappings.py` (+ `plugins/windows/piiat/sessions.py`) | `sources/memory.yaml` |
 | S7 | `windows.sessions` | Volatility3 built-in (fallback) | TS session | login | `third_party/piiat-mem/piiat_mem/mappings.py` | — |
 
 **Provenance-tier legend** (as used in the generated `sources/*.yaml`): `[direct]` = 1:1 native field; `[coalesced]` = first-non-null of several; `[inferred]` = value-mapped / regex-filtered; `[derived]` = transformed (e.g. host label); `[asserted]` = a constant the event's existence proves.
