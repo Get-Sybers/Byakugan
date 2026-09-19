@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 # minted deterministic id survives the rename.
 name = "byakugan"
 version = "0.1.0"
-description = "Byakugan (formerly PIIAT-MitreCar) — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, PIIAT-Mem) into finished MITRE CAR: per-source databases, an inference cascade, per-object JSON."
+description = "Byakugan (formerly PIIAT-MitreCar) — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, Anamnesis) into finished MITRE CAR: per-source databases, an inference cascade, per-object JSON."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}

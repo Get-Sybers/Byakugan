@@ -28,7 +28,7 @@ def _make(tmp: str):
 
 
 def test_timeline_skips_auxiliary_tables_without_a_header(tmp_path):
-    # a producer may add its own non-CAR table (PIIAT-Mem's car.db carries
+    # a producer may add its own non-CAR table (Anamnesis's car.db carries
     # `image_context`: source_image/source_plugin/record, no timestamp). The
     # timeline must skip it, not crash on the missing header column.
     import sqlite3

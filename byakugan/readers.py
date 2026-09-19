@@ -8,7 +8,7 @@ tests/go_engine.py for counting/inspecting fixture rows.)
 
 What stays here is the one source that was never parsed:
 
-- **The memory passthrough** (`load_piiat_car`): PIIAT-Mem v1.0.0 already emits
+- **The memory passthrough** (`load_anamnesis_car`): Anamnesis v1.0.0 already emits
   finished CAR (its car.db per image, built by the volatility lane) — its events
   are translated 1:1 into this store's header (no re-mapping, no re-deriving):
   source_artefact = "memory/<plugin>", source_host = the event's own hostname
@@ -23,13 +23,13 @@ import sqlite3
 from . import normalize
 
 # columns of the piiat car.db header that translate into ours
-_PIIAT_HEADER = {"timestamp", "car_action", "guid", "owning_pid", "owning_offset",
+_ANAMNESIS_HEADER = {"timestamp", "car_action", "guid", "owning_pid", "owning_offset",
                  "owning_guid", "parent_pid", "parent_guid", "link_confidence",
                  "source_plugin", "source_image", "native", "event_id"}
 
 
-def load_piiat_car(car_db: str, image_name: str | None = None) -> list[dict]:
-    """PIIAT-Mem's finished CAR, translated 1:1 into this store's events."""
+def load_anamnesis_car(car_db: str, image_name: str | None = None) -> list[dict]:
+    """Anamnesis's finished CAR, translated 1:1 into this store's events."""
     image_name = image_name or os.path.basename(os.path.dirname(os.path.abspath(car_db)))
     conn = sqlite3.connect(car_db)
     conn.row_factory = sqlite3.Row
@@ -43,7 +43,7 @@ def load_piiat_car(car_db: str, image_name: str | None = None) -> list[dict]:
                 native = json.loads(d.get("native") or "{}")
             except (TypeError, ValueError):
                 native = {}
-            props = {k: v for k, v in d.items() if k not in _PIIAT_HEADER}
+            props = {k: v for k, v in d.items() if k not in _ANAMNESIS_HEADER}
             ev = {
                 "car_object": obj,
                 "car_action": d.get("car_action"),
@@ -61,7 +61,7 @@ def load_piiat_car(car_db: str, image_name: str | None = None) -> list[dict]:
                 "_native": native,
             }
             ev.update(props)
-            # memory (PIIAT-Mem) renders principals as friendly names
+            # memory (Anamnesis) renders principals as friendly names
             # (Local System / Local|Network Service, and the no-space
             # LocalService/NetworkService in its registry plugin) — fold them to
             # the SAME canonical token the artefact maps emit (normalize.user_canon),

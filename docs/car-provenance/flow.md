@@ -4,7 +4,7 @@
 **Actions:** `start`, `message`, `end`.
 **Fields (27):** application_protocol, content, dest_fqdn, dest_hostname, dest_ip, dest_port, end_time, exe, fqdn, hostname, image_path, in_bytes, network_direction, out_bytes, packet_count, pid, ppid, proto_info, src_fqdn, src_hostname, src_ip, src_port, start_time, tcp_flags, transport_protocol, uid, user.
 
-Grounded in: `byakugan/third_party/car/data_model/flow.yaml`, `car_data_model.json`, the four active flow maps, the quarantined WFP audit spec, PIIAT-Mem, and real evidence (`data_store/processed/{zeek,volatility}`).
+Grounded in: `byakugan/third_party/car/data_model/flow.yaml`, `car_data_model.json`, the four active flow maps, the quarantined WFP audit spec, Anamnesis, and real evidence (`data_store/processed/{zeek,volatility}`).
 
 > **The central fact for `flow`.** A network-vantage source (Zeek conn, pcap, NetFlow) gives the 5-tuple, volume, protocols, and TCP history — but carries **no endpoint identity**: no `exe`/`pid`/`ppid`/`user`/`image_path`. Those fields — the ones CAR flow analytics actually key on (`exe`, `user` appear in the detection corpus) — come **only from a host-side source that watches the socket owner**: **Sysmon EID 3**, **memory netscan**, or **WFP 5156** (quarantined). This catalogue's job is to show, per field, which side each source can and cannot fill.
 

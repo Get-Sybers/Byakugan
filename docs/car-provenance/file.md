@@ -31,7 +31,7 @@ Authoritative "find once, done" map of **every canonical field → every artefac
 | S13 | **evtx_sysmon EID 23** (FileDelete) | Sysmon Operational | delete | `sysmon.py:369` |
 | S14 | **evtx_more 4907** (SACL change, ObjectType=File) | Security log | acl_modify | `byakugan/byakugan/mappings/evtx_more.py:98` |
 | S15 | **zeek_files** (files.log) | network pcap — Zeek file analyzer | create ("first seen on wire") | `byakugan/byakugan/mappings/zeek_extra.py:67` |
-| S16 | **windows.mftscan.MFTScan** | memory image — Volatility `$MFT` pages (PIIAT-Mem, finished-CAR passthrough) | create | `third_party/piiat-mem/piiat_mem/mappings.py:192` (+ merge `enrich.py:154`) |
+| S16 | **windows.mftscan.MFTScan** | memory image — Volatility `$MFT` pages (Anamnesis, finished-CAR passthrough) | create | `third_party/piiat-mem/piiat_mem/mappings.py:192` (+ merge `enrich.py:154`) |
 | S17 | **windows.piiat.files** | memory image — handle-enumerated files with owner | (action None — inventory) | `piiat-mem/piiat_mem/mappings.py:236` |
 | S18 | **windows.filescan** | memory image — `FILE_OBJECT` pool scan | (action None — inventory) | `piiat-mem/piiat_mem/mappings.py:300` |
 
@@ -223,7 +223,7 @@ Format: `field | sources (source → native field) | action(s) | mapped? | confi
 ### previous_creation_time
 | | |
 |---|---|
-| **sources** | **PIIAT-Mem mftscan** — SI birth vs FILE_NAME birth mismatch, filled at merge `enrich.py:186`; Sysmon EID 2 `PreviousCreationUtcTime` (N1, unmapped); disk $MFT $SI/$FN split (N5, unmapped) |
+| **sources** | **Anamnesis mftscan** — SI birth vs FILE_NAME birth mismatch, filled at merge `enrich.py:186`; Sysmon EID 2 `PreviousCreationUtcTime` (N1, unmapped); disk $MFT $SI/$FN split (N5, unmapped) |
 | **actions** | create (the DATA rides on a create row; the timestomp verdict is left to the analyst) |
 | **mapped?** | **YES (memory mftscan only)**. |
 | **confidence** | Medium, single-source. **This is the largest timestomp gap:** neither disk `$MFT` (l2t_mft doesn't compare $SI/$FN — one row per timestamp_desc) nor Sysmon EID 2 is mapped, so on-disk / host-telemetry timestomp evidence is invisible. |

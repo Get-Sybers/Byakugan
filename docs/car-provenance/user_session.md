@@ -16,7 +16,7 @@ Authoritative "find once, done" map of **every canonical field × every artefact
 | S3 | `evtx_more` | EvtxECmd (System / Winlogon) | 7001; 7002 | login; logout | `byakugan/byakugan/mappings/evtx_more.py` | `sources/evtx_more.yaml` |
 | S4 | `l2t_utmp` / `l2t_utmpx` | Plaso utmp / utmpx (Linux/macOS login DB, incl. wtmp) | record-type 6/7; 8 | login; logout | `byakugan/byakugan/mappings/plaso_linux.py` | `sources/l2t_utmp.yaml`, `l2t_utmpx.yaml` |
 | S5 | `l2t_text` | Plaso syslog (`syslog:ssh:login`) | sshd "Accepted" | login | `byakugan/byakugan/mappings/plaso_linux.py` | `sources/l2t_text.yaml` |
-| S6 | `windows.piiat.sessions` | Volatility3 (PIIAT-Mem custom plugin) | per-process token LUID | login | `third_party/piiat-mem/piiat_mem/mappings.py` (+ `plugins/windows/piiat/sessions.py`) | `sources/memory.yaml` |
+| S6 | `windows.piiat.sessions` | Volatility3 (Anamnesis custom plugin) | per-process token LUID | login | `third_party/piiat-mem/piiat_mem/mappings.py` (+ `plugins/windows/piiat/sessions.py`) | `sources/memory.yaml` |
 | S7 | `windows.sessions` | Volatility3 built-in (fallback) | TS session | login | `third_party/piiat-mem/piiat_mem/mappings.py` | — |
 
 **Provenance-tier legend** (as used in the generated `sources/*.yaml`): `[direct]` = 1:1 native field; `[coalesced]` = first-non-null of several; `[inferred]` = value-mapped / regex-filtered; `[derived]` = transformed (e.g. host label); `[asserted]` = a constant the event's existence proves.
@@ -154,7 +154,7 @@ Legend: ✔ mapped · ✔* mapped True-only (asserted) · ~ partial / near-miss 
 
 ## Summary
 
-**What is well covered.** The Windows Security 4624-family (S1) is the workhorse: it supplies **8 of 10 fields** (`hostname, login_id, login_successful, login_type, src_ip, src_port, uid, user`) across login/logout/reconnect/unlock, and the LUID (`login_id`) it emits is the designed join key — corroborated cross-artefact by the Volatility memory plugin (S6, `_TOKEN.AuthenticationId`), verified against real evidence (`windows.piiat.sessions.jsonl`, `LogonId:"0x3e7"`). RDP (S2) and Linux utmp/utmpx/sshd (S4/S5) fill `user`/`src_ip`(+`src_port` for sshd) with good confidence. `user` and `hostname` have the broadest source coverage; `src_ip`/`src_port` have solid Windows+Linux coverage. The `login_successful=True` assertion is present on all four "opening" Windows/memory paths (recently extended into PIIAT-Mem sessions).
+**What is well covered.** The Windows Security 4624-family (S1) is the workhorse: it supplies **8 of 10 fields** (`hostname, login_id, login_successful, login_type, src_ip, src_port, uid, user`) across login/logout/reconnect/unlock, and the LUID (`login_id`) it emits is the designed join key — corroborated cross-artefact by the Volatility memory plugin (S6, `_TOKEN.AuthenticationId`), verified against real evidence (`windows.piiat.sessions.jsonl`, `LogonId:"0x3e7"`). RDP (S2) and Linux utmp/utmpx/sshd (S4/S5) fill `user`/`src_ip`(+`src_port` for sshd) with good confidence. `user` and `hostname` have the broadest source coverage; `src_ip`/`src_port` have solid Windows+Linux coverage. The `login_successful=True` assertion is present on all four "opening" Windows/memory paths (recently extended into Anamnesis sessions).
 
 **UNMAPPED / weak — ranked by impact:**
 

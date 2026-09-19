@@ -43,7 +43,7 @@ def _object_entries(car_db: str):
         for t in tables:
             qt = '"' + t.replace('"', '""') + '"'    # escape the identifier quote
             # only CAR object tables carry the event header; a producer may add
-            # its own auxiliary table (PIIAT-Mem's car.db has `image_context`:
+            # its own auxiliary table (Anamnesis's car.db has `image_context`:
             # source_image/source_plugin/record, no timestamp) — skip anything
             # without the header rather than crashing the whole timeline on it
             cols = {r[1] for r in c.execute(f'PRAGMA table_info({qt})')}

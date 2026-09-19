@@ -17,7 +17,7 @@ Grounded in:
 
 ## TL;DR — the honest state
 
-- **Exactly ONE active socket source ships in this pipeline: MEMORY (Volatility 3 netscan/netstat / `windows.piiat.network`) via PIIAT-Mem → CAR `socket`/`listen`.** It is the primary (only) dead-box socket source.
+- **Exactly ONE active socket source ships in this pipeline: MEMORY (Volatility 3 netscan/netstat / `windows.piiat.network`) via Anamnesis → CAR `socket`/`listen`.** It is the primary (only) dead-box socket source.
 - That memory source only produces the **`listen`** action and only the **local-end** fields (`local_address`, `local_port`, `protocol`, `family`, `pid`, `success`) + `image_path` **by enrichment**. It never asserts `remote_*` or `local_path`, and never `bind`/`close`.
 - **Windows Security 5158 (WFP bind) → `socket`/`bind` exists but is INERT** — quarantined in `byakugan/to-be-validated/evtx_audit.yml`, not in the active `mappings/` package.
 - **Sysmon 3, WFP 5156/5157 are mapped to `flow`, NOT `socket`** (deliberate — the connection "as made"). **5031 firewall block is not referenced anywhere in the repo.**
@@ -30,7 +30,7 @@ Grounded in:
 
 | Source | Native table/event | → CAR object here | socket status |
 |---|---|---|---|
-| **Volatility 3 `windows.netscan` / `windows.netstat` / `windows.piiat.network`** (PIIAT-Mem) | bound/LISTENING pooled `_TCP/UDP` endpoint objects | **`socket`/`listen`** (via `is_bound_socket` predicate) | **ACTIVE** — `third_party/piiat-mem/piiat_mem/mappings.py` `_SOCKET_MAP` |
+| **Volatility 3 `windows.netscan` / `windows.netstat` / `windows.piiat.network`** (Anamnesis) | bound/LISTENING pooled `_TCP/UDP` endpoint objects | **`socket`/`listen`** (via `is_bound_socket` predicate) | **ACTIVE** — `third_party/piiat-mem/piiat_mem/mappings.py` `_SOCKET_MAP` |
 | **Security 5158** (WFP "connection bind allowed") | `SourceAddress/SourcePort/Protocol/Application/ProcessID` | **`socket`/`bind`** | **INERT** — `to-be-validated/evtx_audit.yml` key `security_5158_wfp_bind` |
 | osquery 4.6.0 `socket_events` | (bind/listen/close) | `socket` bind/listen/close **(upstream CAR coverage map only)** | **NOT INGESTED** — no osquery collector or mapping in this repo |
 | Sysmon 3 (NetworkConnect) | `SourceIp/DestinationIp/…/Initiated` | **`flow`/`start`** (`mappings/sysmon.py` EID 3) | routed to flow, **not socket** |

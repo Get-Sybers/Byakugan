@@ -111,7 +111,7 @@ def test_user_canon_folds_memory_friendly_forms():
     assert _res(user_canon("v"), "Local System") == "SYSTEM"
     assert _res(user_canon("v"), "Local Service") == "LOCAL SERVICE"
     assert _res(user_canon("v"), "Network Service") == "NETWORK SERVICE"
-    # the no-space renderings PIIAT-Mem's registry plugin emits
+    # the no-space renderings Anamnesis's registry plugin emits
     assert _res(user_canon("v"), "LocalService") == "LOCAL SERVICE"
     assert _res(user_canon("v"), "NetworkService") == "NETWORK SERVICE"
 

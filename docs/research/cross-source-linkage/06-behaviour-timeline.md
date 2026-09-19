@@ -20,7 +20,7 @@ at scale, and there was an open question about how it relates to plaso's
 
 **The first end-to-end run crashed.** `build_timeline` iterated over *every*
 table in the database and assumed each carried the CAR header, so it died with
-`no such column: timestamp` on PIIAT-Mem's auxiliary `image_context` table —
+`no such column: timestamp` on Anamnesis's auxiliary `image_context` table —
 a table that legitimately has no timestamp column.
 
 **psort and the CAR timeliner are different layers — not substitutes.** The

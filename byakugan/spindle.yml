@@ -697,7 +697,7 @@ external:
   memory_proc_offset:
     kind: entity
     form: {form: 'proc-{hex}'}
-    stable_across: one memory image — the _EPROCESS offset PIIAT-Mem mints proc-<hex> from
+    stable_across: one memory image — the _EPROCESS offset Anamnesis mints proc-<hex> from
     golden:                     # synthetic: 0x1a2b -> proc-1a2b (tests/test_derive.py)
       source: synthetic
       object: process

@@ -6,7 +6,7 @@
 
 Grounding: `byakugan/third_party/car/data_model/driver.yaml`, `car_data_model.json` (object index 5), CAR sensor `byakugan/third_party/car/sensors/sysmon_13.yaml`.
 
-> **Authority note.** The bundled `driver.yaml` `coverage_map` is **stale** and is NOT the source of truth. It lists `sysmon_13 → {fqdn, image_path, pid, sha256, signature_valid, signer}` — but that map (a) omits `hostname`, `md5_hash`, `sha1_hash` which the shipped engine *does* extract, and (b) asserts `pid` which the engine correctly does **not** extract (Sysmon EID 6 carries no `ProcessId`). The authoritative "currently mapped" state is the executable engine map `byakugan/byakugan/mappings/sysmon.py` (`sysmon_driver_load` variant) and PIIAT-Mem `third_party/piiat-mem/piiat_mem/mappings.py` (`windows.modules`), reflected in generated source files `sources/evtx_sysmon.yaml` and `sources/memory.yaml`.
+> **Authority note.** The bundled `driver.yaml` `coverage_map` is **stale** and is NOT the source of truth. It lists `sysmon_13 → {fqdn, image_path, pid, sha256, signature_valid, signer}` — but that map (a) omits `hostname`, `md5_hash`, `sha1_hash` which the shipped engine *does* extract, and (b) asserts `pid` which the engine correctly does **not** extract (Sysmon EID 6 carries no `ProcessId`). The authoritative "currently mapped" state is the executable engine map `byakugan/byakugan/mappings/sysmon.py` (`sysmon_driver_load` variant) and Anamnesis `third_party/piiat-mem/piiat_mem/mappings.py` (`windows.modules`), reflected in generated source files `sources/evtx_sysmon.yaml` and `sources/memory.yaml`.
 
 ---
 
@@ -15,7 +15,7 @@ Grounding: `byakugan/third_party/car/data_model/driver.yaml`, `car_data_model.js
 | Src key | Artefact / tool | Event / plugin | Emits object | In pipeline? | File |
 |---|---|---|---|---|---|
 | **S1** | Sysmon (EvtxECmd, `Microsoft-Windows-Sysmon/Operational`) | **EID 6 DriverLoad** | `driver`/`load` | **YES (mapped)** | `mappings/sysmon.py:432` |
-| **S2** | Memory image, Volatility 3 (PIIAT-Mem) | **`windows.modules`** (PsActiveModuleList walk) | `driver`/`load` | **YES (mapped)** | `piiat-mem/piiat_mem/mappings.py:286`; plugin driver `python/get_sybers_get-sybers/volatility.py:58` |
+| **S2** | Memory image, Volatility 3 (Anamnesis) | **`windows.modules`** (PsActiveModuleList walk) | `driver`/`load` | **YES (mapped)** | `piiat-mem/piiat_mem/mappings.py:286`; plugin driver `python/get_sybers_get-sybers/volatility.py:58` |
 | S3 | Memory image, Volatility 3 | `windows.dumpfiles` / `moddump` + hasher | (would feed driver hashes) | **NO** (not in `DEFAULT_PLUGINS`) | — |
 | S4 | Windows Event Log | **System 7045** (SCM service install, kernel-mode driver) | currently `service`/`create` | mapped as **service, not driver** | `mappings/evtx_windows.py:180` (`_SVC_*`), `sources/evtx_services.yaml` |
 | S5 | Windows Event Log | **System 20003** (UserPnp driver-service registration, `DriverFileName`) | currently `service`/`create` | mapped as **service, not driver** | `mappings/evtx_more.py` (header §20003) |

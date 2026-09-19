@@ -62,7 +62,7 @@
 | Plaso registry, shell items, PE, OLE | registry, file |
 | Plaso browser/download (IE, Firefox, Java idx) + lnk + recycle bin | http, file |
 | RECmd (registry), SRUM | registry, flow, process |
-| memory (PIIAT-Mem `car.db`) | passthrough — all memory objects, links preserved |
+| memory (Anamnesis `car.db`) | passthrough — all memory objects, links preserved |
 
 Records with no canonical CAR object/action are routed to nothing **explicitly**
 (known, not unknown); their rows stay raw. Unvalidated inference specs live in

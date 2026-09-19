@@ -26,7 +26,7 @@
 
 **Deliberately NOT mapped (documented):** 4648 (explicit-cred logon at issuance — no service response, asserting success/failure would fake an outcome — `core.py:184`, `CAR-Relations.md:44`).
 
-**Nothing else in the repo produces `authentication`:** the only two sources whose YAML mentions the word are `evtx_security.yaml` (the mapper) and `l2t_text.yaml` (only in a native-keys note — it maps SSH syslog to **user_session/login**, not authentication). PIIAT-Mem emits 10 objects (driver/file/flow/module/process/registry/service/socket/thread/user_session) — **not authentication** (its token `AuthenticationId` LUID feeds `user_session.login_id`). Sysmon has no authentication object. Zeek mappers emit email/file/flow only. **No analytic references `authentication/*` in structured `data_model_references`** (0 of 91) — it is consumed only in prose.
+**Nothing else in the repo produces `authentication`:** the only two sources whose YAML mentions the word are `evtx_security.yaml` (the mapper) and `l2t_text.yaml` (only in a native-keys note — it maps SSH syslog to **user_session/login**, not authentication). Anamnesis emits 10 objects (driver/file/flow/module/process/registry/service/socket/thread/user_session) — **not authentication** (its token `AuthenticationId` LUID feeds `user_session.login_id`). Sysmon has no authentication object. Zeek mappers emit email/file/flow only. **No analytic references `authentication/*` in structured `data_model_references`** (0 of 91) — it is consumed only in prose.
 
 ---
 

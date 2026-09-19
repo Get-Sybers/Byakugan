@@ -24,7 +24,7 @@ parent_pid, parent_guid, link_confidence, source_plugin, source_image, native`).
 | B | **Security 4697** (service installed, audited) | EvtxECmd → `evtx_services` (`evtx_windows.py`) | **service** | create | YES |
 | C | **System 20003** (UserPnp — driver-service registration) | EvtxECmd → `evtx_more` (`evtx_more.py`) | **service** | create | YES |
 | D | **System 7034** (SCM — service crashed) | EvtxECmd → `evtx_more` (`evtx_more.py`) | **service** | stop | YES |
-| E | **Volatility3 `windows.svcscan`** (memory) | PIIAT-Mem → `windows.svcscan` (`piiat-mem/.../mappings.py`) | **service** | *None* (store-only snapshot, no ts) | YES |
+| E | **Volatility3 `windows.svcscan`** (memory) | Anamnesis → `windows.svcscan` (`piiat-mem/.../mappings.py`) | **service** | *None* (store-only snapshot, no ts) | YES |
 | F | **Registry `HKLM\SYSTEM\...\Services`** (Plaso winreg) | Plaso → `plaso_registry` (`plaso_registry.py`) | **registry** (NOT service) | key_edit | YES — but wrong object |
 | G | **Registry Services key** (RECmd/EZ-Tools batch) | RECmd → `recmd_batch` (`recmd.py`) | **registry** (NOT service) | value_edit | YES — but wrong object |
 | H | **Autoruns 13.98** (auto-start services) | CAR upstream sensor only | service | create, delete | **NO** (not in engine) |

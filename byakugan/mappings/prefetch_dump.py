@@ -18,7 +18,7 @@ real `.pf`: `Executable`/`Hash` match Plaso
 (`0x4E6085D4` == 1314948564), one execution per `.pf`.
 
 - `exe` is the `Executable` name; `image_path` is the full run-from `Path` where
-  the `.pf` records it, an honest null otherwise (the PIIAT-Mem process
+  the `.pf` records it, an honest null otherwise (the Anamnesis process
   convention — a bare name never fabricates a path).
 - Timestamped at `LastRun` (the most recent run); the earlier `PreviousRuns` and
   the run count / accessed files / volume metadata stay native.

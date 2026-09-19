@@ -29,7 +29,7 @@ per-parser findings, with the engine's stricter null-over-near-miss rules
 - `exe` is the executable NAME (MITRE: the process's executable) and
   `image_path` the FULL path — where only a bare name is provable (XP-era
   prefetch, a shell builtin in a cron command line) `exe` carries it and
-  `image_path` stays an honest null, per the PIIAT-Mem process convention.
+  `image_path` stays an honest null, per the Anamnesis process convention.
   (The KQL put the same value in both; the engine's rule is stricter.)
 - `action="create"` records the vetted judgement that each row EVIDENCES a
   program execution (prefetch run, shimcache/amcache presence with the

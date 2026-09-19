@@ -3,7 +3,7 @@
 A "find once, done" reference: for every MITRE CAR object, every canonical field,
 and **every artefact/source in the DFIR pipeline that can supply it** — grounded
 in the actual engine maps (not the upstream CAR sensor cards, which overclaim),
-in PIIAT-Mem's memory maps, and in real processed evidence.
+in Anamnesis's memory maps, and in real processed evidence.
 
 Path convention: `byakugan/…` cites a file inside the external Byakugan engine
 repo (at the `byakugan.ref` pin — the engine is cloned + built into the

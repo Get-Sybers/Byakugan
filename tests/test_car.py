@@ -209,7 +209,7 @@ def test_piiat_car_passthrough(tmp_path):
               "NULL,NULL,NULL,4,'proc-b','heuristic','windows.piiat.processes',"
               "'img.dmp','{}',10,'x.exe','DESKTOP-8')")
     c.commit(); c.close()
-    events = sources.load_piiat_car(src, "img.dmp")
+    events = sources.load_anamnesis_car(src, "img.dmp")
     assert len(events) == 1
     ev = events[0]
     assert ev["car_object"] == "process" and ev["guid"] == "proc-a"
