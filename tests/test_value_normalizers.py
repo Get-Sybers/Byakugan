@@ -1,5 +1,5 @@
 """Value-normalization markers — CAR property VALUES rendered in ONE format
-regardless of source (evtx / plaso-disk / volatility-memory), so hayabusa/Sigma
+regardless of source (evtx / plaso-disk / memory), so hayabusa/Sigma
 and CAR analytics detect consistently and cross-source convergence agrees. See
 byakugan/normalize.py:
 

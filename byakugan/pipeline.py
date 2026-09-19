@@ -377,7 +377,7 @@ def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
     - godfir-toolz/<host>/: each Go-parser output directory (ese_dump SRUM
       tables, prefetch_dump) — one source, upper-cased dir name as the
       fallback host;
-    - volatility/<image>/car.db: Anamnesis finished CAR (passthrough).
+    - memory/<image>/car.db: Anamnesis finished CAR (passthrough).
     """
     out: list[tuple[str, str, str | None]] = []
     wl = os.path.join(processed_dir, "windows_logs")
@@ -406,10 +406,10 @@ def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
             d = os.path.join(gt, name)
             if os.path.isdir(d):
                 out.append((f"godfir_toolz_{name}", d, name.upper()))
-    vol = os.path.join(processed_dir, "volatility")
-    if os.path.isdir(vol):
-        for name in sorted(os.listdir(vol)):
-            db = os.path.join(vol, name, "car.db")
+    mem = os.path.join(processed_dir, "memory")
+    if os.path.isdir(mem):
+        for name in sorted(os.listdir(mem)):
+            db = os.path.join(mem, name, "car.db")
             if os.path.isfile(db):
                 out.append((f"memory_{name}", db, None))
     return out

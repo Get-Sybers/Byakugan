@@ -9,7 +9,7 @@ tests/go_engine.py for counting/inspecting fixture rows.)
 What stays here is the one source that was never parsed:
 
 - **The memory passthrough** (`load_anamnesis_car`): Anamnesis v1.0.0 already emits
-  finished CAR (its car.db per image, built by the volatility lane) — its events
+  finished CAR (its car.db per image, built by the memory lane) — its events
   are translated 1:1 into this store's header (no re-mapping, no re-deriving):
   source_artefact = "memory/<plugin>", source_host = the event's own hostname
   (falling back to the image name), links/confidence preserved verbatim.
