@@ -17,7 +17,7 @@ not just the events a single detection cares about.
 
 - **Normalises** processor output — goevtx event logs, log2timeline (Plaso),
   Zeek, gore registry batches, ese_dump SRUM,
-  [flashback](https://github.com/Get-Sybers/flashback) memory — into
+  [anamnesis](https://github.com/Get-Sybers/Anamnesis) memory — into
   finished [MITRE CAR](https://car.mitre.org/) objects. Every record carrying a
   valid CAR object + canonical action is mapped; honest nulls, nothing faked.
 - **Relates** those objects — owning process, parent, auth↔session (LUID),
@@ -85,5 +85,5 @@ Dependencies are traced in three files, each carrying its own upgrade path:
 ## The PIIAT family
 
 Standalone public tooling, consumed by pipelines via the CLI:
-[flashback](https://github.com/Get-Sybers/flashback) (memory → CAR),
+[anamnesis](https://github.com/Get-Sybers/Anamnesis) (memory → CAR),
 PIIAT-l2t-plugins (log2timeline parsers), Byakugan (processor output → CAR).

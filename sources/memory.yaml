@@ -4,15 +4,15 @@
 sensor_name: memory
 sensor_version: 0.1.0
 sensor_developer: Get-Sybers
-sensor_url: https://github.com/Get-Sybers/flashback
-sensor_description: flashback normalises a memory image directly into finished MITRE CAR (its own car.db);
+sensor_url: https://github.com/Get-Sybers/Anamnesis
+sensor_description: anamnesis normalises a memory image directly into finished MITRE CAR (its own car.db);
   the pipeline passes those events through 1:1 (no re-mapping here). Object/action/field coverage is defined
-  by flashback, not by this repo's maps, so it is not enumerated here.
+  by anamnesis, not by this repo's maps, so it is not enumerated here.
 derived_from: memory image
 extractor:
-  tool: flashback (MemProcFS)
+  tool: anamnesis (MemProcFS)
   parser: memory image (car.db)
-  url: https://github.com/Get-Sybers/flashback
+  url: https://github.com/Get-Sybers/Anamnesis
 input_pattern:
 - car.db
 identity:
@@ -21,4 +21,4 @@ identity:
 data_model_coverage: (defined by the producing tool; passthrough)
 mappings: []
 other_coverage:
-- Derived by flashback (MemProcFS) — memory image (car.db) (finished-CAR passthrough).
+- Derived by anamnesis (MemProcFS) — memory image (car.db) (finished-CAR passthrough).
