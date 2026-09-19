@@ -39,7 +39,7 @@ Authoritative, exhaustive map of **every canonical `registry` field → every ar
 | **SEC4657** | Security **4657** *registry value modified* | `byakugan/to-be-validated/evtx_audit.yml` (spec) | `add`/`value_edit`/`remove` (by `OperationType`) | **QUARANTINED — NOT active** |
 | **PLREG** | Plaso `winreg` (all `windows:registry:*` key/value plugins: run, services, userassist, bam, amcache, shellbags, usb, sam, typedpaths, MRU, …) `plaso_registry` | `plaso_registry.py` | `key_edit` (whole-key snapshot) | **ACTIVE** |
 | **RECMD** | EZ-Tools **RECmd** batch (`--json`) `recmd_batch` | `recmd.py` | `value_edit` (live records; `Deleted:true` → raw) | **ACTIVE** |
-| **MEM** | Volatility3 `windows.piiat.registry` (printkey + hivelist, RECmd-style target list) → PIIAT-Mem CAR passthrough | plugin `piiat-mem/plugins/windows/piiat/registry.py`; map `piiat-mem/piiat_mem/mappings.py` | `value_edit` | **ACTIVE** |
+| **MEM** | Volatility3 `windows.piiat.registry` (printkey + hivelist, RECmd-style target list) → Anamnesis CAR passthrough | plugin `piiat-mem/plugins/windows/piiat/registry.py`; map `piiat-mem/piiat_mem/mappings.py` | `value_edit` | **ACTIVE** |
 | **AUTORUNS** | Sysinternals Autoruns (`autoruns_13.98`) | — | (MITRE lists add/key_edit/value_edit) | **NO SOURCE in repo** (honest no-source) |
 | **REGRIPPER** | RegRipper | — | — | **NO SOURCE in repo** (honest no-source) |
 | **SEC4663/4660** | Security 4663 (Key access) / 4660 (object deleted) | 4663-File only in `evtx_audit.yml`; Key path → raw | none for registry | **NO registry mapping** (honest — see §5) |
@@ -48,7 +48,7 @@ Notes carried from source:
 - **PLREG value/data/type live in a `values` LIST** the declarative marker set cannot index → they stay in `_native.values`; only `key`/`hive`/`image_path`/`hostname` are canonical columns. So PLREG cannot populate `value`/`data`/`type` as columns even though the data is present.
 - **PLREG `image_path`** = the winreg record's `image_path` (present on **service** rows: the configured `svchost`/service binary). This is the *configured* binary, **not** the process that wrote the key — a field-name near-collision; see caveats.
 - **PLREG `key_edit`** is a **semantic overload**: a registry snapshot = the key as it exists at its `LastWrite`, mapped to `key_edit` (not a literal rename). SYS14 `key_edit` *is* a literal rename.
-- **MEM** host identity: PIIAT-Mem's CAR layer stamps `hostname`/`fqdn` from the in-memory `ComputerName` (and `Tcpip\Parameters`) registry values — the plugin deliberately captures those; the memory registry rows themselves carry `Hive/Key/ValueName/ValueType/ValueData/LastWrite` only.
+- **MEM** host identity: Anamnesis's CAR layer stamps `hostname`/`fqdn` from the in-memory `ComputerName` (and `Tcpip\Parameters`) registry values — the plugin deliberately captures those; the memory registry rows themselves carry `Hive/Key/ValueName/ValueType/ValueData/LastWrite` only.
 - **Evidence grounding**: memory sample `data_store/processed/volatility/memdump.mem/plugins/windows.piiat.registry.jsonl` confirms native fields `Hive, Key, ValueName, ValueType, ValueData, LastWrite`. (No live Sysmon-13 / plaso-winreg registry rows in the current sampled processed corpus — field names below are grounded in map code + generated `sources/*.yaml`, which are introspected from the maps.)
 
 ---
@@ -161,7 +161,7 @@ Legend: **Mapped?** = yes (+map location) / NO. **Conf** = confidence the field 
 | SYS12 / SYS13 / SYS14 → `Computer` (first DNS label) | all | yes — `sysmon.py` (`_HOSTNAME`) | High. |
 | SEC4657 → `host_label(Computer)` | — | **NO** (quarantined) | High once enabled. |
 | PLREG → `image_hostname` | key_edit | yes — `plaso_registry.py` (`hostname: _R("image_hostname")`) | High — image identity stamped by the lane. |
-| MEM → in-memory `ComputerName` (PIIAT-Mem CAR layer) | value_edit | yes (passthrough) | Med — sole memory-native host source; depends on the `ComputerName` key being resident (the plugin targets it explicitly). |
+| MEM → in-memory `ComputerName` (Anamnesis CAR layer) | value_edit | yes (passthrough) | Med — sole memory-native host source; depends on the `ComputerName` key being resident (the plugin targets it explicitly). |
 | RECMD | — | **NO** | **GAP / honest null** — `recmd.py` sets no `hostname`; the RECmd record carries no host stamp (would need out-of-band image context). |
 
 ### `fqdn`
@@ -170,7 +170,7 @@ Legend: **Mapped?** = yes (+map location) / NO. **Conf** = confidence the field 
 |---|---|---|---|
 | SYS12 / SYS13 / SYS14 → `Computer` (only if it contains a dot) | all | yes — `sysmon.py` (`_FQDN`) | Med — claimed **only** when `Computer` is genuinely an FQDN; a bare NetBIOS name → honest null (never faked). |
 | SEC4657 → the label of `Computer` up to the first dot | — | **NO** (quarantined) | Med — same discipline. |
-| MEM → `Tcpip\Parameters` Hostname/Domain/DhcpDomain (PIIAT-Mem CAR layer) | value_edit | yes (passthrough, tool-defined) | Med/unknown — the plugin captures `Tcpip\Parameters` for fqdn; whether the CAR layer emits `fqdn` is defined by PIIAT-Mem (passthrough source). |
+| MEM → `Tcpip\Parameters` Hostname/Domain/DhcpDomain (Anamnesis CAR layer) | value_edit | yes (passthrough, tool-defined) | Med/unknown — the plugin captures `Tcpip\Parameters` for fqdn; whether the CAR layer emits `fqdn` is defined by Anamnesis (passthrough source). |
 | PLREG | — | **NO** | **Honest no-source** — `image_hostname` is a bare name; no domain recorded. |
 | RECMD | — | **NO** | **Honest no-source.** |
 

@@ -14,7 +14,7 @@ substrate for sigma.py, sources_model, spindle drift guards, and the executable 
 Python LOST (deleted — see "Wiring + deletion", done): pipeline's Python ingestion loop,
 readers.iter_jsonl (and iter_mapped), adapters/l2t_split.py, adapters/winevt.py,
 adapters/jlecmd.py — the whole `byakugan/adapters/` package.
-readers.load_piiat_car (sqlite passthrough) stays in Python.
+readers.load_anamnesis_car (sqlite passthrough) stays in Python.
 
 ## Single source of truth: the IR
 The Go authoring layer (`go/internal/authoring`) is the source of truth for the map
@@ -204,7 +204,7 @@ stdout lines back into the event dicts the Python path used to build; the adapte
 (`jlecmd_dest`, `l2t_winevt`) are passed verbatim and the engine fans them out through
 `ir.adapters`, while pipeline keeps filling `used` (route key + the whole evtx family).
 `pipeline.split_l2t(path, tmp)` runs `split-l2t` into the same tempdir-under-out location and
-returns {table: file} in first-seen order. Passthrough car.db stays Python (readers.load_piiat_car).
+returns {table: file} in first-seen order. Passthrough car.db stays Python (readers.load_anamnesis_car).
 DELETED: pipeline's read/normalize loop, `readers.iter_jsonl` + `readers.iter_mapped`,
 `byakugan/adapters/` entirely (l2t_split, winevt, jlecmd + the package docstring) and the
 `piiat_mitrecar.adapters` shim subpackage; both dropped from pyproject's packages list. The

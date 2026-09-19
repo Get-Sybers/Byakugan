@@ -11,7 +11,7 @@ gated behind the capability determination — never part of the per-file product
 One input file -> route to its artefact map(s) -> normalize -> enrich
 (self-contained) -> <out>/car.db + <out>/car_<object>.jsonl (the downstream
 ingest contract — DX_DFIR ships the JSONL to Elastic).
-A PIIAT-Mem car.db input passes through 1:1 (already finished CAR).
+A Anamnesis car.db input passes through 1:1 (already finished CAR).
 
 Routing is by filename when --artefacts is not given; a Security log feeds BOTH
 its authentication and its user_session maps (same file — the in-file LUID join
@@ -24,7 +24,7 @@ the winevt/jlecmd format adapters, the marker resolver and the spindle identity
 tests (tests/test_car_*.py, via tests/go_engine.py) drive this engine directly.
 Routing, the
 per-source layout, enrichment and everything after it stay here in Python; the
-PIIAT-Mem car.db passthrough is Python too (it never parsed anything).
+Anamnesis car.db passthrough is Python too (it never parsed anything).
 """
 from __future__ import annotations
 
@@ -257,8 +257,8 @@ def process_file(in_path: str, out_dir: str, artefacts: list[str] | None = None,
     os.makedirs(out_dir, exist_ok=True)
     name = os.path.basename(in_path.rstrip("/"))
 
-    if name == "car.db":                       # PIIAT-Mem finished CAR: passthrough
-        events = readers.load_piiat_car(in_path)
+    if name == "car.db":                       # Anamnesis finished CAR: passthrough
+        events = readers.load_anamnesis_car(in_path)
         used = ["memory (passthrough)"]
     else:
         events, used = [], []
@@ -377,7 +377,7 @@ def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
     - godfir-toolz/<host>/: each Go-parser output directory (ese_dump SRUM
       tables, prefetch_dump) — one source, upper-cased dir name as the
       fallback host;
-    - volatility/<image>/car.db: PIIAT-Mem finished CAR (passthrough).
+    - memory/<image>/car.db: Anamnesis finished CAR (passthrough).
     """
     out: list[tuple[str, str, str | None]] = []
     wl = os.path.join(processed_dir, "windows_logs")
@@ -406,10 +406,10 @@ def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
             d = os.path.join(gt, name)
             if os.path.isdir(d):
                 out.append((f"godfir_toolz_{name}", d, name.upper()))
-    vol = os.path.join(processed_dir, "volatility")
-    if os.path.isdir(vol):
-        for name in sorted(os.listdir(vol)):
-            db = os.path.join(vol, name, "car.db")
+    mem = os.path.join(processed_dir, "memory")
+    if os.path.isdir(mem):
+        for name in sorted(os.listdir(mem)):
+            db = os.path.join(mem, name, "car.db")
             if os.path.isfile(db):
                 out.append((f"memory_{name}", db, None))
     return out

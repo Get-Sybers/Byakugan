@@ -1,6 +1,6 @@
 """Per-artefact → MITRE CAR maps for the DX_DFIR pipeline (epic #86).
 
-Same declarative shape as PIIAT-Mem's mappings: one entry per artefact, variants
+Same declarative shape as Anamnesis's mappings: one entry per artefact, variants
 where one artefact's rows split across objects/actions, markers for the small
 transforms, `keep`/`native_extract` for native evidence and join keys with no
 CAR home (never faked into a canonical column).
@@ -24,8 +24,8 @@ LIMITING principles determined per object (docs/design/car-relations.md):
 - **email**: principles documented; no artefact feeds it yet (the one real
   smtp.json is STARTTLS-encrypted), so no map — an empty table is honest.
 
-The memory artefact does NOT map here: PIIAT-Mem already emits finished CAR —
-`readers.load_piiat_car()` passes it straight through.
+The memory artefact does NOT map here: Anamnesis already emits finished CAR —
+`readers.load_anamnesis_car()` passes it straight through.
 """
 from __future__ import annotations
 

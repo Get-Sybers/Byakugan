@@ -285,7 +285,7 @@ def run(car_dir: str = ".") -> _Checker:
         "Windows (event logs: Sysmon/Security)":
             c.has_rows(CAR, lambda r: art(r) in ("evtx_sysmon", "evtx_security", "evtx_process",
                                                  "evtx_services", "evtx_bits", "evtx_rdp")),
-        "Windows (memory: Volatility/PIIAT-Mem)":
+        "Windows (memory: Volatility/Anamnesis)":
             c.has_rows(CAR, lambda r: has_term(art(r), "memory") or has_term(art(r), "piiat")),
         "Linux/Unix (utmp/ssh/cron)":
             c.has_rows(CAR, lambda r: art(r) in ("l2t_utmp", "l2t_text")),

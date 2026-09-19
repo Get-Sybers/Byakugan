@@ -1,6 +1,6 @@
 """Enrichment — the CAR relationship + inheritance engine (epic #86).
 
-The logic proven in PIIAT-Mem's store, generalized for the multi-artefact
+The logic proven in Anamnesis's store, generalized for the multi-artefact
 pipeline. Joins are scoped per **evidence host** (`source_host`) — never across
 hosts:
 

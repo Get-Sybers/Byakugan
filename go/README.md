@@ -50,7 +50,7 @@ unchanged enrich → store → superset → derive → STIX path, and
 for a raw log2timeline container, into a tempdir under the source's output dir.
 Routing (`pipeline.ROUTES`), the mapping tables, normalize's marker
 constructors (the introspection substrate for sigma/sources_model/spindle) and
-the PIIAT-Mem `car.db` passthrough stay in Python.
+the Anamnesis `car.db` passthrough stay in Python.
 
 ## Parity harness
 

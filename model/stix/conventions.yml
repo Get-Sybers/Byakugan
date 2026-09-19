@@ -135,7 +135,7 @@ identity_conventions:
     observed-data.x_car_event_id (ECS event.id) — the row identity, in one of four forms, never
     re-minted here: a sensor's own id (a Sysmon ProcessGuid; a Zeek uid / fuid), a record id the
     map renders (<object>-<host>-<channel>-<record number> for an EVTX record; the JLECmd /
-    RECmd field forms), a memory-object offset (PIIAT-Mem's proc-<hex>), or the spindle uuid5 a
+    RECmd field forms), a memory-object offset (Anamnesis's proc-<hex>), or the spindle uuid5 a
     disk-image row is MINTED with — uuid5(SPINDLE_NS, canonical_json(native.spindle_key)), the
     registry byakugan/spindle.yml (snapshot model/spindle/): native.spindle_key is the
     readable key (_obj, _v = the entry's identity-key version, the identity names),

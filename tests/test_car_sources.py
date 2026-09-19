@@ -128,7 +128,7 @@ def test_source_docs_state_the_row_identity_from_the_registry():
     """Every manifest says what its guid IS (car_source_schema.yaml `identity`):
     a Plaso-derived source names the spindle registry entries its map mints
     from (kind / scope / version); any other source names the external form(s)
-    it carries verbatim; the memory passthrough names PIIAT-Mem's proc-<hex>.
+    it carries verbatim; the memory passthrough names Anamnesis's proc-<hex>.
     Resolved by the registry itself, and drift-checked like coverage."""
     import os
     import tempfile

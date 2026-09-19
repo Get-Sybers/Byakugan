@@ -156,7 +156,7 @@ def test_reconstruction_creates_flagged_inferred_node_not_car_row(tmp_path):
         # a child whose ParentProcessGuid is that same lost process
         _proc("P2", ppid=4242, parent_image_path=r"C:\evil.exe",
               _native={"ParentProcessGuid": gone}),
-        # a memory spoke owned by an _EPROCESS at an offset PIIAT-Mem never listed
+        # a memory spoke owned by an _EPROCESS at an offset Anamnesis never listed
         _ev("thread", "remote_create", "T1", owning_pid=99, owning_offset=0x1a2b,
             source_artefact="memory/windows.piiat.threads"),
         # an owner the cascade DID resolve (observed): nothing to reconstruct
@@ -184,7 +184,7 @@ def test_reconstruction_creates_flagged_inferred_node_not_car_row(tmp_path):
     assert props["pid"] == 4242 and props["image_path"] == r"C:\evil.exe"
     assert "reconstructed, not evidence" in n[7] and "owning_process+parent_process" in n[7]
     assert (n[8], n[9]) == (_T0, "2020-01-01T00:00:05Z")
-    # the memory owner: the guid PIIAT-Mem would have minted for that offset
+    # the memory owner: the guid Anamnesis would have minted for that offset
     m = nodes["proc-1a2b"]
     assert m[1:5] == ("process", "offset", str(0x1a2b), "memory_offset")
     assert json.loads(m[6]) == {"pid": 99}

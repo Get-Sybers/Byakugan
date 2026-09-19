@@ -37,7 +37,7 @@ session semantics is thrown away. So the answer to the "is ANY disk source mappe
 below is **NO, everywhere.**
 
 Second-order gap: `byakugan/byakugan/enrich.py` has **no SID→user resolution from plaso ProfileList rows**. (The
-separate PIIAT-Mem/Volatility `enrich.py:_sid_user_index` does a ProfileList join, but it keys on a flat
+separate Anamnesis/Volatility `enrich.py:_sid_user_index` does a ProfileList join, but it keys on a flat
 `value=="ProfileImagePath"` shape the plaso registry rows — which nest values in a `_native.values` LIST — do
 not have.) So even the `uid`↔`user` link that disk fully supports is not wired on the disk lane.
 
@@ -82,7 +82,7 @@ the `Last Login Time` variant. (LoneWolf: `jcloudy` RID 1001, 23 logins, last 20
 
 **2. SOFTWARE `ProfileList` SID↔user index → `uid`↔`user` resolution + downstream naming.** Ingested today as
 `windows:registry:key_value` (`ProfileList\S-1-5-21-…-1001 → C:\Users\jcloudy`). Wire a disk-lane SID→user
-index in `byakugan/byakugan/enrich.py` (mirroring PIIAT-Mem's `_sid_user_index`, but reading `_native.values` for
+index in `byakugan/byakugan/enrich.py` (mirroring Anamnesis's `_sid_user_index`, but reading `_native.values` for
 `ProfileImagePath`) so RID-only SAM rows and SID-only Winlogon rows get a `user`, and vice-versa. Confidence HIGH.
 
 **3. SAM "Last Password Set Time" → `user_session/metadata` (or `authentication`).** Same `sam_users` record

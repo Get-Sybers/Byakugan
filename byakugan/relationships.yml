@@ -117,8 +117,8 @@ derived:
     guid:
       kind: instance          # Sysmon ProcessGuid / ParentProcessGuid / TargetProcessGuid, a Zeek uid/fuid
     offset:
-      kind: instance          # a memory-image object offset (PIIAT-Mem owning_offset = the owning _EPROCESS)
-      guid_form: "proc-{hex}" # the guid PIIAT-Mem mints for that object (proc-<offset hex>)
+      kind: instance          # a memory-image object offset (Anamnesis owning_offset = the owning _EPROCESS)
+      guid_form: "proc-{hex}" # the guid Anamnesis mints for that object (proc-<offset hex>)
     hash:
       kind: content
       node: file_content

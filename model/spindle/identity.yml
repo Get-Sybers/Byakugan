@@ -832,7 +832,7 @@ external:
   maps: []
   car_object:
   - process
-  stable_across: one memory image — the _EPROCESS offset PIIAT-Mem mints proc-<hex> from
+  stable_across: one memory image — the _EPROCESS offset Anamnesis mints proc-<hex> from
 - name: prefetch_dump_pf
   kind: entity
   form:

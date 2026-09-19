@@ -135,7 +135,7 @@ common_header:
       the row identity, in one of four forms — never re-minted by the loader: a sensor's own id
       (a Sysmon ProcessGuid; a Zeek uid / fuid), a record id the map renders
       (<object>-<host>-<channel>-<record number> for an EVTX record; the JLECmd / RECmd field
-      forms), a memory-object offset (PIIAT-Mem's proc-<hex>), or the spindle uuid5 a disk-image
+      forms), a memory-object offset (Anamnesis's proc-<hex>), or the spindle uuid5 a disk-image
       row is MINTED with — uuid5(SPINDLE_NS, canonical_json(car.native.spindle_key)), the
       registry byakugan/spindle.yml (snapshot model/spindle/): car.native.spindle_key is the
       readable key (_obj, _v = the entry's identity-key version, the identity names),

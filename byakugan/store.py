@@ -1,6 +1,6 @@
 """The DX_DFIR CAR-event store + the per-object JSONL downstream ingest consumes (epic #86).
 
-The same database model proven in PIIAT-Mem's car.db: one SQLite table per CAR
+The same database model proven in Anamnesis's car.db: one SQLite table per CAR
 object (all 13), each row a finished CAR event — a common header plus the
 object's canonical properties as nullable columns:
 

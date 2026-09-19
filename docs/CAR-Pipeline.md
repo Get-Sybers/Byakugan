@@ -25,7 +25,7 @@ input source ──▶ artefact map(s) ──▶ normalize ──▶ its own car
                                               car_<object>.jsonl → downstream ingest
 ```
 
-It is the pipeline-wide application of what shipped in **PIIAT-Mem v1.0.0** for
+It is the pipeline-wide application of what shipped in **Anamnesis v1.0.0** for
 memory: the mapping/inference logic lives in the processor we own, the store is
 finished CAR, and the query layer just reads the model instead of re-deriving it.
 
@@ -39,7 +39,7 @@ source is a coherent evidence set:
 | Windows event logs (a host) | all `*_EvtxECmd_Output.json` for that host, OR the host's Plaso `winevtx` output |
 | Zeek | one capture's per-protocol logs (`conn.json`, `http.json`, …) together |
 | log2timeline | one image's `.jsonl` (a container of many parsers, split internally) |
-| memory | PIIAT-Mem's finished `car.db` (passed through 1:1) |
+| memory | Anamnesis's finished `car.db` (passed through 1:1) |
 
 No source ever depends on another being present, and nothing is mixed.
 Cross-source ("final") enrichment is a **separate, optional end-stage** over the
@@ -65,7 +65,7 @@ python -m byakugan --in <file-or-dir> --out <dir> [--host NAME] [--artefacts k1,
 | `enrich.py` | the relationship + inheritance cascade (identity, joins, inheritance, dedupe, canonical accounts) |
 | `store.py` | the per-object SQLite CAR store + `export_jsonl()` (the downstream ingest contract) |
 | `superset.py` | the `superset.db`: the CAR+ATT&CK superset model + the relationship-instance timeline linking the car.db rows |
-| `readers.py` | `load_piiat_car()` — the memory passthrough (the only source that is not parsed) |
+| `readers.py` | `load_anamnesis_car()` — the memory passthrough (the only source that is not parsed) |
 | `pipeline.py` | orchestration: route source → normalize → enrich (self-contained) → store (car.db + superset.db) → JSON |
 
 ## 4. The CAR data model (13 objects)
@@ -97,7 +97,7 @@ faked into a canonical column.
 | **Plaso execution** | `plaso_exec_prefetch/winreg/cron` | process |
 | **Plaso filesystem + Linux** | `l2t_filestat/mft/usnjrnl/utmp/utmpx/text` | file, user_session |
 | **Registry batch + SRUM + Prefetch** (gore / goese / goprefetch output) | `recmd`, `esedump_srum`, `prefetch_dump` | registry, flow, process |
-| **Memory** (PIIAT-Mem) | passthrough | all 10 memory objects (finished CAR) |
+| **Memory** (Anamnesis) | passthrough | all 10 memory objects (finished CAR) |
 
 Windows event-log EventIds covered: 4624/4625/4634/4647/4672/4688 (Security),
 7045/4697 (service), BITS 59/60, TerminalServices 21/24/25, Sysmon
@@ -130,7 +130,7 @@ sorts out how they relate.
 
 ## 7. The enrichment cascade (`enrich.py`)
 
-Runs once over the whole (per-source) store — data enriching itself, PIIAT-Mem
+Runs once over the whole (per-source) store — data enriching itself, Anamnesis
 style. All joins are **scoped per evidence host**, never across hosts.
 
 - **Identity.** `guid` is the reuse-proof identity (memory: the `_EPROCESS`
@@ -268,7 +268,7 @@ intrinsic or positional — also carries `native.spindle_ref`
 **External forms.** Sysmon (`ProcessGuid`) and event-record
 (`<object>-<host>-<channel>-<recordid>`) guids — including the Plaso `winevtx`
 route through the evtx maps — the Zeek `uid` / `uid+trans_depth` / `fuid`, the
-JLECmd and RECmd field forms and PIIAT-Mem's `proc-<hex>` are left exactly as
+JLECmd and RECmd field forms and Anamnesis's `proc-<hex>` are left exactly as
 they were: a sensor's or tool's own id, never wrapped in uuid5. They are
 declared as data too — the registry's `external:` section, each with a kind
 and a golden sample — and `verify_registry` holds every map leaf's raw guid

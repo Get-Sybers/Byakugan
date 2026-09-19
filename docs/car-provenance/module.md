@@ -7,7 +7,7 @@
 Grounding read:
 - Semantics: `byakugan/third_party/car/data_model/module.yaml`; `byakugan/third_party/car/OSSEM-CDM/schemas/entities/module.yml` (fields: name, path, is_signed, signature, signature_status — no hashes, no base_address, no tid in the CDM either); `car_data_model.json` (object list).
 - Engine maps: `byakugan/byakugan/mappings/sysmon.py` (EID 7), `.../mappings/evtx_more.py` (WMI 5857); sources `.../sources/evtx_sysmon.yaml`, `.../sources/evtx_more.yaml`, `.../sources/memory.yaml`.
-- Memory maps (PIIAT-Mem, finished-CAR passthrough): `third_party/piiat-mem/piiat_mem/mappings.py`, plugin `third_party/piiat-mem/plugins/windows/piiat/modules.py`, enrichment `third_party/piiat-mem/piiat_mem/enrich.py`.
+- Memory maps (Anamnesis, finished-CAR passthrough): `third_party/piiat-mem/piiat_mem/mappings.py`, plugin `third_party/piiat-mem/plugins/windows/piiat/modules.py`, enrichment `third_party/piiat-mem/piiat_mem/enrich.py`.
 - Evidence: `data_store/processed/windows_logs/unspecified_host/log_EvtxECmd_Output.json`; `data_store/processed/volatility/memdump.mem/car.db`.
 
 ---
@@ -20,7 +20,7 @@ Three sources emit `module` events today. **All three emit only `action: load`. 
 |---|---|---|---|---|
 | **Sysmon** `Microsoft-Windows-Sysmon/Operational` | **EID 7 ImageLoad** | module/load | `sysmon.py:389` (`sysmon_module_load`, EID==7) | module_path, module_name, image_path, pid, md5_hash, sha1_hash, sha256_hash, signer, signature_valid, hostname, fqdn — **11 of 12** (no base_address, no tid) |
 | **WMI-Activity** `Microsoft-Windows-WMI-Activity/Operational` | **EID 5857** (provider DLL loaded) | module/load | `evtx_more.py:120` (`em_is_wmi_5857`) | module_path, module_name, image_path, pid, hostname, fqdn — **6 of 12** |
-| **Memory / Volatility3** (PIIAT-Mem) | `windows.piiat.modules` (PEB load-order walk; == `windows.dlllist`) | module/load | `piiat-mem mappings.py:223` + `:275`; plugin `modules.py` | module_path(Path), module_name(Name), **base_address(Base)**, pid, + image_path/hostname/fqdn by enrichment — **7 of 12** |
+| **Memory / Volatility3** (Anamnesis) | `windows.piiat.modules` (PEB load-order walk; == `windows.dlllist`) | module/load | `piiat-mem mappings.py:223` + `:275`; plugin `modules.py` | module_path(Path), module_name(Name), **base_address(Base)**, pid, + image_path/hostname/fqdn by enrichment — **7 of 12** |
 
 The Sysmon EID 7 map is the only one the upstream `module.yaml coverage_map` records (as sensor `sysmon_13`). WMI-5857 and memory are wired in this repo's maps but not reflected in that upstream coverage stub.
 
@@ -66,7 +66,7 @@ Native-field notation: `source → NativeField`. "Mapped?" = does the shipping e
 | sources | action | mapped? | confidence & caveats |
 |---|---|---|---|
 | Sysmon EID 7 → `Hashes` (`MD5=…` substring) | load | **YES** — `sysmon.py:245` `_image_load_props` → `_hashes()` regex `MD5=` | **High**, *iff* Sysmon config has `<HashAlgorithms>MD5</HashAlgorithms>`. Sysmon default is SHA256 only → MD5 often absent (honest null). |
-| Memory (dumpfiles + external hashing) | load | NO | **No-source (not implemented).** dlllist/PEB walk yields no hash; `windows.dumpfiles` + a hash step could produce it but PIIAT-Mem does not run it. |
+| Memory (dumpfiles + external hashing) | load | NO | **No-source (not implemented).** dlllist/PEB walk yields no hash; `windows.dumpfiles` + a hash step could produce it but Anamnesis does not run it. |
 | Plaso pe/pecoff | load | NO (pecoff emits **sha256 only**, and as a `file` object) | **No-source for md5.** See sha256 row. |
 | amcache | load | NO (amcache emits **sha1 only**, as a `process` object) | **No-source for md5.** |
 | WMI 5857 | load | NO | No-source. |
@@ -169,7 +169,7 @@ Native-field notation: `source → NativeField`. "Mapped?" = does the shipping e
 
 ### UNMAPPED gaps — ranked
 
-1. **Memory injection detection — `ldrmodules` / unlinked-module view (NOT IMPLEMENTED).** PIIAT-Mem walks only the PEB *load-order* list (`windows.piiat.modules` == `windows.dlllist`), so it sees only linked modules. There is **no `ldrmodules` plugin** cross-referencing the three PEB lists (load/init/mem order) to flag unlinked = injected/hidden DLLs. `malfind` exists but is a **trigger only** (timeline overlay, never stored as a module record — `piiat_mem/timeline.py`, `cli.py:71`). *Highest-value gap: injected-module detection is absent from the module object.* Would add nothing to the 12 canonical fields but a native `unlinked/injected` flag (no CAR home → native) plus base_address for hidden modules.
+1. **Memory injection detection — `ldrmodules` / unlinked-module view (NOT IMPLEMENTED).** Anamnesis walks only the PEB *load-order* list (`windows.piiat.modules` == `windows.dlllist`), so it sees only linked modules. There is **no `ldrmodules` plugin** cross-referencing the three PEB lists (load/init/mem order) to flag unlinked = injected/hidden DLLs. `malfind` exists but is a **trigger only** (timeline overlay, never stored as a module record — `piiat_mem/timeline.py`, `cli.py:71`). *Highest-value gap: injected-module detection is absent from the module object.* Would add nothing to the 12 canonical fields but a native `unlinked/injected` flag (no CAR home → native) plus base_address for hidden modules.
 
 2. **Prefetch loaded-modules list (`mapped_files`) not exploded into module rows.** Plaso `windows:prefetch:execution` carries `mapped_files` — the DLL/file list the run touched — but it is kept **native on the process/create event** (`plaso_exec.py:231`), never decomposed into `module/load` rows. *High value, low cost:* each `mapped_files` entry → a `module/load` with `module_path`, `module_name`, and `pid`/`image_path` from the owning process event. Caveat: prefetch has no per-module load time, no base_address, no hash (path only), and mixes DLLs with data files.
 
@@ -178,7 +178,7 @@ Native-field notation: `source → NativeField`. "Mapped?" = does the shipping e
    - **amcache** → `sha1` on a **process** event (`plaso_exec.py:286`).
    A cross-source enrichment joining `module.module_path` to these `file`/entity rows would hydrate `sha256_hash`/`sha1_hash`/`md5_hash` for modules that Sysmon logged without hashing (or that only memory/prefetch saw). Not wired.
 
-4. **Memory module hashing (`dumpfiles` + hash) — NOT IMPLEMENTED.** Would give md5/sha1/sha256 for a module seen only in memory (incl. injected ones from gap #1). PIIAT-Mem does not run `windows.dumpfiles` or hash dumped regions.
+4. **Memory module hashing (`dumpfiles` + hash) — NOT IMPLEMENTED.** Would give md5/sha1/sha256 for a module seen only in memory (incl. injected ones from gap #1). Anamnesis does not run `windows.dumpfiles` or hash dumped regions.
 
 5. **Signer/signature_valid limited to Sysmon EID 7.** Any module seen only via WMI/memory/prefetch/pe has null signer & signature_valid. No Authenticode verification runs outside Sysmon's own WinVerifyTrust stamp. (EZ-Tools/PECmd/AmcacheParser are not wired as module sources — Plaso covers those artefact classes.)
 
