@@ -11,7 +11,7 @@ gated behind the capability determination — never part of the per-file product
 One input file -> route to its artefact map(s) -> normalize -> enrich
 (self-contained) -> <out>/car.db + <out>/car_<object>.jsonl (the downstream
 ingest contract — DX_DFIR ships the JSONL to Elastic).
-A Anamnesis car.db input passes through 1:1 (already finished CAR).
+An Anamnesis car.db input passes through 1:1 (already finished CAR).
 
 Routing is by filename when --artefacts is not given; a Security log feeds BOTH
 its authentication and its user_session maps (same file — the in-file LUID join
