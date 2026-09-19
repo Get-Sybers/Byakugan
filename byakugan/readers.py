@@ -22,7 +22,7 @@ import sqlite3
 
 from . import normalize
 
-# columns of the piiat car.db header that translate into ours
+# columns of the Anamnesis car.db header that translate into ours
 _ANAMNESIS_HEADER = {"timestamp", "car_action", "guid", "owning_pid", "owning_offset",
                  "owning_guid", "parent_pid", "parent_guid", "link_confidence",
                  "source_plugin", "source_image", "native", "event_id"}

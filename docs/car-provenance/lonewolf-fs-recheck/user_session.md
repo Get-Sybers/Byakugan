@@ -37,7 +37,7 @@ session semantics is thrown away. So the answer to the "is ANY disk source mappe
 below is **NO, everywhere.**
 
 Second-order gap: `byakugan/byakugan/enrich.py` has **no SID→user resolution from plaso ProfileList rows**. (The
-separate Anamnesis/Volatility `enrich.py:_sid_user_index` does a ProfileList join, but it keys on a flat
+separate Anamnesis `enrich.py:_sid_user_index` does a ProfileList join, but it keys on a flat
 `value=="ProfileImagePath"` shape the plaso registry rows — which nest values in a `_native.values` LIST — do
 not have.) So even the `uid`↔`user` link that disk fully supports is not wired on the disk lane.
 

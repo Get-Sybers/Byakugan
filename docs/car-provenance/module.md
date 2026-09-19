@@ -20,7 +20,7 @@ Three sources emit `module` events today. **All three emit only `action: load`. 
 |---|---|---|---|---|
 | **Sysmon** `Microsoft-Windows-Sysmon/Operational` | **EID 7 ImageLoad** | module/load | `sysmon.py:389` (`sysmon_module_load`, EID==7) | module_path, module_name, image_path, pid, md5_hash, sha1_hash, sha256_hash, signer, signature_valid, hostname, fqdn — **11 of 12** (no base_address, no tid) |
 | **WMI-Activity** `Microsoft-Windows-WMI-Activity/Operational` | **EID 5857** (provider DLL loaded) | module/load | `evtx_more.py:120` (`em_is_wmi_5857`) | module_path, module_name, image_path, pid, hostname, fqdn — **6 of 12** |
-| **Memory / Volatility3** (Anamnesis) | `windows.piiat.modules` (PEB load-order walk; == `windows.dlllist`) | module/load | `piiat-mem mappings.py:223` + `:275`; plugin `modules.py` | module_path(Path), module_name(Name), **base_address(Base)**, pid, + image_path/hostname/fqdn by enrichment — **7 of 12** |
+| **Memory / Anamnesis** (MemProcFS) | `windows.piiat.modules` (PEB load-order walk; == `windows.dlllist`) | module/load | `piiat-mem mappings.py:223` + `:275`; plugin `modules.py` | module_path(Path), module_name(Name), **base_address(Base)**, pid, + image_path/hostname/fqdn by enrichment — **7 of 12** |
 
 The Sysmon EID 7 map is the only one the upstream `module.yaml coverage_map` records (as sensor `sysmon_13`). WMI-5857 and memory are wired in this repo's maps but not reflected in that upstream coverage stub.
 

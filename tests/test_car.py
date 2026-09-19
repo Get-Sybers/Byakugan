@@ -198,9 +198,9 @@ def test_store_roundtrip_and_jsonl_export(tmp_path):
     st.close()
 
 
-def test_piiat_car_passthrough(tmp_path):
+def test_anamnesis_car_passthrough(tmp_path):
     import sqlite3
-    src = str(tmp_path / "piiat.db")
+    src = str(tmp_path / "anamnesis.db")
     c = sqlite3.connect(src)
     c.execute("CREATE TABLE process (timestamp, car_action, guid, owning_pid, owning_offset,"
               " owning_guid, parent_pid, parent_guid, link_confidence, source_plugin,"
