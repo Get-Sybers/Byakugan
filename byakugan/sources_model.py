@@ -182,17 +182,17 @@ DERIVATIONS: dict[str, Derivation] = {
 _PASSTHROUGH = {
     "memory": {
         "derivation": Derivation(
-            "PIIAT-Mem (Volatility 3)", "Get-Sybers / Volatility Foundation",
-            "https://github.com/Get-Sybers/PIIAT-Mem", "memory image (car.db)",
+            "flashback (MemProcFS)", "Get-Sybers",
+            "https://github.com/Get-Sybers/flashback", "memory image (car.db)",
             "memory image"),
         "input_pattern": ["car.db"],
-        # the guid PIIAT-Mem mints: the _EPROCESS offset as proc-<hex> (spindle.yml external:)
+        # the guid flashback mints: the _EPROCESS offset as proc-<hex> (spindle.yml external:)
         "identity": {"external": ["memory_proc_offset"]},
         "description": (
-            "PIIAT-Mem normalises a memory image directly into finished MITRE "
+            "flashback normalises a memory image directly into finished MITRE "
             "CAR (its own car.db); the pipeline passes those events through 1:1 "
             "(no re-mapping here). Object/action/field coverage is defined by "
-            "PIIAT-Mem, not by this repo's maps, so it is not enumerated here."),
+            "flashback, not by this repo's maps, so it is not enumerated here."),
     },
 }
 
