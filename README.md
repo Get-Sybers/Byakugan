@@ -35,7 +35,22 @@ make -C go build                                 # the Go parse engine (Go >= 1.
 python -m byakugan --in <file-or-dir> --out <dir>   # one source
 python -m byakugan --batch <processed_dir>          # every source, isolated
 python -m byakugan.timeline <car-dir>               # one property-rich, time-ordered timeline
+python -m byakugan.verify <car-dir>                 # the CAR run-through (correctness gate)
+byakugan build|timeline|verify|car-vocab            # env-driven (BYAKUGAN_<SUBTOOL>_*): one JSON summary line
 ```
+
+`byakugan <sub-tool>` with nothing else is the container entry point
+(`byakugan/cli.py`): each sub-tool reads its own `BYAKUGAN_<SUBTOOL>_INPUT_DIR`
+/ `_OUT_DIR` / `_FORCE` / `_LOG_LEVEL` block, prints exactly one JSON summary
+line on stdout and exits by the uniform table (0 ok, 1 nothing — or the verify
+gate failed, 2 config error, 3 partial). A sub-tool followed by arguments is
+the pass-through to that module's own CLI.
+
+`--batch` discovers the processed tree's sources: `windows_logs/<item>/goevtx.jsonl`
+(and `*_EvtxECmd_Output.json` directories), `zeek/<capture>/`,
+`log2timeline/jsonl/<source>/timeline.jsonl` (and raw `<image>.jsonl`
+containers), `godfir-toolz/<tool>/<item>/<tool>.jsonl` (and `godfir-toolz/<host>/`
+trees) and `memory/<image>/car.db` — one isolated store each.
 
 **The parse stage is Go-accelerated.** Everything from a raw processor file to
 the pre-enrichment CAR event stream — line reading, raw-l2t container splitting,
