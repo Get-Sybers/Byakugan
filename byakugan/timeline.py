@@ -153,8 +153,7 @@ def _filter_and_sort(rows: list[dict], host: str | None, after: str | None,
         rows = [e for e in rows
                 if (dt := _parse_ts(e.get("timestamp"))) is not None
                 and (lo is None or dt >= lo) and (hi is None or dt <= hi)]
-    rows.sort(key=_sort_key)
-    return rows
+    return _sort_rows(rows)
 
 
 # --------------------------------------------------------------------------- #
@@ -257,26 +256,56 @@ def build_timeline_from_elastic(es_url: str, namespace: str = "default", *,
     return _filter_and_sort(rows, host, after, before)
 
 
-def _sort_key(e: dict):
-    """Order by the true instant; unparseable timestamps sort last (by their
-    raw string); within one instant an object precedes its relationships;
-    within THAT (two rows tied on both — routine: independent sources sharing
-    whole-second evidence timestamps, or two edges off the same event), the
-    entry's own canonical JSON breaks the tie. That last component is what
-    makes the order (and so, via write_jsonl, the output BYTES) depend only
-    on each row's own DATA — never on which tier produced it (car.db/
-    superset.db's SQLite enumeration order, or the arbitrary order
-    Elasticsearch's search_after pagination happens to return hits in —
-    byakugan.timeline's --elastic source, epic #99 phase 5) or on the
-    otherwise-implementation-defined order rows were appended in before this
-    sort. A genuine, byte-identical duplicate row ties even on this — the two
-    are interchangeable, so which one sorts first is moot."""
+def _primary_key(e: dict):
+    """The cheap ordering component: the true instant (unparseable timestamps
+    sort last, by their raw string); within one instant an object precedes
+    its relationships."""
     dt = _parse_ts(e.get("timestamp"))
     edge = e.get("kind") == "relationship"
-    tie = json.dumps(e, default=str, sort_keys=True)
     if dt is not None:
-        return (0, dt, edge, tie)
-    return (1, e.get("timestamp") or "", edge, tie)
+        return (0, dt, edge)
+    return (1, e.get("timestamp") or "", edge)
+
+
+def _tie(e: dict) -> str:
+    """The collision tiebreak: the entry's own canonical JSON, which makes
+    the order (and so, via write_jsonl, the output BYTES) depend only on each
+    row's own DATA — never on which tier produced it (car.db/superset.db's
+    SQLite enumeration order, or the arbitrary order Elasticsearch's
+    search_after pagination happens to return hits in — the --elastic source,
+    epic #99 phase 5) or on the otherwise-implementation-defined order rows
+    were appended in before the sort. A genuine, byte-identical duplicate row
+    ties even on this — the two are interchangeable, so which one sorts first
+    is moot."""
+    return json.dumps(e, default=str, sort_keys=True)
+
+
+def _sort_key(e: dict):
+    """_primary_key + _tie as one composite — the full canonical ordering of
+    a single entry. The bulk path is _sort_rows, which pays _tie's whole-row
+    serialisation only for entries that actually collide on _primary_key
+    (routine: independent sources sharing whole-second evidence timestamps,
+    or two edges off the same event) instead of for every row."""
+    return (*_primary_key(e), _tie(e))
+
+
+def _sort_rows(rows: list[dict]) -> list[dict]:
+    """Sort by _primary_key, then re-order only the runs that tied on it by
+    _tie — the same ordering as sorting every row by _sort_key (asserted by
+    tests), without serialising every row's JSON when few or none collide."""
+    keyed = sorted(((_primary_key(e), e) for e in rows), key=lambda ke: ke[0])
+    out: list[dict] = []
+    i, n = 0, len(keyed)
+    while i < n:
+        j = i + 1
+        while j < n and keyed[j][0] == keyed[i][0]:
+            j += 1
+        if j - i > 1:
+            out.extend(sorted((ke[1] for ke in keyed[i:j]), key=_tie))
+        else:
+            out.append(keyed[i][1])
+        i = j
+    return out
 
 
 def write_jsonl(rows: list[dict], out: str) -> int:

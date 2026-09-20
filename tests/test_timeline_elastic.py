@@ -330,3 +330,22 @@ def test_elastic_connection_failure_is_a_clean_system_exit_not_a_traceback():
     summary — never an uncaught OSError crashing the container sub-tool."""
     with pytest.raises(SystemExit, match="--elastic"):
         timeline.build_timeline_from_elastic("http://127.0.0.1:1", NAMESPACE)
+
+
+def test_sort_rows_matches_sort_key():
+    """_sort_rows (the collision-only tiebreak path) orders exactly as the
+    per-row composite _sort_key: tied instants, tied instant+kind, an
+    object/edge tie at one instant, unparseable and absent timestamps."""
+    rows = [
+        {"timestamp": "2024-01-01T00:00:01", "kind": "object", "object": "b"},
+        {"timestamp": "2024-01-01T00:00:01", "kind": "object", "object": "a"},
+        {"timestamp": "2024-01-01T00:00:01", "kind": "relationship",
+         "relationship": "created", "source_guid": "s", "target_guid": "t"},
+        {"timestamp": "2024-01-01T00:00:00", "kind": "object", "object": "z"},
+        {"timestamp": "not-a-time", "kind": "object", "object": "y"},
+        {"timestamp": "not-a-time", "kind": "object", "object": "x"},
+        {"timestamp": None, "kind": "object", "object": "w"},
+        {"timestamp": "2024-01-01T00:00:01", "kind": "object", "object": "a"},
+    ]
+    expect = sorted(rows, key=timeline._sort_key)
+    assert timeline._sort_rows(list(rows)) == expect
