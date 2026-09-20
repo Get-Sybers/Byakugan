@@ -12,8 +12,9 @@ environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else)
                          --out BYAKUGAN_TIMELINE_OUT_DIR/timeline.jsonl [--host …]
     byakugan verify      the CAR run-through (verify.py) over a materialised
                          tree: verify BYAKUGAN_VERIFY_INPUT_DIR — the report on
-                         stderr and, when BYAKUGAN_VERIFY_OUT_DIR is writable,
-                         in <OUT_DIR>/verify.txt
+                         stderr and in <OUT_DIR>/verify.txt when the output dir
+                         is writable (an absent or read-only /output is fine:
+                         the gate still runs, stderr only)
     byakugan car-vocab   {object: [car_actions]} — the canonical car_action
                          vocabulary the verify gate checks values against; its
                          stdout IS that JSON, one line
@@ -89,13 +90,28 @@ def engine_ref() -> str:
     return os.environ.get("BYAKUGAN_REF") or ""
 
 
+def _probe_writable(path: str) -> str | None:
+    """None when a file can be created under the directory `path`, else why
+    not (a read-only mount, a missing directory, a path that is a file)."""
+    try:
+        probe = os.path.join(path, f".probe-{os.getpid()}")
+        with open(probe, "w"):
+            pass
+        os.remove(probe)
+    except OSError as e:
+        return e.strerror or str(e)
+    return None
+
+
 class Config:
     """The resolved env block of one sub-tool (BYAKUGAN_<SUBTOOL>_*).
 
     The input dir must exist. The output dir is required (created and probed
-    writable) unless `out_optional`: then it is used only when named
-    explicitly or when the default already exists (a mounted /output), and is
-    None otherwise — the default path is never created as a side effect."""
+    writable) unless `out_optional`: then a dir named explicitly must be
+    writable, while the default is used only when it already exists and is
+    writable (a mounted, read-write /output) and is None otherwise — an
+    absent or read-only default is not an error, and the default path is
+    never created as a side effect."""
 
     def __init__(self, subtool: str, env, out_optional: bool = False):
         self.subtool = subtool
@@ -111,20 +127,24 @@ class Config:
             raise ConfigError(f"{self.prefix}_INPUT_DIR {self.input_dir}: not a readable directory")
         explicit = self._env.get(f"{self.prefix}_OUT_DIR") or ""
         self.out_dir: str | None = explicit or DEFAULT_OUT_DIR
-        if out_optional and not explicit and not os.path.isdir(self.out_dir):
-            self.out_dir = None
+        self.out_dir_unused: str | None = None       # why the optional default is not used
+        if out_optional and not explicit:
+            why = (_probe_writable(self.out_dir) if os.path.isdir(self.out_dir)
+                   else "no such directory")
+            if why is not None:
+                self.out_dir_unused = f"{self.out_dir}: {why}"
+                self.out_dir = None
         if self.out_dir is not None:
             self._ensure_writable(self.out_dir)
 
     def _ensure_writable(self, path: str) -> None:
         try:
             os.makedirs(path, exist_ok=True)
-            probe = os.path.join(path, f".probe-{os.getpid()}")
-            with open(probe, "w"):
-                pass
-            os.remove(probe)
         except OSError as e:
             raise ConfigError(f"{self.prefix}_OUT_DIR {path}: not writable: {e}") from e
+        why = _probe_writable(path)
+        if why is not None:
+            raise ConfigError(f"{self.prefix}_OUT_DIR {path}: not writable: {why}")
 
     def get(self, suffix: str, default: str) -> str:
         return self._env.get(f"{self.prefix}_{suffix}") or default
@@ -146,17 +166,25 @@ class Config:
 
 def run_engine(main, argv: list[str]):
     """Run an engine main() with its stdout captured (it prints its own JSON
-    summary there); return (return code or None, captured stdout, SystemExit
-    message or None)."""
+    summary there); return (return code, captured stdout, error message or
+    None). A returned code is the engine's verdict (0 ok, 1 nothing). A
+    SystemExit is the engine failing fast — argparse refusing the argv (code
+    2), a missing parse binary (a message) — and is reported as the error
+    message, a config error; only SystemExit(0)/SystemExit(None) is success."""
     saved = sys.stdout
     buf = io.StringIO()
     sys.stdout = buf
     try:
         rc = main(argv)
         message = None
-    except SystemExit as e:                 # argparse errors, the engine's own fail-fast exits
-        rc = e.code if isinstance(e.code, int) else None
-        message = None if isinstance(e.code, int) else str(e.code)
+    except SystemExit as e:
+        code = e.code
+        if code is None or code == 0:
+            rc, message = 0, None
+        elif isinstance(code, int):
+            rc, message = code, f"engine exited {code} (rejected arguments: {' '.join(argv)})"
+        else:
+            rc, message = None, str(code)
     finally:
         sys.stdout = saved
     return rc, buf.getvalue(), message
@@ -296,6 +324,8 @@ def _verify(cfg: Config, run: _Run) -> int:
         with open(os.path.join(cfg.out_dir, "verify.txt"), "w", encoding="utf-8") as fh:
             fh.write(text)
         s["outputs"] = [cfg.out_dir]
+    else:
+        cfg.log(2, f"no writable output dir ({cfg.out_dir_unused}): report on stderr only")
     cfg.log(2, f"{s['inputs']} source(s), {s['records']} rows: {c.passed} passed, "
                f"{c.failed} failed, {c.skipped} not exercised")
     return run.finish("failed", EXIT_NOTHING) if c.failed else run.finish("ok", EXIT_OK)

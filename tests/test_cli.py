@@ -120,6 +120,59 @@ def test_verify_nothing_to_verify_and_config_errors(tmp_path, env, capsys):
     assert s["status"] == "config_error" and "BYAKUGAN_VERIFY_LOG_LEVEL" in s["error"]
 
 
+def _sane_tree(tmp_path):
+    car = tmp_path / "car"
+    _write(car, "sysmon", "process", [_row("process", "create", command_line="cmd.exe /c whoami",
+                                          sid="S-1-5-18", pid="4536")])
+    return car
+
+
+def test_verify_runs_without_a_writable_output_dir(tmp_path, env, vocab, capsys):
+    """The output mount is optional for verify: an absent, read-only or
+    not-a-directory default /output never stops the gate — it runs, reports on
+    stderr only and lists no outputs."""
+    env.setenv("BYAKUGAN_VERIFY_INPUT_DIR", str(_sane_tree(tmp_path)))
+
+    # absent: the env fixture's default does not exist (and is never created)
+    assert cli.main(["verify"]) == 0
+    s, err = _summary(capsys)
+    assert s["status"] == "ok" and s["outputs"] == []
+    assert "CAR run-through passed" in err and "report on stderr only" in err
+    assert not os.path.exists(cli.DEFAULT_OUT_DIR)
+
+    # read-only: the default exists (a mounted /output) but nothing can be
+    # written under it — the probe fails as it does on a read-only bind mount
+    ro = tmp_path / "ro-output"
+    ro.mkdir()
+    probe = cli._probe_writable
+    env.setattr(cli, "DEFAULT_OUT_DIR", str(ro))
+    env.setattr(cli, "_probe_writable",
+                lambda path: "Read-only file system" if path == str(ro) else probe(path))
+    assert cli.main(["verify"]) == 0
+    s, err = _summary(capsys)
+    assert s["status"] == "ok" and s["outputs"] == []
+    assert "Read-only file system" in err and "report on stderr only" in err
+    assert not (ro / "verify.txt").exists()
+    env.setattr(cli, "_probe_writable", probe)
+
+    # not a directory: the default path is a file
+    env.setattr(cli, "DEFAULT_OUT_DIR", str(tmp_path / "output-file"))
+    (tmp_path / "output-file").write_text("")
+    assert cli.main(["verify"]) == 0
+    s, err = _summary(capsys)
+    assert s["status"] == "ok" and s["outputs"] == [] and "report on stderr only" in err
+
+
+def test_verify_named_output_dir_must_be_writable(tmp_path, env, vocab, capsys):
+    # an OUT_DIR named explicitly is the operator's intent: unusable = config error
+    env.setenv("BYAKUGAN_VERIFY_INPUT_DIR", str(_sane_tree(tmp_path)))
+    (tmp_path / "a-file").write_text("")
+    env.setenv("BYAKUGAN_VERIFY_OUT_DIR", str(tmp_path / "a-file" / "out"))
+    assert cli.main(["verify"]) == 2
+    s, _err = _summary(capsys)
+    assert s["status"] == "config_error" and "BYAKUGAN_VERIFY_OUT_DIR" in s["error"]
+
+
 def test_verify_is_dispatchable_from_the_command(tmp_path):
     """`byakugan verify` with nothing else — what the container ENTRYPOINT runs —
     dispatches through __main__ to the env-driven sub-tool; `byakugan verify
@@ -180,6 +233,46 @@ def test_build_over_an_empty_tree_is_nothing(tmp_path, env, capsys):
     assert cli.main(["build"]) == 1
     s, _err = _summary(capsys)
     assert s["status"] == "nothing" and s["inputs"] == 0 and s["engine"] == []
+
+
+def test_engine_rejecting_its_arguments_is_a_config_error(tmp_path, env, capsys):
+    """An engine that exits non-zero without running (argparse refusing the
+    argv) is a config error, exit 2 — not `nothing`."""
+    env.setenv("BYAKUGAN_BUILD_INPUT_DIR", str(tmp_path))
+    env.setenv("BYAKUGAN_BUILD_OUT_DIR", str(tmp_path / "car"))
+    env.setenv("BYAKUGAN_BUILD_ARGS", "--no-such-flag")
+    assert cli.main(["build"]) == 2
+    s, _err = _summary(capsys)
+    assert s["status"] == "config_error" and s["exit"] == 2
+    assert "exited 2" in s["error"] and "--no-such-flag" in s["error"]
+    assert s["inputs"] == 0 and "engine" not in s
+
+    env.setenv("BYAKUGAN_TIMELINE_INPUT_DIR", str(tmp_path))
+    env.setenv("BYAKUGAN_TIMELINE_OUT_DIR", str(tmp_path / "tl"))
+    env.setenv("BYAKUGAN_TIMELINE_ARGS", "--no-such-flag")
+    assert cli.main(["timeline"]) == 2
+    s, _err = _summary(capsys)
+    assert s["status"] == "config_error" and "exited 2" in s["error"]
+
+
+def test_run_engine_maps_system_exit():
+    def raising(code):
+        def main(_argv):
+            raise SystemExit(code)
+        return main
+
+    assert cli.run_engine(lambda _argv: 1, [])[0::2] == (1, None)     # the engine's own verdict
+    assert cli.run_engine(raising(0), [])[0::2] == (0, None)          # SystemExit(0): success
+    assert cli.run_engine(raising(None), [])[0::2] == (0, None)       # SystemExit(): success
+    rc, _out, message = cli.run_engine(raising(2), ["--bad"])
+    assert rc == 2 and message == "engine exited 2 (rejected arguments: --bad)"
+    rc, _out, message = cli.run_engine(raising("byakugan-parse not found"), [])
+    assert rc is None and message == "byakugan-parse not found"       # the engine's fail-fast message
+
+    def prints(_argv):
+        print('{"ok": true}')
+        return 0
+    assert cli.run_engine(prints, []) == (0, '{"ok": true}\n', None)  # stdout captured
 
 
 # --- the dispatcher ---------------------------------------------------------
