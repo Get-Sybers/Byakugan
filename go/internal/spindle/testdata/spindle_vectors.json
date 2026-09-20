@@ -14,7 +14,7 @@
     "file_path": "/tmp/x",
     "_native": {}
    },
-   "guid": "06a168bf-ed13-50f6-819c-3a237502dbf3",
+   "guid": "5d572d69-92be-5451-8ee0-5179d9c78930",
    "natives": {
     "spindle_key": {
      "_obj": "file",
@@ -43,7 +43,7 @@
     "file_path": "/tmp/x",
     "_native": {}
    },
-   "guid": "f7e4b5b4-6c07-5916-b2aa-9ce9b91ab597",
+   "guid": "78502a69-a3a3-52a0-9037-169f94e62f73",
    "natives": {
     "spindle_key": {
      "_obj": "file",
@@ -72,7 +72,7 @@
     "file_path": "/tmp/x",
     "_native": {}
    },
-   "guid": "f7e4b5b4-6c07-5916-b2aa-9ce9b91ab597",
+   "guid": "78502a69-a3a3-52a0-9037-169f94e62f73",
    "natives": {
     "spindle_key": {
      "_obj": "file",
@@ -133,7 +133,7 @@
      "file_reference": 843
     }
    },
-   "guid": "f07d40f2-945c-52b9-80a6-ff0cf9d98486",
+   "guid": "67b306db-8c30-58fa-9e96-fb7cd43583b1",
    "natives": {
     "spindle_key": {
      "_obj": "file",
@@ -161,7 +161,7 @@
     "file_path": "/x",
     "_native": {}
    },
-   "guid": "a7d40237-f001-5030-9225-66cc7085fd52",
+   "guid": "72c35a87-1d9e-5e9d-906f-add882bf15b2",
    "natives": {
     "spindle_key": {
      "_obj": "file",
@@ -192,7 +192,7 @@
     "url_full": "v1",
     "timestamp": "v2"
    },
-   "guid": "42038fe8-7e68-53cc-b9b0-8eaa43317382",
+   "guid": "56b51341-01e4-57ea-96ba-375d627ad91a",
    "natives": {
     "spindle_key": {
      "_obj": "http",
@@ -224,7 +224,7 @@
     "url_full": "v1",
     "timestamp": "v2"
    },
-   "guid": "42038fe8-7e68-53cc-b9b0-8eaa43317382",
+   "guid": "56b51341-01e4-57ea-96ba-375d627ad91a",
    "natives": {
     "spindle_key": {
      "_obj": "http",

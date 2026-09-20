@@ -7,7 +7,7 @@
 Grounding read:
 - Semantics: `byakugan/third_party/car/data_model/module.yaml`; `byakugan/third_party/car/OSSEM-CDM/schemas/entities/module.yml` (fields: name, path, is_signed, signature, signature_status — no hashes, no base_address, no tid in the CDM either); `car_data_model.json` (object list).
 - Engine maps: `byakugan/byakugan/mappings/sysmon.py` (EID 7), `.../mappings/evtx_more.py` (WMI 5857); sources `.../sources/evtx_sysmon.yaml`, `.../sources/evtx_more.yaml`, `.../sources/memory.yaml`.
-- Memory maps (Anamnesis, finished-CAR passthrough): `third_party/piiat-mem/piiat_mem/mappings.py`, plugin `third_party/piiat-mem/plugins/windows/piiat/modules.py`, enrichment `third_party/piiat-mem/piiat_mem/enrich.py`.
+- Memory maps (Anamnesis, finished-CAR passthrough): `Anamnesis internal/normalize/mappings.yaml`, plugin `Anamnesis internal/collect (collectModules)`, enrichment `the Anamnesis engine/Anamnesis internal/enrich`.
 - Evidence: `data_store/processed/windows_logs/unspecified_host/log_EvtxECmd_Output.json`; `data_store/processed/volatility/memdump.mem/car.db`.
 
 ---
@@ -20,11 +20,11 @@ Three sources emit `module` events today. **All three emit only `action: load`. 
 |---|---|---|---|---|
 | **Sysmon** `Microsoft-Windows-Sysmon/Operational` | **EID 7 ImageLoad** | module/load | `sysmon.py:389` (`sysmon_module_load`, EID==7) | module_path, module_name, image_path, pid, md5_hash, sha1_hash, sha256_hash, signer, signature_valid, hostname, fqdn — **11 of 12** (no base_address, no tid) |
 | **WMI-Activity** `Microsoft-Windows-WMI-Activity/Operational` | **EID 5857** (provider DLL loaded) | module/load | `evtx_more.py:120` (`em_is_wmi_5857`) | module_path, module_name, image_path, pid, hostname, fqdn — **6 of 12** |
-| **Memory / Anamnesis** (MemProcFS) | `windows.piiat.modules` (PEB load-order walk; == `windows.dlllist`) | module/load | `piiat-mem mappings.py:223` + `:275`; plugin `modules.py` | module_path(Path), module_name(Name), **base_address(Base)**, pid, + image_path/hostname/fqdn by enrichment — **7 of 12** |
+| **Memory / Anamnesis** (MemProcFS) | `windows.anamnesis.modules` (PEB load-order walk; == `windows.dlllist`) | module/load | `Anamnesis mappings.yaml` + `:275`; plugin `modules.py` | module_path(Path), module_name(Name), **base_address(Base)**, pid, + image_path/hostname/fqdn by enrichment — **7 of 12** |
 
 The Sysmon EID 7 map is the only one the upstream `module.yaml coverage_map` records (as sensor `sysmon_13`). WMI-5857 and memory are wired in this repo's maps but not reflected in that upstream coverage stub.
 
-**Live evidence caveat:** the current processed store contains **zero** module rows. The EvtxECmd export has only Sysmon EID 1 (45) and EID 5 (39) — no EID 7 — and the `memdump.mem/car.db` `module` table has 0 rows (the `windows.piiat.modules` plugin was not run in that capture; only pslist/processes/registry/sessions/mftscan/banners were). The `module` table schema in `car.db` does carry all 12 canonical columns + `base_address` + `tid`, so the pipe is complete; it just has no populated sample here.
+**Live evidence caveat:** the current processed store contains **zero** module rows. The EvtxECmd export has only Sysmon EID 1 (45) and EID 5 (39) — no EID 7 — and the `memdump.mem/car.db` `module` table has 0 rows (the `windows.anamnesis.modules` plugin was not run in that capture; only pslist/processes/registry/sessions/mftscan/banners were). The `module` table schema in `car.db` does carry all 12 canonical columns + `base_address` + `tid`, so the pipe is complete; it just has no populated sample here.
 
 ---
 
@@ -35,7 +35,7 @@ Native-field notation: `source → NativeField`. "Mapped?" = does the shipping e
 ### base_address
 | sources (source → native field) | action | currently mapped? | confidence & caveats |
 |---|---|---|---|
-| Memory `windows.piiat.modules`/`windows.dlllist` → `Base` (`DllBase` of `_LDR_DATA_TABLE_ENTRY`) | load | **YES** — piiat-mem `mappings.py:228,280` (`base_address: "Base"`) | **High.** Memory is the *only* source that has a base address — it is a runtime virtual-address concept. Point-in-time snapshot of currently-loaded state. |
+| Memory `windows.anamnesis.modules`/`windows.dlllist` → `Base` (`DllBase` of `_LDR_DATA_TABLE_ENTRY`) | load | **YES** — anamnesis `mappings.py:228,280` (`base_address: "Base"`) | **High.** Memory is the *only* source that has a base address — it is a runtime virtual-address concept. Point-in-time snapshot of currently-loaded state. |
 | Sysmon EID 7 | load | NO | **No-source.** ImageLoad event carries no load address. |
 | WMI 5857 / Plaso pe / amcache / prefetch | load | NO | **No-source.** None are runtime-memory views; none carry a VA. |
 
@@ -46,21 +46,21 @@ Native-field notation: `source → NativeField`. "Mapped?" = does the shipping e
 |---|---|---|---|
 | Sysmon EID 7 → `Computer` (claimed only if it contains a dot) | load | **YES** — `sysmon.py:248` via `_FQDN` (`EVTX_FQDN`) | **High**, but null when `Computer` is a bare NetBIOS name (honest null, never faked). |
 | WMI 5857 → `Computer` | load | **YES** — `evtx_more.py:129` (`_FQDN`) | High, same dot-guard caveat. |
-| Memory `windows.piiat.modules` (inherited) | load | **YES (derived)** — `enrich.py:72` `_INHERIT` copies `fqdn` from the owning process | **Medium.** Present only if the owning process event itself carries fqdn (from `windows.info`); memory images often lack a real FQDN → null. |
+| Memory `windows.anamnesis.modules` (inherited) | load | **YES (derived)** — `enrich.py:72` `_INHERIT` copies `fqdn` from the owning process | **Medium.** Present only if the owning process event itself carries fqdn (from `windows.info`); memory images often lack a real FQDN → null. |
 
 ### hostname
 | sources | action | mapped? | confidence & caveats |
 |---|---|---|---|
 | Sysmon EID 7 → `Computer` (first DNS label) | load | **YES** — `sysmon.py:248` (`_HOSTNAME`) | **High.** Always derivable from `Computer`. |
 | WMI 5857 → `Computer` | load | **YES** — `evtx_more.py:129` (`_HOST`) | High. |
-| Memory `windows.piiat.modules` (inherited) | load | **YES (derived)** — `enrich.py` `_INHERIT` | **Medium.** Inherited from owning process (from `windows.info` computer name); null if unavailable. |
+| Memory `windows.anamnesis.modules` (inherited) | load | **YES (derived)** — `enrich.py` `_INHERIT` | **Medium.** Inherited from owning process (from `windows.info` computer name); null if unavailable. |
 
 ### image_path  *(CAR: "the file system location of the **process** image" — i.e. the OWNING process, not the DLL)*
 | sources | action | mapped? | confidence & caveats |
 |---|---|---|---|
 | Sysmon EID 7 → `Image` (the loading process) | load | **YES** — `sysmon.py:396` (`image_path: payload("Image")`) | **High.** Directly the loader process image. Correct CAR semantics. |
 | WMI 5857 → `HostProcess` | load | **YES** — `evtx_more.py:127` | **High.** `HostProcess` is the WMI host process image. |
-| Memory `windows.piiat.modules` → owning `_EPROCESS` image (inherited) | load | **YES (derived)** — `enrich.py:340,380` `_inherit` fills `image_path` from the owner joined by `OwnerOffset` (definitive) or PID (heuristic) | **Medium-High.** Map deliberately leaves it null at extraction (`mappings.py` comment: module.image_path is the OWNING process's image; the DLL's own path is `module_path`), then enrichment fills it. Confidence tracks the join: definitive via OwnerOffset, heuristic via PID. |
+| Memory `windows.anamnesis.modules` → owning `_EPROCESS` image (inherited) | load | **YES (derived)** — `enrich.py:340,380` `_inherit` fills `image_path` from the owner joined by `OwnerOffset` (definitive) or PID (heuristic) | **Medium-High.** Map deliberately leaves it null at extraction (`mappings.py` comment: module.image_path is the OWNING process's image; the DLL's own path is `module_path`), then enrichment fills it. Confidence tracks the join: definitive via OwnerOffset, heuristic via PID. |
 
 ### md5_hash
 | sources | action | mapped? | confidence & caveats |
@@ -76,21 +76,21 @@ Native-field notation: `source → NativeField`. "Mapped?" = does the shipping e
 |---|---|---|---|
 | Sysmon EID 7 → `basename(ImageLoaded)` | load | **YES** — `sysmon.py:395` | **High.** |
 | WMI 5857 → `basename(ProviderPath)` | load | **YES** — `evtx_more.py:126` | **High.** |
-| Memory `windows.piiat.modules` → `Name` (`BaseDllName`) | load | **YES** — `mappings.py:228,280` | **High.** Native `BaseDllName` string; blank on unreadable entries → null. |
+| Memory `windows.anamnesis.modules` → `Name` (`BaseDllName`) | load | **YES** — `mappings.py:228,280` | **High.** Native `BaseDllName` string; blank on unreadable entries → null. |
 
 ### module_path  *(full path to the DLL/EXE loaded into the process)*
 | sources | action | mapped? | confidence & caveats |
 |---|---|---|---|
 | Sysmon EID 7 → `ImageLoaded` | load | **YES** — `sysmon.py:394` | **High.** The definitive path of the loaded image. |
 | WMI 5857 → `ProviderPath` (WMI provider DLL) | load | **YES** — `evtx_more.py:125` | **High**, but scope-limited: only WMI provider DLL loads, not general LoadLibrary. |
-| Memory `windows.piiat.modules` → `Path` (`FullDllName`) | load | **YES** — `mappings.py:227,279` | **High**, occasionally blank/paged-out `FullDllName` → null. |
+| Memory `windows.anamnesis.modules` → `Path` (`FullDllName`) | load | **YES** — `mappings.py:227,279` | **High**, occasionally blank/paged-out `FullDllName` → null. |
 
 ### pid  *(the process the module is loaded into)*
 | sources | action | mapped? | confidence & caveats |
 |---|---|---|---|
 | Sysmon EID 7 → `ProcessId` | load | **YES** — `sysmon.py:397` | **High.** |
 | WMI 5857 → `ProcessID` | load | **YES** — `evtx_more.py:128` | **High.** |
-| Memory `windows.piiat.modules` → `PID` (`UniqueProcessId` of the walked `_EPROCESS`) | load | **YES** — `mappings.py:228,280` | **High.** Also carries `OwnerOffset` (kernel pointer) for a definitive process link beyond the reusable PID. |
+| Memory `windows.anamnesis.modules` → `PID` (`UniqueProcessId` of the walked `_EPROCESS`) | load | **YES** — `mappings.py:228,280` | **High.** Also carries `OwnerOffset` (kernel pointer) for a definitive process link beyond the reusable PID. |
 
 ### sha1_hash
 | sources | action | mapped? | confidence & caveats |
@@ -130,7 +130,7 @@ Native-field notation: `source → NativeField`. "Mapped?" = does the shipping e
 
 | action | mapped sources | notes |
 |---|---|---|
-| **load** | Sysmon EID 7, WMI 5857, Memory `windows.piiat.modules`/`dlllist` | All three sources emit only `load`. |
+| **load** | Sysmon EID 7, WMI 5857, Memory `windows.anamnesis.modules`/`dlllist` | All three sources emit only `load`. |
 | **unload** | **NONE (honest no-source)** | No collected artefact emits a module-unload event. Sysmon has no unload EID; `FreeLibrary` is unlogged. Memory is a point-in-time snapshot of *currently-loaded* state (a load view, not an unload event). The upstream `coverage_map` also lists load only. |
 
 ---
@@ -139,7 +139,7 @@ Native-field notation: `source → NativeField`. "Mapped?" = does the shipping e
 
 - **Sysmon EID 7 (ImageLoad):** `ImageLoaded`(→module_path), `Image`(→image_path), `ProcessId`(→pid), `ProcessGuid`(owner link), `Hashes`(MD5/SHA1/SHA256/**IMPHASH**), `Signed`, `Signature`(→signer), `SignatureStatus`(→signature_valid), `OriginalFileName`, `Company`, `Product`, `Description`, `FileVersion`, `User`, `Computer`(→hostname/fqdn), `UtcTime`, `RuleName`. **Kept native but NOT canonical:** IMPHASH, OriginalFileName, Company, Signed, raw SignatureStatus (`_KEEP` + Payload blob). No `base_address`, no thread id on the wire.
 - **WMI-Activity 5857:** `ProviderPath`(→module_path), `ProviderName`(native), `HostProcess`(→image_path), `ProcessID`(→pid), `Code`(native), `Computer`. No hashes, signer, base_address, tid.
-- **Memory `windows.piiat.modules`** (plugin `modules.py`): `OwnerOffset`(definitive owner link), `PID`(→pid), `ProcessName`(native), `Base`(→**base_address**), `Size`(native), `Name`(→module_name), `Path`(→module_path), `LoadTime`(→ts; Win≥6.1, zeroed for the EXE itself), `LoadCount`(native). No hash/signer/tid available from the PEB walk.
+- **Memory `windows.anamnesis.modules`** (plugin `modules.py`): `OwnerOffset`(definitive owner link), `PID`(→pid), `ProcessName`(native), `Base`(→**base_address**), `Size`(native), `Name`(→module_name), `Path`(→module_path), `LoadTime`(→ts; Win≥6.1, zeroed for the EXE itself), `LoadCount`(native). No hash/signer/tid available from the PEB walk.
 
 ---
 
@@ -169,7 +169,7 @@ Native-field notation: `source → NativeField`. "Mapped?" = does the shipping e
 
 ### UNMAPPED gaps — ranked
 
-1. **Memory injection detection — `ldrmodules` / unlinked-module view (NOT IMPLEMENTED).** Anamnesis walks only the PEB *load-order* list (`windows.piiat.modules` == `windows.dlllist`), so it sees only linked modules. There is **no `ldrmodules` plugin** cross-referencing the three PEB lists (load/init/mem order) to flag unlinked = injected/hidden DLLs. `malfind` exists but is a **trigger only** (timeline overlay, never stored as a module record — `piiat_mem/timeline.py`, `cli.py:71`). *Highest-value gap: injected-module detection is absent from the module object.* Would add nothing to the 12 canonical fields but a native `unlinked/injected` flag (no CAR home → native) plus base_address for hidden modules.
+1. **Memory injection detection — `ldrmodules` / unlinked-module view (NOT IMPLEMENTED).** Anamnesis walks only the PEB *load-order* list (`windows.anamnesis.modules` == `windows.dlllist`), so it sees only linked modules. There is **no `ldrmodules` plugin** cross-referencing the three PEB lists (load/init/mem order) to flag unlinked = injected/hidden DLLs. `malfind` exists but is a **trigger only** (timeline overlay, never stored as a module record — `Anamnesis internal/timeline`, `cli.py:71`). *Highest-value gap: injected-module detection is absent from the module object.* Would add nothing to the 12 canonical fields but a native `unlinked/injected` flag (no CAR home → native) plus base_address for hidden modules.
 
 2. **Prefetch loaded-modules list (`mapped_files`) not exploded into module rows.** Plaso `windows:prefetch:execution` carries `mapped_files` — the DLL/file list the run touched — but it is kept **native on the process/create event** (`plaso_exec.py:231`), never decomposed into `module/load` rows. *High value, low cost:* each `mapped_files` entry → a `module/load` with `module_path`, `module_name`, and `pid`/`image_path` from the owning process event. Caveat: prefetch has no per-module load time, no base_address, no hash (path only), and mixes DLLs with data files.
 

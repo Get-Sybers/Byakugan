@@ -7,12 +7,12 @@ in Anamnesis's memory maps, and in real processed evidence.
 
 Path convention: `byakugan/…` cites a file inside the external Byakugan engine
 repo (at the `byakugan.ref` pin — the engine is cloned + built into the
-`get-sybers/byakugan` image, no longer a host checkout); `third_party/piiat-mem/…`
-stays repo-relative. The
-engine's own import package was renamed `piiat_mitrecar` → `byakugan`, so the
+`get-sybers/byakugan` image, no longer a host checkout); memory-lane citations
+(`Anamnesis …`) point into the external
+[Anamnesis](https://github.com/Get-Sybers/Anamnesis) repo. The
 doubled prefix in `byakugan/byakugan/mappings/…` is not a typo: the outer
-segment is the checkout, the inner one the package. Engine paths with a single
-segment (`byakugan/sources/…`, `byakugan/to-be-validated/…`,
+segment is the checkout, the inner one the import package. Engine paths with a
+single segment (`byakugan/sources/…`, `byakugan/to-be-validated/…`,
 `byakugan/third_party/…`) sit beside the package, at the checkout root.
 
 One file per object (all 13). Each has a per-field table
@@ -37,7 +37,7 @@ plus a source×field coverage matrix.
 
 ## How to read it
 - **"currently mapped?"** is the gap column — a `NO` where a genuine source exists is a completeness gap (see [COMPLETENESS-BACKLOG.md](COMPLETENESS-BACKLOG.md)); a `NO` with no source is an **honest null** (documented, never faked).
-- Grounded in `byakugan/byakugan/mappings/` + `sources/*.yaml` (engine), `piiat-mem/piiat_mem/mappings.py` (memory), `to-be-validated/evtx_audit.yml` (the quarantined audit family), and `car_data_model.json`.
+- Grounded in `byakugan/byakugan/mappings/` + `sources/*.yaml` (engine), `Anamnesis internal/normalize/mappings.yaml` (memory), `to-be-validated/evtx_audit.yml` (the quarantined audit family), and `car_data_model.json`.
 - **Do not trust the upstream `*.yaml` `coverage_map`s** — the agents found driver/thread/flow sensor cards overclaim (`pid`, `src_tid`, `uid` listed but not on the wire). The per-field tables here are ground truth.
 
 Generated 2026-09-07 by a per-object deep audit; §1 of `docs/CAR-Extraction-Rules.md` (extract every field the artefact can supply) is the governing principle.

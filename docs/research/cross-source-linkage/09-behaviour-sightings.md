@@ -45,7 +45,7 @@ A bridge — `dxdfir stix behaviour-sightings --car <car.db|tree> --detections
 
 It reuses the exchange's object builders, bundle assembly and validation
 (`stix/objects.py`, `stix/export.py`), so a behaviour bundle merges
-object-for-object with the `stix export` and PIIAT bundles. Nothing is invented:
+object-for-object with the `stix export` and Byakugan bundles. Nothing is invented:
 a detection that names no resolvable technique, or joins no CAR entity, is
 counted and skipped — never given a fabricated attack-pattern or entity. Root
 pytest **373**, including 8 golden-vector tests for the bridge.

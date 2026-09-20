@@ -1,7 +1,7 @@
 # CAR cross-source linkage & detection — research journey
 
 This directory records, one doc per step, the arc of work that turned the
-PIIAT-MitreCar engine from *"emits CAR objects"* into *"resolves entities across
+Byakugan engine from *"emits CAR objects"* into *"resolves entities across
 sources and lines threat detections up against them."* It is the narrative
 companion to the raw findings in [`../../car-provenance/`](../../car-provenance/) (the
 per-object provenance catalogues and the `crosslink/` value hunt).
@@ -86,7 +86,7 @@ while `ls24-sample` carries the network + host detections used in Step 8.
 
 ## PR ledger
 
-- **Engine (PIIAT-MitreCar):** #57/#58/#59 volume GUID, #60 MAC, #61 DNS + #65
+- **Engine (Byakugan):** #57/#58/#59 volume GUID, #60 MAC, #61 DNS + #65
   SSL, #66 x509, #63/#65 timeliner robustness, #54 behaviour layer (prior).
 - **DX_DFIR:** #153 plaso byte-preservation, #152/#154 YARA ruleset, #159/#161/#162
   detection-lane wiring, #163 this research journey, the behaviour-sightings bridge

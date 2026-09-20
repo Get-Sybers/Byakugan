@@ -18,7 +18,7 @@ input_pattern:
 - .L2tText
 identity:
   registry: byakugan/spindle.yml
-  version: 1
+  version: 2
   entries:
   - name: l2t_text
     kind: entity

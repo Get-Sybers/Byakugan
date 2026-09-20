@@ -115,7 +115,7 @@ def test_value_helpers():
     assert verify._int("4536") == 4536 and verify._int("0x11b8") == 4536
     assert verify._int("abc") is None and verify._int("") is None
     assert verify.empty(None) and verify.empty("  ") and not verify.empty("0")
-    assert verify.has_term("piiat_memory_pslist", "memory")
+    assert verify.has_term("anamnesis_memory_pslist", "memory")
     assert not verify.has_term("memoryless", "memory")
     assert verify._is_ip_literal("10.0.0.1") and verify._is_ip_literal("fe80::1")
     assert not verify._is_ip_literal("999.999.999.999") and not verify._is_ip_literal("12345")

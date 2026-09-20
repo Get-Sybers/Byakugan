@@ -16,8 +16,8 @@ Authoritative "find once, done" map of **every canonical field × every artefact
 | S3 | `evtx_more` | EvtxECmd (System / Winlogon) | 7001; 7002 | login; logout | `byakugan/byakugan/mappings/evtx_more.py` | `sources/evtx_more.yaml` |
 | S4 | `l2t_utmp` / `l2t_utmpx` | Plaso utmp / utmpx (Linux/macOS login DB, incl. wtmp) | record-type 6/7; 8 | login; logout | `byakugan/byakugan/mappings/plaso_linux.py` | `sources/l2t_utmp.yaml`, `l2t_utmpx.yaml` |
 | S5 | `l2t_text` | Plaso syslog (`syslog:ssh:login`) | sshd "Accepted" | login | `byakugan/byakugan/mappings/plaso_linux.py` | `sources/l2t_text.yaml` |
-| S6 | `windows.piiat.sessions` | Anamnesis custom plugin | per-process token LUID | login | `third_party/piiat-mem/piiat_mem/mappings.py` (+ `plugins/windows/piiat/sessions.py`) | `sources/memory.yaml` |
-| S7 | `windows.sessions` | Volatility3 built-in (fallback) | TS session | login | `third_party/piiat-mem/piiat_mem/mappings.py` | — |
+| S6 | `windows.anamnesis.sessions` | Anamnesis custom plugin | per-process token LUID | login | `Anamnesis internal/normalize/mappings.yaml` (+ `Anamnesis internal/collect (collectSessions)`) | `sources/memory.yaml` |
+| S7 | `windows.sessions` | Volatility3 built-in (fallback) | TS session | login | `Anamnesis internal/normalize/mappings.yaml` | — |
 
 **Provenance-tier legend** (as used in the generated `sources/*.yaml`): `[direct]` = 1:1 native field; `[coalesced]` = first-non-null of several; `[inferred]` = value-mapped / regex-filtered; `[derived]` = transformed (e.g. host label); `[asserted]` = a constant the event's existence proves.
 
@@ -48,7 +48,7 @@ Authoritative "find once, done" map of **every canonical field × every artefact
 | S3 `evtx_more` (7001/7002) | `Computer` → `host_label()` `[derived]` | login, logout | **YES** — `evtx_more.py` (`_HOST`) | High. |
 | S4 `l2t_utmp`/`utmpx` | `image_hostname` `[direct]` | login, logout | **YES** — `plaso_linux.py` `_session_map()` | High. **Caveat:** this is the *imaged host*, per the vetted view. utmp's own `Record.hostname` field is the login **SOURCE** host and is kept in `_native.hostname` — CAR `user_session` has no `src_hostname` field. |
 | S5 `l2t_text` (sshd) | `image_hostname` `[direct]` | login | **YES** — `plaso_linux.py` | High. Syslog reporter hostname kept native, not used here. |
-| S6 `windows.piiat.sessions` | — | login | **NO (as a `props` field)** | Med. Not set in `props`; the host is carried on the CAR common header `source_host`, not the canonical `hostname` column → canonical `hostname` is an honest null from memory. |
+| S6 `windows.anamnesis.sessions` | — | login | **NO (as a `props` field)** | Med. Not set in `props`; the host is carried on the CAR common header `source_host`, not the canonical `hostname` column → canonical `hostname` is an honest null from memory. |
 | S7 `windows.sessions` | — | login | **NO (as a `props` field)** | Same as S6. |
 
 ### `login_id` — the Windows LUID; THE join key of the authentication↔user_session cascade (persists until logout)
@@ -56,8 +56,8 @@ Authoritative "find once, done" map of **every canonical field × every artefact
 | source | native field → | action(s) | mapped? | confidence & caveats |
 |---|---|---|---|---|
 | S1 `evtx_security_sessions` | `first(TargetLogonId, LogonID)` `[coalesced]` | login, logout, reconnect, unlock | **YES** — `evtx_windows.py` `_session_props()` | High. THE designed key. 4624 family uses `TargetLogonId`; the 4778/4779 pair uses `LogonID` (coalesced). Well-known singletons (`0x3e7/0x3e5/0x3e4`) recur per boot → heuristic across multi-boot logs (`docs/CAR-Relations.md` auth §, R1). `0x0`/blank = null session, never a key. |
-| S6 `windows.piiat.sessions` | `LogonId` = `_TOKEN.AuthenticationId` (hex) `[direct]` | login | **YES** — `piiat-mem/mappings.py` | High. This is the *real* LUID (same value 4624 logs as `TargetLogonId`) → **cross-artefact joinable** (evtx 4624 ↔ memory session; `CAR-Relations.md`: 1616/1616, 104 definitive on lonewolf). Verified in evidence: `windows.piiat.sessions.jsonl` rows carry `LogonId:"0x3e7"`. |
-| S7 `windows.sessions` (built-in fallback) | `"Session ID"` (TS session int) `[direct]` | login | **YES, but near-miss** — `piiat-mem/mappings.py` | Low-Med. This is the *terminal-services session number* (0/1/…), **not** the token LUID — so it will NOT join evtx `TargetLogonId`. S6 is preferred precisely to avoid this; S7 is a degraded fallback when the custom plugin is absent. |
+| S6 `windows.anamnesis.sessions` | `LogonId` = `_TOKEN.AuthenticationId` (hex) `[direct]` | login | **YES** — `Anamnesis mappings.yaml` | High. This is the *real* LUID (same value 4624 logs as `TargetLogonId`) → **cross-artefact joinable** (evtx 4624 ↔ memory session; `CAR-Relations.md`: 1616/1616, 104 definitive on lonewolf). Verified in evidence: `windows.anamnesis.sessions.jsonl` rows carry `LogonId:"0x3e7"`. |
+| S7 `windows.sessions` (built-in fallback) | `"Session ID"` (TS session int) `[direct]` | login | **YES, but near-miss** — `Anamnesis mappings.yaml` | Low-Med. This is the *terminal-services session number* (0/1/…), **not** the token LUID — so it will NOT join evtx `TargetLogonId`. S6 is preferred precisely to avoid this; S7 is a degraded fallback when the custom plugin is absent. |
 | S2 `evtx_rdp` | — (`SessionID` kept native) | login/logout/reconnect | **NO** | High. TerminalServices carries a TS `SessionID`, not a LUID → `login_id` null; `SessionID` in `_native` (used by R1 lifecycle's by-SID pairing, never promoted). |
 | S3 `evtx_more` (7001/7002) | — (`TSId` kept native) | login/logout | **NO** | High. Winlogon 7001/7002 carry only `UserSid` + `TSId` → `login_id` null. |
 | S4/S5 Linux (utmp/utmpx/sshd) | — (none) | login/logout | **NO — honest null** | High. No Linux LUID analogue; `plaso_linux.py` docstring is explicit: never faked from pid/terminal. |
@@ -68,8 +68,8 @@ Authoritative "find once, done" map of **every canonical field × every artefact
 |---|---|---|---|---|
 | S1 `evtx_security_sessions` (4624) | `const(True)` `[asserted]` | login, **unlock** | **YES (True only)** — `evtx_windows.py` (`login_successful=const(True)`) | High. A mapped 4624 *is* the successful logon. **Not set** on logout/reconnect (a logoff/disconnect records no login decision) → null there. |
 | S3 `evtx_more` (7001) | `const(True)` `[asserted]` | login | **YES (True only)** — `evtx_more.py` | Med. Winlogon 7001 corroborates a completed logon. Not set on 7002/logout. |
-| S6 `windows.piiat.sessions` | `const(True)` `[asserted]` | login | **YES (True only)** — `piiat-mem/mappings.py` (**recently extended**) | High. Proven by existence: a live access-token bearing the AuthenticationId LUID exists only because LSA completed the logon. |
-| S7 `windows.sessions` | `const(True)` `[asserted]` | login | **YES (True only)** — `piiat-mem/mappings.py` | Med. Same "session with live processes ⇒ logon completed" logic. |
+| S6 `windows.anamnesis.sessions` | `const(True)` `[asserted]` | login | **YES (True only)** — `Anamnesis mappings.yaml` (**recently extended**) | High. Proven by existence: a live access-token bearing the AuthenticationId LUID exists only because LSA completed the logon. |
+| S7 `windows.sessions` | `const(True)` `[asserted]` | login | **YES (True only)** — `Anamnesis mappings.yaml` | Med. Same "session with live processes ⇒ logon completed" logic. |
 | S2 `evtx_rdp` | — | login/logout/reconnect | **NO** | Med. Left null — though TS EID 21 is literally "logon succeeded", the map does not assert `True` (design choice: the record is a session-state notice, not an auth decision). Candidate to assert `True` on 21. |
 | S4 `l2t_utmp`/`utmpx` | — | login/logout | **NO** | Med. A USER_PROCESS record implies success but the map does not assert it; failed logins live in **btmp** (not ingested). |
 | S5 `l2t_text` (sshd) | — | login | **NO** | High. `syslog:ssh:login` = an "Accepted" line (implicitly success) but `True` is not asserted; sshd **"Failed password"** lines are a *different* data_type, **not mapped** → no `False`. |
@@ -112,7 +112,7 @@ Authoritative "find once, done" map of **every canonical field × every artefact
 |---|---|---|---|---|
 | S1 `evtx_security_sessions` | `TargetUserSid` `[direct]` | login, logout, reconnect, unlock | **YES** — `evtx_windows.py` | High. **Caveat:** the 4778/4779 pair carries **no SID** → `uid` null on those records (affects some reconnect/logout rows). |
 | S3 `evtx_more` (7001/7002) | `UserSid` `[direct]` | login, logout | **YES** — `evtx_more.py` | High. This is 7001/7002's *only* identity (no username) → uid-only rows. |
-| S6 `windows.piiat.sessions` | `Sid` (token user SID) `[direct]` | login | **YES** — `piiat-mem/mappings.py` | High. Verified in evidence (`Sid:"S-1-5-18"`). |
+| S6 `windows.anamnesis.sessions` | `Sid` (token user SID) `[direct]` | login | **YES** — `Anamnesis mappings.yaml` | High. Verified in evidence (`Sid:"S-1-5-18"`). |
 | S2 `evtx_rdp` | — | login/logout/reconnect | **NO — null** | High. TerminalServices has no SID. |
 | S4/S5 Linux (utmp/utmpx/sshd) | — | login/logout | **NO — null** | High. utmp/sshd records carry a *username*, not a numeric POSIX uid → honest null (never faked). |
 | S7 `windows.sessions` | — | login | **NO — null** | Med. Built-in sessions row has no SID column. |
@@ -125,8 +125,8 @@ Authoritative "find once, done" map of **every canonical field × every artefact
 | S2 `evtx_rdp` | `userdata("User")` `[direct]` | login, logout, reconnect | **YES** — `evtx_extra.py` | High. |
 | S4 `l2t_utmp`/`utmpx` | `username` `[direct]` | login, logout | **YES** — `plaso_linux.py` | High. |
 | S5 `l2t_text` (sshd) | `username` `[direct]` | login | **YES** — `plaso_linux.py` | High. |
-| S6 `windows.piiat.sessions` | `User` (SID→SOFTWARE ProfileList basename) `[derived]` | login | **YES** — `piiat-mem/mappings.py` | Med-High. `NotAvailable` when the SID has no profile (service/well-known SIDs). Verified (`User:"systemprofile"`). |
-| S7 `windows.sessions` | `"User Name"` `[direct]` | login | **YES** — `piiat-mem/mappings.py` | Med. |
+| S6 `windows.anamnesis.sessions` | `User` (SID→SOFTWARE ProfileList basename) `[derived]` | login | **YES** — `Anamnesis mappings.yaml` | Med-High. `NotAvailable` when the SID has no profile (service/well-known SIDs). Verified (`User:"systemprofile"`). |
+| S7 `windows.sessions` | `"User Name"` `[direct]` | login | **YES** — `Anamnesis mappings.yaml` | Med. |
 | S3 `evtx_more` (7001/7002) | — | login/logout | **NO — null** | High. Winlogon 7001/7002 carry `UserSid` only, no name → `uid`-only (a resolvable-downstream gap: name must come from a SID→name join). |
 
 ---
@@ -154,7 +154,7 @@ Legend: ✔ mapped · ✔* mapped True-only (asserted) · ~ partial / near-miss 
 
 ## Summary
 
-**What is well covered.** The Windows Security 4624-family (S1) is the workhorse: it supplies **8 of 10 fields** (`hostname, login_id, login_successful, login_type, src_ip, src_port, uid, user`) across login/logout/reconnect/unlock, and the LUID (`login_id`) it emits is the designed join key — corroborated cross-artefact by the Volatility memory plugin (S6, `_TOKEN.AuthenticationId`), verified against real evidence (`windows.piiat.sessions.jsonl`, `LogonId:"0x3e7"`). RDP (S2) and Linux utmp/utmpx/sshd (S4/S5) fill `user`/`src_ip`(+`src_port` for sshd) with good confidence. `user` and `hostname` have the broadest source coverage; `src_ip`/`src_port` have solid Windows+Linux coverage. The `login_successful=True` assertion is present on all four "opening" Windows/memory paths (recently extended into Anamnesis sessions).
+**What is well covered.** The Windows Security 4624-family (S1) is the workhorse: it supplies **8 of 10 fields** (`hostname, login_id, login_successful, login_type, src_ip, src_port, uid, user`) across login/logout/reconnect/unlock, and the LUID (`login_id`) it emits is the designed join key — corroborated cross-artefact by the Volatility memory plugin (S6, `_TOKEN.AuthenticationId`), verified against real evidence (`windows.anamnesis.sessions.jsonl`, `LogonId:"0x3e7"`). RDP (S2) and Linux utmp/utmpx/sshd (S4/S5) fill `user`/`src_ip`(+`src_port` for sshd) with good confidence. `user` and `hostname` have the broadest source coverage; `src_ip`/`src_port` have solid Windows+Linux coverage. The `login_successful=True` assertion is present on all four "opening" Windows/memory paths (recently extended into Anamnesis sessions).
 
 **UNMAPPED / weak — ranked by impact:**
 
@@ -174,4 +174,4 @@ Legend: ✔ mapped · ✔* mapped True-only (asserted) · ~ partial / near-miss 
 
 8. **Security 4964 (special-groups logon), 4648 (explicit-cred issuance) — unmapped.** 4648 is a deliberate honest-null (no outcome in the record); 4964 has no map.
 
-**Evidence caveat:** the processed corpus on hand (`data_store/processed/`) is a light set — the only EvtxECmd export present is Sysmon-only (no Security/System/TerminalServices session events), so S1–S3 wiring is verified by code + generated `sources/*.yaml` rather than by a live session row here. Real `user_session` evidence present: `volatility/.../windows.piiat.sessions.jsonl` (clean S6 rows) and `log2timeline/jsonl/5g-webui.jsonl` (1,398 `linux:utmp:event` — S4; note this particular image parses to junk field values, so it validates field *wiring*, not content).
+**Evidence caveat:** the processed corpus on hand (`data_store/processed/`) is a light set — the only EvtxECmd export present is Sysmon-only (no Security/System/TerminalServices session events), so S1–S3 wiring is verified by code + generated `sources/*.yaml` rather than by a live session row here. Real `user_session` evidence present: `volatility/.../windows.anamnesis.sessions.jsonl` (clean S6 rows) and `log2timeline/jsonl/5g-webui.jsonl` (1,398 `linux:utmp:event` — S4; note this particular image parses to junk field values, so it validates field *wiring*, not content).

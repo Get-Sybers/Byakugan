@@ -40,7 +40,7 @@ Scope: plaso (`log2timeline/jsonl/*`), Windows logs (`windows_logs/`), Zeek (`ze
 |---|---|---|---|
 | `DESKTOP-PM6C56D` | plaso DESKTOP-PM6C56D.jsonl only | n/a (plaso `image_hostname`) | single-artefact; no cross-link |
 | `5g-webui` | plaso 5g-webui.jsonl only | n/a (plaso `image_hostname`) | anchors Linux disk; FQDN carries berylia bridge |
-| `BGP-WS1-CONF` | memory: pslist/piiat.* + `car.db` process/file/registry/user_session | **YES** — CAR `hostname` (from registry ComputerName + env) | memory host identity; NOT found in any disk/log |
+| `BGP-WS1-CONF` | memory: pslist/anamnesis.* + `car.db` process/file/registry/user_session | **YES** — CAR `hostname` (from registry ComputerName + env) | memory host identity; NOT found in any disk/log |
 | `DESKTOP-M913391` | windows_logs EvtxECmd `Computer` (85 recs) | NO | Sysmon host identity; no IP, no cross-link |
 | `5g-webui.sac.baf.10.berylia.org` (FQDN) | 5g-webui disk cert `/srv/certs/*.crt` | NO | ties 5g-webui disk into berylia.org domain |
 | **`100.95.95.4`** (IPv4 DNS) | Zeek conn.json + Zeek dns.json (`id.resp_h`) **AND** memory registry `Tcpip\...\Interfaces\{89b3e14f-...}` NameServer | **NO** (memory reg raw; CAR has 0 IPs) | **CONVERGENCE KEY — memory↔network.** Same DNS for BGP-WS1-CONF and Zeek client 10.27.33.61 |
@@ -59,7 +59,7 @@ Scope: plaso (`log2timeline/jsonl/*`), Windows logs (`windows_logs/`), Zeek (`ze
 ## 3. Cross-source IP / domain links (zeek ↔ registry ↔ memory)
 
 ### Link A — DNS resolver bridges MEMORY ↔ NETWORK
-- **Memory (`BGP-WS1-CONF`)** — `windows.piiat.registry.jsonl`, key `\REGISTRY\MACHINE\SYSTEM\ControlSet001\Services\Tcpip\Parameters\Interfaces\{89b3e14f-e403-4965-be04-aaeceb0a4e2f}`:
+- **Memory (`BGP-WS1-CONF`)** — `windows.anamnesis.registry.jsonl`, key `\REGISTRY\MACHINE\SYSTEM\ControlSet001\Services\Tcpip\Parameters\Interfaces\{89b3e14f-e403-4965-be04-aaeceb0a4e2f}`:
   - `IPAddress = 10.27.32.51`, `SubnetMask = 255.255.255.128` (/25), `DefaultGateway = 10.27.32.1`
   - `NameServer = 100.95.95.4`; Tcpip6 `NameServer = 2a07:1181:95:95::4`; `DhcpServer = 255.255.255.255` (static)
 - **Zeek DFIRdump** — `conn.json`/`dns.json`: `id.resp_h = 100.95.95.4` (118 flows) and `2a07:1181:95:95::4` (7608 flows) on `id.resp_p = 53` — i.e. the **same DNS resolver**.
@@ -79,7 +79,7 @@ Scope: plaso (`log2timeline/jsonl/*`), Windows logs (`windows_logs/`), Zeek (`ze
 ## 4. Un-normalised network identifiers (raw/native — no CAR field carries them)
 
 1. **CAR drops all network identity.** `car.db` tables `flow`, `socket`, `http`, `email`, `authentication`, `driver`, `module`, `service`, `thread` = **0 rows**. Populated: `file` (31828), `registry` (12171), `process` (180), `user_session` (9), `image_context` (163). Even `user_session.src_ip/src_port/dest_ip/dest_port` are **all NULL**. So the CAR schema *has* IP columns but nothing populates them.
-2. **Memory static IP config is buried in raw registry.** `10.27.32.51`, `10.27.32.1`, `100.95.95.4`, `2a07:1181:95:95::4`, subnet `255.255.255.128` live only inside raw `windows.piiat.registry.jsonl` Tcpip Interface `ValueData` strings — never surfaced to a normalised IP field. The memory host is therefore never programmatically tied to its own IP.
+2. **Memory static IP config is buried in raw registry.** `10.27.32.51`, `10.27.32.1`, `100.95.95.4`, `2a07:1181:95:95::4`, subnet `255.255.255.128` live only inside raw `windows.anamnesis.registry.jsonl` Tcpip Interface `ValueData` strings — never surfaced to a normalised IP field. The memory host is therefore never programmatically tied to its own IP.
 3. **Zeek is entirely raw** (not ingested into CAR at all): every `id.orig_h`/`id.resp_h`, `dns.query`, `dns.answers`, `ssl.server_name`, `http.host`, `x509` subject/SAN is native JSON only.
 4. **DNS answers not tied to flows.** `dns.answers` present in only 21 records; even there, the domain→IP→conn correlation must be done by hand (no join key emitted).
 5. **MAC addresses exist only implicitly.** No artefact emits a MAC field. The only MACs recoverable are EUI-64-embedded in Zeek IPv6 link-locals: `fe80::250:56ff:fe89:a269 → 00:50:56:89:a2:69` and `fe80::250:56ff:fe89:ab90 → 00:50:56:89:ab:90` (VMware OUI 00:50:56). Registry `NetworkAddress`/`PermanentAddress` MAC values: none present in the dumped SYSTEM hive.
@@ -210,8 +210,8 @@ rule GENERIC_Windows_Hostname_NETBIOS
 
 ## 6. Evidence pointers
 
-- Memory static IP / DNS (BGP-WS1-CONF): `data_store/processed/volatility/memdump.mem/plugins/windows.piiat.registry.jsonl` — Tcpip Interface `{89b3e14f-e403-4965-be04-aaeceb0a4e2f}`; ComputerName under `...\Control\ComputerName\ComputerName`.
-- Memory COMPUTERNAME env: `data_store/processed/volatility/memdump.mem/plugins/windows.piiat.processes.jsonl` (EnvVars `COMPUTERNAME=BGP-WS1-CONF`).
+- Memory static IP / DNS (BGP-WS1-CONF): `data_store/processed/volatility/memdump.mem/plugins/windows.anamnesis.registry.jsonl` — Tcpip Interface `{89b3e14f-e403-4965-be04-aaeceb0a4e2f}`; ComputerName under `...\Control\ComputerName\ComputerName`.
+- Memory COMPUTERNAME env: `data_store/processed/volatility/memdump.mem/plugins/windows.anamnesis.processes.jsonl` (EnvVars `COMPUTERNAME=BGP-WS1-CONF`).
 - CAR normalised host / empty network tables: `data_store/processed/volatility/memdump.mem/car.db`.
 - Zeek DNS/flow/C2: `data_store/processed/zeek/DFIRdump_FOR_200_capture_pcap/{conn,dns,http,ssl,x509}.json`; second capture `data_store/processed/zeek/ME_FOR_1308_pcapng/conn.json`.
 - 5g-webui FQDN cert: `data_store/processed/log2timeline/jsonl/5g-webui.jsonl` (`berylia` matches → `/srv/certs/5g-webui.sac.baf.10.berylia.org_cert.crt`).

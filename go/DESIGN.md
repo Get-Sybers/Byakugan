@@ -88,7 +88,7 @@ dict (e.g. map_value tables) → object). A source arg that is a plain string me
   (predicate runs before resolve).
 - `spindle`: identity resolution over the NORMALIZED event (field paths, version, scope),
   positional fallback when any intrinsic component blank; emits native spindle_key/scope/ref.
-- `ids`: SPINDLE_NS = uuid5(uuid5(NAMESPACE_URL, "https://github.com/Get-Sybers/PIIAT-MitreCar/stix"),
+- `ids`: SPINDLE_NS = uuid5(uuid5(NAMESPACE_URL, "https://github.com/Get-Sybers/Byakugan/stix"),
   "spindle"); mint = uuid5(SPINDLE_NS, PyCanonical({"_obj":obj,"_v":version, name:PyStr(value)...}));
   fields-guid = "<obj>-" + "-".join(PyStr(v)) with any-nil voiding. MUST pass every vector in
   model/spindle/golden.yml (Go test loads that YAML — small hand parser or yaml dep; prefer
@@ -207,7 +207,7 @@ stdout lines back into the event dicts the Python path used to build; the adapte
 returns {table: file} in first-seen order. Passthrough car.db stays Python (readers.load_anamnesis_car).
 DELETED: pipeline's read/normalize loop, `readers.iter_jsonl` + `readers.iter_mapped`,
 `byakugan/adapters/` entirely (l2t_split, winevt, jlecmd + the package docstring) and the
-`piiat_mitrecar.adapters` shim subpackage; both dropped from pyproject's packages list. The
+pre-rename import-name compat shim subpackage; both dropped from pyproject's packages list. The
 frozen copies under tests/parity/reference/ are now the only Python statement of that
 behaviour, and `tests/reference_plumbing.py` is how the repointed unit tests load them
 (route() and the mapping tables stayed Python, so the routing/mapping tests are untouched).

@@ -17,12 +17,12 @@ Grounded in:
 
 ## TL;DR — the honest state
 
-- **Exactly ONE active socket source ships in this pipeline: MEMORY (Volatility 3 netscan/netstat / `windows.piiat.network`) via Anamnesis → CAR `socket`/`listen`.** It is the primary (only) dead-box socket source.
+- **Exactly ONE active socket source ships in this pipeline: MEMORY (Volatility 3 netscan/netstat / `windows.anamnesis.network`) via Anamnesis → CAR `socket`/`listen`.** It is the primary (only) dead-box socket source.
 - That memory source only produces the **`listen`** action and only the **local-end** fields (`local_address`, `local_port`, `protocol`, `family`, `pid`, `success`) + `image_path` **by enrichment**. It never asserts `remote_*` or `local_path`, and never `bind`/`close`.
 - **Windows Security 5158 (WFP bind) → `socket`/`bind` exists but is INERT** — quarantined in `byakugan/to-be-validated/evtx_audit.yml`, not in the active `mappings/` package.
 - **Sysmon 3, WFP 5156/5157 are mapped to `flow`, NOT `socket`** (deliberate — the connection "as made"). **5031 firewall block is not referenced anywhere in the repo.**
 - No `socket` source exists for **`remote_address`, `remote_port`, `local_path`, or the `close` action** — honest no-source (matches even the upstream CAR coverage map, which leaves `local_path` and `success` empty and has no non-osquery sensor).
-- **The current evidence corpus contains ZERO socket rows** — no netscan/netstat/`piiat.network` output was collected into `data_store/processed/volatility/…`, and the EvtxECmd corpus has only Sysmon 1/5 (no 5158, no Sysmon 3). The capability is present but unexercised.
+- **The current evidence corpus contains ZERO socket rows** — no netscan/netstat/`anamnesis.network` output was collected into `data_store/processed/volatility/…`, and the EvtxECmd corpus has only Sysmon 1/5 (no 5158, no Sysmon 3). The capability is present but unexercised.
 
 ---
 
@@ -30,7 +30,7 @@ Grounded in:
 
 | Source | Native table/event | → CAR object here | socket status |
 |---|---|---|---|
-| **Volatility 3 `windows.netscan` / `windows.netstat` / `windows.piiat.network`** (Anamnesis) | bound/LISTENING pooled `_TCP/UDP` endpoint objects | **`socket`/`listen`** (via `is_bound_socket` predicate) | **ACTIVE** — `third_party/piiat-mem/piiat_mem/mappings.py` `_SOCKET_MAP` |
+| **Volatility 3 `windows.netscan` / `windows.netstat` / `windows.anamnesis.network`** (Anamnesis) | bound/LISTENING pooled `_TCP/UDP` endpoint objects | **`socket`/`listen`** (via `is_bound_socket` predicate) | **ACTIVE** — `Anamnesis internal/normalize/mappings.yaml` `_SOCKET_MAP` |
 | **Security 5158** (WFP "connection bind allowed") | `SourceAddress/SourcePort/Protocol/Application/ProcessID` | **`socket`/`bind`** | **INERT** — `to-be-validated/evtx_audit.yml` key `security_5158_wfp_bind` |
 | osquery 4.6.0 `socket_events` | (bind/listen/close) | `socket` bind/listen/close **(upstream CAR coverage map only)** | **NOT INGESTED** — no osquery collector or mapping in this repo |
 | Sysmon 3 (NetworkConnect) | `SourceIp/DestinationIp/…/Initiated` | **`flow`/`start`** (`mappings/sysmon.py` EID 3) | routed to flow, **not socket** |
@@ -50,14 +50,14 @@ Legend — **action**: which socket action the row carries. **mapped?**: `yes+wh
 ### `family` — AF_INET / AF_INET6 / AF_UNIX (socket type)
 | source (native → field) | action | mapped? | confidence & caveats |
 |---|---|---|---|
-| Vol3 netscan `Proto` → `family()` | listen | **yes** — piiat-mem `mappings.py` `_SOCKET_MAP` (`family("Proto")`) | **Med.** Value form diverges: emits **`ipv4`/`ipv6`** (ECS-style, from `TCPv4`→`ipv4` in `normalize.py`), **not** the CAR-documented `AF_INET`/`AF_INET6`. Consequence: the STIX `_b_socket` `socket-ext` gate (`str(fam).startswith("AF_")` in `stix.py:995`) never fires, so `address_family`/`is_listening` are dropped from the STIX SCO — though the CAR field itself is populated. Windows memory is only ever ipv4/ipv6, **never AF_UNIX**. |
+| Vol3 netscan `Proto` → `family()` | listen | **yes** — anamnesis `mappings.py` `_SOCKET_MAP` (`family("Proto")`) | **Med.** Value form diverges: emits **`ipv4`/`ipv6`** (ECS-style, from `TCPv4`→`ipv4` in `normalize.py`), **not** the CAR-documented `AF_INET`/`AF_INET6`. Consequence: the STIX `_b_socket` `socket-ext` gate (`str(fam).startswith("AF_")` in `stix.py:995`) never fires, so `address_family`/`is_listening` are dropped from the STIX SCO — though the CAR field itself is populated. Windows memory is only ever ipv4/ipv6, **never AF_UNIX**. |
 | Security 5158 WFP | bind | **NO** — 5158 map omits `family` entirely | — |
 | osquery `socket_events` | bind/listen/close | NO (not ingested) | upstream coverage lists osquery for family |
 
 ### `image_path` — path to the executable that acted on the socket
 | source (native → field) | action | mapped? | confidence & caveats |
 |---|---|---|---|
-| Vol3 netscan (owning process) | listen | **yes (by ENRICHMENT)** — piiat-mem `enrich.py` `_INHERIT` (line 72) fills `image_path` from the owning process | **High.** NOT native to the netscan row (netscan `Owner` = `ImageFileName`, the process **name** only, no path — `plugins/windows/piiat/network.py:17`). Filled from the owner's `image_path`, joined **definitively** on `OwnerOffset` (the kernel `_EPROCESS` pointer), falling back to (reusable) PID. Null if the owning process isn't recovered. |
+| Vol3 netscan (owning process) | listen | **yes (by ENRICHMENT)** — anamnesis `enrich.py` `_INHERIT` (line 72) fills `image_path` from the owning process | **High.** NOT native to the netscan row (netscan `Owner` = `ImageFileName`, the process **name** only, no path — `Anamnesis internal/collect (collectNetwork)`). Filled from the owner's `image_path`, joined **definitively** on `OwnerOffset` (the kernel `_EPROCESS` pointer), falling back to (reusable) PID. Null if the owning process isn't recovered. |
 | Security 5158 WFP `Application` → `image_path` | bind | **INERT** — `to-be-validated/evtx_audit.yml` (`image_path: Application`) | Native full path when promoted; inert today. |
 | osquery `socket_events` | bind/listen/close | NO (not ingested) | upstream coverage lists osquery |
 
@@ -117,7 +117,7 @@ Legend — **action**: which socket action the row carries. **mapped?**: `yes+wh
 
 | action | source(s) | mapped? | note |
 |---|---|---|---|
-| **`listen`** | Vol3 memory netscan/netstat/`piiat.network` | **yes (ACTIVE)** — piiat-mem `_SOCKET_MAP action=listen` | A memory snapshot sees the **steady-state** listener → `listen`. This is the entire active socket object. |
+| **`listen`** | Vol3 memory netscan/netstat/`anamnesis.network` | **yes (ACTIVE)** — anamnesis `_SOCKET_MAP action=listen` | A memory snapshot sees the **steady-state** listener → `listen`. This is the entire active socket object. |
 | **`bind`** | Security 5158 WFP | **INERT** — `to-be-validated/evtx_audit.yml` | Schema-grounded, not sample-verified; absent from all corpora. |
 | **`close`** | — | **NO SOURCE** | No producer emits `close`: a memory snapshot can't observe a close transition; no WFP close EID is mapped; osquery upstream has it but isn't ingested. |
 
@@ -128,7 +128,7 @@ Minor: the cascade verb map (`byakugan/byakugan/cascade_relationships.yml:38`) d
 ## Coverage summary
 
 **What ships (active):** memory-only, `listen`-only, local-end-only.
-`socket`/`listen` from Vol3 netscan/netstat/`windows.piiat.network` → `local_address`, `local_port`,
+`socket`/`listen` from Vol3 netscan/netstat/`windows.anamnesis.network` → `local_address`, `local_port`,
 `protocol`, `family`(as ipv4/ipv6), `pid`, `success`(const) natively + `image_path` by owner-inheritance.
 Windows AF_INET/INET6 only. 4 of 10 fields have **no** active source (`local_path`, `remote_address`,
 `remote_port`, and — for the `bind`/`close` actions — everything).
@@ -141,7 +141,7 @@ Windows AF_INET/INET6 only. 4 of 10 fields have **no** active source (`local_pat
 
 ### UNMAPPED gaps, ranked
 
-1. **Memory socket capability ACTIVE but UNEXERCISED in the corpus (collection gap).** `data_store/processed/volatility/memdump.mem/plugins/` contains only `banners`, `mftscan`, `piiat.processes`, `piiat.registry`, `piiat.sessions`, `pslist` — **no `netscan`/`netstat`/`windows.piiat.network` output**. So the *entire* listen/bind socket object is invisible in current evidence. **Fix: run `windows.piiat.network` (or `netscan`/`netstat`) over `memdump.mem`** — the map already handles the output 1:1 (passthrough via `pipeline.py:150`). Highest value, zero code.
+1. **Memory socket capability ACTIVE but UNEXERCISED in the corpus (collection gap).** `data_store/processed/volatility/memdump.mem/plugins/` contains only `banners`, `mftscan`, `anamnesis.processes`, `anamnesis.registry`, `anamnesis.sessions`, `pslist` — **no `netscan`/`netstat`/`windows.anamnesis.network` output**. So the *entire* listen/bind socket object is invisible in current evidence. **Fix: run `windows.anamnesis.network` (or `netscan`/`netstat`) over `memdump.mem`** — the map already handles the output 1:1 (passthrough via `pipeline.py:150`). Highest value, zero code.
 2. **Promote WFP 5158 (`to-be-validated/evtx_audit.yml` → active `mappings/*.py`).** The only path to the **`bind`** action and to socket coverage from Windows event logs. Needs a capture with the *Filtering Platform Connection* auditpol subcategory enabled to validate, then port back (prior impl in git history: `mappings/evtx_audit.py`). **On promotion, fix `protocol` to normalize** (`map_value(Protocol,{6:tcp,17:udp})`) rather than passing the raw numeric, to match the memory source's `TCP`/`UDP`.
 3. **`family` value-form normalization.** Memory emits `ipv4`/`ipv6`; the STIX `socket-ext` gate expects `AF_*` and silently drops the extension. Decide one canonical form (CAR docs say `AF_INET`; ECS projection says `ipv4`) and align emitter + STIX gate.
 4. **`remote_address`/`remote_port` — no socket source (by design).** Only worth revisiting if an *established* (non-listening) endpoint should ever be represented as `socket` rather than `flow`. Currently intentional; low priority.

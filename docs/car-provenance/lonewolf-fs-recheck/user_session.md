@@ -26,7 +26,7 @@ lane** those seven sources ignore.
 | Winlogon 7001/7002 | `mappings/evtx_more.py:172,183` | evtx |
 | RDP TerminalServices 21/24/25 | `mappings/evtx_extra.py:80` | evtx |
 | utmp/utmpx/sshd | `mappings/plaso_linux.py:300` | plaso (Linux login DB) |
-| Volatility sessions | `../piiat-mem/piiat_mem/mappings.py:251,343` | memory |
+| Volatility sessions | `../Anamnesis internal/normalize/mappings.yaml` | memory |
 
 The registry hives **are parsed and ingested** — SAM `sam_users`, SOFTWARE `ProfileList`, `Winlogon`,
 `shutdown` all flow through the pipeline — but `mappings/plaso_registry.py` claims **every** `windows:registry:*`

@@ -20,7 +20,7 @@ image** (a device seen across its LNK + shellbag + registry). Cross-image port m
 are shared-service coincidences, not the same host.
 
 **CAR normalisation state (the headline gap):** `car.db` is built **only from the memory dump**
-(`windows.mftscan`, `windows.piiat.registry/processes/sessions`). It **never ingests** plaso LNK/shellbags,
+(`windows.mftscan`, `windows.anamnesis.registry/processes/sessions`). It **never ingests** plaso LNK/shellbags,
 zeek, or evtx. Its `socket(local_port,remote_port)` and `flow(src_port,dest_port)` columns exist but are
 **empty (0 rows)** — no netscan plugin was run. `file` has **no serial column**; there is **no MAC column
 anywhere** in the schema. Verified: LoneWolf USB serials, volume serials, and MACs are **absent** from CAR

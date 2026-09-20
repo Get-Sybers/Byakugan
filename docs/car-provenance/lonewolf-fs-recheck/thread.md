@@ -33,11 +33,11 @@ is **`jcloudy`** (+ `defaultuser0` OOBE). 66 distinct `data_type`s in the whole 
 ## 0. What the pipeline can do with threads from disk (code reality)
 
 Exhaustive grep of the ingest code (`byakugan/byakugan` + `sources`,
-`third_party/piiat-mem/piiat_mem`, `python/`):
+`the Anamnesis engine`, `python/`):
 
 - **The ONLY `thread` producer in the entire pipeline is Sysmon EID 8** (`mappings/sysmon.py`
   L442-467, `thread/remote_create`) — a **runtime event log**, out of scope here — plus the memory
-  lane (`piiat-mem`, `thread/create`) — **runtime memory**, out of scope here.
+  lane (`anamnesis`, `thread/create`) — **runtime memory**, out of scope here.
 - **No minidump / WER / crashdump / hiberfil / pagefile parser or map exists anywhere.**
   `grep -rniE "minidump|reportarchive|report\.wer|localdumps|crashdumps|hiberfil|pagefile|\.mdmp|\.hdmp"`
   over all pipeline code returns **zero** matches. There is no code path that opens a `.dmp`, a
@@ -257,7 +257,7 @@ unmined by the current pipeline (captured as filenames, never parsed).
 - `fs:stat` → **file** object (never thread): `…/byakugan/mappings/plaso_fs_extra.py`
 - Prior runtime catalogue (Sysmon EID 8 + memory lanes): `../thread.md`
 - Confirmed ABSENT from the pipeline (grep, zero matches): any minidump / WER / crashdump / hiberfil /
-  pagefile parser or map across `byakugan`, `piiat-mem/piiat_mem`, `sources`, `python/`.
+  pagefile parser or map across `byakugan`, `anamnesis`, `sources`, `python/`.
 - Real disk artefacts (all `fs:stat` metadata only, contents unparsed): crash dumps
   `\Users\jcloudy\AppData\Local\CrashDumps\Dropbox.exe.{13188,5748,9780}.dmp`,
   `\Windows\System32\config\systemprofile\AppData\Local\CrashDumps\svchost.exe.4104.dmp`,

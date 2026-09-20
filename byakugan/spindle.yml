@@ -45,7 +45,8 @@
 # the recipe vector, which would move every guid at once.
 
 spindle:
-  version: 1
+  version: 2                  # 2: CAR_NS re-seeded to the byakugan project URL — a new
+                              #    spindle: every guid re-mints, stores need a rebuild
   namespace:
     parent: CAR_NS            # ids.CAR_NS = uuid5(NAMESPACE_URL, the project URL)
     label: spindle            # ids.SPINDLE_NS = uuid5(CAR_NS, label)

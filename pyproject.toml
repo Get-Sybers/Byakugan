@@ -3,13 +3,14 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-# Distribution and import package are both byakugan (formerly piiat-mitrecar).
+# Distribution and import package are both byakugan.
 # The STIX namespace/producer identity seed strings are frozen INSIDE
-# ids.py/stix.py — they do not depend on the import name, so every previously
-# minted deterministic id survives the rename.
+# ids.py/stix.py — wire-format constants that never depend on packaging and
+# move only with a contract version bump (last: v4, re-seeded to the byakugan
+# name — every deterministic id re-minted).
 name = "byakugan"
 version = "0.1.0"
-description = "Byakugan (formerly PIIAT-MitreCar) — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, Anamnesis) into finished MITRE CAR: per-source databases, an inference cascade, per-object JSON."
+description = "Byakugan — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, Anamnesis) into finished MITRE CAR: per-source databases, an inference cascade, per-object JSON."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}

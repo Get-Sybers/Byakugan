@@ -14,7 +14,7 @@ Grounded in (read verbatim):
 `byakugan/third_party/car/data_model/process.yaml` (+ `docs/data_model/process.md`);
 `car_data_model.json`; the live engine maps
 `byakugan/byakugan/mappings/{sysmon,evtx_windows,plaso_exec,plaso_srum}.py`,
-`piiat_mem/mappings.py`, the memory plugin `plugins/windows/piiat/{processes,access}.py`;
+`Anamnesis mappings.yaml`, the memory plugin `Anamnesis internal/collect (collectProcesses/collectAccess)`;
 generated sources `sources/{evtx_sysmon,evtx_process,memory,plaso_exec_prefetch,plaso_exec_winreg,plaso_exec_cron}.yaml`;
 `byakugan/byakugan/enrich.py` + `relationships.yml`; `docs/CAR-Relations.md`; the quarantined
 `to-be-validated/evtx_audit.yml`; and real evidence
@@ -32,8 +32,8 @@ generated sources `sources/{evtx_sysmon,evtx_process,memory,plaso_exec_prefetch,
 | S3 | **Sysmon EID 10** `evtx_sysmon`/`sysmon_proc_access` | EvtxECmd | access | ✅ active | cross-proc handle open (cred-dump/injection) |
 | S4 | **Security 4688** `evtx_process`/`evtxwin_is_sec_4688` | EvtxECmd (Security) | create | ✅ active | audit-log process create |
 | S5 | **Security 4689** `evtx_audit.yml`/`security_4689_process_exit` | EvtxECmd (Security) | terminate | ⛔ **INERT** (quarantined, un-validated) | audit-log process exit |
-| S6 | **Memory processes** `windows.piiat.processes` | Anamnesis (MemProcFS) | create | ✅ active | live PEB+token snapshot — **only source for a resident process with cleared logs** |
-| S7 | **Memory access** `windows.piiat.access` | Anamnesis (handle scan) | access | ✅ active | open Process-type handle = "A accesses B" |
+| S6 | **Memory processes** `windows.anamnesis.processes` | Anamnesis (MemProcFS) | create | ✅ active | live PEB+token snapshot — **only source for a resident process with cleared logs** |
+| S7 | **Memory access** `windows.anamnesis.access` | Anamnesis (handle scan) | access | ✅ active | open Process-type handle = "A accesses B" |
 | S8 | **Prefetch** `plaso_exec_prefetch`/`plaso_is_prefetch_execution` | Plaso L2tPrefetch (≈PECmd) | create | ✅ active | execution **proof** (run count/times) |
 | S9 | **Amcache** `plaso_exec_winreg/amcache` | Plaso L2tWinreg (≈AmcacheParser) | create | ✅ active | presence→execution **inferred**; carries SHA-1 |
 | S10 | **Userassist** `plaso_exec_winreg/userassist` | Plaso L2tWinreg | create | ✅ active | GUI-launch counter |

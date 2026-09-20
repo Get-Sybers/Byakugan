@@ -13,6 +13,7 @@ extractor:
   parser: Jump Lists (AutomaticDestinations)
   url: https://github.com/EricZimmerman/JLECmd
 input_pattern:
+- gojle.jsonl
 - jlecmd_AutomaticDestinations
 identity:
   external:

@@ -74,7 +74,7 @@ event-log-only today). Native field shown as `artefact → NativeField`.
 | fs artefact → native field | action | mined? | conf & caveats |
 |---|---|---|---|
 | SAM `sam_users` → `username` | success | **NO** (`_native.username`) | HIGH string. Local account name (`jcloudy`, `Administrator`). For a local interactive logon subject≈target. |
-| SOFTWARE `ProfileList\<SID>` → `ProfileImagePath` basename | — | **NO** | HIGH — SID→name resolver (already used by piiat-mem `enrich.py` for the memory lane). |
+| SOFTWARE `ProfileList\<SID>` → `ProfileImagePath` basename | — | **NO** | HIGH — SID→name resolver (already used by anamnesis `enrich.py` for the memory lane). |
 | Winlogon `DefaultUserName` (autologon) | success | **NO** | LOW — identity hint, and **not set** in the real sample (only WinSxS component-store noise matched); trapped in the `values` list → `_native`. |
 | LogonUI `LastLoggedOnUser` / `LastLoggedOnSAMUser` | success | **NO** | LOW — last interactive user hint; **no dedicated Plaso plugin** (generic `key_value` → unindexed `values` list); not present as a real value in this sample. |
 
@@ -180,7 +180,7 @@ field — keep native). **Caveats that must ride with it:**
   would be a **second authoritative artefact** for the object (tension with
   Extraction-Rules §3) — defensible because it's the *only* disk auth outcome, but it
   must be marked snapshot-derived and never merged onto a real 4624's identity.
-- **Overlaps `user_session/login`** — the memory lane's `windows.piiat.sessions`
+- **Overlaps `user_session/login`** — the memory lane's `windows.anamnesis.sessions`
   already resolves `User` via ProfileList for login events; the SAM last-login is
   arguably a `user_session/login` too. Pick one canonical home (auth vs session) to
   avoid a double count.
@@ -200,7 +200,7 @@ field — keep native). **Caveats that must ride with it:**
    **enabler**: turns SAM's bare RID into a full `S-1-5-21-…-<RID>` SID and resolves
    SID→username. Real machine SID present (`S-1-5-21-2734969515-1644526556-1039763013`,
    RIDs 1000/1001). The join logic already exists for the memory lane
-   (`piiat-mem/enrich.py` `_PROFILELIST_SID`); reuse it disk-side. Ship with #1.
+   (`Anamnesis internal/enrich` `_PROFILELIST_SID`); reuse it disk-side. Ship with #1.
 3. **SAM well-known-RID → `user_type` / `target_user_type` derivation**
    (500=Administrator, 501=Guest, 503=DefaultAccount, 504=service). Pure derivation
    from a field already captured (`account_rid`); the same coarse-assertion class as

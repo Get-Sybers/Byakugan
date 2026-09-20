@@ -18,7 +18,7 @@ input_pattern:
 - .L2tSyslog
 identity:
   registry: byakugan/spindle.yml
-  version: 1
+  version: 2
   entries:
   - name: plaso_exec_cron
     kind: entity

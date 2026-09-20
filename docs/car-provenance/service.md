@@ -24,7 +24,7 @@ parent_pid, parent_guid, link_confidence, source_plugin, source_image, native`).
 | B | **Security 4697** (service installed, audited) | EvtxECmd → `evtx_services` (`evtx_windows.py`) | **service** | create | YES |
 | C | **System 20003** (UserPnp — driver-service registration) | EvtxECmd → `evtx_more` (`evtx_more.py`) | **service** | create | YES |
 | D | **System 7034** (SCM — service crashed) | EvtxECmd → `evtx_more` (`evtx_more.py`) | **service** | stop | YES |
-| E | **`windows.svcscan`** (memory) | Anamnesis → `windows.svcscan` (`piiat-mem/.../mappings.py`) | **service** | *None* (store-only snapshot, no ts) | YES |
+| E | **`windows.svcscan`** (memory) | Anamnesis → `windows.svcscan` (`Anamnesis internal/normalize/mappings.yaml`) | **service** | *None* (store-only snapshot, no ts) | YES |
 | F | **Registry `HKLM\SYSTEM\...\Services`** (Plaso winreg) | Plaso → `plaso_registry` (`plaso_registry.py`) | **registry** (NOT service) | key_edit | YES — but wrong object |
 | G | **Registry Services key** (RECmd/EZ-Tools batch) | RECmd → `recmd_batch` (`recmd.py`) | **registry** (NOT service) | value_edit | YES — but wrong object |
 | H | **Autoruns 13.98** (auto-start services) | CAR upstream sensor only | service | create, delete | **NO** (not in engine) |
@@ -197,7 +197,7 @@ sample carries none of the service EventIds. The maps are real; this evidence se
 - Semantics: `byakugan/third_party/car/data_model/service.yaml`
 - Canonical schema: `car_data_model.json` (object `service`); live `car.db` `service` table
 - Maps (emit service): `byakugan/byakugan/mappings/evtx_windows.py`
-  (7045/4697), `.../evtx_more.py` (20003, 7034); `third_party/piiat-mem/piiat_mem/mappings.py`
+  (7045/4697), `.../evtx_more.py` (20003, 7034); `Anamnesis internal/normalize/mappings.yaml`
   (`windows.svcscan`)
 - Maps (hold service facts, emit registry): `.../mappings/plaso_registry.py`, `.../mappings/recmd.py`
 - Refusals: `.../mappings/evtx_extra.py` (7040), `evtx_windows.py:290` (7036)

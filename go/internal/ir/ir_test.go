@@ -86,7 +86,7 @@ func TestLoad(t *testing.T) {
 	}
 	// the frozen wire constant rides in the IR too — belt and braces
 	url, _ := Get(doc, "spindle", "namespace", "CAR_NS_URL").(string)
-	if url != "https://github.com/Get-Sybers/PIIAT-MitreCar/stix" {
+	if url != "https://github.com/Get-Sybers/Byakugan/stix" {
 		t.Fatalf("ir: CAR_NS_URL drifted: %q", url)
 	}
 }

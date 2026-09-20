@@ -2,7 +2,7 @@
 
 Authoritative "find once, done" map of every canonical `thread` field to every artefact/source
 in this repo that can supply it. Grounded in the pinned CAR data model, the two live CAR engines
-(EVTX/Sysmon lane = `byakugan`; memory lane = `piiat-mem`), and the current processed evidence.
+(EVTX/Sysmon lane = `byakugan`; memory lane = `anamnesis`), and the current processed evidence.
 READ-ONLY analysis.
 
 ## Canonical object (authoritative)
@@ -28,7 +28,7 @@ Semantics that drive the whole catalogue (from `thread.yaml`):
 | Lane | Engine | Object/action emitted | Where |
 |---|---|---|---|
 | **Sysmon EID 8 (CreateRemoteThread)** | `byakugan` | `thread/remote_create` | `byakugan/byakugan/mappings/sysmon.py` L442-467; source card `sources/evtx_sysmon.yaml` L319-339 |
-| **Memory / Volatility 3** | `piiat-mem` | `thread/create` | plugin `plugins/windows/piiat/threads.py`; map `piiat_mem/mappings.py` L204-222 (+ built-in fallback `windows.thrdscan` L261-272) |
+| **Memory / Volatility 3** | `anamnesis` | `thread/create` | plugin `Anamnesis internal/collect (collectThreads)`; map `Anamnesis mappings.yaml` (+ built-in fallback `windows.thrdscan`) |
 
 Sysmon EID 8 is the ONLY host/log artefact in the repo that maps to `thread` (all three pinned CAR
 sensor cards — `sysmon_10.4`, `sysmon_11.0`, `sysmon_13` — cover `thread` only via EID 8; no
@@ -83,8 +83,8 @@ dual-link that makes the injection edge explicit. `TargetImage` stays native (no
 
 ## Per-field provenance — action `create` (Memory / Volatility 3)
 
-Plugin: `third_party/piiat-mem/plugins/windows/piiat/threads.py` (pool-tag scan = finds unlinked /
-hidden threads). Map: `piiat_mem/mappings.py` L204-222. Owner link = `OwnerOffset`
+Plugin: `Anamnesis internal/collect (collectThreads)` (pool-tag scan = finds unlinked /
+hidden threads). Map: `Anamnesis mappings.yaml`. Owner link = `OwnerOffset`
 (`_ETHREAD.Tcb.Process` → owning `_EPROCESS` offset, tier-1 definitive). Enrichment: host identity
 from the image's own registry (`enrich.py` L309-318) + inheritance from the owning process
 (`_INHERIT` incl. `user, sid, uid, hostname` — `enrich.py` L72, L288-291, L377-380).
@@ -119,7 +119,7 @@ threads — Win10 unions it with KeyedWaitChain, gated on the cross-thread TERMI
 
 **Fallback source:** built-in `windows.thrdscan` (map `mappings.py` L261-272) maps the same
 `tgt_pid/tgt_tid/start_address/start_module/start_module_name` but **no stacks and no user-stack**
-(thrdscan doesn't emit them). It is SUPERSEDED by `windows.piiat.threads` when present
+(thrdscan doesn't emit them). It is SUPERSEDED by `windows.anamnesis.threads` when present
 (`mappings.py` L99-100 `SUPERSEDES`), so it only matters if the custom plugin wasn't run.
 
 ---
@@ -171,7 +171,7 @@ present. Split by lane:
 ## UNMAPPED gaps, ranked
 
 1. **Memory threads plugin not in the processed store → all live-thread + stack fields currently
-   absent.** The `windows.piiat.threads` plugin (and its `thread/create` rows carrying stacks,
+   absent.** The `windows.anamnesis.threads` plugin (and its `thread/create` rows carrying stacks,
    user-stacks, live tgt_pid/tid, live start_address/module/function) exists in code but was NOT run
    against the current memory image: `data_store/processed/volatility/memdump.mem/plugins/` contains
    only processes, registry, sessions, mftscan, pslist, banners — **no threads output**. This is the
@@ -212,9 +212,9 @@ present. Split by lane:
 - Sysmon source card: `byakugan/sources/evtx_sysmon.yaml` (L319-353)
 - Plaso alt-derivation of EID 8: `byakugan/byakugan/adapters/winevt.py` (L95-98)
 - Sysmon-lane enrich (inherit + R5 dual-link): `byakugan/byakugan/enrich.py` (L257-260, L488-498); rules `byakugan/byakugan/relationships.yml` (L21-29)
-- Memory threads plugin: `third_party/piiat-mem/plugins/windows/piiat/threads.py`
-- Memory CAR map: `third_party/piiat-mem/piiat_mem/mappings.py` (L204-222 piiat.threads, L261-272 thrdscan fallback, L99-104 SUPERSEDES)
-- Memory-lane enrich (host id + inherit): `third_party/piiat-mem/piiat_mem/enrich.py` (L72, L288-291, L309-324, L377-380)
+- Memory threads plugin: `Anamnesis internal/collect (collectThreads)`
+- Memory CAR map: `Anamnesis internal/normalize/mappings.yaml` ( anamnesis.threads, thrdscan fallback, SUPERSEDES)
+- Memory-lane enrich (host id + inherit): `the Anamnesis engine/Anamnesis internal/enrich` (L72, L288-291, L309-324, L377-380)
 - Injection analytics: `byakugan/third_party/car/analytics/CAR-2013-10-002.yaml` (LoadLibrary injection); `.../CAR-2021-05-011.yaml` (remote thread into LSASS)
 - R5 relationship doc: `docs/CAR-Relations.md` (L154)
 - Evidence checked (both empty of thread data): `data_store/processed/volatility/memdump.mem/plugins/` (no threads jsonl); `data_store/processed/windows_logs/unspecified_host/log_EvtxECmd_Output.json` (EID 1/5 only)

@@ -59,10 +59,10 @@ Counts are records extracted from the 4.17 M-line timeline:
   **`Cmd.EXE Missing Space Characters Execution Anomaly` (1)**.
 
 ### BGP-WS1-CONF — memory host (full resident argv)
-- `windows.piiat.processes.jsonl`: `CommandLine`, `ImageFileName`, `Path`, `Cwd`, `EnvVars`, SID, integrity.
+- `windows.anamnesis.processes.jsonl`: `CommandLine`, `ImageFileName`, `Path`, `Cwd`, `EnvVars`, SID, integrity.
 - `windows.pslist.jsonl`: `ImageFileName` (exe only), PID/PPID, CreateTime.
 - `car.db → process` (180 rows, **157 with `command_line`**): the **normalized** form of
-  `piiat.processes` (verified: winlogbeat cmdline byte-identical between the two).
+  `anamnesis.processes` (verified: winlogbeat cmdline byte-identical between the two).
 - `car.db → service` table exists with a `command_line` column but is **0 rows** (empty).
 
 ---
@@ -82,8 +82,8 @@ Legend for "supplies": **exe**=binary name only · **path**=full image path, no 
 | **obfuscated `cmd /c` env-var payload** (decodes to `flag{UKxhry6MoKCYdLV7RglTI5wEE23terqKVvf2FLdz2GexLeSMQ0jB0cmZPw1ITKn8D8r8vZs6iD1h90GU}`) | DESKTOP-M913391 | EvtxECmd EID1 (`ExecutableInfo` full argv) · hayabusa (`Details.Cmdline` full argv) · **hayabusa Sigma detection** (`Cmd.EXE Missing Space Characters Execution Anomaly`) | n/a (Sysmon host not in CAR) | **3-vantage on one execution, all full argv** — raw evtx ↔ timeline ↔ signature. The canonical "same command seen via log + detection" convergence. |
 | `cmd.exe /c "ver"` , `ipconfig` , `whoami`-style recon | DESKTOP-M913391 | EvtxECmd EID1 (argv) · hayabusa (argv, `Proc Exec`) | n/a | evtx ↔ hayabusa full-argv convergence; classic hands-on-keyboard recon sequence. |
 | `MicrosoftEdgeUpdate.exe /ua /installsource scheduler` | DESKTOP-M913391 | EvtxECmd EID1 (argv) · hayabusa (argv) | n/a | evtx ↔ hayabusa; note same `/ua /installsource scheduler` pattern also appears as a **.job** on the LoneWolf host (DropboxUpdate) — same scheduler idiom, two hosts, two artefact classes. |
-| **`winlogbeat.exe … --environment=windows_service -c …yml --path.home … -E logging.files.redirect_stderr=true`** | BGP-WS1-CONF | piiat.processes (`CommandLine` full argv) · car.db process (`command_line` full argv, **normalized copy**) · pslist (exe only) | **YES** (memory-derived) | **3-vantage memory convergence**: pslist=exe vantage, piiat=raw resident argv, CAR=normalized argv. Demonstrates the one place normalization actually fires. |
-| `scoringbot.exe`, `owncloud_crash_reporter.exe "…\*.dmp"`, `FTK Imager.exe`, `Everything.exe -svc`, `sshd.exe`, `nssm.exe` | BGP-WS1-CONF | piiat.processes (argv) · car.db process (argv) · pslist (exe) | YES | Same 3-vantage memory pattern; `owncloud_crash_reporter` argv reveals a crash-dump path in Temp only visible in the resident cmdline. |
+| **`winlogbeat.exe … --environment=windows_service -c …yml --path.home … -E logging.files.redirect_stderr=true`** | BGP-WS1-CONF | anamnesis.processes (`CommandLine` full argv) · car.db process (`command_line` full argv, **normalized copy**) · pslist (exe only) | **YES** (memory-derived) | **3-vantage memory convergence**: pslist=exe vantage, anamnesis=raw resident argv, CAR=normalized argv. Demonstrates the one place normalization actually fires. |
+| `scoringbot.exe`, `owncloud_crash_reporter.exe "…\*.dmp"`, `FTK Imager.exe`, `Everything.exe -svc`, `sshd.exe`, `nssm.exe` | BGP-WS1-CONF | anamnesis.processes (argv) · car.db process (argv) · pslist (exe) | YES | Same 3-vantage memory pattern; `owncloud_crash_reporter` argv reveals a crash-dump path in Temp only visible in the resident cmdline. |
 
 ---
 
@@ -104,9 +104,9 @@ Legend for "supplies": **exe**=binary name only · **path**=full image path, no 
    textbook "same execution, log + detection" convergence.
 
 3. **winlogbeat / scoringbot / owncloud on BGP-WS1-CONF — 3 vantages incl. CAR.**
-   pslist(exe) ↔ piiat.processes(argv) ↔ car.db process(argv). Only cluster where a full
+   pslist(exe) ↔ anamnesis.processes(argv) ↔ car.db process(argv). Only cluster where a full
    argv is actually lifted into CAR `command_line`, and proves CAR.process == normalized
-   piiat.processes (identical strings).
+   anamnesis.processes (identical strings).
 
 ---
 

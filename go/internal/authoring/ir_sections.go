@@ -393,10 +393,10 @@ func irCanonUser() pyjson.Value {
 func irSpindle() pyjson.Value {
 	return po(
 		"namespace", po(
-			"CAR_NS_URL", "https://github.com/Get-Sybers/PIIAT-MitreCar/stix",
+			"CAR_NS_URL", "https://github.com/Get-Sybers/Byakugan/stix",
 			"SPINDLE_LABEL", "spindle",
-			"CAR_NS", "c59b6244-0ed6-57c9-9248-03376f66270d",
-			"SPINDLE_NS", "dd668a4a-3945-5171-b031-7eb064307058",
+			"CAR_NS", "1fba557d-9fd4-5bcc-9546-d3ea3e787f02",
+			"SPINDLE_NS", "afab0259-176f-58d2-9e88-8f508fb46232",
 		),
 		"object_key", "_obj",
 		"version_key", "_v",
@@ -1092,7 +1092,7 @@ func irSpindle() pyjson.Value {
 func irGolden() pyjson.Value {
 	return po(
 		"spindle", po(
-			"version", pyjson.Int(1),
+			"version", pyjson.Int(2),
 			"recipe", po(
 				"canonical_json", po(
 					"input", po(
@@ -1103,8 +1103,8 @@ func irGolden() pyjson.Value {
 				),
 				"namespaces", po(
 					"STIX_NS", "00abedb4-aa42-466c-9c01-fed23315a9b7",
-					"CAR_NS", "c59b6244-0ed6-57c9-9248-03376f66270d",
-					"SPINDLE_NS", "dd668a4a-3945-5171-b031-7eb064307058",
+					"CAR_NS", "1fba557d-9fd4-5bcc-9546-d3ea3e787f02",
+					"SPINDLE_NS", "afab0259-176f-58d2-9e88-8f508fb46232",
 				),
 				"mint", "guid = uuid5(SPINDLE_NS, canonical_json(key))",
 			),
@@ -1122,7 +1122,7 @@ func irGolden() pyjson.Value {
 				"SourceImage", "M57-JO.jsonl",
 				"RecordId", "42",
 			),
-			"guid", "b04cd5e3-8531-5596-a584-85f82067a885",
+			"guid", "c2a2034c-66e0-5af6-9576-7f523a541f10",
 		),
 		"identities", pa(
 			po(
@@ -1136,7 +1136,7 @@ func irGolden() pyjson.Value {
 					"file_path", "\\Program Files\\app\\FPEXT.MSG",
 					"event_time", "2020-09-16T13:14:30.462820Z",
 				),
-				"guid", "445da026-0327-550f-8ca8-f3e7e41725c2",
+				"guid", "fef81767-4b0e-540a-a830-031b85f14bcc",
 			),
 			po(
 				"name", "l2t_firefox_cache",
@@ -1150,7 +1150,7 @@ func irGolden() pyjson.Value {
 					"url", "http://windowsupdate.microsoft.com/",
 					"visit_time", "2009-11-20T19:13:29.625000Z",
 				),
-				"guid", "5a07b777-ec7a-5992-953d-0dab657162a8",
+				"guid", "1bcdb758-ae1c-5b46-8420-57ec34d6ed5f",
 			),
 			po(
 				"name", "l2t_firefox_places",
@@ -1164,7 +1164,7 @@ func irGolden() pyjson.Value {
 					"url", "http://windowsupdate.microsoft.com/",
 					"visit_time", "2009-11-20T19:13:29.625000Z",
 				),
-				"guid", "36cc0018-5671-5965-953c-2d84e3b35019",
+				"guid", "472d594d-b0be-540c-ae6b-c41ccd6cb215",
 			),
 			po(
 				"name", "l2t_javaidx",
@@ -1178,7 +1178,7 @@ func irGolden() pyjson.Value {
 					"url", "http://dl.javafx.com/jogl.jar",
 					"visit_time", "2009-11-20T19:13:29.625000Z",
 				),
-				"guid", "9aa795b3-141c-578b-b5c5-c388728a9af5",
+				"guid", "faf26bb5-c15f-54d2-9d91-dfa021c9faff",
 			),
 			po(
 				"name", "l2t_lnk",
@@ -1192,7 +1192,7 @@ func irGolden() pyjson.Value {
 					"file_path", "C:\\Program Files\\OO3\\soffice.exe",
 					"event_time", "2009-11-20T19:13:29.625000Z",
 				),
-				"guid", "990e99d8-f356-5869-aca4-7560c253692a",
+				"guid", "f686d851-c7c8-5ad5-afa0-4ca78a50fd2d",
 			),
 			po(
 				"name", "l2t_mft",
@@ -1205,7 +1205,7 @@ func irGolden() pyjson.Value {
 					"file_reference", "843",
 					"event_time", "2020-09-16T13:14:30.462820Z",
 				),
-				"guid", "8750caa0-0755-5d4f-b487-850d6047eaf7",
+				"guid", "068d2085-7fa8-5c23-b8a0-708ad624c773",
 			),
 			po(
 				"name", "l2t_msiecf",
@@ -1219,7 +1219,7 @@ func irGolden() pyjson.Value {
 					"url", "http://windowsupdate.microsoft.com/x",
 					"visit_time", "2009-11-20T19:13:29.625000Z",
 				),
-				"guid", "14f16528-69d8-58ab-998f-c20fe74b0363",
+				"guid", "f779714e-f2ab-5e43-b8a5-473efe90ccfe",
 			),
 			po(
 				"name", "l2t_recyclebin",
@@ -1233,7 +1233,7 @@ func irGolden() pyjson.Value {
 					"file_path", "C:\\Documents and Settings\\Jo\\secret.xls",
 					"event_time", "2009-11-20T19:13:29.625000Z",
 				),
-				"guid", "6dff9f7e-ae52-52a4-957d-fd69919ff658",
+				"guid", "8c5cd823-db54-563d-81b3-1536972aac3d",
 			),
 			po(
 				"name", "l2t_srum/application_usage",
@@ -1247,7 +1247,7 @@ func irGolden() pyjson.Value {
 					"user_identifier", "S-1-5-18",
 					"recorded_time", "2018-03-27T12:19:00Z",
 				),
-				"guid", "f5306754-3e3f-583b-80a6-850e75be574b",
+				"guid", "5d2c8766-f567-5a22-ba28-88db1338b619",
 			),
 			po(
 				"name", "l2t_srum/network_usage",
@@ -1262,7 +1262,7 @@ func irGolden() pyjson.Value {
 					"interface_luid", "19985273102270464",
 					"recorded_time", "2018-03-27T12:19:00Z",
 				),
-				"guid", "e5505e75-40ae-5abd-b68e-ad6ac69c930b",
+				"guid", "46be4a7e-d922-5388-81a5-585aa3b1e738",
 			),
 			po(
 				"name", "l2t_text",
@@ -1276,7 +1276,7 @@ func irGolden() pyjson.Value {
 					"user", "insec",
 					"event_time", "2020-09-16T13:14:30.462820Z",
 				),
-				"guid", "a2ea3c6e-dca4-5d6f-904b-c18d69556148",
+				"guid", "e1a0dee2-1e31-5f03-8c97-e8d5bcedb9ac",
 			),
 			po(
 				"name", "l2t_usnjrnl",
@@ -1289,7 +1289,7 @@ func irGolden() pyjson.Value {
 					"usn", "1048576",
 					"file_reference", "281474976727294",
 				),
-				"guid", "3a2ab643-e362-5270-b2ce-ff0dd75812e7",
+				"guid", "e9e7f63e-c0a2-53b0-8a13-eb628df6843b",
 			),
 			po(
 				"name", "l2t_utmp",
@@ -1303,7 +1303,7 @@ func irGolden() pyjson.Value {
 					"terminal", "tty7",
 					"event_time", "2020-09-16T13:14:30.462820Z",
 				),
-				"guid", "66bccfff-8d8f-5f11-a5fd-06c16a14d7c2",
+				"guid", "d08f2b4d-4324-5d5c-8a92-c135fac818d2",
 			),
 			po(
 				"name", "l2t_utmpx",
@@ -1317,7 +1317,7 @@ func irGolden() pyjson.Value {
 					"terminal", "ttys000",
 					"event_time", "2020-09-16T13:14:30.462820Z",
 				),
-				"guid", "a4f7f4d0-7bc5-5f2c-a9dc-c9bfd21b2b6f",
+				"guid", "3bbc38ab-8ac0-5aa2-bc78-d4028e4f5795",
 			),
 			po(
 				"name", "plaso_exec_cron",
@@ -1331,7 +1331,7 @@ func irGolden() pyjson.Value {
 					"pid", "2534",
 					"event_time", "2020-08-26T11:46:13.000000Z",
 				),
-				"guid", "1028f1ec-0585-59ba-b3f9-a297b0767848",
+				"guid", "02fb1264-b522-55cf-9c74-568b97d3f3ca",
 			),
 			po(
 				"name", "plaso_exec_prefetch",
@@ -1345,7 +1345,7 @@ func irGolden() pyjson.Value {
 					"prefetch_hash", "892401266",
 					"run_time", "2009-11-20T09:31:29.671875Z",
 				),
-				"guid", "4c294458-58b8-53f8-a08e-5e061deeb6a6",
+				"guid", "9c9a2690-4727-5eda-94e1-6968d3e8168b",
 			),
 			po(
 				"name", "plaso_exec_winreg/amcache",
@@ -1358,7 +1358,7 @@ func irGolden() pyjson.Value {
 					"image_path", "c:\\users\\bob\\downloads\\evil.exe",
 					"recorded_time", "2023-05-01T10:00:00.000000Z",
 				),
-				"guid", "76356f08-7ebe-57f4-a18f-dae52ef93374",
+				"guid", "cbebdba4-d979-509a-95d2-f6086a7a9efc",
 			),
 			po(
 				"name", "plaso_exec_winreg/amcache_link_time",
@@ -1371,7 +1371,7 @@ func irGolden() pyjson.Value {
 					"file_path", "c:\\users\\bob\\downloads\\evil.exe",
 					"sha1", "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
 				),
-				"guid", "af665d74-c954-5517-a1e4-577adeea633d",
+				"guid", "781d4f10-ba73-54ab-a36e-71246cfb24ba",
 			),
 			po(
 				"name", "plaso_exec_winreg/appcompatcache",
@@ -1384,7 +1384,7 @@ func irGolden() pyjson.Value {
 					"image_path", "\\??\\C:\\WINDOWS\\system32\\hkcmd.exe",
 					"recorded_time", "2004-02-10T18:31:30.000000Z",
 				),
-				"guid", "9f7d9174-75ac-5efd-b38e-ec4be58357f1",
+				"guid", "8968e86e-b445-5d89-b6f0-4ada1121a0ba",
 			),
 			po(
 				"name", "plaso_exec_winreg/bam",
@@ -1398,7 +1398,7 @@ func irGolden() pyjson.Value {
 					"image_path", "\\Device\\HarddiskVolume2\\Windows\\System32\\notepad.exe",
 					"event_time", "2023-05-01T11:00:00.000000Z",
 				),
-				"guid", "7e4df065-f8cb-5635-bc3d-49b7534d8163",
+				"guid", "0ff183da-a2cc-5ff1-969d-98837e8c5c02",
 			),
 			po(
 				"name", "plaso_exec_winreg/userassist",
@@ -1412,7 +1412,7 @@ func irGolden() pyjson.Value {
 					"value_name", "UEME_RUNPATH:E:\\R54402.EXE",
 					"event_time", "2009-11-20T01:23:45.000000Z",
 				),
-				"guid", "c227a3e4-2cdd-5f87-bd30-f6555633cd69",
+				"guid", "e0862967-c63f-5dfb-aa1c-a6db372da12b",
 			),
 			po(
 				"name", "plaso_fseventsd",
@@ -1425,7 +1425,7 @@ func irGolden() pyjson.Value {
 					"event_identifier", "226530",
 					"file_path", "/Users/jo/Documents/notes.txt",
 				),
-				"guid", "4632d78d-e5d0-508d-8fe7-a18781b019da",
+				"guid", "cd7ebdf2-0e7f-554a-8c47-7c7a7975aa8f",
 			),
 			po(
 				"name", "plaso_olecf",
@@ -1438,7 +1438,7 @@ func irGolden() pyjson.Value {
 					"file_path", "\\Documents and Settings\\Jo\\My Documents\\budget.xls",
 					"event_time", "2009-11-20T19:13:29.625000Z",
 				),
-				"guid", "139b87de-7a0a-5dd3-809e-72d0c7945d28",
+				"guid", "9dddb200-9b58-5f57-a1c5-96c6c6ae9961",
 			),
 			po(
 				"name", "plaso_pecoff",
@@ -1451,7 +1451,7 @@ func irGolden() pyjson.Value {
 					"file_path", "\\Windows\\System32\\evil.dll",
 					"sha256", "b5de10a000000000000000000000000000000000000000000000000000000000",
 				),
-				"guid", "dd7a8086-618e-560c-8687-1b56d01b75e0",
+				"guid", "f0b51854-1690-5460-9841-4e17061c24a2",
 			),
 			po(
 				"name", "plaso_registry",
@@ -1465,7 +1465,7 @@ func irGolden() pyjson.Value {
 					"key_path", "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
 					"last_write", "2020-09-16T13:14:30.462820Z",
 				),
-				"guid", "f42566b3-3742-5364-8bf8-c90d8aa76e53",
+				"guid", "a575d9ce-94fc-5bee-b275-796a81fdda40",
 			),
 			po(
 				"name", "plaso_shellitem",
@@ -1479,7 +1479,7 @@ func irGolden() pyjson.Value {
 					"file_path", "C:\\Program Files\\OO3\\soffice.exe",
 					"event_time", "2009-11-20T19:13:29.625000Z",
 				),
-				"guid", "d465d1af-2c1e-5f27-b158-fab9a18cfa20",
+				"guid", "a7e59ec8-7d03-5df4-b5bf-8151bff49aa7",
 			),
 		),
 		"external", pa(

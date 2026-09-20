@@ -158,7 +158,7 @@ def test_reconstruction_creates_flagged_inferred_node_not_car_row(tmp_path):
               _native={"ParentProcessGuid": gone}),
         # a memory spoke owned by an _EPROCESS at an offset Anamnesis never listed
         _ev("thread", "remote_create", "T1", owning_pid=99, owning_offset=0x1a2b,
-            source_artefact="memory/windows.piiat.threads"),
+            source_artefact="memory/windows.anamnesis.threads"),
         # an owner the cascade DID resolve (observed): nothing to reconstruct
         _proc("P9"),
         _ev("registry", "add", "R1", owning_guid_native="P9", owning_guid="P9",
