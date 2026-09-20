@@ -1,0 +1,383 @@
+"""The `byakugan` command — the engine's multi-tool entry point.
+
+One binary, four operations, selected by the first argument (the GoDFIR-toolz
+container framework's multi-tool dispatcher: name the sub-tool, pass the
+environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else):
+
+    byakugan build       materialise CAR from a processed-evidence tree:
+                         pipeline --batch BYAKUGAN_BUILD_INPUT_DIR
+                         --out BYAKUGAN_BUILD_OUT_DIR [--force] [--derive] [--stix]
+    byakugan timeline    the unified, time-ordered CAR timeline of a car tree:
+                         timeline BYAKUGAN_TIMELINE_INPUT_DIR
+                         --out BYAKUGAN_TIMELINE_OUT_DIR/timeline.jsonl [--host …]
+    byakugan verify      the CAR run-through (verify.py) over a materialised
+                         tree: verify BYAKUGAN_VERIFY_INPUT_DIR — the report on
+                         stderr and, when BYAKUGAN_VERIFY_OUT_DIR is writable,
+                         in <OUT_DIR>/verify.txt
+    byakugan car-vocab   {object: [car_actions]} — the canonical car_action
+                         vocabulary the verify gate checks values against; its
+                         stdout IS that JSON, one line
+
+Each batch sub-tool reads its own env block — BYAKUGAN_<SUBTOOL>_INPUT_DIR
+(default /input, read-only), _OUT_DIR (default /output), _FORCE, _LOG_LEVEL
+(error|warn|info|debug, stderr only), _ARGS (extra engine argv) and the
+sub-tool's own flags — and prints exactly one JSON summary line on stdout:
+`tool`, `subtool`, `version`, `engine_ref`, `status`, `inputs`, `processed`,
+`skipped`, `failed`, `records`, `outputs`, `exit`, `started`, `duration_s`,
+the engine's own summary as `engine`, `failures` when something failed and
+`error` on a config error. The engine's own stdout is captured; progress and
+errors go to stderr.
+
+Exit codes follow the framework's uniform table:
+
+    0  ok            build: every source processed or already up to date;
+                     timeline: written (or kept); verify: the gate PASSED
+    1  nothing       build: no source produced events; timeline: no car.db;
+                     verify: no materialised CAR under the input dir — or the
+                     gate FAILED (status `failed`, `failed` = the failed checks,
+                     `failures` names them)
+    2  config_error  no sub-tool named, a bad variable, a missing or unreadable
+                     input, an unwritable output, an engine argument error
+    3  partial       build: at least one source processed, at least one failed
+
+A sub-tool followed by arguments is the pass-through to the engine's own CLI,
+with its own stdout and exit code: `byakugan timeline <car_dir> [flags]`,
+`byakugan verify [car_dir]`, `byakugan [build] --in FILE --out DIR | --batch
+DIR [--out DIR] [--force] [--derive] [--stix]`. `--version` prints the version
+and the pinned engine ref (BYAKUGAN_VERSION / BYAKUGAN_REF), `--print-contract`
+prints the contract file at BYAKUGAN_CONTRACT (default /opt/byakugan/contract.yml).
+"""
+from __future__ import annotations
+
+import io
+import json
+import os
+import sys
+import time
+
+TOOL = "byakugan"
+SUBTOOLS = ("build", "timeline", "verify", "car-vocab")
+BATCH_SUBTOOLS = ("build", "timeline", "verify")
+DEFAULT_INPUT_DIR = "/input"
+DEFAULT_OUT_DIR = "/output"
+CONTRACT_ENV = "BYAKUGAN_CONTRACT"
+CONTRACT_DEFAULT = "/opt/byakugan/contract.yml"
+LEVELS = {"error": 0, "warn": 1, "info": 2, "debug": 3}
+BOOL_TRUE = {"1", "true", "yes", "on"}
+BOOL_FALSE = {"", "0", "false", "no", "off"}
+EXIT_OK, EXIT_NOTHING, EXIT_CONFIG, EXIT_PARTIAL = 0, 1, 2, 3
+
+
+class ConfigError(Exception):
+    """A bad variable or an unusable mount: exit 2, never a traceback."""
+
+
+def version() -> str:
+    """BYAKUGAN_VERSION (what the image was built as), else the installed
+    distribution's version, else a dev marker (run from the source tree)."""
+    env = os.environ.get("BYAKUGAN_VERSION")
+    if env:
+        return env
+    try:
+        from importlib.metadata import version as dist_version
+        return dist_version("byakugan")
+    except Exception:                       # noqa: BLE001 — not installed
+        return "0.0.0-dev"
+
+
+def engine_ref() -> str:
+    return os.environ.get("BYAKUGAN_REF") or ""
+
+
+class Config:
+    """The resolved env block of one sub-tool (BYAKUGAN_<SUBTOOL>_*).
+
+    The input dir must exist. The output dir is required (created and probed
+    writable) unless `out_optional`: then it is used only when named
+    explicitly or when the default already exists (a mounted /output), and is
+    None otherwise — the default path is never created as a side effect."""
+
+    def __init__(self, subtool: str, env, out_optional: bool = False):
+        self.subtool = subtool
+        self.prefix = f"{TOOL.upper()}_{subtool.upper().replace('-', '_')}"
+        self._env = env
+        self.input_dir = self.get("INPUT_DIR", DEFAULT_INPUT_DIR)
+        self.force = self.bool("FORCE", "0")
+        level = self.get("LOG_LEVEL", "info").lower()
+        if level not in LEVELS:
+            raise ConfigError(f"{self.prefix}_LOG_LEVEL: {level!r} is not one of error|warn|info|debug")
+        self.level = LEVELS[level]
+        if not os.path.isdir(self.input_dir):
+            raise ConfigError(f"{self.prefix}_INPUT_DIR {self.input_dir}: not a readable directory")
+        explicit = self._env.get(f"{self.prefix}_OUT_DIR") or ""
+        self.out_dir: str | None = explicit or DEFAULT_OUT_DIR
+        if out_optional and not explicit and not os.path.isdir(self.out_dir):
+            self.out_dir = None
+        if self.out_dir is not None:
+            self._ensure_writable(self.out_dir)
+
+    def _ensure_writable(self, path: str) -> None:
+        try:
+            os.makedirs(path, exist_ok=True)
+            probe = os.path.join(path, f".probe-{os.getpid()}")
+            with open(probe, "w"):
+                pass
+            os.remove(probe)
+        except OSError as e:
+            raise ConfigError(f"{self.prefix}_OUT_DIR {path}: not writable: {e}") from e
+
+    def get(self, suffix: str, default: str) -> str:
+        return self._env.get(f"{self.prefix}_{suffix}") or default
+
+    def bool(self, suffix: str, default: str) -> bool:
+        raw = self.get(suffix, default).strip().lower()
+        if raw in BOOL_TRUE:
+            return True
+        if raw in BOOL_FALSE:
+            return False
+        raise ConfigError(f"{self.prefix}_{suffix}: {raw!r} is not a boolean "
+                          "(1/true/yes/on or 0/false/no/off)")
+
+    def log(self, level: int, msg: str) -> None:
+        if level <= self.level:
+            sys.stderr.write(f"{TOOL} {self.subtool}: {msg}\n")
+            sys.stderr.flush()
+
+
+def run_engine(main, argv: list[str]):
+    """Run an engine main() with its stdout captured (it prints its own JSON
+    summary there); return (return code or None, captured stdout, SystemExit
+    message or None)."""
+    saved = sys.stdout
+    buf = io.StringIO()
+    sys.stdout = buf
+    try:
+        rc = main(argv)
+        message = None
+    except SystemExit as e:                 # argparse errors, the engine's own fail-fast exits
+        rc = e.code if isinstance(e.code, int) else None
+        message = None if isinstance(e.code, int) else str(e.code)
+    finally:
+        sys.stdout = saved
+    return rc, buf.getvalue(), message
+
+
+def _engine_json(out: str, cfg: Config, summary: dict, default):
+    """The engine's own summary out of its captured stdout: the whole capture,
+    else its last line (a stray line before the summary), else kept verbatim."""
+    text = out.strip()
+    if not text:
+        return default
+    for candidate in (text, text.splitlines()[-1]):
+        try:
+            return json.loads(candidate)
+        except ValueError:
+            continue
+    cfg.log(1, "engine summary is not JSON; kept verbatim")
+    summary["engine_raw"] = text
+    return default
+
+
+class _Run:
+    """One batch run: the summary line, finished exactly once."""
+
+    def __init__(self, subtool: str, stdout):
+        self.started = time.time()
+        self.stdout = stdout
+        self.summary = {
+            "tool": TOOL, "subtool": subtool, "version": version(), "engine_ref": engine_ref(),
+            "status": "", "inputs": 0, "processed": 0, "skipped": 0, "failed": 0, "records": 0,
+            "outputs": [], "exit": 0,
+            "started": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(self.started)),
+            "duration_s": 0.0}
+
+    def finish(self, status: str, code: int) -> int:
+        s = self.summary
+        s["status"], s["exit"] = status, code
+        s["duration_s"] = round(time.time() - self.started, 3)
+        self.stdout.write(json.dumps(s, separators=(",", ":"), default=str) + "\n")
+        self.stdout.flush()
+        return code
+
+
+def _build(cfg: Config, run: _Run) -> int:
+    from .pipeline import main as build_main
+    s = run.summary
+    argv = ["--batch", cfg.input_dir, "--out", cfg.out_dir]
+    if cfg.force:
+        argv.append("--force")
+    if cfg.bool("DERIVE", "0"):
+        argv.append("--derive")
+    if cfg.bool("STIX", "0"):
+        argv.append("--stix")
+    argv += cfg.get("ARGS", "").split()
+    cfg.log(3, "engine argv: " + " ".join(argv))
+    rc, out, message = run_engine(build_main, argv)
+    if message is not None:
+        s["error"] = message
+        cfg.log(0, f"engine: {message}")
+        return run.finish("config_error", EXIT_CONFIG)
+    results = _engine_json(out, cfg, s, default=[])
+    s["engine"] = results
+    rows = [r for r in results if isinstance(r, dict)] if isinstance(results, list) else []
+    s["inputs"] = len(rows)
+    s["failed"] = sum(1 for r in rows if "error" in r)
+    s["skipped"] = sum(1 for r in rows if r.get("skipped"))
+    s["processed"] = s["inputs"] - s["failed"] - s["skipped"]
+    s["records"] = sum(int(r.get("events", 0) or 0) for r in rows)
+    s["outputs"] = sorted({os.path.join(cfg.out_dir, str(r["source"]))
+                           for r in rows if r.get("source") and "error" not in r}) or [cfg.out_dir]
+    if s["failed"]:
+        s["failures"] = [{"item": str(r.get("source") or r.get("input") or "?"), "error": str(r["error"])}
+                         for r in rows if "error" in r]
+    cfg.log(2, "{inputs} sources: {processed} processed, {skipped} skipped, {failed} failed".format(**s))
+    if rc == 0 and s["failed"]:
+        return run.finish("partial", EXIT_PARTIAL)
+    return run.finish("ok", EXIT_OK) if rc == 0 else run.finish("nothing", EXIT_NOTHING)
+
+
+def _timeline(cfg: Config, run: _Run) -> int:
+    from .timeline import main as timeline_main
+    s = run.summary
+    out_path = os.path.join(cfg.out_dir, "timeline.jsonl")
+    s["inputs"] = 1
+    s["outputs"] = [cfg.out_dir]
+    if os.path.isfile(out_path) and not cfg.force:
+        s["skipped"] = 1
+        cfg.log(2, f"skip {cfg.input_dir} (output exists: {out_path})")
+        return run.finish("ok", EXIT_OK)
+    argv = [cfg.input_dir, "--out", out_path]
+    for flag in ("HOST", "AFTER", "BEFORE"):
+        if value := cfg.get(flag, ""):
+            argv += [f"--{flag.lower()}", value]
+    argv += cfg.get("ARGS", "").split()
+    cfg.log(3, "engine argv: " + " ".join(argv))
+    rc, out, message = run_engine(timeline_main, argv)
+    if message is not None:
+        s["error"] = message
+        cfg.log(0, f"engine: {message}")
+        if message.startswith("no car.db"):
+            return run.finish("nothing", EXIT_NOTHING)
+        return run.finish("config_error", EXIT_CONFIG)
+    engine = _engine_json(out, cfg, s, default={})
+    s["engine"] = engine
+    s["records"] = int(engine.get("entries", 0) or 0) if isinstance(engine, dict) else 0
+    s["processed"] = 1
+    cfg.log(2, f"timeline {out_path}: {s['records']} entries")
+    return run.finish("ok", EXIT_OK) if rc == 0 else run.finish("nothing", EXIT_NOTHING)
+
+
+def _verify(cfg: Config, run: _Run) -> int:
+    """The CAR run-through over BYAKUGAN_VERIFY_INPUT_DIR: `inputs` are the
+    source directories holding materialised CAR, `records` the rows the gate
+    read, `failed` the checks that failed (named in `failures`); the report
+    goes to stderr, and to <OUT_DIR>/verify.txt when there is an output dir."""
+    from . import verify
+    s = run.summary
+    files = [p for obj in (*verify._OBJECTS, verify.RELATIONSHIPS)   # noqa: SLF001
+             for p in verify.car_files(cfg.input_dir, obj)]
+    s["inputs"] = len({os.path.dirname(p) for p in files})
+    if not files:
+        cfg.log(1, f"no materialised CAR under {cfg.input_dir} — build the CAR first")
+        return run.finish("nothing", EXIT_NOTHING)
+    c = verify.run(cfg.input_dir)
+    text = verify.report(c)
+    sys.stderr.write(text)
+    sys.stderr.flush()
+    s["engine"] = {"passed": c.passed, "failed": c.failed, "not_exercised": c.skipped,
+                   "os_families_covered": c.os_families_covered,
+                   "os_families_total": c.os_families_total}
+    s["records"] = len(c.rows(verify.CAR))
+    s["processed"] = s["inputs"]
+    s["failed"] = c.failed
+    if c.failed:
+        s["failures"] = [{"item": desc} for desc in verify.failures(c)]
+    if cfg.out_dir is not None:
+        with open(os.path.join(cfg.out_dir, "verify.txt"), "w", encoding="utf-8") as fh:
+            fh.write(text)
+        s["outputs"] = [cfg.out_dir]
+    cfg.log(2, f"{s['inputs']} source(s), {s['records']} rows: {c.passed} passed, "
+               f"{c.failed} failed, {c.skipped} not exercised")
+    return run.finish("failed", EXIT_NOTHING) if c.failed else run.finish("ok", EXIT_OK)
+
+
+_RUNNERS = {"build": _build, "timeline": _timeline, "verify": _verify}
+
+
+def batch(subtool: str, env, stdout) -> int:
+    """Run one sub-tool from its env block; the one summary line goes to
+    `stdout`, everything else to stderr."""
+    run = _Run(subtool, stdout)
+    try:
+        cfg = Config(subtool, env, out_optional=subtool == "verify")
+    except ConfigError as e:
+        run.summary["error"] = str(e)
+        sys.stderr.write(f"{TOOL} {subtool}: config error: {e}\n")
+        return run.finish("config_error", EXIT_CONFIG)
+    return _RUNNERS[subtool](cfg, run)
+
+
+def car_vocab() -> int:
+    from . import carmodel
+    model = carmodel.load()
+    json.dump({obj: sorted(model[obj].get("actions", [])) for obj in model}, sys.stdout)
+    sys.stdout.write("\n")
+    return 0
+
+
+def print_contract() -> int:
+    path = os.environ.get(CONTRACT_ENV) or CONTRACT_DEFAULT
+    try:
+        with open(path, encoding="utf-8") as fh:
+            sys.stdout.write(fh.read())
+    except OSError as e:
+        sys.stderr.write(f"{TOOL}: no contract at {path} ({e.strerror}); set {CONTRACT_ENV}\n")
+        return EXIT_CONFIG
+    return 0
+
+
+def usage() -> None:
+    sys.stderr.write(
+        "usage: byakugan build|timeline|verify       (env-driven batch: BYAKUGAN_<SUBTOOL>_*)\n"
+        "       byakugan car-vocab                   (the car_action vocabulary, one JSON line)\n"
+        "       byakugan timeline <car_dir> [flags] | byakugan verify [car_dir] | "
+        "byakugan [build] <pipeline flags...>   (pass-through)\n"
+        "       byakugan --version | --print-contract\n")
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if len(argv) == 1:
+        head = argv[0]
+        if head.lstrip("-") == "version":
+            print(f"{TOOL} {version()} ({engine_ref() or 'unpinned'})")
+            return 0
+        if head.lstrip("-") == "print-contract":
+            return print_contract()
+        if head == "car-vocab":
+            return car_vocab()
+        if head in BATCH_SUBTOOLS:
+            return batch(head, os.environ, sys.stdout)
+    if not argv:
+        usage()
+        run = _Run("", sys.stdout)
+        run.summary["error"] = f"no sub-tool named ({'|'.join(SUBTOOLS)})"
+        return run.finish("config_error", EXIT_CONFIG)
+    # pass-through: the engine's own argv
+    if argv[0] == "timeline":
+        from .timeline import main as timeline_main
+        return timeline_main(argv[1:])
+    if argv[0] == "verify":
+        from .verify import main as verify_main
+        return verify_main(argv[1:])
+    if argv[0] == "car-vocab":
+        usage()
+        return EXIT_CONFIG
+    if argv[0] == "build":
+        argv = argv[1:]
+    from .pipeline import main as build_main
+    return build_main(argv)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

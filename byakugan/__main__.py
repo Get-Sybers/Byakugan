@@ -1,3 +1,3 @@
-from .pipeline import main
+from .cli import main
 
 raise SystemExit(main())

@@ -25,7 +25,9 @@ Repository = "https://github.com/Get-Sybers/byakugan"
 Issues = "https://github.com/Get-Sybers/byakugan/issues"
 
 [project.scripts]
-byakugan = "byakugan.pipeline:main"
+# the multi-tool entry point: `byakugan build|timeline|verify|car-vocab` driven
+# by BYAKUGAN_<SUBTOOL>_* (the container contract), or the engine's own argv
+byakugan = "byakugan.cli:main"
 
 [tool.pytest.ini_options]
 # tests/ holds shared helpers (reference_plumbing.py) that the test modules
