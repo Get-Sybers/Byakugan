@@ -21,6 +21,20 @@ exit:
     object (and only those); outcome sources name real actions / fields;
   * `derived:` entries build from real header / object fields.
 
+relationships.yml / inferred.yml (the superset.db `relationship` /
+`inferred_node` projections) and ecs_types.yml (the non-keyword mapping-type
+overrides) are checked too, on their own terms (validate_edges):
+
+  * their `fields:` cover exactly the source table's column list — no
+    duplicate, no unknown key, no column left unprojected;
+  * every field entry names an `ecs:` target and a `type:` (or an
+    `ecs_types.yml` match) — `also:`/`also_type:` come in pairs;
+  * `document_id.recipe` names only real source columns; `constants:` carries
+    the data_stream identity (event.kind/module/dataset, data_stream.type/
+    dataset, ecs.version), consistent with `dataset:`;
+  * every ecs_types.yml path is ECS- or car.*-shaped, and every non-keyword
+    override is actually used by some contract file — no dead overrides.
+
 Dependencies: pyyaml only.
 
     python model/projection/validate.py
@@ -39,6 +53,9 @@ MODEL_DIR = os.path.dirname(HERE)
 CAR_OBJECTS_DIR = os.path.join(MODEL_DIR, "car", "objects")
 CONVENTIONS_PATH = os.path.join(HERE, "conventions.yml")
 OBJECTS_DIR = os.path.join(HERE, "objects")
+RELATIONSHIPS_PATH = os.path.join(HERE, "relationships.yml")
+INFERRED_PATH = os.path.join(HERE, "inferred.yml")
+ECS_TYPES_PATH = os.path.join(HERE, "ecs_types.yml")
 
 # ECS 8.x top-level field sets (+ the base fields). A cheap guard against
 # typos (`proccess.name`) — the full ECS schema is deliberately not vendored.
@@ -57,6 +74,21 @@ ECS_PATH = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*$")
 NATIVE_TYPES = {"keyword", "text", "long", "double", "float", "boolean", "date", "ip", "flattened"}
 ENTRY_KEYS = {"car", "ecs", "also", "fallback", "note", "native", "rationale", "type"}
 OUTCOMES = {"success", "failure", "unknown"}
+
+# relationships.yml / inferred.yml: the superset.db `relationship` / `inferred_node`
+# columns (byakugan/superset.py SupersetStore._create), minus the SQLite `id`
+# autoincrement. Hardcoded here (validate.py stays pyyaml-only, no byakugan
+# import) — tests/test_projection_rel_drift.py cross-checks this pair against
+# the LIVE engine schema via PRAGMA table_info, so a schema change fails there
+# until these two contract files (and this list) get a decision.
+REL_COLUMNS = ["timestamp", "source_host", "relationship", "source_object", "source_guid",
+              "target_object", "target_guid", "confidence", "method", "class",
+              "identity_key", "inferred_end", "corroborated_by"]
+INFERRED_COLUMNS = ["node_id", "source_host", "object", "identity_key", "identity_value",
+                    "reason", "method", "corroborated_by", "properties", "first_seen",
+                    "last_seen"]
+EDGE_ENTRY_KEYS = {"car", "ecs", "type", "also", "also_type", "note"}
+_RECIPE_SHA1 = re.compile(r"^sha1\((.*)\)$")
 
 
 def _load(path: str) -> dict:
@@ -232,6 +264,184 @@ def _validate_object(name: str, model: dict, doc: dict, header_union: set[str],
         _check_path((d or {}).get("ecs"), dw, errors)
 
 
+def _recipe_components(recipe: str) -> list[str]:
+    """The column names a document_id.recipe names: the `|`-joined args of a
+    sha1(...) call, or (inferred.yml's `node_id`) the bare recipe itself."""
+    m = _RECIPE_SHA1.match(recipe.strip())
+    if m:
+        return [c.strip() for c in m.group(1).split("|")]
+    return [recipe.strip()]
+
+
+def _validate_edge_constants(where: str, doc: dict, errors: list[str]) -> None:
+    constants = doc.get("constants")
+    if not isinstance(constants, dict):
+        errors.append(f"{where} constants: must be a mapping")
+        return
+    for k in ("event.kind", "event.module", "event.dataset",
+             "data_stream.type", "data_stream.dataset", "ecs.version"):
+        if k not in constants:
+            errors.append(f"{where} constants: missing the data_stream identity key '{k}'")
+    dataset = doc.get("dataset")
+    if dataset:
+        for k in ("event.dataset", "data_stream.dataset"):
+            if k in constants and constants[k] != dataset:
+                errors.append(f"{where} constants.{k}: {constants[k]!r} does not match dataset: {dataset!r}")
+
+
+def _validate_edge_fields(where: str, doc: dict, columns: list[str], ecs_types: dict,
+                          errors: list[str], used_paths: set[str]) -> None:
+    fields = doc.get("fields")
+    if not isinstance(fields, list):
+        errors.append(f"{where} fields: must be a list of projection entries")
+        return
+    seen: set[str] = set()
+    for i, e in enumerate(fields):
+        if not isinstance(e, dict) or not e.get("car"):
+            errors.append(f"{where} fields[{i}]: entry needs a car: column name")
+            continue
+        c = e["car"]
+        ew = f"{where} fields[{c}]"
+        if c not in columns:
+            errors.append(f"{ew}: '{c}' is not a column of this table (or is the 'id' autoincrement, "
+                          "which is never projected)")
+            continue
+        if c in seen:
+            errors.append(f"{ew}: duplicate entry")
+            continue
+        seen.add(c)
+        unknown = sorted(set(e) - EDGE_ENTRY_KEYS)
+        if unknown:
+            errors.append(f"{ew}: unknown key(s) {unknown}")
+        if "ecs" not in e:
+            errors.append(f"{ew}: needs an ecs: target")
+        else:
+            _check_path(e["ecs"], ew, errors, allow_custom=True)
+            used_paths.add(str(e["ecs"]))
+        if e.get("type") not in NATIVE_TYPES and str(e.get("ecs")) not in ecs_types:
+            errors.append(f"{ew}: needs a type: (one of {sorted(NATIVE_TYPES)}) — every field entry "
+                          "here carries its own type explicitly (or resolves via ecs_types.yml)")
+        also = e.get("also")
+        if also is None:
+            if "also_type" in e:
+                errors.append(f"{ew}: also_type: is only meaningful with also:")
+        else:
+            _check_path(also, f"{ew} also", errors, allow_custom=True)
+            used_paths.add(str(also))
+            if e.get("also_type") not in NATIVE_TYPES:
+                errors.append(f"{ew} also: needs also_type: (one of {sorted(NATIVE_TYPES)})")
+    for c in columns:
+        if c not in seen:
+            errors.append(f"{where}: column '{c}' has no projection entry")
+
+
+def _validate_edge(where: str, doc: dict, expected_object: str, expected_stream: str,
+                   expected_dataset: str, columns: list[str], ecs_types: dict,
+                   errors: list[str], used_paths: set[str]) -> None:
+    """relationships.yml / inferred.yml: a simplified objects/*.yml-shaped contract
+    projecting a superset.db table (not a CAR object) onto its own logs-car.* stream."""
+    if not isinstance(doc, dict):
+        errors.append(f"{where}: top-level document must be a mapping")
+        return
+    if doc.get("object") != expected_object:
+        errors.append(f"{where}: object: must be '{expected_object}'")
+    if doc.get("stream") != expected_stream:
+        errors.append(f"{where}: stream: must be '{expected_stream}'")
+    if doc.get("dataset") != expected_dataset:
+        errors.append(f"{where}: dataset: must be '{expected_dataset}'")
+    _validate_edge_constants(where, doc, errors)
+    dr = doc.get("document_id") or {}
+    recipe = dr.get("recipe")
+    if not isinstance(recipe, str) or not recipe.strip():
+        errors.append(f"{where} document_id: needs a recipe: string")
+    else:
+        for c in _recipe_components(recipe):
+            if c not in columns:
+                errors.append(f"{where} document_id.recipe: component '{c}' names no real source column")
+    if not isinstance(dr.get("note"), str) or not dr["note"].strip():
+        errors.append(f"{where} document_id: needs a note:")
+    _validate_edge_fields(where, doc, columns, ecs_types, errors, used_paths)
+
+
+def _collect_used_ecs_paths(conventions: dict, objects: dict[str, dict],
+                            rel_doc: dict, inferred_doc: dict) -> set[str]:
+    """Every ECS/car.* target path any contract file actually names — what
+    ecs_types.yml's dead-override check treats as 'used'."""
+    used: set[str] = set()
+    for entry in (conventions.get("common_header") or {}).values():
+        if not isinstance(entry, dict):
+            continue
+        if "ecs" in entry:
+            used.add(str(entry["ecs"]))
+        used.update(str(a) for a in entry.get("also") or [])
+        for override in (entry.get("per_object") or {}).values():
+            used.update(str(a) for a in (override or {}).get("also") or [])
+    used.update(conventions.get("custom_namespace") or {})
+    for doc in objects.values():
+        for e in doc.get("fields") or []:
+            if not isinstance(e, dict):
+                continue
+            if "ecs" in e:
+                used.add(str(e["ecs"]))
+            used.update(str(a) for a in e.get("also") or [])
+        for d in doc.get("derived") or []:
+            if isinstance(d, dict) and d.get("ecs"):
+                used.add(str(d["ecs"]))
+    for doc in (rel_doc, inferred_doc):
+        for e in (doc or {}).get("fields") or []:
+            if not isinstance(e, dict):
+                continue
+            if "ecs" in e:
+                used.add(str(e["ecs"]))
+            if e.get("also"):
+                used.add(str(e["also"]))
+    return used
+
+
+def _validate_ecs_types(ecs_types: dict, used_paths: set[str], errors: list[str]) -> None:
+    for path, spec in ecs_types.items():
+        where = f"ecs_types.yml types.{path}"
+        if path != "@timestamp" and not ECS_PATH.match(str(path)):
+            errors.append(f"{where}: {path!r} is not an ECS- or car.*-shaped field path")
+        else:
+            root = str(path).split(".", 1)[0]
+            if path != "@timestamp" and root != CUSTOM_ROOT and root not in ECS_TOP_LEVEL:
+                errors.append(f"{where}: '{root}' is neither an ECS 8.x top-level field set nor '{CUSTOM_ROOT}'")
+        if not isinstance(spec, dict) or spec.get("type") not in NATIVE_TYPES:
+            errors.append(f"{where}: needs type: one of {sorted(NATIVE_TYPES)}")
+            continue
+        if spec["type"] != "keyword" and path not in used_paths:
+            errors.append(f"{where}: type override '{spec['type']}' is not used by any contract file "
+                          "(conventions.yml, objects/*.yml, relationships.yml, inferred.yml) — dead override")
+
+
+def load_edge_docs() -> tuple[dict, dict, dict]:
+    """(relationships.yml doc, inferred.yml doc, ecs_types.yml {path: {type, note}})."""
+    ecs_types = (_load(ECS_TYPES_PATH) or {}).get("types") or {}
+    return _load(RELATIONSHIPS_PATH), _load(INFERRED_PATH), ecs_types
+
+
+def validate_edges(conventions: dict, objects: dict[str, dict], rel_doc: dict,
+                   inferred_doc: dict, ecs_types: dict) -> list[str]:
+    """Every relationships.yml / inferred.yml / ecs_types.yml problem; [] means in step.
+    Kept separate from validate() (which stays exactly the objects/*.yml <-> CAR-model
+    check it always was) so neither check's signature or behaviour disturbs the other."""
+    errors: list[str] = []
+    used_paths: set[str] = set()
+    _validate_edge("relationships.yml", rel_doc, "rel", "logs-car.rel-*", "car.rel",
+                  REL_COLUMNS, ecs_types, errors, used_paths)
+    _validate_edge("inferred.yml", inferred_doc, "inferred", "logs-car.inferred-*", "car.inferred",
+                  INFERRED_COLUMNS, ecs_types, errors, used_paths)
+    used_paths |= _collect_used_ecs_paths(conventions, objects, rel_doc, inferred_doc)
+    _validate_ecs_types(ecs_types, used_paths, errors)
+    return errors
+
+
+def edge_summary(rel_doc: dict, inferred_doc: dict) -> str:
+    return (f" | rel: {len(rel_doc.get('fields') or [])} fields, "
+            f"inferred: {len(inferred_doc.get('fields') or [])} fields")
+
+
 def validate(car: dict[str, dict], conventions: dict, objects: dict[str, dict]) -> list[str]:
     """Every contract problem as a message; an empty list means the contract is in step."""
     errors: list[str] = []
@@ -268,13 +478,15 @@ def main() -> int:
         print(f"no CAR objects found under {CAR_OBJECTS_DIR}", file=sys.stderr)
         return 1
     conventions, objects = load_contract()
+    rel_doc, inferred_doc, ecs_types = load_edge_docs()
     errors = validate(car, conventions, objects)
+    errors += validate_edges(conventions, objects, rel_doc, inferred_doc, ecs_types)
     if errors:
         print(f"car-ecs projection DRIFT: {len(errors)} problem(s)", file=sys.stderr)
         for e in errors:
             print(f"  - {e}", file=sys.stderr)
         return 1
-    print(summary(car, conventions, objects))
+    print(summary(car, conventions, objects) + edge_summary(rel_doc, inferred_doc))
     return 0
 
 

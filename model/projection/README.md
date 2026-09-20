@@ -24,8 +24,15 @@ model/projection/
 ├── conventions.yml                cross-cutting rules: the common header, data-stream shape,
 │                                  the car.* custom namespace, precedence/coercion rules
 ├── objects/<object>.yml           one file per CAR object (13): every object_field -> ECS, or native
+├── relationships.yml              superset.db `relationship` row -> logs-car.rel-* (the edge timeline)
+├── inferred.yml                   superset.db `inferred_node` row -> logs-car.inferred-*
+├── ecs_types.yml                  mapping-type overrides (date/long/ip/float/boolean) for the
+│                                  non-keyword `ecs:`/`also:`/`derived:` targets objects/*.yml uses
 ├── validate.py                    the drift check (pyyaml only) — exit 1 on any problem
-└── test_projection_contract.py    thin pytest wrapper around validate.py
+├── render_elastic.py              renders rendered/ from the contract (pyyaml only) — --check for drift
+├── rendered/                      GENERATED, committed: component templates, index templates, Kibana views
+├── test_projection_contract.py    thin pytest wrapper around validate.py + render_elastic.py --check
+└── test_kibana_assets.py          structural checks on rendered/kibana/*.ndjson
 ```
 
 ## The shape of the contract
@@ -118,7 +125,60 @@ object does not have; every common-header field is projected; `ecs:` paths are
 ECS-shaped (a known ECS 8.x top-level field set — `car.*` homes must be
 `native: true`, never an `ecs:` path); shared targets declare `fallback: true`;
 `event_defaults` cover every `car_action` and only those; `derived:` sources
-exist.
+exist. The same run also checks `relationships.yml` / `inferred.yml`: their
+`fields:` cover exactly the superset.db `relationship` / `inferred_node`
+column lists (no dup, no unknown key), every entry's `type:` (or an
+`ecs_types.yml` match) is explicit, the `document_id.recipe` names real source
+columns, and `constants:` carries the data_stream identity — and it checks
+`ecs_types.yml` itself: every path is ECS- or `car.*`-shaped, and every
+non-keyword override is actually used somewhere in the contract (no dead
+overrides).
+
+## Rendered assets
+
+`render_elastic.py` (pyyaml only, like `validate.py`) renders the contract —
+`conventions.yml` + `objects/*.yml` + `relationships.yml` + `inferred.yml` +
+`ecs_types.yml` — into the Elasticsearch/Kibana assets DX_DFIR's loader
+composes at index-template time, under `rendered/` (committed output, like
+`model/sql/*.sql`: a point-in-time record kept for inspection and easy
+diffing, not a live artifact in its own right):
+
+- `rendered/component_templates/logs-car-header.json` — the common-header
+  mapping every stream shares (composed first everywhere): the eleven
+  `byakugan/store.py` HEADER fields at their ECS/custom homes, plus the
+  CAR-name aliases (`car.guid → event.id`, `car.owning_guid → process.entity_id`, ...)
+  a query can use either name through.
+- `rendered/component_templates/logs-car-<object>.json` (13) /
+  `logs-car-rel.json` / `logs-car-inferred.json` — one stream's own mapped
+  fields (typed via `ecs_types.yml`, keyword by default), its `native: true`
+  fields as concrete `car.<object>.<field>`, and (objects only) a CAR-name
+  alias for every mapped field — deduplicated against the header, which
+  already supplies `@timestamp`, `host.name`, `process.entity_id`, ...
+- `rendered/index_templates/logs-car-<object>.json` (13) + `logs-car-rel.json`
+  + `logs-car-inferred.json` — `index_patterns`, `data_stream: {}`,
+  `composed_of: [logs-car-header, the stream's own component, logs-car@custom]`,
+  with `ignore_missing_component_templates` so the template applies before
+  DX_DFIR creates its own `@custom` customization component.
+- `rendered/kibana/logs-car-views.ndjson` — one data view (`logs-car.*`) and
+  one saved search, minimal and hand-editable, its saved-object shapes
+  modelled on the uSaid Kibana bundle conventions.
+
+```sh
+python model/projection/render_elastic.py            # write rendered/
+python model/projection/render_elastic.py --check    # verify rendered/ is in sync; write nothing
+```
+
+`--check` is the drift guard (the same idea as `byakugan.gen_sources --check`):
+it re-renders to memory and byte-compares against the files on disk, exiting 1
+with a missing/drifted/orphan-file list on any mismatch — so `rendered/` going
+stale after a contract edit is caught exactly like an un-regenerated `sources/`
+manifest is. `test_projection_contract.py` runs `--check` in CI;
+`test_kibana_assets.py` separately checks the Kibana bundle's own internal
+consistency (every column/sort/timeField resolves against the rendered
+mappings of the streams its data view matches, references resolve, ids are
+unique); `tests/test_projection_rel_drift.py` (repo root) checks
+`relationships.yml`/`inferred.yml` against the *live* superset.db schema, not
+just their own declared coverage.
 
 ## Changing it
 
@@ -134,8 +194,12 @@ exist.
 
 ## What this is not
 
-- Not runtime code: no loader, no index templates, no ingest pipeline. Those
-  are built in DX_DFIR *from* this contract.
+- Not runtime code: no loader, no ingest pipeline, nothing that talks to a
+  live cluster. Elasticsearch component/index templates now ARE rendered here
+  (`render_elastic.py`, `rendered/` — see above); *putting* them
+  (`_component_template` / `_index_template`), the ingest pipeline, and the
+  loader that writes CAR events into the resulting streams are still built in
+  DX_DFIR *from* this contract.
 - Not the Sigma/detection layer: rules are authored against the ECS fields this
   contract produces (and the `car-detections` lookup joins on `event.id`), in a
   later phase.

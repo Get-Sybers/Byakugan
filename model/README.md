@@ -167,8 +167,16 @@ streams: `conventions.yml` (the common header — `guid → event.id`,
 `owning_guid → process.entity_id`, `native → car.native` …, the data-stream
 shape, the `car.*` custom namespace) and `objects/<object>.yml` (every
 `object_field` → an ECS field, or `native: true` with a rationale where ECS has
-no honest home). It is **not generated** — projections are decisions — but it
-is **validated against** `car/objects/*.yml` by `python model/projection/validate.py`,
+no honest home). Since contract v3 it also projects the superset.db
+relationship and inferred-node rows (`relationships.yml`, `inferred.yml` →
+`logs-car.rel-*` / `logs-car.inferred-*`), types the ECS targets
+(`ecs_types.yml`), and **renders the Elastic assets** the loader applies —
+index/component templates with CAR-name field aliases, and the Kibana saved
+objects — into `projection/rendered/` via `python model/projection/render_elastic.py`
+(`--check` guards drift, like the other generated dirs). The contract files
+are **not generated** — projections are decisions — but they are **validated
+against** `car/objects/*.yml` (and the live superset.db schema, via
+`tests/test_projection_rel_drift.py`) by `python model/projection/validate.py`,
 which fails on any drift (a CAR field without a decision, an entry naming a
 field that does not exist). See [`projection/README.md`](projection/README.md).
 
