@@ -1,6 +1,6 @@
 """The `byakugan` command — the engine's multi-tool entry point.
 
-One binary, four operations, selected by the first argument (the GoDFIR-toolz
+One binary, five operations, selected by the first argument (the GoDFIR-toolz
 container framework's multi-tool dispatcher: name the sub-tool, pass the
 environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else):
 
@@ -18,6 +18,16 @@ environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else)
     byakugan car-vocab   {object: [car_actions]} — the canonical car_action
                          vocabulary the verify gate checks values against; its
                          stdout IS that JSON, one line
+    byakugan load        bulk-load a materialised car tree into the DX_DFIR
+                         Elastic stack's logs-car.* data streams (the CAR->ECS
+                         projection contract, byakugan.projection/byakugan.load):
+                         load BYAKUGAN_LOAD_INPUT_DIR --out BYAKUGAN_LOAD_OUT_DIR
+                         --namespace BYAKUGAN_LOAD_NAMESPACE [--force] — offline
+                         Elasticsearch _bulk NDJSON bundles by default, or also
+                         pushed over HTTPS when BYAKUGAN_LOAD_ES_URL is set
+                         (push mode: [--es-url …] [--es-api-key … | --es-user …
+                         --es-password …|--es-password-file …] [--es-ca-file …]
+                         [--setup [--kibana-url …]])
 
 Each batch sub-tool reads its own env block — BYAKUGAN_<SUBTOOL>_INPUT_DIR
 (default /input, read-only), _OUT_DIR (default /output), _FORCE, _LOG_LEVEL
@@ -32,33 +42,39 @@ errors go to stderr.
 Exit codes follow the framework's uniform table:
 
     0  ok            build: every source processed or already up to date;
-                     timeline: written (or kept); verify: the gate PASSED
+                     timeline: written (or kept); verify: the gate PASSED;
+                     load: every stream bundled (push mode: pushed+verified)
     1  nothing       build: no source produced events; timeline: no car.db;
                      verify: no materialised CAR under the input dir — or the
                      gate FAILED (status `failed`, `failed` = the failed checks,
-                     `failures` names them)
+                     `failures` names them); load: no materialised CAR under
+                     the input dir (status `nothing`) — or, push mode, every
+                     stream failed to push (status `failed`)
     2  config_error  no sub-tool named, a bad variable, a missing or unreadable
                      input, an unwritable output, an engine argument error
-    3  partial       build: at least one source processed, at least one failed
+    3  partial       build: at least one source processed, at least one failed;
+                     load: push mode, at least one stream pushed, at least one failed
 
 A sub-tool followed by arguments is the pass-through to the engine's own CLI,
 with its own stdout and exit code: `byakugan timeline <car_dir> [flags]`,
-`byakugan verify [car_dir]`, `byakugan [build] --in FILE --out DIR | --batch
-DIR [--out DIR] [--force] [--derive] [--stix]`. `--version` prints the version
-and the pinned engine ref (BYAKUGAN_VERSION / BYAKUGAN_REF), `--print-contract`
-prints the contract file at BYAKUGAN_CONTRACT (default /opt/byakugan/contract.yml).
+`byakugan verify [car_dir]`, `byakugan load <car_dir> [flags]`, `byakugan
+[build] --in FILE --out DIR | --batch DIR [--out DIR] [--force] [--derive]
+[--stix]`. `--version` prints the version and the pinned engine ref
+(BYAKUGAN_VERSION / BYAKUGAN_REF), `--print-contract` prints the contract file
+at BYAKUGAN_CONTRACT (default /opt/byakugan/contract.yml).
 """
 from __future__ import annotations
 
 import io
 import json
 import os
+import re
 import sys
 import time
 
 TOOL = "byakugan"
-SUBTOOLS = ("build", "timeline", "verify", "car-vocab")
-BATCH_SUBTOOLS = ("build", "timeline", "verify")
+SUBTOOLS = ("build", "timeline", "verify", "car-vocab", "load")
+BATCH_SUBTOOLS = ("build", "timeline", "verify", "load")
 DEFAULT_INPUT_DIR = "/input"
 DEFAULT_OUT_DIR = "/output"
 CONTRACT_ENV = "BYAKUGAN_CONTRACT"
@@ -148,6 +164,14 @@ class Config:
 
     def get(self, suffix: str, default: str) -> str:
         return self._env.get(f"{self.prefix}_{suffix}") or default
+
+    def explicit(self, suffix: str) -> str | None:
+        """The raw BYAKUGAN_<SUBTOOL>_<suffix> value with no default applied —
+        None when unset or empty. `get`'s own default-vs-set distinction (see
+        `out_dir`/`out_dir_unused`), exposed for a sub-tool whose default is
+        itself conditional (load's ES_CA_FILE: the default path is used only
+        when it exists, but an operator-set path is used as given)."""
+        return self._env.get(f"{self.prefix}_{suffix}") or None
 
     def bool(self, suffix: str, default: str) -> bool:
         raw = self.get(suffix, default).strip().lower()
@@ -331,7 +355,96 @@ def _verify(cfg: Config, run: _Run) -> int:
     return run.finish("failed", EXIT_NOTHING) if c.failed else run.finish("ok", EXIT_OK)
 
 
-_RUNNERS = {"build": _build, "timeline": _timeline, "verify": _verify}
+_NAMESPACE_JUNK = re.compile(r"[^a-z0-9_-]+")
+_DEFAULT_CA_FILE = "/certs/ca/ca.crt"
+
+
+def _slugify_namespace(raw: str) -> str | None:
+    """BYAKUGAN_LOAD_NAMESPACE -> a slug: lower-cased, every run of characters
+    outside [a-z0-9_-] collapsed to one '-'; None (config error) when that is
+    empty or starts with -/_/+ (an Elastic data-stream namespace may not)."""
+    slug = _NAMESPACE_JUNK.sub("-", raw.lower())
+    if not slug or slug[0] in "-_+":
+        return None
+    return slug
+
+
+def _load(cfg: Config, run: _Run) -> int:
+    """`byakugan load`: BYAKUGAN_LOAD_* -> `byakugan.load`'s own CLI, wired
+    like build/timeline (run_engine + its one JSON summary line as `engine`).
+    Bundle mode (BYAKUGAN_LOAD_ES_URL unset) never touches the network; the
+    ES_* / KIBANA_URL / SETUP variables are only even resolved in push mode."""
+    from .load import main as load_main
+    s = run.summary
+    ns = _slugify_namespace(cfg.get("NAMESPACE", "default"))
+    if ns is None:
+        s["error"] = f"{cfg.prefix}_NAMESPACE: {cfg.get('NAMESPACE', 'default')!r} has no usable slug"
+        return run.finish("config_error", EXIT_CONFIG)
+
+    argv = [cfg.input_dir, "--out", cfg.out_dir, "--namespace", ns]
+    if cfg.force:
+        argv.append("--force")
+    es_url = cfg.get("ES_URL", "")
+    if es_url:
+        argv += ["--es-url", es_url]
+        if api_key := cfg.get("ES_API_KEY", ""):
+            argv += ["--es-api-key", api_key]
+        if es_user := cfg.get("ES_USER", ""):
+            argv += ["--es-user", es_user]
+        if es_password := cfg.get("ES_PASSWORD", ""):
+            argv += ["--es-password", es_password]
+        if pw_file := cfg.get("ES_PASSWORD_FILE", ""):
+            argv += ["--es-password-file", pw_file]
+        # the default CA is used only when the certs mount is actually
+        # present; an operator-set path is passed through as given (load.py's
+        # own ssl context construction is what would fail on a bad one)
+        ca_file = cfg.explicit("ES_CA_FILE") or (
+            _DEFAULT_CA_FILE if os.path.isfile(_DEFAULT_CA_FILE) else None)
+        if ca_file:
+            argv += ["--es-ca-file", ca_file]
+        if kibana_url := cfg.get("KIBANA_URL", ""):
+            argv += ["--kibana-url", kibana_url]
+        if cfg.bool("SETUP", "0"):
+            argv.append("--setup")
+    argv += cfg.get("ARGS", "").split()
+    cfg.log(3, "engine argv: " + " ".join(argv))
+
+    rc, out, message = run_engine(load_main, argv)
+    if message is not None:
+        if message.startswith("no materialised CAR"):
+            cfg.log(1, f"nothing to load under {cfg.input_dir}")
+            return run.finish("nothing", EXIT_NOTHING)
+        s["error"] = message
+        cfg.log(0, f"engine: {message}")
+        return run.finish("config_error", EXIT_CONFIG)
+
+    engine = _engine_json(out, cfg, s, default={})
+    s["engine"] = engine
+    e = engine if isinstance(engine, dict) else {}
+    for key in ("records", "processed", "skipped", "failed"):
+        s[key] = int(e.get(key, 0) or 0)
+    s["inputs"] = len(e.get("sources") or [])
+    s["outputs"] = [os.path.join(cfg.out_dir, "elastic")]
+    if s["failed"]:
+        items = []
+        for name, info in (e.get("streams") or {}).items():
+            if info.get("failed"):
+                items.append({"item": name, "error": "; ".join(info.get("errors") or []) or "push failed"})
+            elif info.get("verified") is False:
+                items.append({"item": name, "error": info.get("verify_error") or "verification shortfall"})
+        if items:
+            s["failures"] = items
+    status = e.get("status", "ok")
+    cfg.log(2, f"{s['inputs']} source(s), {s['records']} record(s): "
+              f"{e.get('mode', 'bundle')} mode, status {status}")
+    if status == "partial":
+        return run.finish("partial", EXIT_PARTIAL)
+    if status == "failed":
+        return run.finish("failed", EXIT_NOTHING)
+    return run.finish("ok", EXIT_OK)
+
+
+_RUNNERS = {"build": _build, "timeline": _timeline, "verify": _verify, "load": _load}
 
 
 def batch(subtool: str, env, stdout) -> int:
@@ -368,10 +481,11 @@ def print_contract() -> int:
 
 def usage() -> None:
     sys.stderr.write(
-        "usage: byakugan build|timeline|verify       (env-driven batch: BYAKUGAN_<SUBTOOL>_*)\n"
+        "usage: byakugan build|timeline|verify|load   (env-driven batch: BYAKUGAN_<SUBTOOL>_*)\n"
         "       byakugan car-vocab                   (the car_action vocabulary, one JSON line)\n"
         "       byakugan timeline <car_dir> [flags] | byakugan verify [car_dir] | "
-        "byakugan [build] <pipeline flags...>   (pass-through)\n"
+        "byakugan load <car_dir> [flags] |\n"
+        "       byakugan [build] <pipeline flags...>   (pass-through)\n"
         "       byakugan --version | --print-contract\n")
 
 
@@ -400,6 +514,9 @@ def main(argv: list[str] | None = None) -> int:
     if argv[0] == "verify":
         from .verify import main as verify_main
         return verify_main(argv[1:])
+    if argv[0] == "load":
+        from .load import main as load_main
+        return load_main(argv[1:])
     if argv[0] == "car-vocab":
         usage()
         return EXIT_CONFIG
