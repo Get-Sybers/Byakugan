@@ -43,17 +43,15 @@ mirroring `byakugan build`'s own per-source skip.
 from __future__ import annotations
 
 import argparse
-import base64
 import glob
 import hashlib
 import json
 import os
 import ssl
 import sys
-import urllib.error
-import urllib.request
 
 from . import projection
+from ._http import auth_headers, http_json, ssl_context
 
 BULK_MAX_ACTIONS = 1000
 BULK_MAX_BYTES = 4 * 1024 * 1024
@@ -209,43 +207,10 @@ def _manifest_is_reusable(manifest: dict | None, sources: list[str], car_dir: st
 
 
 # --------------------------------------------------------------------------- #
-# HTTP (stdlib urllib only) — auth, TLS, the one request primitive every ES/
-# Kibana call in this module goes through.
+# HTTP: auth, TLS, the one request primitive every ES/Kibana call in this
+# module goes through — `byakugan._http` (shared with byakugan.timeline's
+# own --elastic fetch; imported above, re-exported here unchanged).
 # --------------------------------------------------------------------------- #
-def auth_headers(api_key: str, user: str, password: str) -> dict:
-    if api_key:
-        return {"Authorization": f"ApiKey {api_key}"}
-    if user:
-        token = base64.b64encode(f"{user}:{password}".encode("utf-8")).decode("ascii")
-        return {"Authorization": f"Basic {token}"}
-    return {}
-
-
-def ssl_context(ca_file: str | None) -> ssl.SSLContext:
-    return ssl.create_default_context(cafile=ca_file) if ca_file else ssl.create_default_context()
-
-
-def http_json(url: str, method: str, body, headers: dict, context: ssl.SSLContext | None,
-             timeout: float = 30.0):
-    """(status, parsed-JSON-or-None, raw-bytes). An HTTP error response
-    (4xx/5xx) is returned, not raised — the ES/Kibana APIs this module calls
-    put their own error detail in the body. A genuine connection failure
-    (DNS, refused, timeout, TLS) DOES raise `OSError`, for the caller to
-    count as a whole chunk/stream/request failure."""
-    data = None
-    if body is not None:
-        data = body.encode("utf-8") if isinstance(body, str) else body
-    req = urllib.request.Request(url, data=data, method=method, headers=dict(headers))
-    try:
-        with urllib.request.urlopen(req, context=context, timeout=timeout) as resp:
-            raw, status = resp.read(), resp.status
-    except urllib.error.HTTPError as e:
-        raw, status = e.read(), e.code
-    try:
-        parsed = json.loads(raw.decode("utf-8")) if raw else None
-    except ValueError:
-        parsed = None
-    return status, parsed, raw
 
 
 # --------------------------------------------------------------------------- #

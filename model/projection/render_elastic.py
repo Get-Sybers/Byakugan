@@ -197,6 +197,18 @@ def object_targets(name: str, doc: dict, ecs_types: dict,
             concrete[f"car.{name}.{car_field}"] = {"type": e["type"]}
             continue
         primary = e["ecs"]
+        if primary == "event.outcome":
+            # excluded from the primary ECS mapping (byakugan/projection.py
+            # _compile_object: event.outcome is DERIVED from event_defaults,
+            # never a plain field copy — rules.event_action), but the raw
+            # value that DRIVES the derivation (event_defaults.
+            # outcome_from_field) is still captured verbatim, native-style
+            # (_apply_event_defaults) — so it is concrete here too, exactly
+            # like a native: true field. An alias to event.outcome would
+            # collide with that real write (ES refuses to index a value at
+            # an alias path).
+            concrete[f"car.{name}.{car_field}"] = {"type": "keyword"}
+            continue
         concrete.setdefault(primary, {"type": _ecs_type(primary, ecs_types)})
         for also in e.get("also") or []:
             concrete.setdefault(also, {"type": _ecs_type(also, ecs_types)})
@@ -274,15 +286,127 @@ def render_index_template(index_pattern: str, component_name: str, extra_sources
 
 
 # --------------------------------------------------------------------------- #
-# Kibana: one data view spanning every logs-car.* stream + one saved search.
-# Object/reference shape modelled on /home/user/uSaid/elastic/kibana/*.ndjson
-# (index-pattern: id/type/managed/attributes{title,name,timeFieldName}/
-# references[]; search: + columns/sort/kibanaSavedObjectMeta.searchSourceJSON,
-# references pointing at the data view by name/type/id). typeMigrationVersion
-# is a `lens`-object requirement there (Kibana 9.5.3 migration-chain crash on
-# import) — neither object type used here is a lens, so neither carries it.
+# Kibana: one data view spanning every logs-car.* stream, one saved search,
+# one Lens date-histogram, and the "CAR timeline" dashboard that carries
+# both. Object/reference shape modelled on
+# /home/user/uSaid/elastic/kibana/*.ndjson (index-pattern: id/type/managed/
+# attributes{title,name,timeFieldName}/references[]; search: +columns/sort/
+# kibanaSavedObjectMeta.searchSourceJSON; lens: state.datasourceStates.
+# formBased.layers + state.visualization, modelled specifically on that
+# bundle's own stix-feed-views.ndjson `sf-types-over-time` — a terms bucket
+# + a date_histogram bucket + a count metric feeding an lnsXY bar chart, the
+# same shape this renders with car.object/@timestamp in place of its
+# stix_type/stix_created; dashboard: panelsJSON (gridData + panelRefName) +
+# references naming each panel by panelRefName, LAST in the file
+# (model/projection/test_kibana_assets.py enforces this, uSaid's own
+# tests/test_kibana_views.py convention too).
+#
+# typeMigrationVersion '8.9.0' + coreMigrationVersion '8.8.0' are stamped on
+# the lens object ONLY (uSaid's tests/test_kibana_views.py docstring:
+# without them Kibana 9.5.3 runs the legacy lens migration chain over the
+# MODERN state shape hand-authored here, and the import 500s — falsified
+# live, 2026-09-05; index-pattern/search/dashboard import fine unstamped,
+# exactly as the two objects rendered here already did before this addition).
 # --------------------------------------------------------------------------- #
 DATA_VIEW_ID = "car-logs-all"
+SEARCH_ID = "car-timeline"
+LENS_ID = "car-timeline-histogram"
+DASHBOARD_ID = "car-timeline-dashboard"
+
+
+def _render_lens_histogram() -> dict:
+    return {
+        "id": LENS_ID,
+        "type": "lens",
+        "managed": False,
+        "coreMigrationVersion": "8.8.0",
+        "typeMigrationVersion": "8.9.0",
+        "attributes": {
+            "title": "CAR events over time (by object)",
+            "description": "Document count over @timestamp, split by car.object.",
+            "visualizationType": "lnsXY",
+            "state": {
+                "datasourceStates": {
+                    "formBased": {
+                        "layers": {
+                            "layer1": {
+                                "columnOrder": ["colBreak", "colDate", "colCount"],
+                                "columns": {
+                                    "colBreak": {
+                                        "dataType": "string", "isBucketed": True,
+                                        "label": "car.object", "operationType": "terms",
+                                        "params": {
+                                            "missingBucket": False,
+                                            "orderBy": {"columnId": "colCount", "type": "column"},
+                                            "orderDirection": "desc", "otherBucket": True,
+                                            "parentFormat": {"id": "terms"}, "size": 10,
+                                        },
+                                        "scale": "ordinal", "sourceField": "car.object",
+                                    },
+                                    "colCount": {
+                                        "dataType": "number", "isBucketed": False,
+                                        "label": "Count of records", "operationType": "count",
+                                        "params": {"emptyAsNull": True},
+                                        "scale": "ratio", "sourceField": "___records___",
+                                    },
+                                    "colDate": {
+                                        "dataType": "date", "isBucketed": True,
+                                        "label": "@timestamp", "operationType": "date_histogram",
+                                        "params": {"dropPartials": False, "includeEmptyRows": True,
+                                                  "interval": "auto"},
+                                        "scale": "interval", "sourceField": "@timestamp",
+                                    },
+                                },
+                                "incompleteColumns": {},
+                            },
+                        },
+                    },
+                },
+                "filters": [],
+                "query": {"language": "kuery", "query": ""},
+                "visualization": {
+                    "fittingFunction": "None",
+                    "layers": [{
+                        "accessors": ["colCount"], "layerId": "layer1", "layerType": "data",
+                        "seriesType": "bar_stacked", "splitAccessor": "colBreak", "xAccessor": "colDate",
+                    }],
+                    "legend": {"isVisible": True, "position": "right"},
+                    "preferredSeriesType": "bar_stacked", "valueLabels": "hide",
+                },
+            },
+        },
+        "references": [{"id": DATA_VIEW_ID, "name": "indexpattern-datasource-layer-layer1",
+                        "type": "index-pattern"}],
+    }
+
+
+def _render_dashboard() -> dict:
+    panels = [
+        {"panelIndex": "1", "type": "lens", "gridData": {"x": 0, "y": 0, "w": 48, "h": 15, "i": "1"},
+         "panelRefName": "panel_1", "embeddableConfig": {}},
+        {"panelIndex": "2", "gridData": {"x": 0, "y": 15, "w": 48, "h": 20, "i": "2"},
+         "panelRefName": "panel_2", "embeddableConfig": {}},
+    ]
+    return {
+        "id": DASHBOARD_ID,
+        "type": "dashboard",
+        "managed": False,
+        "attributes": {
+            "title": "CAR timeline",
+            "description": "The CAR event timeline: every logs-car.* document (the car-timeline "
+                           "saved search) and its shape over time by object (the histogram).",
+            "panelsJSON": json.dumps(panels, sort_keys=True),
+            "timeRestore": False,
+            "kibanaSavedObjectMeta": {
+                "searchSourceJSON": json.dumps(
+                    {"query": {"query": "", "language": "kuery"}, "filter": []}, sort_keys=True),
+            },
+        },
+        "references": [
+            {"id": LENS_ID, "name": "panel_1", "type": "lens"},
+            {"id": SEARCH_ID, "name": "panel_2", "type": "search"},
+        ],
+    }
 
 
 def render_kibana_ndjson() -> str:
@@ -298,7 +422,7 @@ def render_kibana_ndjson() -> str:
         "references": [],
     }
     search = {
-        "id": "car-timeline",
+        "id": SEARCH_ID,
         "type": "search",
         "managed": False,
         "attributes": {
@@ -315,7 +439,10 @@ def render_kibana_ndjson() -> str:
         "references": [{"name": "kibanaSavedObjectMeta.searchSourceJSON.index",
                         "type": "index-pattern", "id": DATA_VIEW_ID}],
     }
-    return "\n".join([_dump_ndjson_line(index_pattern), _dump_ndjson_line(search)]) + "\n"
+    # the dashboard references the search + lens objects above by id, and
+    # must itself come LAST (test_kibana_assets.py, uSaid's own convention).
+    objects = [index_pattern, search, _render_lens_histogram(), _render_dashboard()]
+    return "\n".join(_dump_ndjson_line(o) for o in objects) + "\n"
 
 
 # --------------------------------------------------------------------------- #

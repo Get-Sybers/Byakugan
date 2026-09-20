@@ -8,6 +8,22 @@ aggregate every source under it.
 
   python -m byakugan.timeline <car-dir-or-tree> [--out FILE]
          [--host H] [--after ISO] [--before ISO] [--objects-only | --edges-only]
+
+SOURCE (epic #99 phase 5): the same rows can come from Elasticsearch instead
+of car.db/superset.db — `--elastic <es-url>` (with `--namespace`, default
+"default") builds the timeline from the `logs-car.*-<namespace>` data
+streams `byakugan load` populated, via `byakugan.inverse_projection`'s
+ECS->CAR inverse of the SAME projection contract `byakugan.load` projects
+forward. `<car_dir>` is then only the default --out directory (no car.db is
+read). Auth/TLS: `--es-api-key`, or `--es-user` with `--es-password` /
+`--es-password-file`, and `--es-ca-file` for the server's CA bundle — the
+same flags/shapes `byakugan.load`'s push mode takes, via the same shared
+`byakugan._http` helpers. --host/--after/--before, --objects-only/
+--edges-only, the output ordering and timeline.jsonl bytes are unchanged
+either way: an Elastic-sourced row is converted to the exact same entry
+shape a local row already has, then handed to the SAME filter/sort/write
+code (`_sort_key`, `write_jsonl`) — this module does not know or care
+afterward which tier answered the query.
 """
 from __future__ import annotations
 
@@ -18,9 +34,18 @@ import os
 import sqlite3
 import sys
 
+from . import inverse_projection
+from ._http import auth_headers, http_json, ssl_context
 # the one tolerant ISO-8601 parser (mixed renderings, any fraction width) —
 # shared with the engine's ts_before marker and the STIX projection
 from .normalize import parse_ts as _parse_ts
+
+# ~1000 documents/page (module constant, not a CLI flag — tests lower it via
+# monkeypatch to prove multi-page search_after paging on a small fixture; read
+# fresh inside _fetch_hits rather than bound as a def-time default, so that
+# monkeypatch actually takes effect).
+PAGE_SIZE = 1000
+_PIT_KEEP_ALIVE = "2m"
 
 
 def _find_stores(path: str) -> list[str]:
@@ -105,6 +130,15 @@ def build_timeline(path: str, host: str | None = None, after: str | None = None,
             rows.extend(_object_entries(os.path.join(d, "car.db")))
         if not objects_only:
             rows.extend(_edge_entries(os.path.join(d, "superset.db")))
+    return _filter_and_sort(rows, host, after, before)
+
+
+def _filter_and_sort(rows: list[dict], host: str | None, after: str | None,
+                     before: str | None) -> list[dict]:
+    """--host/--after/--before + the canonical ordering — shared by every
+    SOURCE (car.db/superset.db locally, or Elasticsearch — see
+    build_timeline_from_elastic), so which tier answered the query decides
+    nothing about filtering, ordering or (via write_jsonl) the output bytes."""
     if host is not None:
         rows = [e for e in rows if e.get("source_host") == host]
     lo = _parse_ts(after) if after is not None else None
@@ -123,14 +157,126 @@ def build_timeline(path: str, host: str | None = None, after: str | None = None,
     return rows
 
 
+# --------------------------------------------------------------------------- #
+# SOURCE: Elasticsearch (epic #99 phase 5) — point-in-time + search_after over
+# logs-car.*-<namespace>, excluding event.dataset car.inferred (never part of
+# the timeline: an inferred_node is reconstructed evidence about an object,
+# never a car.db event row — see model/projection/inferred.yml), each hit
+# inverted back to the local entry shape (byakugan.inverse_projection), then
+# handed to the exact same _filter_and_sort/write_jsonl as the local source.
+# --------------------------------------------------------------------------- #
+def _pit_open(es_url: str, namespace: str, headers: dict, context) -> str:
+    status, parsed, raw = http_json(
+        f"{es_url}/logs-car.*-{namespace}/_pit?keep_alive={_PIT_KEEP_ALIVE}",
+        "POST", None, headers, context)
+    if status >= 300 or not parsed or "id" not in parsed:
+        raise RuntimeError(f"open PIT on logs-car.*-{namespace}: HTTP {status}: {raw[:200]!r}")
+    return parsed["id"]
+
+
+def _pit_close(es_url: str, pit_id: str, headers: dict, context) -> None:
+    try:
+        http_json(f"{es_url}/_pit", "DELETE", json.dumps({"id": pit_id}, separators=(",", ":")),
+                 {**headers, "Content-Type": "application/json"}, context)
+    except OSError:
+        pass                 # best-effort close; an unclosed PIT just expires on its keep_alive
+
+
+def _fetch_hits(es_url: str, namespace: str, headers: dict, context, page_size: int | None = None):
+    """Every logs-car.*-<namespace> document's `_source`, EXCEPT
+    event.dataset car.inferred — sorted `@timestamp` asc with the PIT
+    tiebreak (`_shard_doc`), `page_size` (default: the module's PAGE_SIZE,
+    looked up fresh so a test's monkeypatch takes effect) per `_search`."""
+    if page_size is None:
+        page_size = PAGE_SIZE
+    headers = {**headers, "Content-Type": "application/json"}
+    query = {"bool": {"must_not": [{"term": {"event.dataset": "car.inferred"}}]}}
+    sort = [{"@timestamp": "asc"}, {"_shard_doc": "asc"}]
+    pit_id = _pit_open(es_url, namespace, headers, context)
+    try:
+        search_after = None
+        while True:
+            body = {"size": page_size, "pit": {"id": pit_id, "keep_alive": _PIT_KEEP_ALIVE},
+                    "sort": sort, "query": query}
+            if search_after is not None:
+                body["search_after"] = search_after
+            status, parsed, raw = http_json(f"{es_url}/_search", "POST",
+                                            json.dumps(body, separators=(",", ":")), headers, context)
+            if status >= 300 or not parsed:
+                raise RuntimeError(f"search logs-car.*-{namespace}: HTTP {status}: {raw[:200]!r}")
+            pit_id = parsed.get("pit_id") or pit_id
+            hits = (parsed.get("hits") or {}).get("hits") or []
+            if not hits:
+                return
+            for hit in hits:
+                yield hit["_source"]
+            search_after = hits[-1].get("sort")
+            if not search_after:
+                return
+    finally:
+        _pit_close(es_url, pit_id, headers, context)
+
+
+def _invert_hit(source: dict) -> tuple[bool, dict]:
+    """(is_relationship, entry) — the one place a hit's `event.dataset` is
+    read to pick which inverse projector (byakugan.inverse_projection) owns
+    it."""
+    if (source.get("event") or {}).get("dataset") == "car.rel":
+        return True, inverse_projection.invert_relationship(source)
+    return False, inverse_projection.invert_object(source)
+
+
+def build_timeline_from_elastic(es_url: str, namespace: str = "default", *,
+                                host: str | None = None, after: str | None = None,
+                                before: str | None = None, objects_only: bool = False,
+                                edges_only: bool = False, es_api_key: str = "", es_user: str = "",
+                                es_password: str = "", es_ca_file: str | None = None,
+                                page_size: int | None = None) -> list[dict]:
+    """The merged, time-ordered timeline built from `logs-car.*-<namespace>`
+    instead of car.db/superset.db — same rows, same filters, same order, same
+    write_jsonl bytes as `build_timeline` (see module docstring)."""
+    headers = auth_headers(es_api_key, es_user, es_password)
+    context = ssl_context(es_ca_file)
+    rows: list[dict] = []
+    try:
+        for source in _fetch_hits(es_url.rstrip("/"), namespace, headers, context, page_size):
+            is_rel, entry = _invert_hit(source)
+            if is_rel and objects_only:
+                continue
+            if not is_rel and edges_only:
+                continue
+            rows.append(entry)
+    except (OSError, RuntimeError) as e:
+        # a connection failure (DNS, refused, TLS, timeout — OSError) or a
+        # non-2xx ES response (RuntimeError, see _pit_open/_fetch_hits): the
+        # same SystemExit-is-a-config-error contract build_timeline's own
+        # --after/--before checks already use, so `byakugan timeline`
+        # (byakugan/cli.py's run_engine) reports it cleanly instead of a
+        # raw traceback.
+        raise SystemExit(f"--elastic {es_url}: {e}") from e
+    return _filter_and_sort(rows, host, after, before)
+
+
 def _sort_key(e: dict):
     """Order by the true instant; unparseable timestamps sort last (by their
-    raw string), and within one instant an object precedes its relationships."""
+    raw string); within one instant an object precedes its relationships;
+    within THAT (two rows tied on both — routine: independent sources sharing
+    whole-second evidence timestamps, or two edges off the same event), the
+    entry's own canonical JSON breaks the tie. That last component is what
+    makes the order (and so, via write_jsonl, the output BYTES) depend only
+    on each row's own DATA — never on which tier produced it (car.db/
+    superset.db's SQLite enumeration order, or the arbitrary order
+    Elasticsearch's search_after pagination happens to return hits in —
+    byakugan.timeline's --elastic source, epic #99 phase 5) or on the
+    otherwise-implementation-defined order rows were appended in before this
+    sort. A genuine, byte-identical duplicate row ties even on this — the two
+    are interchangeable, so which one sorts first is moot."""
     dt = _parse_ts(e.get("timestamp"))
     edge = e.get("kind") == "relationship"
+    tie = json.dumps(e, default=str, sort_keys=True)
     if dt is not None:
-        return (0, dt, edge)
-    return (1, e.get("timestamp") or "", edge)
+        return (0, dt, edge, tie)
+    return (1, e.get("timestamp") or "", edge, tie)
 
 
 def write_jsonl(rows: list[dict], out: str) -> int:
@@ -143,8 +289,10 @@ def write_jsonl(rows: list[dict], out: str) -> int:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(
         prog="byakugan.timeline",
-        description="one property-rich, time-ordered CAR timeline from car.db + superset.db")
-    ap.add_argument("car_dir", help="a source's car directory, or a tree to aggregate")
+        description="one property-rich, time-ordered CAR timeline from car.db + superset.db, "
+                    "or (--elastic) from the logs-car.* data streams")
+    ap.add_argument("car_dir", help="a source's car directory, or a tree to aggregate "
+                    "(--elastic: only the default --out directory; no car.db is read)")
     ap.add_argument("--out", help="output path (default: <car_dir>/timeline.jsonl)")
     ap.add_argument("--host", help="only events whose source_host matches")
     ap.add_argument("--after", help="only events at/after this ISO timestamp")
@@ -152,9 +300,30 @@ def main(argv=None) -> int:
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--objects-only", action="store_true")
     g.add_argument("--edges-only", action="store_true")
+    ap.add_argument("--elastic", default="",
+                    help="Elasticsearch base URL: build the timeline from "
+                        "logs-car.*-<namespace> instead of car_dir")
+    ap.add_argument("--namespace", default="default", help="the Elastic data-stream namespace "
+                    "(--elastic only)")
+    ap.add_argument("--es-api-key", default="")
+    ap.add_argument("--es-user", default="")
+    ap.add_argument("--es-password", default="")
+    ap.add_argument("--es-password-file", default="")
+    ap.add_argument("--es-ca-file", default="", help="CA bundle for the Elasticsearch TLS certificate")
     a = ap.parse_args(argv)
-    rows = build_timeline(a.car_dir, a.host, a.after, a.before,
-                          a.objects_only, a.edges_only)
+
+    if a.elastic:
+        password = a.es_password
+        if a.es_password_file:
+            with open(a.es_password_file, encoding="utf-8") as fh:
+                password = fh.read().strip()
+        rows = build_timeline_from_elastic(
+            a.elastic, a.namespace, host=a.host, after=a.after, before=a.before,
+            objects_only=a.objects_only, edges_only=a.edges_only, es_api_key=a.es_api_key,
+            es_user=a.es_user, es_password=password, es_ca_file=a.es_ca_file or None)
+    else:
+        rows = build_timeline(a.car_dir, a.host, a.after, a.before,
+                              a.objects_only, a.edges_only)
     out = a.out or os.path.join(a.car_dir, "timeline.jsonl")
     write_jsonl(rows, out)
     json.dump({"car_dir": a.car_dir, "timeline": out, "entries": len(rows),

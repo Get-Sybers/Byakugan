@@ -14,12 +14,37 @@ way `byakugan/build_data_model.py` resolves `third_party/` (its `_HERE`/
 file, because — like the CAR model itself — the contract is meant to be read
 from the checked-out source tree, never vendored.
 
-Design note: this is the FORWARD projection only (CAR -> ECS, what `byakugan
-load` bulk-loads into Elasticsearch). The INVERSE (ECS -> CAR, reconstructing
-a CAR row from an Elastic document — needed once the Elastic timeline becomes
-a served tier in its own right) is a later phase; it must reuse this module's
-`load_contract()` rather than re-reading the YAML its own way, so the two
-directions can never see a different contract.
+Design note: this is the FORWARD projection (CAR -> ECS, what `byakugan load`
+bulk-loads into Elasticsearch). The INVERSE (ECS -> CAR, reconstructing a CAR
+row from an Elastic document — `byakugan timeline --elastic`, epic #99 phase
+5) lives in the companion module `byakugan.inverse_projection`, which reuses
+this module's `load_contract()` rather than re-reading the YAML its own way,
+so the two directions can never see a different contract.
+
+Two forward-pass adjustments exist ONLY to keep that inverse lossless (both
+are ordinary, deterministic projection rules — not inverse-specific code —
+and both are covered by tests/test_projection.py alongside every other rule
+here):
+
+  - rules.fallback (a shared ECS target with a primary + a `fallback: true`
+    entry, e.g. objects/process.yml hostname/fqdn -> host.hostname): a
+    fallback that WINS the target outright (the primary was absent) now also
+    lands verbatim at car.<object>.<field> — the same capture a LOSING
+    fallback already got. Without it, "the fallback alone had a value" and
+    "the primary independently held that same value" are indistinguishable
+    on the document. The one case this still cannot resolve — primary and
+    fallback populated with the EXACT SAME string — is genuinely
+    irrecoverable by design (documented, and excluded from the round-trip
+    test, in byakugan.inverse_projection's own docstring).
+  - event_defaults.outcome_from_field (socket.yml `success`, user_session.yml
+    `login_successful`): these CAR fields' own `fields:` entry maps
+    `ecs: event.outcome`, but _compile_object excludes every such entry from
+    `groups` (event.outcome is DERIVED, never a plain field copy —
+    rules.event_action), so the raw value had no home anywhere once
+    _apply_event_defaults collapsed it to success/failure. It is now also
+    captured verbatim at car.<object>.<field>, exactly like a native: true
+    field (render_elastic.py renders that path concrete, never an alias, for
+    the same reason).
 
 Three entry points, one per stream family:
 
@@ -495,6 +520,19 @@ def _apply_object_fields(doc: dict, plan: dict, row: dict, name: str, ecs_types:
             if ok and not filled:
                 _nest_set(doc, target, val)
                 filled = True
+                if entry is not group["primary"]:
+                    # a fallback that WON the shared target only because the
+                    # primary was absent: preserve verbatim which CAR field
+                    # actually supplied it too (the same capture the "loses"
+                    # branch below already performs) -- otherwise nothing on
+                    # the document distinguishes "the fallback alone had a
+                    # value" from "the primary independently held this same
+                    # value", which the inverse projection (byakugan/
+                    # inverse_projection.py) needs to tell apart. See that
+                    # module's docstring for the one residual case even this
+                    # cannot resolve (primary and fallback sharing the exact
+                    # same value).
+                    _nest_set(doc, f"car.{name}.{car_field}", raw)
                 for also in entry.get("also") or []:
                     _apply_also(doc, also, val)
             elif ok:
@@ -528,7 +566,7 @@ def _apply_derived(doc: dict, plan: dict, row: dict, name: str) -> None:
             _nest_set(doc, d["ecs"], val)
 
 
-def _apply_event_defaults(doc: dict, plan: dict, row: dict) -> None:
+def _apply_event_defaults(doc: dict, plan: dict, row: dict, name: str) -> None:
     """event.category (constant per object) / event.type (per car_action) /
     event.outcome (from car_action, or from one boolean object field) —
     ECS categorisation, never a plain field copy (rules.event_action)."""
@@ -550,6 +588,18 @@ def _apply_event_defaults(doc: dict, plan: dict, row: dict) -> None:
         if field:
             raw = row.get(field)
             if not _blank(raw):
+                # the objects/*.yml `fields:` entry naming this CAR field
+                # (e.g. socket.yml `success`, user_session.yml
+                # `login_successful`) maps `ecs: event.outcome`, but
+                # _compile_object excludes every such entry from `groups`
+                # (event.outcome is DERIVED here, never a plain field copy —
+                # rules.event_action) — so without this capture the raw
+                # value has no home anywhere once it collapses to the
+                # success/failure word below: preserve it verbatim, exactly
+                # like a native: true field (render_elastic.py's
+                # object_targets renders car.<object>.<field> concrete for
+                # it, never an alias, for the same reason).
+                _nest_set(doc, f"car.{name}.{field}", raw)
                 ok, val = _coerce_boolean(raw)
                 if ok:
                     outcome = "success" if val else "failure"
@@ -613,7 +663,7 @@ def project_event(ev: dict, namespace: str):
     _apply_header(doc, ev, name, conv.get("common_header") or {})
     _apply_object_fields(doc, plan, ev, name, contract["ecs_types"])
     _apply_derived(doc, plan, ev, name)
-    _apply_event_defaults(doc, plan, ev)
+    _apply_event_defaults(doc, plan, ev, name)
 
     recipe = (conv.get("data_stream") or {}).get("document_id", {}).get("recipe", "")
     doc_id = _object_document_id(recipe, ev, name)

@@ -54,8 +54,7 @@
                   "type": "alias"
                 },
                 "success": {
-                  "path": "event.outcome",
-                  "type": "alias"
+                  "type": "keyword"
                 }
               }
             }
@@ -68,13 +67,6 @@
             },
             "port": {
               "type": "long"
-            }
-          }
-        },
-        "event": {
-          "properties": {
-            "outcome": {
-              "type": "keyword"
             }
           }
         },

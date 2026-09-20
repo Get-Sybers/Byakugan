@@ -10,6 +10,12 @@ environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else)
     byakugan timeline    the unified, time-ordered CAR timeline of a car tree:
                          timeline BYAKUGAN_TIMELINE_INPUT_DIR
                          --out BYAKUGAN_TIMELINE_OUT_DIR/timeline.jsonl [--host …]
+                         — or, from the logs-car.* Elastic data streams instead
+                         of car.db/superset.db (epic #99 phase 5), by passing
+                         timeline.py's own [--elastic ES_URL --namespace NS
+                         --es-api-key … | --es-user … --es-password …] through
+                         BYAKUGAN_TIMELINE_ARGS (no dedicated env var: the
+                         container's env-block contract is frozen)
     byakugan verify      the CAR run-through (verify.py) over a materialised
                          tree: verify BYAKUGAN_VERIFY_INPUT_DIR — the report on
                          stderr and in <OUT_DIR>/verify.txt when the output dir

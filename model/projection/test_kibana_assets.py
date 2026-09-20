@@ -158,3 +158,73 @@ def test_search_columns_and_sort_exist_in_matched_streams(path):
             if isinstance(pair, list) and pair:
                 assert _field_ok(pair[0], fields), (
                     f"{path}: {o['id']} sort field {pair[0]!r} not in any stream {title!r} matches")
+
+
+# --------------------------------------------------------------------------- #
+# The dashboard (id car-timeline-dashboard) + its Lens panel: last in the
+# file, panels reference-consistent, and (uSaid's own falsified-live rule)
+# every lens carries the migration stamps an unstamped Kibana 9.5.3 import
+# 500s without. Mirrors /home/user/uSaid/tests/test_kibana_views.py.
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize("path", BUNDLES, ids=lambda p: os.path.basename(p))
+def test_dashboard_is_last_object_in_the_file(path):
+    objs = _objects(path)
+    dashboards = [o for o in objs if o["type"] == "dashboard"]
+    if not dashboards:
+        pytest.skip(f"{path}: no dashboard object")
+    assert objs[-1]["type"] == "dashboard", f"{path}: the dashboard must be the last object"
+
+
+@pytest.mark.parametrize("path", BUNDLES, ids=lambda p: os.path.basename(p))
+def test_dashboard_panels_reference_consistently(path):
+    objs = _objects(path)
+    ids_here = {o["id"] for o in objs}
+    for o in objs:
+        if o["type"] != "dashboard":
+            continue
+        panels = json.loads(o["attributes"]["panelsJSON"])
+        ref_names = {r["name"] for r in o.get("references", [])}
+        panel_names = {p["panelRefName"] for p in panels}
+        assert panel_names == ref_names, (
+            f"{path}: {o['id']} panelsJSON panelRefNames {panel_names} != "
+            f"references {ref_names}")
+        for r in o.get("references", []):
+            assert r["id"] in ids_here, f"{path}: {o['id']} -> dangling ref {r['id']!r}"
+
+
+@pytest.mark.parametrize("path", BUNDLES, ids=lambda p: os.path.basename(p))
+def test_lens_source_fields_exist_in_matched_streams(path):
+    objs = _objects(path)
+    views = {o["id"]: o for o in objs if o["type"] == "index-pattern"}
+    for o in objs:
+        if o["type"] != "lens":
+            continue
+        idx_refs = [r for r in o["references"] if r["type"] == "index-pattern"]
+        assert idx_refs, f"{path}: lens {o['id']} needs an index-pattern reference"
+        title = views[idx_refs[0]["id"]]["attributes"]["title"]
+        fields = _fields_for_title(title)
+        assert fields, f"{path}: data view {idx_refs[0]['id']} title {title!r} matches no rendered stream"
+        layers = o["attributes"]["state"]["datasourceStates"]["formBased"]["layers"]
+        for layer in layers.values():
+            for col in layer["columns"].values():
+                sf = col.get("sourceField")
+                if sf and sf != "___records___":
+                    assert _field_ok(sf, fields), (
+                        f"{path}: lens {o['id']} sourceField {sf!r} not in any stream {title!r} matches")
+
+
+@pytest.mark.parametrize("path", BUNDLES, ids=lambda p: os.path.basename(p))
+def test_lens_objects_carry_migration_stamps(path):
+    """Lens objects are hand-authored in the MODERN (8.9-frozen) state shape,
+    so they must SAY so: typeMigrationVersion 8.9.0 (where lens type
+    migrations froze) and coreMigrationVersion 8.8.0, the pair a real
+    `_export` emits — proven against live Kibana 9.5.3 in
+    /home/user/uSaid/tests/test_kibana_views.py: unstamped -> import 500,
+    stamped -> success:true. Other object types import fine unstamped."""
+    for o in _objects(path):
+        if o["type"] != "lens":
+            continue
+        assert o.get("typeMigrationVersion") == "8.9.0", (
+            f"{path}: lens {o['id']} must carry typeMigrationVersion '8.9.0'")
+        assert o.get("coreMigrationVersion") == "8.8.0", (
+            f"{path}: lens {o['id']} must carry coreMigrationVersion '8.8.0'")
