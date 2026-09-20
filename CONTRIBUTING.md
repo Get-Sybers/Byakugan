@@ -69,6 +69,8 @@ python -m byakugan --in <file-or-dir> --out <dir>   # run one source
 python -m byakugan --batch <processed_dir>          # every source
 python -m byakugan.gen_sources                      # regenerate sources/ after a map change
 python -m byakugan.timeline <car-dir>               # unified CAR timeline (car.db + superset.db)
+python -m byakugan.verify <car-dir>                 # the CAR run-through over a materialised tree
+python -m byakugan build|timeline|verify|car-vocab  # the env-driven sub-tools (cli.py; BYAKUGAN_<SUBTOOL>_*)
 python -m byakugan.build_data_model --write out/    # export the models for inspection
 python -m byakugan.export_ir                        # re-export the Go engine's IR after a map change
 make -C go build test                               # build the parse engine + go vet/test

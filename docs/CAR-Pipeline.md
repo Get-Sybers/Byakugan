@@ -36,10 +36,15 @@ source is a coherent evidence set:
 
 | source | what counts as "the source" |
 |---|---|
-| Windows event logs (a host) | all `*_EvtxECmd_Output.json` for that host, OR the host's Plaso `winevtx` output |
+| Windows event logs | one goevtx item (`windows_logs/<item>/goevtx.jsonl` — one log), OR a directory of `*_EvtxECmd_Output.json` (a host's channels), OR the host's Plaso `winevtx` output |
 | Zeek | one capture's per-protocol logs (`conn.json`, `http.json`, …) together |
-| log2timeline | one image's `.jsonl` (a container of many parsers, split internally) |
+| log2timeline | one image's rendered timeline (`log2timeline/jsonl/<source>/timeline.jsonl`, or a raw `<image>.jsonl` — a container of many parsers, split internally) |
+| GoDFIR-toolz | one Go-tool item (`godfir-toolz/<tool>/<item>/<tool>.jsonl` — a hive, a `.pf`, a SRUM database), OR an older `godfir-toolz/<host>/` tree |
 | memory | Anamnesis's finished `car.db` (passed through 1:1) |
+
+`--batch` discovers these under a processed tree (`pipeline.discover_sources`);
+a lane's `_`-prefixed staging directory (the image exports the tools parse) is
+never a source.
 
 No source ever depends on another being present, and nothing is mixed.
 Cross-source ("final") enrichment is a **separate, optional end-stage** over the
@@ -317,7 +322,11 @@ over a materialised CAR tree: each exercised object populated, values sane
 to one artefact, relationship edges naming real endpoints. It exits non-zero on a
 failed check (2 when no CAR is present). The vocabulary is the engine's own model,
 so the object model never leaves the engine — a consumer runs the gate inside the
-image rather than reimplementing it.
+image rather than reimplementing it: `byakugan verify` (the `verify` sub-tool of
+`cli.py`) runs the same run-through over `BYAKUGAN_VERIFY_INPUT_DIR`, prints one
+JSON summary line (`failed` = the failed checks, named in `failures`), writes
+the report to stderr and to `<BYAKUGAN_VERIFY_OUT_DIR>/verify.txt`, and exits 0
+when the gate passed, 1 when it failed or no CAR is present, 2 on a config error.
 
 ## 9. What is NOT done yet
 

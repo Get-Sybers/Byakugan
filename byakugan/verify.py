@@ -302,6 +302,30 @@ def run(car_dir: str = ".") -> _Checker:
     return c
 
 
+def present(car_dir: str) -> bool:
+    """Whether a materialised CAR (any car_<object>.jsonl or
+    car_relationships.jsonl) exists under car_dir."""
+    return any(car_files(car_dir, obj) for obj in (*_OBJECTS, RELATIONSHIPS))
+
+
+def failures(c: _Checker) -> list[str]:
+    """The descriptions of the checks that failed, in report order."""
+    return [line.strip()[2:] for line in c.lines if line.strip().startswith("✗")]
+
+
+def report(c: _Checker) -> str:
+    """The human report of one run: every check line, the tally and the verdict."""
+    lines = [*c.lines,
+             "\n" + "=" * 43,
+             f"  passed: {c.passed:<4} failed: {c.failed:<4} not-exercised: {c.skipped}",
+             "=" * 43]
+    if c.failed:
+        lines.append("  ❌ CAR run-through FAILED — a CAR field held a wrong/unpopulated/out-of-vocabulary value.")
+    else:
+        lines.append("  ✅ CAR run-through passed — populated, value-sane, traceable materialised CAR.")
+    return "\n".join(lines) + "\n"
+
+
 def main(argv: list[str] | None = None) -> int:
     import argparse
     ap = argparse.ArgumentParser(
@@ -311,21 +335,14 @@ def main(argv: list[str] | None = None) -> int:
                     help="the materialised CAR tree (default: the current directory)")
     args = ap.parse_args(argv)
 
-    if not any(car_files(args.car_dir, obj) for obj in (*_OBJECTS, RELATIONSHIPS)):
+    if not present(args.car_dir):
         sys.stderr.write(
             f"no materialised CAR under {args.car_dir} — build the CAR first.\n")
         return 2
 
     c = run(args.car_dir)
-    print("\n".join(c.lines))
-    print("\n" + "=" * 43)
-    print(f"  passed: {c.passed:<4} failed: {c.failed:<4} not-exercised: {c.skipped}")
-    print("=" * 43)
-    if c.failed:
-        print("  ❌ CAR run-through FAILED — a CAR field held a wrong/unpopulated/out-of-vocabulary value.")
-        return 1
-    print("  ✅ CAR run-through passed — populated, value-sane, traceable materialised CAR.")
-    return 0
+    sys.stdout.write(report(c))
+    return 1 if c.failed else 0
 
 
 if __name__ == "__main__":

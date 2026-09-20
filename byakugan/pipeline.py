@@ -59,6 +59,7 @@ EVTX_MAPS = ["evtx_security",           # Security 4624/4625/4672 -> authenticat
 # filename-pattern -> artefact map keys (explicit, first match wins)
 ROUTES = [
     ("_EvtxECmd_Output", EVTX_MAPS),
+    ("goevtx.jsonl", EVTX_MAPS),        # goevtx (the evtx lane): the same record shape, one file per log
     ("conn.json", ["zeek_conn"]),
     ("dns.json", ["zeek_dns"]),
     ("http.json", ["zeek_http"]),
@@ -108,10 +109,32 @@ ROUTES = [
     ("NetworkDataUsage", ["esedump_srum"]),        # ese_dump SRUM -> flow (network usage)
     ("ApplicationResourceUsage", ["esedump_srum"]),  # ese_dump SRUM -> process (app usage)
     ("PrefetchDump_Output", ["prefetch_dump"]),    # prefetch_dump -> process (execution)
+    # The GoDFIR-toolz framework layout (godfir-toolz/<tool>/<item>/<tool>.jsonl,
+    # the tools in GODFIR_TOOLS): every Go tool writes one <tool>.jsonl per
+    # item, in the record shape the map above already consumes — the file name
+    # is the route.
+    ("gore.jsonl", ["recmd_batch"]),           # gore registry batch (recmd_batch shape) -> registry
+    ("goprefetch.jsonl", ["prefetch_dump"]),   # goprefetch -> process (execution)
+    ("gojle.jsonl", ["jlecmd_dest"]),          # gojle jump lists (jlecmd_dest shape) -> file (via adapter)
+    # goese writes one <table>.jsonl per SRUM provider table (NetworkDataUsage /
+    # ApplicationResourceUsage route above) plus goese.jsonl, its per-table
+    # index; the other provider tables (NetworkConnectivityUsage, EnergyUsage,
+    # PushNotifications, ...) are SRUM-internal telemetry with no CAR object.
+    ("goese.jsonl", []),
+    # Go tools with no CAR map yet — routed to nothing EXPLICITLY (known, not
+    # unknown): a raw $MFT entry, a shortcut, a $I record, a shellbag, an
+    # Amcache/ShimCache entry, a Timeline activity. Their records stay raw.
+    ("gomft.jsonl", []), ("gole.jsonl", []), ("gorb.jsonl", []), ("gosbe.jsonl", []),
+    ("goamcache.jsonl", []), ("goappcompat.jsonl", []), ("gowxt.jsonl", []),
     (".L2tUtmp", ["l2t_utmp"]),
     (".L2tUtmpx", ["l2t_utmpx"]),
     (".L2tText", ["l2t_text"]),
 ]
+
+# The GoDFIR-toolz Go tools: each has a godfir-toolz/<tool>/ output dir and a
+# <tool>.jsonl route above (mapped, or explicitly to nothing).
+GODFIR_TOOLS = ("gore", "gojle", "gole", "goamcache", "goappcompat", "gosbe",
+                "gorb", "gomft", "goese", "goprefetch", "gowxt")
 
 
 def route(path: str) -> list[str]:
@@ -366,46 +389,111 @@ def _write_source_manifests(out_dir: str, used: list[str]) -> tuple[list[str], l
     return ids, problems
 
 
+# --------------------------------------------------------------------------- #
+# source discovery over a processed tree
+# --------------------------------------------------------------------------- #
+# A lane's staging directory — `_`-prefixed: windows_logs/_extracted_evtx and
+# godfir-toolz/_extracted, the image exports the tools parse — holds raw
+# artefacts, never processed output, and is not walked.
+def _is_staging(name: str) -> bool:
+    return name.startswith("_")
+
+
+def _subdirs(path: str) -> list[str]:
+    """The non-staging subdirectory names of `path`, sorted (none when it is
+    not a directory)."""
+    if not os.path.isdir(path):
+        return []
+    return sorted(n for n in os.listdir(path)
+                  if os.path.isdir(os.path.join(path, n)) and not _is_staging(n))
+
+
+# One directory holding any of these is one event-log source: an EvtxECmd
+# export (a host's channels, one file each) or a goevtx item (one log:
+# windows_logs/<item>/goevtx.jsonl).
+_EVTX_SOURCE_FILES = ("_EvtxECmd_Output.json", "goevtx.jsonl")
+
+
+def _evtx_sources(wl: str):
+    """(name, path, host) for every directory under windows_logs/ that holds
+    event-log output."""
+    for cur, dirs, files in os.walk(wl):
+        dirs[:] = sorted(d for d in dirs if not _is_staging(d))
+        if any(f.endswith(_EVTX_SOURCE_FILES) for f in files):
+            rel = os.path.relpath(cur, wl).replace(os.sep, "_")
+            yield f"windows_logs_{rel}", cur, None
+
+
+def _plaso_sources(jsonl_dir: str):
+    """(name, path, host) under a psort output root: <source>/timeline.jsonl
+    (the plaso lane's per-item folder) or a raw <image>.jsonl container beside
+    it — one source each, the l2t maps derive the host from the records."""
+    if not os.path.isdir(jsonl_dir):
+        return
+    for name in sorted(os.listdir(jsonl_dir)):
+        path = os.path.join(jsonl_dir, name)
+        if os.path.isdir(path):
+            timeline = os.path.join(path, "timeline.jsonl")
+            if os.path.isfile(timeline) and not _is_staging(name):
+                yield f"l2t_{name}", timeline, None
+        elif name.endswith(".jsonl"):
+            yield f"l2t_{name[:-6]}", path, None
+
+
+def _godfir_toolz_sources(gt: str):
+    """(name, path, host) under godfir-toolz/. The framework layout is
+    godfir-toolz/<tool>/<item>/<tool>.jsonl: each item directory (one parsed
+    artefact — a hive, a .pf, a SRUM database) is one source, and no host is
+    claimed (the item is a path, not a host; the maps carry what the records
+    say). A tool directory (one of GODFIR_TOOLS, or any directory holding
+    such items) with no finished item yields nothing. Any other directory is
+    the older godfir-toolz/<host>/ tree: one source per host directory,
+    upper-cased name as the fallback host."""
+    for name in _subdirs(gt):
+        d = os.path.join(gt, name)
+        items = [it for it in _subdirs(d)
+                 if os.path.isfile(os.path.join(d, it, f"{name}.jsonl"))]
+        if items or name in GODFIR_TOOLS:
+            for it in items:
+                yield f"godfir_toolz_{name}_{it}", os.path.join(d, it), None
+        else:
+            yield f"godfir_toolz_{name}", d, name.upper()
+
+
 def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
     """The CAR sources under a processed tree, honouring the isolation rule
-    (one source -> one car.db). Returns (source_name, in_path, default_host):
+    (one source -> one car.db). Returns (source_name, in_path, default_host).
+    The GoDFIR-toolz framework lanes write one folder per item; the older
+    per-host / per-image layouts are still recognised beside them:
 
-    - windows_logs/<case>/...: each DIRECTORY holding *_EvtxECmd_Output.json is
-      one host's event-log export (one source);
+    - windows_logs/<item>/goevtx.jsonl (one event log) and windows_logs/<case>/
+      ... directories holding *_EvtxECmd_Output.json (a host's export): each
+      such DIRECTORY is one source;
     - zeek/<capture>/: each capture directory (one source, all protocol logs);
-    - log2timeline/jsonl/<image>.jsonl: each raw l2t container (one source);
-    - godfir-toolz/<host>/: each Go-parser output directory (ese_dump SRUM
-      tables, prefetch_dump) — one source, upper-cased dir name as the
-      fallback host;
+    - log2timeline/jsonl/<source>/timeline.jsonl (psort's per-item folder) and
+      log2timeline/jsonl/<image>.jsonl (a raw container): one source each —
+      likewise under a top-level jsonl/ (a psort output root mounted directly);
+    - godfir-toolz/<tool>/<item>/<tool>.jsonl: each Go-tool item (one parsed
+      artefact) is one source (a tool dir with no finished item: none);
+      godfir-toolz/<host>/ (not a tool dir): one source per host directory,
+      upper-cased dir name as the fallback host;
     - memory/<image>/car.db: Anamnesis finished CAR (passthrough).
+
+    A lane's `_`-prefixed staging directory (the image exports the tools
+    parse) is never a source.
     """
     out: list[tuple[str, str, str | None]] = []
     wl = os.path.join(processed_dir, "windows_logs")
     if os.path.isdir(wl):
-        dirs = set()
-        for root, _d, files in os.walk(wl):
-            if any(f.endswith("_EvtxECmd_Output.json") for f in files):
-                dirs.add(root)
-        for d in sorted(dirs):
-            rel = os.path.relpath(d, wl).replace(os.sep, "_")
-            out.append((f"windows_logs_{rel}", d, None))
+        out.extend(sorted(_evtx_sources(wl)))
     zk = os.path.join(processed_dir, "zeek")
-    if os.path.isdir(zk):
-        for name in sorted(os.listdir(zk)):
-            d = os.path.join(zk, name)
-            if os.path.isdir(d):
-                out.append((f"zeek_{name}", d, name))
-    l2t = os.path.join(processed_dir, "log2timeline", "jsonl")
-    if os.path.isdir(l2t):
-        for name in sorted(os.listdir(l2t)):
-            if name.endswith(".jsonl"):
-                out.append((f"l2t_{name[:-6]}", os.path.join(l2t, name), None))
+    for name in _subdirs(zk):
+        out.append((f"zeek_{name}", os.path.join(zk, name), name))
+    out.extend(_plaso_sources(os.path.join(processed_dir, "log2timeline", "jsonl")))
+    out.extend(_plaso_sources(os.path.join(processed_dir, "jsonl")))
     gt = os.path.join(processed_dir, "godfir-toolz")
     if os.path.isdir(gt):
-        for name in sorted(os.listdir(gt)):
-            d = os.path.join(gt, name)
-            if os.path.isdir(d):
-                out.append((f"godfir_toolz_{name}", d, name.upper()))
+        out.extend(_godfir_toolz_sources(gt))
     mem = os.path.join(processed_dir, "memory")
     if os.path.isdir(mem):
         for name in sorted(os.listdir(mem)):
