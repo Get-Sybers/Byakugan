@@ -1,0 +1,125 @@
+# HAND-AUTHORED — mapping-TYPE overrides for the `ecs:` / `also:` / `derived:`
+# target paths used across objects/*.yml, for whichever of those paths is NOT
+# an ECS keyword. Consulted by render_elastic.py when it builds each
+# logs-car-<object> component template; a target path absent here renders as
+# `keyword` — ECS's own overwhelming default, and the honest choice for
+# anything this table does not positively know to be a date / long / ip /
+# float / boolean. A CAR field an objects/*.yml note calls "loose" (a
+# duration string, a formatted byte count) still renders at its real ECS
+# type: rules.fallback/coercion (conventions.yml) is precisely the mechanism
+# that keeps an unparseable value verbatim under car.<object>.<field> without
+# forcing the ECS field itself to be dishonestly widened to keyword — so
+# "conservative" here means matching ECS's own declared type, not
+# second-guessing it because one source's values are messy.
+#
+# `boolean` is a fourth override bucket beyond the three ECS-numeric/temporal
+# ones (date, long, ip) plus float: every `code_signature.valid` target is a
+# genuine ECS boolean, and the objects/*.yml entries that feed it already say
+# so in their own notes — leaving it keyword would silently mistype a real
+# boolean field. `boolean` is already a recognised type in this contract
+# (validate.py NATIVE_TYPES, used today by native: true entries).
+#
+# validate.py checks every path here is ECS-shaped or car.*-shaped, and that
+# every entry is actually used by some contract file (conventions.yml,
+# objects/*.yml, relationships.yml, inferred.yml) — no dead overrides.
+#
+# Scope note: relationships.yml and inferred.yml carry their own explicit
+# `type:` per field entry (car.rel.* / car.inferred.* are typed keyword by
+# design, per their own files) and do not consult this table when rendering;
+# a couple of their target paths (`@timestamp`) are listed below anyway
+# because they are also real ECS date targets and this is the one place that
+# says so.
+
+types:
+  # --- dates -----------------------------------------------------------
+  '@timestamp':
+    type: date
+    note: >-
+      the ECS document time axis. Not an objects/*.yml target (conventions.yml
+      projects the common-header `timestamp` here directly), but it is the
+      primary target of relationships.yml `timestamp` and inferred.yml
+      `first_seen` too, so it is listed here once rather than three times.
+  event.start:
+    type: date
+    note: flow.yml start_time — the flow's open time.
+  event.end:
+    type: date
+    note: flow.yml end_time — the flow's close time.
+  file.created:
+    type: date
+    note: file.yml creation_time.
+  email.origination_timestamp:
+    type: date
+    note: email.yml date — the parsed SMTP Date header (RFC 5322), UTC.
+
+  # --- long (ids, ports, byte/packet counts, durations) -----------------
+  event.duration:
+    type: long
+    note: >-
+      authentication.yml response_time, nanoseconds. CAR sources carry a loose
+      duration string ("12ms"); rules.coercion (conventions.yml) is the
+      system-wide safety valve for that — an unparseable value stays verbatim
+      under car.authentication.response_time and event.duration is left unset,
+      so the ECS field itself stays honestly typed rather than downgraded.
+  process.pid:
+    type: long
+    note: a MITRE/Windows PID; every *.pid target across the object files.
+  process.parent.pid:
+    type: long
+  process.thread.id:
+    type: long
+    note: module.yml tid, thread.yml src_tid.
+  source.port:
+    type: long
+  destination.port:
+    type: long
+  source.bytes:
+    type: long
+    note: flow.yml out_bytes (ECS source.bytes = bytes sent by the initiator).
+  destination.bytes:
+    type: long
+    note: flow.yml in_bytes (ECS destination.bytes = bytes sent by the responder).
+  network.packets:
+    type: long
+    note: flow.yml packet_count.
+  http.request.body.bytes:
+    type: long
+  http.response.body.bytes:
+    type: long
+  http.response.status_code:
+    type: long
+  email.attachments.file.size:
+    type: long
+    note: >-
+      email.yml attachment_size. CAR sources carry loose formatted text
+      ("567 Kb"); as with event.duration, rules.coercion is the fallback for
+      an unparseable value (kept verbatim under car.email.attachment_size) —
+      the ECS field itself is genuinely long (bytes), not keyword.
+
+  # --- ip -----------------------------------------------------------------
+  source.ip:
+    type: ip
+  destination.ip:
+    type: ip
+  related.ip:
+    type: ip
+    note: the related.* pivot every source.ip/destination.ip `also:` copy feeds.
+
+  # --- float ----------------------------------------------------------
+  car.link_confidence:
+    type: float
+    note: >-
+      conventions.yml link_confidence — already declared with this type in
+      custom_namespace; listed here too so render_elastic.py (and a reader)
+      have one lookup table for every non-keyword target in the contract.
+
+  # --- boolean --------------------------------------------------------
+  process.code_signature.valid:
+    type: boolean
+    note: process.yml signature_valid.
+  dll.code_signature.valid:
+    type: boolean
+    note: module.yml signature_valid.
+  file.code_signature.valid:
+    type: boolean
+    note: file.yml signature_valid; also driver.yml signature_valid (the driver image is a file.*).

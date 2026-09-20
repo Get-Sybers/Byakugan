@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "generated_by": "python model/projection/render_elastic.py",
+    "notes": "logs-car@custom is the optional DX_DFIR-owned customization component; ignore_missing_component_templates lets this template apply before DX_DFIR creates it (the riskgate remedy hook).",
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "model/projection/conventions.yml",
+      "model/projection/objects/driver.yml",
+      "model/projection/ecs_types.yml"
+    ],
+    "version": 3
+  },
+  "composed_of": [
+    "logs-car-header",
+    "logs-car-driver",
+    "logs-car@custom"
+  ],
+  "data_stream": {},
+  "ignore_missing_component_templates": [
+    "logs-car@custom"
+  ],
+  "index_patterns": [
+    "logs-car.driver-*"
+  ],
+  "priority": 500
+}

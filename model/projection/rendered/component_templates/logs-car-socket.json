@@ -1,0 +1,120 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "generated_by": "python model/projection/render_elastic.py",
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "model/projection/conventions.yml",
+      "model/projection/objects/socket.yml",
+      "model/projection/ecs_types.yml"
+    ],
+    "version": 3
+  },
+  "template": {
+    "mappings": {
+      "properties": {
+        "car": {
+          "properties": {
+            "socket": {
+              "properties": {
+                "family": {
+                  "path": "network.type",
+                  "type": "alias"
+                },
+                "image_path": {
+                  "path": "process.executable",
+                  "type": "alias"
+                },
+                "local_address": {
+                  "path": "source.ip",
+                  "type": "alias"
+                },
+                "local_path": {
+                  "path": "file.path",
+                  "type": "alias"
+                },
+                "local_port": {
+                  "path": "source.port",
+                  "type": "alias"
+                },
+                "pid": {
+                  "path": "process.pid",
+                  "type": "alias"
+                },
+                "protocol": {
+                  "path": "network.transport",
+                  "type": "alias"
+                },
+                "remote_address": {
+                  "path": "destination.ip",
+                  "type": "alias"
+                },
+                "remote_port": {
+                  "path": "destination.port",
+                  "type": "alias"
+                },
+                "success": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "destination": {
+          "properties": {
+            "ip": {
+              "type": "ip"
+            },
+            "port": {
+              "type": "long"
+            }
+          }
+        },
+        "file": {
+          "properties": {
+            "path": {
+              "type": "keyword"
+            }
+          }
+        },
+        "network": {
+          "properties": {
+            "transport": {
+              "type": "keyword"
+            },
+            "type": {
+              "type": "keyword"
+            }
+          }
+        },
+        "process": {
+          "properties": {
+            "executable": {
+              "type": "keyword"
+            },
+            "pid": {
+              "type": "long"
+            }
+          }
+        },
+        "related": {
+          "properties": {
+            "ip": {
+              "type": "ip"
+            }
+          }
+        },
+        "source": {
+          "properties": {
+            "ip": {
+              "type": "ip"
+            },
+            "port": {
+              "type": "long"
+            }
+          }
+        }
+      }
+    }
+  }
+}

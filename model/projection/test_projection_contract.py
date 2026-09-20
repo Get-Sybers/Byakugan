@@ -26,6 +26,15 @@ def test_validate_cli_passes():
     assert "car-ecs projection OK" in r.stdout
 
 
+def test_render_elastic_check_passes():
+    """rendered/ (component templates, index templates, the Kibana bundle) is
+    committed output — --check re-renders to memory and must find it in sync."""
+    r = subprocess.run([sys.executable, str(HERE / "render_elastic.py"), "--check"],
+                       capture_output=True, text=True, check=False)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "OK" in r.stdout
+
+
 def test_orphan_and_missing_fields_are_drift():
     v = _validator()
     car = v.load_car_model()

@@ -8,9 +8,12 @@
 
 contract:
   name: car-ecs-projection
-  version: 2                     # bump on any change to a target field path
+  version: 3                     # bump on any change to a target field path
                                  # 2: the row identity's forms (event.id: the spindle uuid5 +
                                  #    car.native.spindle_*), the fold's native keys
+                                 # 3: relationship + inferred stream projections
+                                 #    (relationships.yml / inferred.yml), rendered Elastic
+                                 #    assets (rendered/, render_elastic.py)
   ecs_version: '8.11.0'          # the ECS 8.x field set the `ecs:` paths are authored against
   car_model: model/car/objects   # the 13 CAR objects this contract must cover exactly
   validated_by: model/projection/validate.py
