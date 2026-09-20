@@ -206,7 +206,7 @@ def test_anamnesis_car_passthrough(tmp_path):
               " owning_guid, parent_pid, parent_guid, link_confidence, source_plugin,"
               " source_image, native, pid, exe, hostname)")
     c.execute("INSERT INTO process VALUES ('2019-01-28T19:40:32+00:00','create','proc-a',"
-              "NULL,NULL,NULL,4,'proc-b','heuristic','windows.piiat.processes',"
+              "NULL,NULL,NULL,4,'proc-b','heuristic','windows.anamnesis.processes',"
               "'img.dmp','{}',10,'x.exe','DESKTOP-8')")
     c.commit(); c.close()
     events = sources.load_anamnesis_car(src, "img.dmp")
@@ -215,7 +215,7 @@ def test_anamnesis_car_passthrough(tmp_path):
     assert ev["car_object"] == "process" and ev["guid"] == "proc-a"
     assert ev["parent_guid"] == "proc-b"                      # links preserved verbatim
     assert ev["link_confidence"] == "heuristic"
-    assert ev["source_artefact"] == "memory/windows.piiat.processes"
+    assert ev["source_artefact"] == "memory/windows.anamnesis.processes"
     assert ev["source_host"] == "DESKTOP-8"                   # its own hostname wins
 
 

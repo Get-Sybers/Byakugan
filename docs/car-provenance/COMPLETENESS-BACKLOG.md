@@ -34,7 +34,7 @@ validate, then promotion into `mappings/`. It alone unlocks:
 
 ## Tier 3 — run the plugin / capture the evidence (schema complete, unexercised)
 Several objects are wired but empty on LS24 because the plugin wasn't run or the
-channel wasn't captured: run **windows.piiat.network** (socket `listen`),
+channel wasn't captured: run **windows.anamnesis.network** (socket `listen`),
 **windows.modules/ldrmodules** (module `base_address` + injection),
 **windows.threads** (thread stacks) over the memdump; capture **Sysmon EID
 6/7/8**, the **Security** channel, and the **audit subcategories**.

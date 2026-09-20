@@ -16,7 +16,7 @@ Grounded in: `byakugan/third_party/car/data_model/flow.yaml`, `car_data_model.js
 |---|--------|-----|--------|---------|--------------------------------------|
 | **S1** | **Zeek conn.log** | `byakugan/byakugan/mappings/zeek_conn.py` | **MAPPED** | network | **NO** (pcap has no host identity) |
 | **S2** | **Sysmon EID 3 NetworkConnect** | `byakugan/byakugan/mappings/sysmon.py:311` | **MAPPED** | host (endpoint) | **YES** — `exe`,`image_path`,`pid`,`user` native; `ppid` inherited |
-| **S3** | **Memory netscan / netstat** (Volatility) | `piiat-mem/piiat_mem/mappings.py:125` (`_FLOW_MAP`) | **MAPPED** | host (memory) | **YES** — `pid`,`exe` native; `image_path`,`user`,`uid`,`ppid` **inherited** from owning `_EPROCESS` (definitive) |
+| **S3** | **Memory netscan / netstat** (Volatility) | `Anamnesis internal/normalize/mappings.yaml` (`_FLOW_MAP`) | **MAPPED** | host (memory) | **YES** — `pid`,`exe` native; `image_path`,`user`,`uid`,`ppid` **inherited** from owning `_EPROCESS` (definitive) |
 | **S4** | **SMBClient/Connectivity 30803** | `byakugan/byakugan/mappings/evtx_more.py:152` | **MAPPED (thin)** | host (endpoint) | NO (no process ctx on 30803) — only `dest_fqdn` |
 | **S5** | **SRUM network_usage** (Plaso esedb/srum) | `byakugan/byakugan/mappings/plaso_srum.py:73` | **MAPPED** | host (per-app aggregate) | partial — `exe`,`image_path`,`uid` native; no pid/user/endpoints |
 | **U1** | **WFP 5156 (allow) / 5157 (block)** | `byakugan/to-be-validated/evtx_audit.yml:157` | **QUARANTINED — NOT active** | host (endpoint) | **YES (spec)** — `image_path`,`pid`,`owning_pid`; no user/exe |
@@ -25,7 +25,7 @@ Grounded in: `byakugan/third_party/car/data_model/flow.yaml`, `car_data_model.js
 | **U4** | **Suricata EVE / NetFlow-IPFIX / raw pcap payload** | — | **NOT mapped (no mapper exists)** | network | NO — but pcap payload is the *only* real source of `content` & `proto_info` |
 | **U5** | **Plaso firewall/pfirewall.log, browser history** | (browser→http via `plaso_web`) | **NOT mapped to flow** | host | — |
 
-**Evidence check.** Zeek `conn.json` present for 2 captures (fields verified: `ts`,`uid`,`id.orig_h/p`,`id.resp_h/p`,`proto`,`duration`,`orig_bytes`/`resp_bytes`,`conn_state`,`history`,`orig_pkts`/`resp_pkts`,`local_orig`/`local_resp`,`ip_proto`). Memory `car.db` has a **`flow` table with the full 27-field schema plus owner-link columns** (`owning_pid`,`owning_offset`,`owning_guid`,`parent_pid`,`parent_guid`,`link_confidence`) — but **0 flow rows in this sample** (this memory image produced no `windows.netscan`/`piiat.network` output; only mftscan+processes ran). Pipeline is schema-complete for memory flow; this particular image just has no connections to show.
+**Evidence check.** Zeek `conn.json` present for 2 captures (fields verified: `ts`,`uid`,`id.orig_h/p`,`id.resp_h/p`,`proto`,`duration`,`orig_bytes`/`resp_bytes`,`conn_state`,`history`,`orig_pkts`/`resp_pkts`,`local_orig`/`local_resp`,`ip_proto`). Memory `car.db` has a **`flow` table with the full 27-field schema plus owner-link columns** (`owning_pid`,`owning_offset`,`owning_guid`,`parent_pid`,`parent_guid`,`link_confidence`) — but **0 flow rows in this sample** (this memory image produced no `windows.netscan`/`anamnesis.network` output; only mftscan+processes ran). Pipeline is schema-complete for memory flow; this particular image just has no connections to show.
 
 ---
 
@@ -106,7 +106,7 @@ Legend for "mapped?": **yes** = an active map fills it; **inherit** = filled by 
 
 ### Key file references
 - Active maps: `byakugan/byakugan/mappings/{zeek_conn.py, sysmon.py:311, evtx_more.py:152, plaso_srum.py:73}`
-- Memory flow map: `third_party/piiat-mem/piiat_mem/mappings.py:125` (`_FLOW_MAP`); inheritance list `piiat_mem/enrich.py:72` (`_INHERIT`)
+- Memory flow map: `Anamnesis internal/normalize/mappings.yaml` (`_FLOW_MAP`); inheritance list `Anamnesis internal/enrich` (`_INHERIT`)
 - Enrich inheritance rules: `byakugan/byakugan/relationships.yml` (`from_owning_process` includes `ppid`)
 - Quarantined WFP spec: `byakugan/to-be-validated/evtx_audit.yml:157-189`
 - Model + semantics: `car_data_model.json`, `byakugan/third_party/car/data_model/flow.yaml`

@@ -39,7 +39,7 @@ Authoritative, exhaustive map of **every canonical `registry` field → every ar
 | **SEC4657** | Security **4657** *registry value modified* | `byakugan/to-be-validated/evtx_audit.yml` (spec) | `add`/`value_edit`/`remove` (by `OperationType`) | **QUARANTINED — NOT active** |
 | **PLREG** | Plaso `winreg` (all `windows:registry:*` key/value plugins: run, services, userassist, bam, amcache, shellbags, usb, sam, typedpaths, MRU, …) `plaso_registry` | `plaso_registry.py` | `key_edit` (whole-key snapshot) | **ACTIVE** |
 | **RECMD** | EZ-Tools **RECmd** batch (`--json`) `recmd_batch` | `recmd.py` | `value_edit` (live records; `Deleted:true` → raw) | **ACTIVE** |
-| **MEM** | Volatility3 `windows.piiat.registry` (printkey + hivelist, RECmd-style target list) → Anamnesis CAR passthrough | plugin `piiat-mem/plugins/windows/piiat/registry.py`; map `piiat-mem/piiat_mem/mappings.py` | `value_edit` | **ACTIVE** |
+| **MEM** | Volatility3 `windows.anamnesis.registry` (printkey + hivelist, RECmd-style target list) → Anamnesis CAR passthrough | plugin `Anamnesis internal/collect (collectRegistry)`; map `Anamnesis internal/normalize/mappings.yaml` | `value_edit` | **ACTIVE** |
 | **AUTORUNS** | Sysinternals Autoruns (`autoruns_13.98`) | — | (MITRE lists add/key_edit/value_edit) | **NO SOURCE in repo** (honest no-source) |
 | **REGRIPPER** | RegRipper | — | — | **NO SOURCE in repo** (honest no-source) |
 | **SEC4663/4660** | Security 4663 (Key access) / 4660 (object deleted) | 4663-File only in `evtx_audit.yml`; Key path → raw | none for registry | **NO registry mapping** (honest — see §5) |
@@ -49,7 +49,7 @@ Notes carried from source:
 - **PLREG `image_path`** = the winreg record's `image_path` (present on **service** rows: the configured `svchost`/service binary). This is the *configured* binary, **not** the process that wrote the key — a field-name near-collision; see caveats.
 - **PLREG `key_edit`** is a **semantic overload**: a registry snapshot = the key as it exists at its `LastWrite`, mapped to `key_edit` (not a literal rename). SYS14 `key_edit` *is* a literal rename.
 - **MEM** host identity: Anamnesis's CAR layer stamps `hostname`/`fqdn` from the in-memory `ComputerName` (and `Tcpip\Parameters`) registry values — the plugin deliberately captures those; the memory registry rows themselves carry `Hive/Key/ValueName/ValueType/ValueData/LastWrite` only.
-- **Evidence grounding**: memory sample `data_store/processed/volatility/memdump.mem/plugins/windows.piiat.registry.jsonl` confirms native fields `Hive, Key, ValueName, ValueType, ValueData, LastWrite`. (No live Sysmon-13 / plaso-winreg registry rows in the current sampled processed corpus — field names below are grounded in map code + generated `sources/*.yaml`, which are introspected from the maps.)
+- **Evidence grounding**: memory sample `data_store/processed/volatility/memdump.mem/plugins/windows.anamnesis.registry.jsonl` confirms native fields `Hive, Key, ValueName, ValueType, ValueData, LastWrite`. (No live Sysmon-13 / plaso-winreg registry rows in the current sampled processed corpus — field names below are grounded in map code + generated `sources/*.yaml`, which are introspected from the maps.)
 
 ---
 
@@ -67,7 +67,7 @@ Legend: **Mapped?** = yes (+map location) / NO. **Conf** = confidence the field 
 | SEC4657 → `ObjectName` | add, value_edit, remove | **NO** (quarantined `evtx_audit.yml`) | High once audit enabled. |
 | PLREG → `key_path` | key_edit | yes — `plaso_registry.py` (`key: _R("key_path")`) | High. |
 | RECMD → `KeyPath` | value_edit | yes — `recmd.py` | High. |
-| MEM → `Key` | value_edit | yes — `mappings.py:windows.piiat.registry` | High — in-memory path (may be `\REGISTRY\MACHINE\SYSTEM\…` NT form). |
+| MEM → `Key` | value_edit | yes — `mappings.py:windows.anamnesis.registry` | High — in-memory path (may be `\REGISTRY\MACHINE\SYSTEM\…` NT form). |
 
 ### `value` — the value name (value-level sources only)
 

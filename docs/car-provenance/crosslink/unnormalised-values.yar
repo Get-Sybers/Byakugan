@@ -36,7 +36,7 @@
 
    Matches land in data_store/processed/signatures/yara/{matches,disk,memory}.jsonl.
    Scan targets that carry the most yield: the plaso JSONL timelines, EvtxECmd /
-   hayabusa JSON, Volatility piiat.* plugin JSONL, and raw registry/LNK text.
+   hayabusa JSON, anamnesis plugin JSONL (windows.anamnesis.*), and raw registry/LNK text.
 
    Compile-checked with YARA 4.5.2 (the get-sybers/yara image). Rule identifiers
    are globally unique (the lane merges every file into one include index).

@@ -2,7 +2,7 @@
 
 > Part of the CAR cross-source linkage & detection research arc — see [README](README.md) for the full map.
 
-**Status:** merged (timeliner robustness fix on engine `main`, PIIAT-MitreCar#65)
+**Status:** merged (timeliner robustness fix on engine `main`, #65)
 
 ## The gap
 

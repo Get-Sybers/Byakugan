@@ -2,7 +2,7 @@
 
 FS/disk companion to the earlier memory-grounded catalogue (`../socket.md`).
 That pass established the **live/memory** truth: the *only* active socket source in this pipeline is
-Volatility3 `windows.piiat.network`/`netscan` → `socket`/`listen` (memory), and WFP 5158 → `socket`/`bind`
+Volatility3 `windows.anamnesis.network`/`netscan` → `socket`/`listen` (memory), and WFP 5158 → `socket`/`bind`
 is built-but-inert. **This pass asks a different question: what DISK artefacts record a bound/listening
 socket, and does the pipeline mine them?** Answer up front: **socket is a runtime object — disk evidence is
 thin, and what little exists is *policy/config*, not an observed bind.** But there is one real, sizeable,
@@ -13,14 +13,14 @@ completely-unmined seam: **the Windows Firewall rule set in the registry.**
 - **Maps under audit:** `byakugan/byakugan/mappings/plaso_registry.py` (claims every
   `windows:registry:*` type as `registry`/`key_edit`), `plaso_artifacts.py`, `plaso_fs_extra.py`,
   `plaso_linux.py`. Memory socket map for the field vocabulary:
-  `third_party/piiat-mem/piiat_mem/mappings.py` `_SOCKET_MAP`.
+  `Anamnesis internal/normalize/mappings.yaml` `_SOCKET_MAP`.
 - **CAR `socket` fields (car_data_model.json):** `family, image_path, local_address, local_path,
   local_port, pid, protocol, remote_address, remote_port, success`; actions `bind, listen, close`.
 
 ## 0. Headline
 
 - **NO disk→`socket` mapping exists anywhere in the pipeline.** `grep` for socket emission across
-  `mappings/*.py` returns only the memory package (`piiat-mem`). Every plaso mapping routes to
+  `mappings/*.py` returns only the memory package (`anamnesis`). Every plaso mapping routes to
   `file`/`registry`/`process`/`user_session`/`flow`/`http` — **never `socket`.** So 100 % of the disk
   socket surface below is UNMINED.
 - **The one real seam: `SharedAccess\...\FirewallPolicy\FirewallRules`** in the SYSTEM hive. Each rule is a

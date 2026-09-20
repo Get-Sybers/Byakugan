@@ -14,6 +14,7 @@ extractor:
   url: https://github.com/EricZimmerman/RECmd
 input_pattern:
 - _RECmd_Batch_
+- gore.jsonl
 - recmd_batch.json
 identity:
   external:

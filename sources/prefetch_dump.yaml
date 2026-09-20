@@ -14,6 +14,7 @@ extractor:
   url: https://github.com/Get-Sybers/GoDFIR-toolz
 input_pattern:
 - PrefetchDump_Output
+- goprefetch.jsonl
 identity:
   external:
   - prefetch_dump_pf

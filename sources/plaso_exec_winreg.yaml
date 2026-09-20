@@ -17,7 +17,7 @@ input_pattern:
 - .L2tWinreg
 identity:
   registry: byakugan/spindle.yml
-  version: 1
+  version: 2
   entries:
   - name: plaso_exec_winreg/amcache
     kind: entity

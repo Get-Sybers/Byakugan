@@ -7,7 +7,7 @@ module_path, pid, sha1_hash, sha256_hash, signature_valid, signer, tid`.
 
 **Scope of THIS pass:** disk/filesystem artefacts only. The prior pass
 (`docs/car-provenance/module.md`, LS24) covered the three *live* producers —
-Sysmon EID 7, WMI 5857, memory `windows.piiat.modules` — and already flagged
+Sysmon EID 7, WMI 5857, memory `windows.anamnesis.modules` — and already flagged
 prefetch `mapped_files` (backlog Tier-1 #7) and hash-hydration (Tier-2 #6) as
 gaps. This pass grounds those in **real disk evidence** and sweeps every other
 filesystem source exhaustively.
@@ -55,7 +55,7 @@ produces a `module` row at all).
 ### base_address
 | fs artefact → native field | action | mined? | conf & caveats |
 |---|---|---|---|
-| — none — | load | **NO (honest no-source)** | **Runtime-only field.** A load VA exists only in a live/memory view. No disk artefact (PE, prefetch, amcache, shimcache) records where a module was mapped. Memory `windows.piiat.modules`→`Base` is the sole producer (prior pass). Permanent null from disk. |
+| — none — | load | **NO (honest no-source)** | **Runtime-only field.** A load VA exists only in a live/memory view. No disk artefact (PE, prefetch, amcache, shimcache) records where a module was mapped. Memory `windows.anamnesis.modules`→`Base` is the sole producer (prior pass). Permanent null from disk. |
 
 ### fqdn / hostname
 | fs artefact → native field | action | mined? | conf & caveats |

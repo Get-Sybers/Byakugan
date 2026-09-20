@@ -17,11 +17,10 @@ import (
 	"github.com/get-sybers/byakugan/go/internal/pyjson"
 )
 
-// CarNSURL seeds every deterministic id the engine mints.
-// Deliberately still the historical PIIAT-MitreCar URL after the byakugan
-// rename: this string SEEDS every deterministic id the engine mints — changing
-// it would orphan every previously issued id. A seed, not a link.
-const CarNSURL = "https://github.com/Get-Sybers/PIIAT-MitreCar/stix"
+// CarNSURL seeds every deterministic id the engine mints — changing it
+// re-mints every id ever issued, so it only moves with a major version.
+// A seed, not a link.
+const CarNSURL = "https://github.com/Get-Sybers/Byakugan/stix"
 
 // SpindleLabel is the CAR row-identity namespace label under CAR_NS.
 const SpindleLabel = "spindle"

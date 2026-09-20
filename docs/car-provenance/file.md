@@ -31,9 +31,9 @@ Authoritative "find once, done" map of **every canonical field → every artefac
 | S13 | **evtx_sysmon EID 23** (FileDelete) | Sysmon Operational | delete | `sysmon.py:369` |
 | S14 | **evtx_more 4907** (SACL change, ObjectType=File) | Security log | acl_modify | `byakugan/byakugan/mappings/evtx_more.py:98` |
 | S15 | **zeek_files** (files.log) | network pcap — Zeek file analyzer | create ("first seen on wire") | `byakugan/byakugan/mappings/zeek_extra.py:67` |
-| S16 | **windows.mftscan.MFTScan** | memory image — `$MFT` pages (Anamnesis, finished-CAR passthrough) | create | `third_party/piiat-mem/piiat_mem/mappings.py:192` (+ merge `enrich.py:154`) |
-| S17 | **windows.piiat.files** | memory image — handle-enumerated files with owner | (action None — inventory) | `piiat-mem/piiat_mem/mappings.py:236` |
-| S18 | **windows.filescan** | memory image — `FILE_OBJECT` pool scan | (action None — inventory) | `piiat-mem/piiat_mem/mappings.py:300` |
+| S16 | **windows.mftscan.MFTScan** | memory image — `$MFT` pages (Anamnesis, finished-CAR passthrough) | create | `Anamnesis internal/normalize/mappings.yaml` (+ merge `enrich.py:154`) |
+| S17 | **windows.anamnesis.files** | memory image — handle-enumerated files with owner | (action None — inventory) | `Anamnesis internal/normalize/mappings.yaml` |
+| S18 | **windows.filescan** | memory image — `FILE_OBJECT` pool scan | (action None — inventory) | `Anamnesis internal/normalize/mappings.yaml` |
 
 ### Inert / to-be-validated (spec written, NOT wired into the pipeline)
 
@@ -87,7 +87,7 @@ Format: `field | sources (source → native field) | action(s) | mapped? | confi
 ### creation_time
 | | |
 |---|---|
-| **sources** | filestat → `Timestamp` (SI birth, create rows only) `plaso_linux.py:210`; mft → `Timestamp`; usnjrnl → `Timestamp` (0x100 create); lnk → `Timestamp`; shellitem → `Timestamp` `plaso_shellitem.py:69`; **Sysmon EID 11 → `CreationUtcTime`** (the file's OWN stamp, not event time) `sysmon.py:357`; mftscan-mem → `Created` (SI) `piiat-mem mappings.py:196` |
+| **sources** | filestat → `Timestamp` (SI birth, create rows only) `plaso_linux.py:210`; mft → `Timestamp`; usnjrnl → `Timestamp` (0x100 create); lnk → `Timestamp`; shellitem → `Timestamp` `plaso_shellitem.py:69`; **Sysmon EID 11 → `CreationUtcTime`** (the file's OWN stamp, not event time) `sysmon.py:357`; mftscan-mem → `Created` (SI) `Anamnesis mappings.yaml` |
 | **actions** | create (asserted only on action=create — any other MACB row's time is provably not the birth time; see `plaso_linux.py:209`) |
 | **mapped?** | **YES** — broad. |
 | **confidence** | Strong. Caveat: Sysmon 11 correctly separates file-creation stamp from event ts (overwrite verdict in native); plaso asserts it only on the create variant. |
@@ -111,7 +111,7 @@ Format: `field | sources (source → native field) | action(s) | mapped? | confi
 ### file_path
 | | |
 |---|---|
-| **sources** | filestat (`filename`\|`display_name`); mft (`name`\|`filename`; note plaso can't index `path_hints[0]` — kept native); usnjrnl; lnk (`local_path`\|`network_path`\|`link_target`); recyclebin (`original_filename`); shellitem (`shell_item_path`\|`long_name`\|`name`); pecoff; olecf; fseventsd (`path`); amcache_link (`full_path`); jlecmd (`Path`); Sysmon 11/23 (`TargetFilename`); 4907 (`ObjectName`); piiat.files (`Path`); filescan (`Name`) |
+| **sources** | filestat (`filename`\|`display_name`); mft (`name`\|`filename`; note plaso can't index `path_hints[0]` — kept native); usnjrnl; lnk (`local_path`\|`network_path`\|`link_target`); recyclebin (`original_filename`); shellitem (`shell_item_path`\|`long_name`\|`name`); pecoff; olecf; fseventsd (`path`); amcache_link (`full_path`); jlecmd (`Path`); Sysmon 11/23 (`TargetFilename`); 4907 (`ObjectName`); anamnesis.files (`Path`); filescan (`Name`) |
 | **actions** | all |
 | **mapped?** | **YES** — broad. |
 | **confidence** | Strong. **NOT** on zeek_files (network file — no host path) or mftscan-mem (only `Filename`, full path not in memory-resident $MFT). |
@@ -207,7 +207,7 @@ Format: `field | sources (source → native field) | action(s) | mapped? | confi
 ### pid
 | | |
 |---|---|
-| **sources** | Sysmon 11/23 → `ProcessId`; 4907 → `hex_int(ProcessId)`; piiat.files → `PID` (handle-holder) |
+| **sources** | Sysmon 11/23 → `ProcessId`; 4907 → `hex_int(ProcessId)`; anamnesis.files → `PID` (handle-holder) |
 | **actions** | create, delete, acl_modify |
 | **mapped?** | **YES (partial)** — host-telemetry + memory-handle only. |
 | **confidence** | Medium. Files at rest (disk artefacts) have no acting pid — honest null. Sysmon also surfaces `owning_pid`/`owning_guid` (tier-1 process link). INERT audit family adds pid to 4663/4660/4670. |

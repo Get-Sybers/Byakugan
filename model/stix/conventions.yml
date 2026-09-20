@@ -8,12 +8,14 @@
 
 contract:
   name: car-stix-projection
-  version: 3                       # bump on any change to an id recipe or a target property
+  version: 4                       # bump on any change to an id recipe or a target property
                                    # 2: the row identity's forms (the spindle uuid5 + native.spindle_*),
                                    #    the fold's native keys (contributions / contributed_by)
                                    # 3: the behaviour layer — attack-pattern / indicator / indicates
                                    #    (GLOBAL) + sighting + host identity (CASE-SCOPED), from the
                                    #    runnable CAR analytics over car.db (analytics.py; see `behaviour`)
+                                   # 4: CAR_NS re-seeded to the byakugan URL and the producer to
+                                   #    identity|byakugan / "Byakugan" — every deterministic id re-mints
   stix_version: '2.1'
   engine: byakugan/stix.py
   validated_by: model/stix/validate.py
@@ -31,10 +33,10 @@ output:
     one STIX 2.1 bundle. Objects are ordered (identity, SCOs by type/id, observed-data by time,
     inferred nodes, relationships by time, then the behaviour layer: attack-pattern, indicator,
     sighting) so a re-export is byte-identical.
-  # The producer identity and CAR_NS below keep their original piiat-mitrecar
-  # seeds across the byakugan rename: they are wire-format constants — changing
-  # either would re-mint every deterministic id ever issued.
-  producer: identity--<uuid5(CAR_NS, "identity|piiat-mitrecar")> (name PIIAT-MitreCar, identity_class system)
+  # The producer identity and CAR_NS below are wire-format constants — changing
+  # either re-mints every deterministic id ever issued, so they only move with
+  # a major contract version (last: v4).
+  producer: identity--<uuid5(CAR_NS, "identity|byakugan")> (name Byakugan, identity_class system)
   cli: 'python -m byakugan.stix export <car-dir> [--out FILE] [--case ID] [--as-of ISO]'
   pipeline_flag: '--stix (python -m byakugan --in/--batch ... --stix): export after the stores are built'
   as_of: >-
@@ -47,7 +49,7 @@ output:
 id_derivation:
   namespaces:
     STIX_NS: 00abedb4-aa42-466c-9c01-fed23315a9b7          # STIX 2.1 §2.9
-    CAR_NS: uuid5(NAMESPACE_URL, "https://github.com/Get-Sybers/PIIAT-MitreCar/stix")
+    CAR_NS: uuid5(NAMESPACE_URL, "https://github.com/Get-Sybers/Byakugan/stix")
     case_ns: uuid5(CAR_NS, "case|<case>")
     case: >-
       --case, default the car directory's name (the batch source name, e.g. windows_logs_<case>_<host>).

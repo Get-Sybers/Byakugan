@@ -17,7 +17,7 @@ input_pattern:
 - .L2tEsedb
 identity:
   registry: byakugan/spindle.yml
-  version: 1
+  version: 2
   entries:
   - name: l2t_srum/application_usage
     kind: entity

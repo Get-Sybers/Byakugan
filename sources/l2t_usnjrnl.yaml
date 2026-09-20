@@ -17,7 +17,7 @@ input_pattern:
 - .L2tUsnjrnl
 identity:
   registry: byakugan/spindle.yml
-  version: 1
+  version: 2
   entries:
   - name: l2t_usnjrnl
     kind: record

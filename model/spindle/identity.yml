@@ -10,13 +10,13 @@
 # fail on drift.
 
 spindle:
-  version: 1
+  version: 2
   namespace:
     STIX_NS: 00abedb4-aa42-466c-9c01-fed23315a9b7
-    CAR_NS: c59b6244-0ed6-57c9-9248-03376f66270d
-    SPINDLE_NS: dd668a4a-3945-5171-b031-7eb064307058
+    CAR_NS: 1fba557d-9fd4-5bcc-9546-d3ea3e787f02
+    SPINDLE_NS: afab0259-176f-58d2-9e88-8f508fb46232
   recipe:
-    CAR_NS: uuid5(NAMESPACE_URL, "https://github.com/Get-Sybers/PIIAT-MitreCar/stix")
+    CAR_NS: uuid5(NAMESPACE_URL, "https://github.com/Get-Sybers/Byakugan/stix")
     SPINDLE_NS: uuid5(CAR_NS, "spindle")
   mint: 'uuid5(SPINDLE_NS, canonical_json({"_obj": <car_object>, "_v": <version>, <name>: <value>, ...}))'
   seam: byakugan.ids.mint(car_object, identity, version) -> (guid, key); ids.guid_of(key) re-mints a row's

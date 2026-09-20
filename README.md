@@ -4,10 +4,6 @@
 artefact into MITRE CAR, relate the objects through proven relationships, and
 (roadmap) flag adversary TTP behaviours — automatically.**
 
-> Formerly **PIIAT-MitreCar**. Repository, distribution and Python import
-> package are now all **byakugan**. The STIX namespace/producer identity keep
-> their original seeds so previously issued deterministic ids stay stable.
-
 An analyst points it at what their forensic tooling already produces and gets
 back a timeline that is **CAR-normalised**, **relationship-enriched**, and
 heading toward **TTP-flagged** — the complete, faithful model of what happened,
@@ -97,8 +93,9 @@ Dependencies are traced in three files, each carrying its own upgrade path:
 (the exact test/lint versions the repo is proven against) and
 [`go/go.mod`](go/go.mod) for the parse engine, which is stdlib-only.
 
-## The PIIAT family
+## Standalone tooling
 
 Standalone public tooling, consumed by pipelines via the CLI:
 [anamnesis](https://github.com/Get-Sybers/Anamnesis) (memory → CAR),
-PIIAT-l2t-plugins (log2timeline parsers), Byakugan (processor output → CAR).
+[PIIAT-l2t-plugins](https://github.com/Get-Sybers/PIIAT-l2t-plugins)
+(log2timeline parsers), Byakugan (processor output → CAR).

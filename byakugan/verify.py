@@ -115,7 +115,7 @@ def _int(v):
 
 def has_term(value, term: str) -> bool:
     """Whole-term containment (terms split on non-alphanumerics): 'memory' is in
-    'piiat_memory_pslist' but not in 'memoryless'."""
+    'anamnesis_memory_pslist' but not in 'memoryless'."""
     return re.search(rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])",
                      str(value or ""), re.I) is not None
 
@@ -286,7 +286,7 @@ def run(car_dir: str = ".") -> _Checker:
             c.has_rows(CAR, lambda r: art(r) in ("evtx_sysmon", "evtx_security", "evtx_process",
                                                  "evtx_services", "evtx_bits", "evtx_rdp")),
         "Windows (memory: Anamnesis)":
-            c.has_rows(CAR, lambda r: has_term(art(r), "memory") or has_term(art(r), "piiat")),
+            c.has_rows(CAR, lambda r: has_term(art(r), "memory") or has_term(art(r), "anamnesis")),
         "Linux/Unix (utmp/ssh/cron)":
             c.has_rows(CAR, lambda r: art(r) in ("l2t_utmp", "l2t_text")),
         "macOS (utmpx/fseventsd)":

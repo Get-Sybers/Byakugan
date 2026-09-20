@@ -6,7 +6,7 @@
 
 Grounding: `byakugan/third_party/car/data_model/driver.yaml`, `car_data_model.json` (object index 5), CAR sensor `byakugan/third_party/car/sensors/sysmon_13.yaml`.
 
-> **Authority note.** The bundled `driver.yaml` `coverage_map` is **stale** and is NOT the source of truth. It lists `sysmon_13 → {fqdn, image_path, pid, sha256, signature_valid, signer}` — but that map (a) omits `hostname`, `md5_hash`, `sha1_hash` which the shipped engine *does* extract, and (b) asserts `pid` which the engine correctly does **not** extract (Sysmon EID 6 carries no `ProcessId`). The authoritative "currently mapped" state is the executable engine map `byakugan/byakugan/mappings/sysmon.py` (`sysmon_driver_load` variant) and Anamnesis `third_party/piiat-mem/piiat_mem/mappings.py` (`windows.modules`), reflected in generated source files `sources/evtx_sysmon.yaml` and `sources/memory.yaml`.
+> **Authority note.** The bundled `driver.yaml` `coverage_map` is **stale** and is NOT the source of truth. It lists `sysmon_13 → {fqdn, image_path, pid, sha256, signature_valid, signer}` — but that map (a) omits `hostname`, `md5_hash`, `sha1_hash` which the shipped engine *does* extract, and (b) asserts `pid` which the engine correctly does **not** extract (Sysmon EID 6 carries no `ProcessId`). The authoritative "currently mapped" state is the executable engine map `byakugan/byakugan/mappings/sysmon.py` (`sysmon_driver_load` variant) and the Anamnesis map `internal/normalize/mappings.yaml` (`windows.modules`), reflected in generated source files `sources/evtx_sysmon.yaml` and `sources/memory.yaml`.
 
 ---
 
@@ -15,7 +15,7 @@ Grounding: `byakugan/third_party/car/data_model/driver.yaml`, `car_data_model.js
 | Src key | Artefact / tool | Event / plugin | Emits object | In pipeline? | File |
 |---|---|---|---|---|---|
 | **S1** | Sysmon (EvtxECmd, `Microsoft-Windows-Sysmon/Operational`) | **EID 6 DriverLoad** | `driver`/`load` | **YES (mapped)** | `mappings/sysmon.py:432` |
-| **S2** | Memory image, Anamnesis (MemProcFS) | **`windows.modules`** (PsActiveModuleList walk) | `driver`/`load` | **YES (mapped)** | `piiat-mem/piiat_mem/mappings.py:286`; plugin driver `python/get_sybers_get-sybers/volatility.py:58` |
+| **S2** | Memory image, Anamnesis (MemProcFS) | **`windows.modules`** (PsActiveModuleList walk) | `driver`/`load` | **YES (mapped)** | `Anamnesis internal/normalize/mappings.yaml`; plugin driver `python/get_sybers_get-sybers/volatility.py:58` |
 | S3 | Memory image, Volatility 3 | `windows.dumpfiles` / `moddump` + hasher | (would feed driver hashes) | **NO** (not in `DEFAULT_PLUGINS`) | — |
 | S4 | Windows Event Log | **System 7045** (SCM service install, kernel-mode driver) | currently `service`/`create` | mapped as **service, not driver** | `mappings/evtx_windows.py:180` (`_SVC_*`), `sources/evtx_services.yaml` |
 | S5 | Windows Event Log | **System 20003** (UserPnp driver-service registration, `DriverFileName`) | currently `service`/`create` | mapped as **service, not driver** | `mappings/evtx_more.py` (header §20003) |
@@ -33,7 +33,7 @@ Legend for "currently mapped?": **YES** = shipped engine writes this canonical c
 
 | field | sources (source → native field) | action(s) | currently mapped? (yes+where / NO) | confidence & caveats |
 |---|---|---|---|---|
-| **base_address** | **S2** memory `windows.modules` → `Base` (kernel virtual load addr) | load | **YES** — `piiat-mem mappings.py:286` (`base_address:"Base"`); `driver.base_address` col in `car.db` | High. **Memory is the ONLY source.** Sysmon EID 6, 7045, PE, amcache carry no runtime load address (disk/log artefacts never observe where the kernel mapped it). S1 leaves it null. |
+| **base_address** | **S2** memory `windows.modules` → `Base` (kernel virtual load addr) | load | **YES** — `Anamnesis mappings.yaml` (`base_address:"Base"`); `driver.base_address` col in `car.db` | High. **Memory is the ONLY source.** Sysmon EID 6, 7045, PE, amcache carry no runtime load address (disk/log artefacts never observe where the kernel mapped it). S1 leaves it null. |
 | **fqdn** | **S1** Sysmon EID 6 → `Computer` (only if dotted) | load | **YES** — `sysmon.py` `_image_load_props()` via `_FQDN` | High. Inferred: claimed only when `Computer` contains a dot; a NetBIOS name is not faked into an FQDN. S2 (memory) does not stamp fqdn on the driver plugin row → null there. |
 | **hostname** | **S1** Sysmon EID 6 → `Computer` (first DNS label) | load | **YES** — `sysmon.py` via `_HOSTNAME` | High. (The stale `driver.yaml` coverage_map omits this — engine does map it.) S2 windows.modules yields no hostname on the row (kernel-global); memory host lives in `image_context`, not the driver row. |
 | **image_path** | **S1** Sysmon EID 6 → `ImageLoaded`; **S2** memory `windows.modules` → `Path` (FullDllName). *Potential (unmapped-as-driver): S4 7045 `ImagePath`, S5 20003 `DriverFileName`, S6 PE `display_name`, S7 amcache `full_path`.* | load | **YES** — S1 `sysmon.py:432`; S2 `mappings.py:286` | High. A driver loads into the kernel with no module_path, so `ImageLoaded`/`Path` **is** the driver's own file path (note in `sysmon.py:429`). Two independent mapped sources. |
@@ -79,7 +79,7 @@ This is an **honest structural no-source**, not merely an unmapped one.
 
 The current light test set (LS24) exercises **no** driver evidence:
 - `windows_logs/unspecified_host/log_EvtxECmd_Output.json`: **0** Sysmon EID 6 records, **0** System 7045.
-- `volatility/memdump.mem/plugins/`: only `banners, mftscan, piiat.processes, piiat.registry, piiat.sessions, pslist` ran — **`windows.modules` did not run / produced nothing**, so `car.db` `driver` table = **0 rows** (the table + full 11-column schema exist and are correct).
+- `volatility/memdump.mem/plugins/`: only `banners, mftscan, anamnesis.processes, anamnesis.registry, anamnesis.sessions, pslist` ran — **`windows.modules` did not run / produced nothing**, so `car.db` `driver` table = **0 rows** (the table + full 11-column schema exist and are correct).
 
 So the maps are in place and correct, but there is **no grounded driver output in the processed store** to validate against yet. A memory image with kernel modules, or a Sysmon-6-bearing evtx, is needed to exercise the driver lane end-to-end.
 
