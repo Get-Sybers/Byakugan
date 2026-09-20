@@ -109,9 +109,10 @@ ROUTES = [
     ("NetworkDataUsage", ["esedump_srum"]),        # ese_dump SRUM -> flow (network usage)
     ("ApplicationResourceUsage", ["esedump_srum"]),  # ese_dump SRUM -> process (app usage)
     ("PrefetchDump_Output", ["prefetch_dump"]),    # prefetch_dump -> process (execution)
-    # The GoDFIR-toolz framework layout (godfir-toolz/<tool>/<item>/<tool>.jsonl):
-    # every Go tool writes one <tool>.jsonl per item, in the record shape the
-    # map above already consumes — the file name is the route.
+    # The GoDFIR-toolz framework layout (godfir-toolz/<tool>/<item>/<tool>.jsonl,
+    # the tools in GODFIR_TOOLS): every Go tool writes one <tool>.jsonl per
+    # item, in the record shape the map above already consumes — the file name
+    # is the route.
     ("gore.jsonl", ["recmd_batch"]),           # gore registry batch (recmd_batch shape) -> registry
     ("goprefetch.jsonl", ["prefetch_dump"]),   # goprefetch -> process (execution)
     ("gojle.jsonl", ["jlecmd_dest"]),          # gojle jump lists (jlecmd_dest shape) -> file (via adapter)
@@ -129,6 +130,11 @@ ROUTES = [
     (".L2tUtmpx", ["l2t_utmpx"]),
     (".L2tText", ["l2t_text"]),
 ]
+
+# The GoDFIR-toolz Go tools: each has a godfir-toolz/<tool>/ output dir and a
+# <tool>.jsonl route above (mapped, or explicitly to nothing).
+GODFIR_TOOLS = ("gore", "gojle", "gole", "goamcache", "goappcompat", "gosbe",
+                "gorb", "gomft", "goese", "goprefetch", "gowxt")
 
 
 def route(path: str) -> list[str]:
@@ -439,13 +445,15 @@ def _godfir_toolz_sources(gt: str):
     godfir-toolz/<tool>/<item>/<tool>.jsonl: each item directory (one parsed
     artefact — a hive, a .pf, a SRUM database) is one source, and no host is
     claimed (the item is a path, not a host; the maps carry what the records
-    say). A directory with no such items is the older godfir-toolz/<host>/
-    tree: one source per host directory, upper-cased name as the fallback host."""
+    say). A tool directory (one of GODFIR_TOOLS, or any directory holding
+    such items) with no finished item yields nothing. Any other directory is
+    the older godfir-toolz/<host>/ tree: one source per host directory,
+    upper-cased name as the fallback host."""
     for name in _subdirs(gt):
         d = os.path.join(gt, name)
         items = [it for it in _subdirs(d)
                  if os.path.isfile(os.path.join(d, it, f"{name}.jsonl"))]
-        if items:
+        if items or name in GODFIR_TOOLS:
             for it in items:
                 yield f"godfir_toolz_{name}_{it}", os.path.join(d, it), None
         else:
@@ -466,8 +474,9 @@ def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
       log2timeline/jsonl/<image>.jsonl (a raw container): one source each —
       likewise under a top-level jsonl/ (a psort output root mounted directly);
     - godfir-toolz/<tool>/<item>/<tool>.jsonl: each Go-tool item (one parsed
-      artefact) is one source; godfir-toolz/<host>/ (no per-tool items): one
-      source per host directory, upper-cased dir name as the fallback host;
+      artefact) is one source (a tool dir with no finished item: none);
+      godfir-toolz/<host>/ (not a tool dir): one source per host directory,
+      upper-cased dir name as the fallback host;
     - memory/<image>/car.db: Anamnesis finished CAR (passthrough).
 
     A lane's `_`-prefixed staging directory (the image exports the tools

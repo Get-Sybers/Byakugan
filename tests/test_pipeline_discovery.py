@@ -23,6 +23,9 @@ def test_framework_files_are_routed():
     for name in ("goese.jsonl", "gomft.jsonl", "gole.jsonl", "gorb.jsonl", "gosbe.jsonl",
                  "goamcache.jsonl", "goappcompat.jsonl", "gowxt.jsonl"):
         assert pipeline.route(name) == [], name
+    # every known Go tool's <tool>.jsonl has an explicit route (mapped, or to nothing)
+    for tool in pipeline.GODFIR_TOOLS:
+        assert any(pattern in f"{tool}.jsonl" for pattern, _keys in pipeline.ROUTES), tool
 
 
 def test_framework_layouts_are_discovered(tmp_path):
@@ -69,6 +72,28 @@ def test_older_layouts_still_discover_beside_the_framework_ones(tmp_path):
     assert found["windows_logs_hostA"] == (str(tmp_path / "windows_logs" / "hostA"), None)
     assert found["godfir_toolz_hostB"] == (str(tmp_path / "godfir-toolz" / "hostB"), "HOSTB")
     assert "godfir_toolz_gore_img_Windows_System32_config_SOFTWARE" in found
+
+
+def test_a_tool_dir_without_finished_items_yields_no_source(tmp_path):
+    """A known Go tool's directory with no finished item — empty (the tool found
+    nothing to parse) or an item still being written — is never a spurious
+    host; the legacy host rule applies only to directories that are not tool
+    directories."""
+    gt = tmp_path / "godfir-toolz"
+    (gt / "gore").mkdir(parents=True)                                  # ran, found no hive
+    (gt / "goprefetch" / "img_Windows_Prefetch_X.pf").mkdir(parents=True)
+    (gt / "goprefetch" / "img_Windows_Prefetch_X.pf" / "goprefetch.jsonl.part").write_text("")
+    assert pipeline.discover_sources(str(tmp_path)) == []
+    # beside them: a legacy host tree keeps its host, and a tool this engine
+    # does not know yet is still a tool directory by its <item>/<name>.jsonl shape
+    jsonl(str(gt / "hostB" / "PrefetchDump_Output.json"), {"Executable": "X"})
+    jsonl(str(gt / "gonew" / "img_thing" / "gonew.jsonl"), {"k": "v"})
+    found = {name: (path, host) for name, path, host in pipeline.discover_sources(str(tmp_path))}
+    assert found == {
+        "godfir_toolz_hostB": (str(gt / "hostB"), "HOSTB"),
+        "godfir_toolz_gonew_img_thing": (str(gt / "gonew" / "img_thing"), None),
+    }
+    assert not any(host in ("GORE", "GOPREFETCH") for _p, host in found.values())
 
 
 def test_framework_sources_are_ingested_one_store_each(tmp_path):
