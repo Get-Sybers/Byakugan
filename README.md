@@ -96,6 +96,5 @@ Dependencies are traced in three files, each carrying its own upgrade path:
 ## Standalone tooling
 
 Standalone public tooling, consumed by pipelines via the CLI:
-[anamnesis](https://github.com/Get-Sybers/Anamnesis) (memory → CAR),
-[PIIAT-l2t-plugins](https://github.com/Get-Sybers/PIIAT-l2t-plugins)
-(log2timeline parsers), Byakugan (processor output → CAR).
+[anamnesis](https://github.com/Get-Sybers/Anamnesis) (memory → CAR) and
+Byakugan (processor output → CAR).
