@@ -143,20 +143,14 @@ def test_enrich_lifts_device_serial_into_the_column():
     assert out["device_serial"] == "AA010215170355310594"   # lifted into the column
 
 
-def test_device_serial_is_a_stored_column_on_every_object(tmp_path):
-    st = store.CarStore(str(tmp_path / "car.db"))
-    try:
-        for obj in st.model:
-            assert "device_serial" in st._cols(obj)
-    finally:
-        st.close()
+def test_device_serial_is_a_stored_column_on_every_object():
+    st = store.CarStore()
+    for obj in st.model:
+        assert "device_serial" in st._cols(obj)
 
 
-def test_volume_guid_is_a_stored_column_on_every_object(tmp_path):
+def test_volume_guid_is_a_stored_column_on_every_object():
     # the non-MITRE header addition must be a real column on all 13 objects
-    st = store.CarStore(str(tmp_path / "car.db"))
-    try:
-        for obj in st.model:
-            assert "volume_guid" in st._cols(obj)
-    finally:
-        st.close()
+    st = store.CarStore()
+    for obj in st.model:
+        assert "volume_guid" in st._cols(obj)

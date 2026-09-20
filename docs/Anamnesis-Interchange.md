@@ -77,9 +77,15 @@ what it does, not what seems sensible):
 - **`event_id`** — Anamnesis's own SQLite autoincrement row id — is
   **dropped**. It is never a CAR value and carries no meaning outside
   Anamnesis's own store.
-- **`owning_guid_native`** is set to **`None` on every row, unconditionally**
-  — see "The second enrich pass" below for why this specific field, of all
-  of them, is deliberately never populated from Anamnesis's data.
+- **`owning_guid_native`** is set from the row's own `owning_guid` ONLY when
+  `link_confidence == "definitive"` — Anamnesis's own strongest tier, a
+  resolved `_EPROCESS` pointer, the memory-lane equivalent of Sysmon's native
+  `ProcessGuid` — and `None` otherwise (including every `heuristic`-confidence
+  Anamnesis link). Likewise, a `process` row with a definitive `parent_guid`
+  gets it mirrored into `_native["ParentProcessGuid"]`. See "The second enrich
+  pass" below for why: this is what makes a DEFINITIVE Anamnesis link survive
+  Byakugan's own enrichment pass instead of being silently re-labelled
+  `heuristic`.
 - **`owning_pid`, `owning_offset`, `owning_guid`, `parent_pid`, `parent_guid`,
   `link_confidence`** pass through **verbatim** — whatever Anamnesis's own
   memory-lane enrichment already resolved (see below).
@@ -129,9 +135,9 @@ What actually happens, precisely (verified by
 - **Fold/dedupe** (`relationships.yml`'s `dedupe.key` — host, object, guid,
   action, target_guid, access_level) applies identically: an Anamnesis row
   that happens to share a same-event key with another row (from Anamnesis
-  itself, or from a different source sharing one car.db — never happens
-  today, since each `car.db` is one Anamnesis image, but the mechanism does
-  not care) folds exactly like any other duplicate would.
+  itself, or from a different source sharing one translation batch — never
+  happens today, since each Anamnesis `car.db` is one image, but the
+  mechanism does not care) folds exactly like any other duplicate would.
 - **Null-only inheritance** (`relationships.yml`'s `inheritance.from_owning_process`
   — exe, image_path, command_line, user, sid, fqdn, hostname, ppid) fills
   only fields the receiving CAR object has **and** that are still null on
@@ -139,28 +145,40 @@ What actually happens, precisely (verified by
   (its own enrichment inherits the same fields — `internal/enrich/enrich.go`'s
   `inherit`), so in practice this pass has little left to do; it never
   overwrites a value either side already supplied.
-- **Owner/parent identity — re-derived, not inherited from Anamnesis's
-  label.** `owning_guid_native` is *always* `None` for a translated Anamnesis
-  row (see above), so `enrich.py`'s tier-1 check (a definitively-carried
-  native guid on the spoke's own record) never fires for these rows — even
-  though Anamnesis's own resolution may itself have been tier-1 (a direct
-  `_EPROCESS`-offset match, its `link_confidence = "definitive"`). The
-  cascade instead always falls to **its own tier 2**: the (`owning_pid`,
-  create-time-window) match against the OTHER translated process rows in
-  this same `car.db` (`enrich._resolve_owner`/`_match`, host-scoped). Two
-  outcomes, both observed in `tests/test_anamnesis_interchange.py`:
-  - a candidate is found (the common case for a single-snapshot image: one
-    live process per pid) — it is, in practice, the *same* process Anamnesis
-    already named, so `owning_guid`/`parent_guid` are **re-derived to the
-    identical value** — the link's target survives unchanged — but
-    `link_confidence` is **re-stamped `"heuristic"`** (this pass's own
-    pid-window tier), even when Anamnesis's original confidence was
-    `"definitive"`. The identity is preserved; the confidence label is not.
-  - no candidate is found (e.g. the owning process never became its own row
-    in this `car.db`, or a host mismatch) — the `if owner is not None:`
-    guard around both assignments never runs, so `owning_guid` /
-    `parent_guid` / `link_confidence` are left **completely untouched** at
-    whatever Anamnesis originally wrote.
+- **Owner/parent identity — CONFIRMED at Anamnesis's own tier, not
+  re-derived down to Byakugan's weaker one (the definitive-confidence fix).**
+  `owning_guid_native` (spoke owner) and `_native["ParentProcessGuid"]`
+  (process parent) are populated from the row's own Anamnesis-resolved link
+  **only when that link was `"definitive"`** (see "The producer schema" /
+  "The translation" above) — Anamnesis's own strongest tier, a resolved
+  `_EPROCESS` pointer, the memory-lane equivalent of a natively-carried
+  Sysmon `ProcessGuid`/`ParentProcessGuid`. `enrich.py`'s tier-1 check (a
+  definitively-carried native guid on the spoke's own record, or on the
+  process's own record for a parent link) then finds it — via
+  `enrich._resolve_owner`/the process-create parent block, exactly as it
+  would a Sysmon row — and stamps `link_confidence = "definitive"` again,
+  never falling to **its own tier 2** (the `(owning_pid`/`parent_pid`,
+  create-time-window) heuristic match) for these rows. A NON-definitive
+  Anamnesis link (`link_confidence == "heuristic"`, or none at all) is never
+  surfaced this way — `owning_guid_native`/`_native["ParentProcessGuid"]`
+  stay unset, and the row re-derives through Byakugan's own tier 2 exactly
+  as before the fix; the fix only ever strengthens what Anamnesis itself
+  already asserted at Sysmon-strength, never weakens tier 2 for anything
+  else. Two outcomes, both observed in `tests/test_anamnesis_interchange.py`:
+  - the process Anamnesis named as owner/parent has its own row in this same
+    translation batch (the common case) — tier 1 finds it, so
+    `owning_guid`/`parent_guid` **confirm the identical value** Anamnesis
+    already named AND `link_confidence` **stays `"definitive"`** — no
+    longer re-stamped `"heuristic"`. `edges_from_events`
+    (`byakugan/superset.py`) then also resolves the edge's `method` as
+    `native_guid` (`superset._method`), not `pid_window`.
+  - it does not (e.g. a host mismatch, or the named process was never its
+    own row) — tier 1 finds nothing, so the row falls through to tier 2
+    exactly as an unfixed (non-definitive) row would: a candidate found
+    there re-derives the guid with `link_confidence` re-stamped
+    `"heuristic"`; no candidate leaves `owning_guid`/`parent_guid`/
+    `link_confidence` completely untouched at whatever Anamnesis originally
+    wrote.
 
   A separate, **opt-in** mechanism covers the case NEITHER tier resolves
   anything: `--derive`'s reconstruction stage (`relationships.yml`'s
@@ -169,23 +187,28 @@ What actually happens, precisely (verified by
   never runs as part of the base `enrich()` pass this section describes.
 
   Either way: **a link Anamnesis minted is never overwritten with a
-  DIFFERENT value.** It is either confirmed (re-derived to the same guid,
-  confidence relabelled) or left alone. `edges_from_events`
-  (`byakugan/superset.py`) reads `owning_guid`/`parent_guid` *after* this
-  pass to materialise the relationship-timeline edges
-  (`car_relationships.jsonl`), so those edges reference the surviving
-  (Anamnesis-identical) guids either way.
+  DIFFERENT value.** It is either confirmed (tier 1, identical guid AND
+  confidence — the fixed path — or tier 2, identical guid, relabelled
+  confidence) or left alone. `edges_from_events` (`byakugan/superset.py`)
+  reads `owning_guid`/`parent_guid` *after* this pass to materialise the
+  relationship-timeline edges (`car_relationships.jsonl`), so those edges
+  reference the surviving (Anamnesis-identical) guids either way, with
+  whichever confidence/method tier actually resolved them.
 - **The B1/B3 native-id lifts** (`volume_guid`, `mac_address`,
   `device_serial` — pulled out of `_native` into first-class header columns)
   run over an Anamnesis row's `_native` blob exactly like any other row's;
   whether they fire depends only on whether that blob happens to carry a
   recognisable pattern, same as any source.
 - **`owning_pid` / `owning_offset` / `parent_pid` / `owning_guid_native`
-  never reach car.db or the exported JSONL.** They are transient enrichment
-  inputs only (`byakugan/store.py`'s own header comment says so explicitly);
-  once `enrich()` has used them, only `owning_guid`, `parent_guid` (a
-  `process` object field), `link_confidence`, `source_artefact`,
-  `source_host`, `native`, and the object's own CAR fields persist.
+  never reach the exported JSONL.** They are transient enrichment inputs
+  only (`byakugan/store.py`'s own header comment says so explicitly); once
+  `enrich()` has used them, only `owning_guid`, `parent_guid` (a `process`
+  object field), `link_confidence`, `source_artefact`, `source_host`,
+  `native`, and the object's own CAR fields persist. The
+  `_native["ParentProcessGuid"]` this fix injects on a definitively-parented
+  process row is likewise consumed by enrich's parent-resolution block and
+  rides through into the exported `native` object like any other kept
+  native field — it is not stripped afterward.
 
 ## Drift guards
 

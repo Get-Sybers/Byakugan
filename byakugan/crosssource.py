@@ -1,16 +1,19 @@
 """Cross-source convergence — the optional end-stage over the aggregate (#41).
 
-The isolation rule keeps every source's `car.db` self-contained (one source, one
-database, enriched only within itself). This stage is the deliberate, separate,
-scope-gated exception: it reads the WHOLE case — every source's `car.db` under a
-batch tree — and CONVERGES rows that describe the SAME entity across sources, so
-a process seen in an event log, in memory and on disk becomes one view holding
-every property each artefact could supply (the log's `command_line`, memory's
-recovered `command_line`/handles, amcache's `sha1_hash`, prefetch's run count).
+The isolation rule keeps every source's materialised tree self-contained (one
+source, one set of car_<object>.jsonl files, enriched only within itself).
+This stage is the deliberate, separate, scope-gated exception: it reads the
+WHOLE case — every source's car_<object>.jsonl under a batch tree — and
+CONVERGES rows that describe the SAME entity across sources, so a process seen
+in an event log, in memory and on disk becomes one view holding every property
+each artefact could supply (the log's `command_line`, memory's recovered
+`command_line`/handles, amcache's `sha1_hash`, prefetch's run count). No
+SQLite is read — every source's own working store lived only in memory for
+the duration of its own build.
 
 **Nothing per-source is mutated.** Convergence is additive: a merged property
 view whose every field records WHICH source supplied it, plus the confidence the
-join was made at. The per-source stores stand exactly as they were.
+join was made at. The per-source materialised trees stand exactly as they were.
 
 Four tiers, honest about certainty (CAR-Relations §: a property may be
 attributed across sources only via a key that identifies the same entity beyond
@@ -43,10 +46,9 @@ import argparse
 import glob
 import json
 import os
-import sqlite3
 import sys
 
-from . import native_ids, spindle
+from . import carmodel, native_ids, spindle, store
 
 # the strongest-to-weakest tiers; a converged group keeps the strongest that
 # joined it (so a content-hash match outranks a mere image-path lead).
@@ -71,7 +73,7 @@ _CONTENT_BUCKET = {"process": "file", "module": "file", "driver": "file"}
 _IMAGED = {"process", "service", "module", "driver"}
 _HASH_FIELDS = ("sha256_hash", "sha1_hash", "md5_hash")
 # header/provenance columns that are not converged as entity properties
-_META = {"event_id", "car_object", "native", "_native", "_source",
+_META = {"event_id", "_row_index", "car_object", "native", "_native", "_source",
          "link_confidence", "source_artefact"}
 
 
@@ -116,38 +118,36 @@ def _native_ids(row: dict) -> list[tuple[str, str]]:
 
 
 def _find_stores(case_dir: str) -> list[str]:
-    """The source directories under a case tree, each holding one car.db."""
-    if os.path.isfile(os.path.join(case_dir, "car.db")):
+    """The source directories under a case tree, each holding a materialised
+    CAR tree (car_<object>.jsonl)."""
+    if glob.glob(os.path.join(case_dir, "car_*.jsonl")):
         return [case_dir]
     return sorted({os.path.dirname(p)
-                   for p in glob.glob(os.path.join(case_dir, "**", "car.db"),
+                   for p in glob.glob(os.path.join(case_dir, "**", "car_*.jsonl"),
                                       recursive=True)})
 
 
 def _load_case(case_dir: str) -> dict[str, list[dict]]:
-    """{source_name: [rows]} for every source's car.db under the case. A row is a
-    dict with its canonical columns + parsed `native`, tagged with its source."""
+    """{source_name: [rows]} for every source's materialised tree under the
+    case. A row is a dict with its canonical columns + `native` (a dict),
+    tagged with its source — walked from car_<object>.jsonl (store.read_object_jsonl),
+    no SQLite anywhere."""
     out: dict[str, list[dict]] = {}
     for d in _find_stores(case_dir):
         source = os.path.basename(d.rstrip("/")) or d
         rows: list[dict] = []
-        conn = sqlite3.connect(os.path.join(d, "car.db"))
-        conn.row_factory = sqlite3.Row
-        try:
-            tables = [r[0] for r in conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table'")]
-            for t in tables:
-                for r in conn.execute(f'SELECT * FROM "{t}"'):
-                    row = dict(r)
-                    row["car_object"] = t
-                    row["_source"] = source
-                    try:
-                        row["native"] = json.loads(row.get("native") or "{}")
-                    except (TypeError, ValueError):
-                        row["native"] = {}
-                    rows.append(row)
-        finally:
-            conn.close()
+        for obj in carmodel.load():
+            # `_row_index`: a per-(source, object) ordinal — the read-back
+            # replacement for the old car.db's SQLite `event_id` autoincrement
+            # (itself only ever unique within one object's table), so
+            # converge()'s member-set de-dup can still tell two distinct rows
+            # of the same source+object apart, including guid-less ones.
+            for i, row in enumerate(store.read_object_jsonl(d, obj)):
+                row["_source"] = source
+                row["_row_index"] = i
+                if not isinstance(row.get("native"), dict):
+                    row["native"] = {}
+                rows.append(row)
         out[source] = rows
     return out
 
@@ -239,7 +239,7 @@ def converge(case_dir: str) -> list[dict]:
         sources = {r["_source"] for r in rows}
         if len(sources) < 2:                   # not cross-source
             continue
-        member = frozenset((r["_source"], r.get("event_id"), r["car_object"]) for r in rows)
+        member = frozenset((r["_source"], r.get("_row_index"), r["car_object"]) for r in rows)
         if member in seen:                     # already emitted at a stronger tier
             continue
         seen.add(member)
@@ -296,8 +296,8 @@ def summary(converged: list[dict]) -> dict:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(
         prog="byakugan.crosssource",
-        description="cross-source convergence over a case's aggregate car.db stores")
-    ap.add_argument("case_dir", help="a batch output tree (one <source>/car.db per source)")
+        description="cross-source convergence over a case's aggregate materialised CAR trees")
+    ap.add_argument("case_dir", help="a batch output tree (one <source>/car_<object>.jsonl set per source)")
     ap.add_argument("--out", help="output path (default: <case_dir>/crosssource.jsonl)")
     a = ap.parse_args(argv)
     converged = converge(a.case_dir)

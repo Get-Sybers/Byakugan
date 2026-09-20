@@ -1,12 +1,15 @@
-"""STIX 2.1 projection — DERIVED from the stores at export (the D4 exchange layer).
+"""STIX 2.1 projection — DERIVED from the materialised tree at export (the D4
+exchange layer).
 
-car.db holds the OBJECT events (one CAR entry per event, every source's
-properties superset-filled, the homeless values in `native`); superset.db holds
-the RELATIONSHIP instances in both classes (declared cascade edges, derived
-strong-identity links), the reconstructed `inferred_node` rows and the
-content-keyed attribution layer. This module reads those — and nothing else —
-and projects them as STIX 2.1 at export time: there is no second extraction
-path, no parser-side STIX, nothing a re-export could disagree with.
+car_<object>.jsonl holds the OBJECT events (one CAR entry per event, every
+source's properties superset-filled, the homeless values in `native`);
+car_relationships.jsonl holds the RELATIONSHIP instances in both classes
+(declared cascade edges, derived strong-identity links), and car_inferred.jsonl
+the reconstructed `inferred_node` rows (the content-keyed attribution layer is
+recomputed from the events themselves — derive.content_entities). This module
+reads those — and nothing else, no SQLite anywhere — and projects them as STIX
+2.1 at export time: there is no second extraction path, no parser-side STIX,
+nothing a re-export could disagree with.
 
     SCO             one per ENTITY a CAR row observes (its process, the file at
                     a path, the registry key, the connection, the account …)
@@ -19,7 +22,7 @@ path, no parser-side STIX, nothing a re-export could disagree with.
                     SCOs stand, no row-keyed SCO, no record, no observation
                     (A9; no mapped row is guid-less by design —
                     spindle.verify_registry refuses a leaf without a guid form)
-    relationship    one SRO per superset.db relationship row, labelled with its
+    relationship    one SRO per relationship-timeline row, labelled with its
                     class (declared | derived) and its method
     x-car-inferred-node
                     a reconstructed-but-unobserved end (antiforensics / partial
@@ -27,7 +30,7 @@ path, no parser-side STIX, nothing a re-export could disagree with.
                     only — never an SCO, never inside an observed-data
 
 The BEHAVIOUR layer (analytics.py, the third pillar — flag TTPs) is projected
-into the same id space: the finished car.db is read back through the runnable
+into the same id space: the finished events are read back through the runnable
 MITRE CAR analytics, and each hit becomes STIX:
 
     attack-pattern  one per distinct ATT&CK id (technique or subtechnique) the
@@ -72,6 +75,7 @@ car.native (here x_car_native). The contract is model/stix/.
 from __future__ import annotations
 
 import argparse
+import glob
 import ipaddress
 import json
 import os
@@ -95,7 +99,7 @@ PRODUCER = {"type": "identity", "spec_version": SPEC,
             "id": f"identity--{uuid.uuid5(CAR_NS, 'identity|byakugan')}",
             "created": EPOCH, "modified": EPOCH, "name": "Byakugan",
             "identity_class": "system",
-            "description": "MITRE CAR evidence stores (car.db + superset.db), projected to STIX 2.1 at export"}
+            "description": "the materialised MITRE CAR tree, projected to STIX 2.1 at export"}
 
 # STIX 2.1 §2.9: when `hashes` contributes to an id ONE hash is used, chosen in this order
 HASH_PREFERENCE = ("MD5", "SHA-1", "SHA-256", "SHA-512")
@@ -727,7 +731,7 @@ class Projection:
         self.process(c.host, c.owning_guid, props, image_path=image_path, image_name=image_name,
                      role="owning_guid")
 
-    # -- inferred nodes and relationships (superset.db) -----------------------
+    # -- inferred nodes and relationships (car_inferred.jsonl / car_relationships.jsonl) --
     def inferred(self, n: dict) -> str:
         """A reconstructed node as a FLAGGED, opinion-style object: never the
         would-be SCO type, never referenced by an observed-data."""
@@ -810,7 +814,7 @@ class Projection:
                    "x_car_source_host": host})
         self.stats[f"relationships_{cls}"] += 1
 
-    # -- the behaviour layer (analytics.py hits over car.db) ------------------
+    # -- the behaviour layer (analytics.py hits over the in-memory events) ------
     def _host_identity(self, host) -> str | None:
         """The host as a system identity — where a behaviour was sighted."""
         if host in _MISSING:
@@ -1127,7 +1131,7 @@ def project(events: list[dict], edges: list[dict] = (), inferred_nodes: list[dic
     `created` stamp for objects that carry no evidence time (default: the
     latest evidence time, so a re-export is byte-identical).
 
-    `behaviour_hits` (analytics.BehaviourHit list, computed from the same car.db)
+    `behaviour_hits` (analytics.BehaviourHit list, computed from the same events)
     add the behaviour layer — the attack-pattern / indicator catalogue and the
     sightings; the timeline is projected only when hits are supplied (the SCO /
     observation / relationship projection is unchanged when they are not)."""
@@ -1153,46 +1157,45 @@ def project(events: list[dict], edges: list[dict] = (), inferred_nodes: list[dic
 
 
 def load(car_dir: str) -> tuple[list[dict], list[dict], list[dict]]:
-    """(events, relationship rows, inferred_node rows) from <car_dir>/car.db +
-    superset.db — the finished stores, read as they are."""
-    car_db, sup_db = os.path.join(car_dir, "car.db"), os.path.join(car_dir, "superset.db")
-    if not os.path.isfile(car_db):
-        raise SystemExit(f"no car.db under {car_dir!r}")
-    events = derive.load_events(car_db)
-    edges, nodes = [], []
-    if os.path.isfile(sup_db):
-        st = superset.SupersetStore(sup_db)
-        try:
-            for table, dst in (("relationship", edges), ("inferred_node", nodes)):
-                cur = st.conn.execute(f"SELECT * FROM {table} ORDER BY id")
-                cols = [c[0] for c in cur.description]
-                dst.extend(superset._row_dict(cols, row) for row in cur)  # noqa: SLF001
-        finally:
-            st.close()
+    """(events, relationship rows, inferred_node rows) from a materialised CAR
+    tree: every car_<object>.jsonl (events, native -> _native),
+    car_relationships.jsonl (edges) and car_inferred.jsonl (inferred nodes) —
+    read as they are. No SQLite is involved; a missing relationships/inferred
+    file simply contributes no edges/nodes (an object-only or --derive-less
+    tree is still exportable)."""
+    if not glob.glob(os.path.join(car_dir, "car_*.jsonl")):
+        raise SystemExit(f"no materialised CAR under {car_dir!r}")
+    events = derive.load_events(car_dir)
+    edges = list(store.read_jsonl(os.path.join(car_dir, "car_relationships.jsonl")))
+    nodes = list(store.read_jsonl(os.path.join(car_dir, "car_inferred.jsonl")))
     return events, edges, nodes
 
 
-def _behaviour_pass(car_db: str) -> tuple[list | None, list | None]:
-    """(runnable analytics, behaviour hits) over the finished car.db — the third
-    pillar read back through the pinned CAR analytics (analytics.flag_store reads
-    car.db and nothing else, so the D4 'derived from the stores' contract holds).
-    Both None when the corpus is unavailable: the behaviour layer is additive and
-    must never break a STIX export."""
+def _behaviour_pass(events: list[dict]) -> tuple[list | None, list | None]:
+    """(runnable analytics, behaviour hits) over the events `load()` already
+    read — the third pillar, projected from the SAME in-memory events this
+    export is adjacent to (analytics.flag_rows, not a second read of the
+    materialised tree via flag_store). Both None when the corpus is
+    unavailable: the behaviour layer is additive and must never break a STIX
+    export."""
     try:
         from . import analytics as _an
         ans = _an.load_analytics()
-        return ans, _an.flag_store(car_db, ans)
+        rows_by_object: dict[str, list[dict]] = defaultdict(list)
+        for ev in events:
+            rows_by_object[ev["car_object"]].append(ev)
+        return ans, _an.flag_rows(rows_by_object, ans)
     except (ImportError, SystemExit):
         return None, None
 
 
 def export(car_dir: str, out_path: str | None = None, case: str | None = None,
            as_of: str | None = None) -> dict:
-    """Derive <car_dir>/stix_bundle.json (or `out_path`) from the stores.
-    `case` scopes the instance ids (default: the car directory's name)."""
+    """Derive <car_dir>/stix_bundle.json (or `out_path`) from the materialised
+    tree. `case` scopes the instance ids (default: the car directory's name)."""
     case = case or os.path.basename(os.path.abspath(car_dir.rstrip("/\\"))) or "default"
     events, edges, nodes = load(car_dir)
-    ans, hits = _behaviour_pass(os.path.join(car_dir, "car.db"))
+    ans, hits = _behaviour_pass(events)
     bundle, summary = project(events, edges, nodes, case=case, as_of=as_of,
                               behaviour_hits=hits, analytics_list=ans)
     out_path = out_path or os.path.join(car_dir, "stix_bundle.json")
@@ -1208,8 +1211,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="byakugan.stix",
                                  description="STIX 2.1, derived from a source's stores at export")
     sub = ap.add_subparsers(dest="cmd", required=True)
-    ex = sub.add_parser("export", help="derive <car-dir>/stix_bundle.json from car.db + superset.db")
-    ex.add_argument("car_dir", help="a source's car directory (car.db [+ superset.db])")
+    ex = sub.add_parser("export", help="derive <car-dir>/stix_bundle.json from the materialised CAR tree")
+    ex.add_argument("car_dir", help="a source's car directory (car_<object>.jsonl [+ car_relationships.jsonl])")
     ex.add_argument("--out", default=None, help="bundle path (default: <car-dir>/stix_bundle.json)")
     ex.add_argument("--case", default=None,
                     help="case id scoping the instance ids (default: the car directory's name)")

@@ -65,7 +65,7 @@ make -C go build                                 # the Go parse engine (Go >= 1.
 python -m byakugan --in <file-or-dir> --out <dir>   # build: one source
 python -m byakugan --batch <processed_dir>          # build: every source, isolated
 
-python -m byakugan.timeline <car-dir>               # timeline: from car.db/superset.db
+python -m byakugan.timeline <car-dir>               # timeline: from the local materialised JSONL tree
 python -m byakugan.timeline <car-dir> --elastic <es-url> --namespace <ns>   # timeline: from logs-car.* instead
 
 python -m byakugan.verify <car-dir>                 # verify: the CAR run-through (correctness gate)
@@ -102,21 +102,19 @@ STIX, the CAR→ECS projection and every mapping table stay Python.
 
 ## The materialised CAR tree
 
-Each evidence source becomes a **materialised CAR tree** —
-`car_<object>.jsonl` (13 CAR objects) + `car_relationships.jsonl` (the
-granular relationship-instance timeline), plus `car_inferred.jsonl` with
-`--derive` — and that JSONL is **the interchange every consumer reads**:
-downstream ingestion, `byakugan.timeline`, `byakugan.verify` and
-`byakugan.elastic.load` all read it, never the databases behind it directly.
-
-Behind that tree sit the engine's own **per-source working stores** — kept
-alongside the JSONL for inspection, never a second contract to read:
-
-- **`car.db`** — the CAR object events: one SQLite table per CAR object, one
-  row per finished CAR event.
-- **`superset.db`** — the CAR + ATT&CK superset model (as reference data) and
-  the relationship instances the enrichment cascade produces between the
-  car.db events — a second, more granular relationship timeline.
+Byakugan is an **elastic engine**: for the duration of one source's build it
+holds that source's finished CAR events and relationship edges **in memory**
+(`store.CarStore`, `superset.SupersetStore`) and writes only the
+**materialised CAR tree** — `car_<object>.jsonl` (13 CAR objects) +
+`car_relationships.jsonl` (the granular relationship-instance timeline,
+always written, even empty — the build's done-marker), plus
+`car_inferred.jsonl` with `--derive` — no SQLite anywhere. That JSONL tree is
+**the interchange every consumer reads**: downstream ingestion,
+`byakugan.timeline`, `byakugan.verify`, `byakugan.crosssource`, `byakugan.stix`
+and `byakugan.elastic.load` all read it, never the in-memory stores behind it
+(the one exception: `byakugan/readers.py` reads an Anamnesis `car.db` — that
+file is Anamnesis's own output format, a component boundary, not Byakugan's
+store).
 
 `byakugan load` projects that same materialised tree, through the CAR→ECS
 projection contract (`elastic/projection/`), into `logs-car.*` Elasticsearch
@@ -125,7 +123,7 @@ data streams — the **served, queryable tier**: bundle mode renders the
 DX_DFIR's integrated stack, Byakugan's own standalone one
 ([elastic/](elastic/README.md)), or any other Elasticsearch that serves the
 same contract. `byakugan.timeline --elastic` reads that served tier back into
-the exact same `timeline.jsonl` shape a local car.db-backed run produces.
+the exact same `timeline.jsonl` shape a local JSONL-backed run produces.
 
 ## Documentation
 

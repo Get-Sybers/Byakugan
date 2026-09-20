@@ -135,11 +135,12 @@ hand is STARTTLS-encrypted — an empty `car_email` table is the honest output.
 
 ## Within-source inference rules
 
-These rules mine each per-source `car.db` for join keys the base cascade does not
-already exploit. Every rule is **within one `car.db`** (scoped per `source_host`)
-and grounded in a concrete key in the evidence, implemented in `enrich.py` +
-`relationships.yml`. Cross-source correlation (memory + disk + network) is a
-separate stage — see [CAR-CrossSource.md](CAR-CrossSource.md).
+These rules mine each per-source event collection for join keys the base
+cascade does not already exploit. Every rule is **within one source**
+(scoped per `source_host`) and grounded in a concrete key in the evidence,
+implemented in `enrich.py` + `relationships.yml`. Cross-source correlation
+(memory + disk + network) is a separate stage — see
+[CAR-CrossSource.md](CAR-CrossSource.md).
 
 The CAR model has no session/process `end_time` field, so R1/R2 surface the
 lifetime in `_native` (never a fabricated column); R2's real gain is
@@ -156,7 +157,7 @@ terminated (`enrich._alive_at`), improving owner/parent link correctness.
 | R4 | **BITS transfer correlation** — assemble one transfer from its events | `transferId` GUID (definitive) | final bytes/URL, completion; owner from the BITS job-created event's process |
 | R7 | **service→process by image** (weak) — link a 7045 install to a run of its binary | 7045 `ImagePath` ↔ 4688 `NewProcessName` exe+window (heuristic) | service `owning_guid` |
 
-**Deferred to the cross-source aggregate stage (different `car.db`s):**
+**Deferred to the cross-source aggregate stage (different sources):**
 service↔registry service-key writes (evtx and registry are separate sources),
 host-rename lineage (a host-identity call across scopes), and any `community_id`
 zeek↔host-flow bridge.

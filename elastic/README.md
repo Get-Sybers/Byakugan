@@ -78,8 +78,8 @@ document ids + a manifest) unless the car tree changed or you pass `--force`.
 
 `byakugan.timeline`'s own `--elastic` source (the same flags) rebuilds the
 merged, time-ordered `timeline.jsonl` from the data streams instead of from
-`car.db`/`superset.db` — useful once several sources/cases share this one
-stack:
+the local materialised JSONL tree — useful once several sources/cases share
+this one stack:
 
 ```sh
 python -m byakugan.timeline <car-tree> --out timeline.jsonl \
@@ -87,7 +87,7 @@ python -m byakugan.timeline <car-tree> --out timeline.jsonl \
     --es-user elastic --es-password "$ELASTIC_PASSWORD"
 ```
 
-`<car-tree>` here only supplies the default `--out` path — no `car.db` is
+`<car-tree>` here only supplies the default `--out` path — no local file is
 read; every row comes from `logs-car.*-<case>`. Same output bytes either way
 (see `byakugan/timeline.py`'s module docstring).
 

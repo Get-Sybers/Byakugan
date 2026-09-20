@@ -207,20 +207,30 @@ def test_load_anamnesis_car_translation_rules(tmp_path):
     assert m1["source_host"] == "WORKSTATION1"
     assert d1["source_host"] == "IMG-7"
 
-    # native: JSON-decoded into `_native`; the raw `native` column name is gone
+    # native: JSON-decoded into `_native`; the raw `native` column name is gone.
+    # P2's is no longer merely the decoded empty blob: a definitive PROCESS->
+    # PARENT link (below) is surfaced into it as ParentProcessGuid — the same
+    # key enrich's tier 1 reads off a native Sysmon record.
     assert p1["_native"] == {"offset": "0xfffff8a000001040"}
-    assert m1["_native"] == {"foo": "bar"}
-    assert p2["_native"] == {}                            # an empty native blob decodes to {}
+    assert m1["_native"] == {"foo": "bar"}                     # unaffected: owner rides owning_guid_native, not _native
+    assert p2["_native"] == {"ParentProcessGuid": _P1_GUID}
     for ev in (p1, p2, m1, d1):
         assert "native" not in ev
 
-    # owning_guid_native is ALWAYS None: Anamnesis's OWN resolved owning_guid
-    # is a finished link (memory-offset-based), never a raw native identifier
-    # on the spoke's own record the way e.g. Sysmon's ProcessGuid is — so the
-    # translation must not let the second enrich pass treat it as tier-1
-    # definitive (see docs/Anamnesis-Interchange.md "The second enrich pass")
-    for ev in (p1, p2, m1, d1):
-        assert ev["owning_guid_native"] is None
+    # owning_guid_native carries Anamnesis's OWN resolved owning_guid ONLY when
+    # Anamnesis itself called the link "definitive" (a resolved _EPROCESS
+    # pointer, Sysmon-ProcessGuid strength) — so enrich's tier-1 check can
+    # trust it exactly the way it trusts a natively-carried sensor guid (see
+    # docs/Anamnesis-Interchange.md "The second enrich pass" — the
+    # definitive-confidence fix). P1/D1 carry no definitive owner link at all;
+    # P2's OWN link (definitive) is a PARENT link, not an owner link — parent
+    # rides in _native.ParentProcessGuid (above), not this field — so its
+    # owning_guid_native is still None. Only M1 (a definitive spoke->owner
+    # link) surfaces one here.
+    assert p1["owning_guid_native"] is None
+    assert p2["owning_guid_native"] is None
+    assert d1["owning_guid_native"] is None
+    assert m1["owning_guid_native"] == _P2_GUID
 
     # links Anamnesis minted are passed through 1:1 at this stage, verbatim,
     # confidence included
@@ -248,16 +258,14 @@ def test_anamnesis_passthrough_survives_the_full_pipeline(tmp_path):
     SAME second enrich pass (fold, null-only inheritance, owner/parent
     resolution) runs over these rows too — memory rows join the relationship
     timeline and logs-car.* through the same one pipeline, not a special
-    case. The pass RE-DERIVES owner/parent via its own pid+time-window tier
-    (owning_guid_native is always None for Anamnesis rows — see the test
-    above), but over an unambiguous single-owner-per-pid fixture like this
-    one it re-derives the SAME guid Anamnesis already minted: the LINK's
-    IDENTITY survives unchanged. `link_confidence`, by contrast, is NOT
-    preserved — the pass has no way to know Anamnesis's own link was
-    memory-offset-based, so it re-stamps it "heuristic" (its own pid-window
-    tier), even though Anamnesis's original confidence was "definitive".
-    Document this precisely; it is the actual, verified behaviour, not
-    merely the sensible-sounding one.
+    case. THE DEFINITIVE-CONFIDENCE FIX: a DEFINITIVE Anamnesis link (P2's
+    parent, M1's owner) is surfaced as the transient native-guid signal
+    enrich's tier 1 already trusts (see readers.py), so the pass CONFIRMS —
+    rather than re-derives via its own pid+time-window heuristic — the exact
+    guid Anamnesis already minted, AND keeps `link_confidence: "definitive"`
+    intact all the way into the exported car_<object>.jsonl. P1 carries no
+    parent link at all (ppid 4 matches no process in this source): an honest
+    null, untouched either way.
     """
     model = _load_fixture_model()
     image_dir = tmp_path / "memory" / "IMG-7"
@@ -280,16 +288,20 @@ def test_anamnesis_passthrough_survives_the_full_pipeline(tmp_path):
     # the guids/owning_guid/parent_guid Anamnesis minted survive UNCHANGED
     # into the exported car_<object>.jsonl
     assert p1["guid"] == _P1_GUID and p2["guid"] == _P2_GUID and m1["guid"] == _M1_GUID
-    assert p2["parent_guid"] == _P1_GUID          # re-derived by pid+window, same target
-    assert m1["owning_guid"] == _P2_GUID          # re-derived by pid+window, same target
+    assert p2["parent_guid"] == _P1_GUID          # confirmed via the native-guid (tier-1) signal
+    assert m1["owning_guid"] == _P2_GUID          # confirmed via the native-guid (tier-1) signal
     assert p1["parent_guid"] is None              # ppid 4 matches no process in this source: honest null
 
-    # ... but link_confidence is RE-STAMPED by the pass's own pid-window
-    # tier, not preserved from Anamnesis's own (stronger) resolution
-    assert p2["link_confidence"] == "heuristic"
-    assert m1["link_confidence"] == "heuristic"
+    # ... and link_confidence SURVIVES intact — the fix: no longer re-stamped
+    # "heuristic" by the pass's own pid-window tier, because tier 1 (not
+    # tier 2) is what resolved these links this time
+    assert p2["link_confidence"] == "definitive"
+    assert m1["link_confidence"] == "definitive"
 
-    # the superset edges reference the SAME (unchanged) guids
+    # the superset edges reference the SAME (unchanged) guids, and their
+    # `method` reflects the tier that actually resolved them (native_guid,
+    # not pid_window) now that confidence survives
+    assert superset._method({"link_confidence": "definitive"}) == "native_guid"   # noqa: SLF001
     rel_path = os.path.join(out_dir, "car_relationships.jsonl")
     with open(rel_path, encoding="utf-8") as fh:
         edges = [json.loads(line) for line in fh]
@@ -299,6 +311,10 @@ def test_anamnesis_passthrough_survives_the_full_pipeline(tmp_path):
     parent_verb = superset._edge_verb("parent_process")           # noqa: SLF001
     owner_verb = superset._spoke_verb("module", "load")           # noqa: SLF001
     assert ("process", _P1_GUID, "process", _P2_GUID) in by_pair
-    assert by_pair[("process", _P1_GUID, "process", _P2_GUID)]["relationship"] == parent_verb
+    parent_edge = by_pair[("process", _P1_GUID, "process", _P2_GUID)]
+    assert parent_edge["relationship"] == parent_verb
+    assert parent_edge["confidence"] == "definitive" and parent_edge["method"] == "native_guid"
     assert ("process", _P2_GUID, "module", _M1_GUID) in by_pair
-    assert by_pair[("process", _P2_GUID, "module", _M1_GUID)]["relationship"] == owner_verb
+    owner_edge = by_pair[("process", _P2_GUID, "module", _M1_GUID)]
+    assert owner_edge["relationship"] == owner_verb
+    assert owner_edge["confidence"] == "definitive" and owner_edge["method"] == "native_guid"

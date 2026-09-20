@@ -30,8 +30,9 @@ is ever opened without it, the same opt-in shape as ANAMNESIS_SYMBOLS_ONLINE):
           loading, and — with `--kibana-url` — imports the Kibana bundle.
 
 Discovery mirrors byakugan/timeline.py's `_find_stores`, keyed on the JSONL
-export (`car_*.jsonl`) rather than `car.db`: the input dir itself if it holds
-any, else every directory beneath it that does. A row with no parseable
+export (`car_*.jsonl` — the engine's only on-disk product, no SQLite anywhere):
+the input dir itself if it holds any, else every directory beneath it that
+does. A row with no parseable
 timestamp, or a stream this contract has no home for, is what
 `byakugan.elastic.projection` already decides (SKIP_NO_TIMESTAMP / a raised
 exception) — this module just counts the outcome.

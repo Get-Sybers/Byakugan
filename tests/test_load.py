@@ -40,12 +40,10 @@ def _build_tree(root, sources=("sysmon1", "sysmon2")):
         d = os.path.join(root, name)
         os.makedirs(d, exist_ok=True)
         events = _events(f"HOST{i}", f"{name}-")
-        st = store.CarStore(os.path.join(d, "car.db"))
+        st = store.CarStore()
         st.insert_events(events)
         st.export_jsonl(d)
-        st.close()
-        sup = superset.SupersetStore(os.path.join(d, "superset.db"))
-        sup.seed_model()
+        sup = superset.SupersetStore()
         sup.insert_edges(superset.edges_from_events(events))
         sup.insert_inferred_nodes([
             {"node_id": f"{name}-inferred-1", "source_host": f"HOST{i}", "object": "process",

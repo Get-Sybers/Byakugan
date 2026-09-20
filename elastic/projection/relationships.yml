@@ -1,6 +1,6 @@
 # HAND-AUTHORED contract — validated by `python elastic/projection/validate.py`.
-# Projection of a superset.db `relationship` row (byakugan/superset.py
-# SupersetStore._create, table `relationship`) onto the logs-car.rel-<namespace>
+# Projection of a relationship-timeline row (byakugan/superset.py
+# REL_COLUMNS, exported as car_relationships.jsonl) onto the logs-car.rel-<namespace>
 # data stream — the granular relationship TIMELINE (source_object --relationship-->
 # target_object edges, both DECLARED and DERIVED), as distinct from the
 # object-level logs-car.<object>-* streams objects/*.yml projects.
@@ -8,8 +8,8 @@
 # Not a CAR object: `rel` here names this projection file, not one of the 13
 # model/car/objects/*.yml entries validate.py cross-checks objects/*.yml
 # against — relationships.yml is checked on its own terms (see validate.py's
-# rel/inferred checks): its `fields:` must cover exactly the `relationship`
-# table's columns (minus the SQLite `id` autoincrement), no more, no fewer.
+# rel/inferred checks): its `fields:` must cover exactly superset.py's
+# REL_COLUMNS (the exported car_relationships.jsonl row), no more, no fewer.
 object: rel
 stream: logs-car.rel-*
 dataset: car.rel

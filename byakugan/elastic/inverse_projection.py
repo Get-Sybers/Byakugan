@@ -5,7 +5,7 @@ used only by `byakugan timeline --elastic` (epic #99 phase 5).
 This module undoes exactly that move — a `logs-car.<object>-*` / `logs-car.rel-*`
 document (an ES hit's `_source`) back into the SAME shape
 `byakugan/timeline.py`'s own `_object_entries` / `_edge_entries` already
-build from `car.db` / `superset.db` directly — so a timeline built from
+build from the local materialised JSONL tree directly — so a timeline built from
 Elastic and a timeline built locally are the same rows, ordered and filtered
 by the SAME code (`build_timeline`'s --host/--after/--before, `_sort_key`,
 `write_jsonl`), regardless of which tier answered the query.
@@ -37,13 +37,13 @@ never a second, hand-written field table:
     read off `store.HEADER`/`carmodel.fields()` themselves, not retyped, so a
     round-trip is BYTE-identical (`byakugan/timeline.py`'s `write_jsonl` does
     not sort keys: JSON key order is dict insertion order, and it must match
-    exactly what a real `car.db` SELECT * would have produced).
+    exactly what `store.export_jsonl()`'s own car_<object>.jsonl row order is).
 
 Loader-stamped constants (event.kind/module/dataset, data_stream.*,
 ecs.version, car.object, event.category/type and every other
 event_defaults-derived field, car.link_confidence's float) are never CAR
-data — timeline.py's OBJECT entries do not carry them either (car.db has no
-column for them), so there is nothing to invert. car.link_confidence (the
+data — timeline.py's OBJECT entries do not carry them either (the materialised
+tree has no field for them), so there is nothing to invert. car.link_confidence (the
 float) is specifically NOT the source for `link_confidence`:
 labels.link_confidence carries the verbatim pipeline word back, exactly as
 the module docstring of `byakugan.elastic.projection` documents.
@@ -229,7 +229,8 @@ def _invert_object_fields(doc: dict, name: str, plan: dict) -> dict:
 
 def invert_object(doc: dict) -> dict:
     """A logs-car.<object>-* ES `_source` -> the OBJECT timeline entry
-    `byakugan/timeline.py`'s `_object_entries` emits from car.db directly.
+    `byakugan/timeline.py`'s `_object_entries` emits from the local
+    materialised tree directly.
     Raises ValueError when `doc` does not carry a recognised `car.object`
     (the loader-stamped constant every object stream document has — a
     malformed/foreign document, never a normal projection outcome)."""
@@ -300,8 +301,8 @@ RELATIONSHIP_ENTRY_FIELDS = ("source_host", "relationship", "source_object", "so
 
 def invert_relationship(doc: dict) -> dict:
     """A logs-car.rel-* ES `_source` -> the RELATIONSHIP timeline entry
-    `byakugan/timeline.py`'s `_edge_entries` emits from superset.db's
-    `relationship` table directly -- the same 9 fields (not every
+    `byakugan/timeline.py`'s `_edge_entries` emits from
+    `car_relationships.jsonl` directly -- the same 9 fields (not every
     relationships.yml column: class/identity_key/inferred_end/
     corroborated_by ride along in the document but are not part of the
     timeline's own relationship-entry shape, so they are simply not among

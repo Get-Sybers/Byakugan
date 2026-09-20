@@ -24,8 +24,8 @@ elastic/projection/
 ├── conventions.yml                cross-cutting rules: the common header, data-stream shape,
 │                                  the car.* custom namespace, precedence/coercion rules
 ├── objects/<object>.yml           one file per CAR object (13): every object_field -> ECS, or native
-├── relationships.yml              superset.db `relationship` row -> logs-car.rel-* (the edge timeline)
-├── inferred.yml                   superset.db `inferred_node` row -> logs-car.inferred-*
+├── relationships.yml              relationship-timeline row (REL_COLUMNS) -> logs-car.rel-* (the edge timeline)
+├── inferred.yml                   inferred-node row (INFERRED_COLUMNS) -> logs-car.inferred-*
 ├── ecs_types.yml                  mapping-type overrides (date/long/ip/float/boolean) for the
 │                                  non-keyword `ecs:`/`also:`/`derived:` targets objects/*.yml uses
 ├── validate.py                    the drift check (pyyaml only) — exit 1 on any problem
@@ -126,7 +126,7 @@ ECS-shaped (a known ECS 8.x top-level field set — `car.*` homes must be
 `native: true`, never an `ecs:` path); shared targets declare `fallback: true`;
 `event_defaults` cover every `car_action` and only those; `derived:` sources
 exist. The same run also checks `relationships.yml` / `inferred.yml`: their
-`fields:` cover exactly the superset.db `relationship` / `inferred_node`
+`fields:` cover exactly the exported `relationship` / `inferred_node`
 column lists (no dup, no unknown key), every entry's `type:` (or an
 `ecs_types.yml` match) is explicit, the `document_id.recipe` names real source
 columns, and `constants:` carries the data_stream identity — and it checks
@@ -177,7 +177,7 @@ manifest is. `test_projection_contract.py` runs `--check` in CI;
 consistency (every column/sort/timeField resolves against the rendered
 mappings of the streams its data view matches, references resolve, ids are
 unique); `tests/test_projection_rel_drift.py` (repo root) checks
-`relationships.yml`/`inferred.yml` against the *live* superset.db schema, not
+`relationships.yml`/`inferred.yml` against the *live* superset.py row shapes, not
 just their own declared coverage.
 
 ## Changing it

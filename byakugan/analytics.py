@@ -1,4 +1,5 @@
-"""The behaviour layer — MITRE CAR analytics compiled over finished car.db (#12).
+"""The behaviour layer — MITRE CAR analytics compiled over a materialised CAR
+tree, or in-memory events directly (#12).
 
 The third pillar (README: normalise -> relate -> **flag TTPs**). Where the
 cascade winds a deterministic **spindle** identity onto every row and resolves
@@ -10,7 +11,7 @@ timeline (what was logged) into a *behaviour* timeline (what the adversary did).
 submodule (third_party/car/analytics/*.yaml), the same discipline carmodel.py
 uses for the object model: nothing is hand-copied, a refresh is a pin bump. The
 engine here is only the MECHANIC — a compiler from the analytic's CAR-native
-`pseudocode` implementation to a predicate over a car.db object row.
+`pseudocode` implementation to a predicate over a CAR object row.
 
     process = search Process:Create
     wsmprovhost = filter process where (exe == "wsmprovhost.exe"
@@ -50,7 +51,7 @@ _ROOT = os.path.dirname(_HERE)
 _ANALYTICS_DIR = os.path.join(_ROOT, "third_party", "car", "analytics")
 
 # CAR object words that are not one of the 13 objects (so an analytic searching
-# them cannot run against a car.db) — aliased or genuinely absent.
+# them cannot run against the CAR object model) — aliased or genuinely absent.
 _OBJECT_ALIASES = {"usersession": "user_session"}
 
 
@@ -77,7 +78,7 @@ class Clause:
 @dataclass
 class CarAnalytic:
     """A CAR analytic reconstructed from the pinned submodule and, where its
-    pseudocode compiles, a set of clauses runnable over one car.db object table."""
+    pseudocode compiles, a set of clauses runnable over one CAR object's rows."""
     id: str
     title: str
     coverage: list[Coverage]
@@ -97,7 +98,7 @@ class CarAnalytic:
 class BehaviourHit:
     """One row exhibiting one analytic clause's behaviour — a behaviour-timeline
     entry. `guid` is the matched row's spindle id (the evidence link back to its
-    observed-data / car.db row); `coverage` carries the ATT&CK technique(s)."""
+    observed-data / CAR object row); `coverage` carries the ATT&CK technique(s)."""
     analytic_id: str
     title: str
     clause: str
@@ -141,7 +142,7 @@ def _snake(word: str) -> str:
 # -- field resolution + value matching ---------------------------------------
 
 def _field(row: dict, name: str):
-    """The value of a (possibly dotted) field on a car.db row: a canonical
+    """The value of a (possibly dotted) field on a CAR object row: a canonical
     column first, then the row's `native` bag (a join key the map surfaced) —
     an absent field is None, so its clause simply does not match (honest)."""
     if name in row and not isinstance(row.get(name), dict):
@@ -504,7 +505,7 @@ def load_analytics(analytics_dir: str | None = None) -> list[CarAnalytic]:
 # -- running an analytic over rows -------------------------------------------
 
 def run_analytic(an: CarAnalytic, rows: list[dict]) -> list[BehaviourHit]:
-    """Behaviour hits for one runnable analytic over an iterable of car.db rows
+    """Behaviour hits for one runnable analytic over an iterable of CAR object rows
     (dicts with `car_action`, `guid`, `timestamp`, `source_host`, canonical
     fields and `native`). One hit per (clause, matching row)."""
     if not an.runnable:
@@ -535,16 +536,13 @@ def flag_rows(rows_by_object: dict[str, list[dict]],
     return hits
 
 
-def flag_store(car_db: str, analytics: list[CarAnalytic] | None = None) -> list[BehaviourHit]:
-    """Behaviour hits over a finished car.db, one object table at a time."""
+def flag_store(car_dir: str, analytics: list[CarAnalytic] | None = None) -> list[BehaviourHit]:
+    """Behaviour hits over a materialised source tree, one car_<object>.jsonl
+    at a time (store.read_object_jsonl — no SQLite involved)."""
     from . import store
-    st = store.CarStore(car_db)
-    try:
-        ans = analytics if analytics is not None else load_analytics()
-        objects = {an.car_object for an in ans if an.runnable}
-        rows_by_object = {obj: list(st.iter_object(obj)) for obj in objects}
-    finally:
-        st.close()
+    ans = analytics if analytics is not None else load_analytics()
+    objects = {an.car_object for an in ans if an.runnable}
+    rows_by_object = {obj: list(store.read_object_jsonl(car_dir, obj)) for obj in objects}
     return flag_rows(rows_by_object, ans)
 
 

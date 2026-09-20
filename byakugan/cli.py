@@ -11,8 +11,8 @@ environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else)
                          timeline BYAKUGAN_TIMELINE_INPUT_DIR
                          --out BYAKUGAN_TIMELINE_OUT_DIR/timeline.jsonl [--host …]
                          — or, from the logs-car.* Elastic data streams instead
-                         of car.db/superset.db (epic #99 phase 5), by passing
-                         timeline.py's own [--elastic ES_URL --namespace NS
+                         of the local materialised JSONL tree (epic #99 phase 5),
+                         by passing timeline.py's own [--elastic ES_URL --namespace NS
                          --es-api-key … | --es-user … --es-password …] through
                          BYAKUGAN_TIMELINE_ARGS (no dedicated env var: the
                          container's env-block contract is frozen)
@@ -54,9 +54,10 @@ Exit codes follow the framework's uniform table:
     0  ok            build: every source processed or already up to date;
                      timeline: written (or kept); verify: the gate PASSED;
                      load: every stream bundled (push mode: pushed+verified)
-    1  nothing       build: no source produced events; timeline: no car.db;
-                     verify: no materialised CAR under the input dir — or the
-                     gate FAILED (status `failed`, `failed` = the failed checks,
+    1  nothing       build: no source produced events; timeline: no
+                     materialised CAR under the input dir; verify: no
+                     materialised CAR under the input dir — or the gate
+                     FAILED (status `failed`, `failed` = the failed checks,
                      `failures` names them); load: no materialised CAR under
                      the input dir (status `nothing`) — or, push mode, every
                      stream failed to push (status `failed`)
@@ -318,7 +319,7 @@ def _timeline(cfg: Config, run: _Run) -> int:
     if message is not None:
         s["error"] = message
         cfg.log(0, f"engine: {message}")
-        if message.startswith("no car.db"):
+        if message.startswith("no materialised CAR"):
             return run.finish("nothing", EXIT_NOTHING)
         return run.finish("config_error", EXIT_CONFIG)
     engine = _engine_json(out, cfg, s, default={})

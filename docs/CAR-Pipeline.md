@@ -14,25 +14,30 @@ superset, reconstructed live from the pinned CAR + ATT&CK model).*
 and emits it as per-object **JSONL** (`car_<object>.jsonl`) for downstream
 ingestion (DX_DFIR ships it to Elastic).
 
-The design is deliberately small and **repeatable**. One recipe, run per source:
+The design is deliberately small and **repeatable**, and the engine is
+**elastic**: it holds a source's events in memory for the duration of a build
+and writes only the materialised JSONL tree — no SQLite anywhere. One recipe,
+run per source:
 
 ```
-input source ──▶ artefact map(s) ──▶ normalize ──▶ its own car.db ──▶ enrich
-   (a file        (object/action/      (raw row →     (SQLite, one     (self-
-    or a dir)      property rules)      CAR event)     table/object)    contained)
+input source ──▶ artefact map(s) ──▶ normalize ──▶ enrich (self- ──▶ in-memory
+   (a file        (object/action/      (raw row →     contained,        CarStore +
+    or a dir)      property rules)      CAR event)     within-source)   SupersetStore
                                                                           │
                                                         JSON out ◀────────┘
-                                              car_<object>.jsonl → downstream ingest
+                                              car_<object>.jsonl + car_relationships.jsonl
+                                              → downstream ingest
 ```
 
 It is the pipeline-wide application of what shipped in **Anamnesis v1.0.0** for
 memory: the mapping/inference logic lives in the processor we own, the store is
 finished CAR, and the query layer just reads the model instead of re-deriving it.
 
-## 2. The isolation rule — one source, one database
+## 2. The isolation rule — one source, one store
 
-**Each evidence source gets its OWN `car.db`, enriched only within itself.** A
-source is a coherent evidence set:
+**Each evidence source gets its OWN in-memory working store, enriched only
+within itself, and its own materialised JSONL tree.** A source is a coherent
+evidence set:
 
 | source | what counts as "the source" |
 |---|---|
@@ -54,7 +59,7 @@ Run it:
 
 ```
 python -m byakugan --in <file-or-dir> --out <dir> [--host NAME] [--artefacts k1,k2]
-# → <dir>/car.db  +  <dir>/car_<object>.jsonl   (one JSONL per populated object)
+# → <dir>/car_<object>.jsonl (one JSONL per populated object) + car_relationships.jsonl
 ```
 
 ## 3. Components (`byakugan/`)
@@ -68,10 +73,10 @@ python -m byakugan --in <file-or-dir> --out <dir> [--host NAME] [--artefacts k1,
 | `../go/` (`byakugan-parse`) | the **parse engine**: raw file → pre-enrichment CAR events. Holds the line reader, the winevt adapter (Plaso winevt(x) record → EvtxECmd shape, so the evtx maps run unchanged), the jlecmd flatten, the l2t container splitter (→ per-parser wrapped tables: `SourceImage`, `RecordId`, `Timestamp`, `Parser`, `Record`), the marker resolver and the spindle identity — reading the mapping tables through `internal/ir/ir.json` (`python -m byakugan.export_ir`) |
 | `ids.py` | the one id recipe — canonical JSON + the namespaces (`STIX_NS`, `CAR_NS`, `SPINDLE_NS`) — shared by the STIX projection and the spindle row guid |
 | `enrich.py` | the relationship + inheritance cascade (identity, joins, inheritance, dedupe, canonical accounts) |
-| `store.py` | the per-object SQLite CAR store + `export_jsonl()` (the downstream ingest contract) |
-| `superset.py` | the `superset.db`: the CAR+ATT&CK superset model + the relationship-instance timeline linking the car.db rows |
-| `readers.py` | `load_anamnesis_car()` — the memory passthrough (the only source that is not parsed) |
-| `pipeline.py` | orchestration: route source → normalize → enrich (self-contained) → store (car.db + superset.db) → JSON |
+| `store.py` | the in-memory per-object `CarStore` + `export_jsonl()`/`read_object_jsonl()`/`read_events()` (the downstream ingest contract and its read-back) |
+| `superset.py` | the in-memory `SupersetStore`: the relationship-instance timeline linking the object rows, exported as `car_relationships.jsonl`/`car_inferred.jsonl` |
+| `readers.py` | `load_anamnesis_car()` — the memory passthrough (the only source that is not parsed; the one place this repo still reads a `car.db` — Anamnesis's own output format) |
+| `pipeline.py` | orchestration: route source → normalize → enrich (self-contained) → in-memory store → JSONL |
 
 ## 4. The CAR data model (13 objects)
 
@@ -84,14 +89,14 @@ so there is no host model checkout at runtime. The 13 objects:
 authentication, driver, email, file, flow, http, module, process, registry,
 service, socket, thread, user_session.
 
-The store keeps **one table per object**. Each row = one CAR event: a minimal
-header (`timestamp, car_action, guid, owning_guid, link_confidence,
-source_artefact, source_host, native`) + that object's MITRE fields. Header
-columns beyond MITRE are the deliberate, labelled additions a materialized
-multi-source store needs; `parent_guid` is a process-only column (MITRE defines
-it only there); `owning_guid` is the one non-MITRE field we add — the definitive
-spoke→process link. `native` (JSON) holds evidence with no CAR home — never
-faked into a canonical column.
+The engine keeps **one in-memory collection per object** (`store.CarStore`).
+Each row = one CAR event: a minimal header (`timestamp, car_action, guid,
+owning_guid, link_confidence, source_artefact, source_host, native`) + that
+object's MITRE fields. Header columns beyond MITRE are the deliberate,
+labelled additions a materialized multi-source store needs; `parent_guid` is a
+process-only column (MITRE defines it only there); `owning_guid` is the one
+non-MITRE field we add — the definitive spoke→process link. `native` (JSON)
+holds evidence with no CAR home — never faked into a canonical column.
 
 ## 5. Artefact coverage (source → CAR objects)
 
@@ -287,7 +292,7 @@ of two sources are the same row-identity **only** on exact equality of
 kind `record` | `entity`, both keys at the same `_v` (a store pair at mixed
 versions is refused, never bridged); a `positional` identity is never equated;
 an external form equates by exact value. The boundary is the **case** — the
-batch tree (`--case`, default its basename); no car.db column is added.
+batch tree (`--case`, default its basename); no header field is added.
 `spindle.equatable_across_sources(row)` is the predicate; PR-1 ships the rule
 and the predicate only, `crosssource.py` is untouched.
 
@@ -310,8 +315,9 @@ until that corpus is processed the component is complete *within Plaso*.
 ## 8. Output contract (per-object JSONL)
 
 `store.export_jsonl()` writes one `car_<object>.jsonl` per populated object (plus
-`car_relationships.jsonl` for the `superset.db` relationship edges); each line is
-a flat CAR event (`native` kept as a JSON object). This JSONL is the downstream
+`superset.SupersetStore.export_jsonl()`'s `car_relationships.jsonl` for the
+relationship edges); each line is a flat CAR event (`native` kept as a JSON
+object). This JSONL is the downstream
 ingest contract: a downstream consumer — e.g. DX_DFIR, which ships it to Elastic —
 reads the files additive next to the existing raw evidence, so nothing already
 built changes.

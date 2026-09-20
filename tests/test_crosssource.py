@@ -14,9 +14,9 @@ from byakugan import crosssource, store
 def _store(case_dir, source, events):
     d = os.path.join(case_dir, source)
     os.makedirs(d, exist_ok=True)
-    st = store.CarStore(os.path.join(d, "car.db"))
+    st = store.CarStore()
     st.insert_events(events)
-    st.close()
+    st.export_jsonl(d)
 
 
 def _proc(guid, host="WIN10", **kw):

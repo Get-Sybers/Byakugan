@@ -25,13 +25,12 @@ def test_one_file_one_enriched_db(tmp_path):
         pytest.skip("lonewolf evidence absent")
     s = pipeline.process_file(_SEC, str(tmp_path))
     assert s["objects"] == {"authentication": 1616, "process": 40, "user_session": 875}
-    assert os.path.isfile(tmp_path / "car.db")
     assert os.path.isfile(tmp_path / "car_authentication.jsonl")
+    assert not os.path.isfile(tmp_path / "car.db")            # no SQLite anywhere
     # the in-file LUID join is self-contained and fires for every auth row
-    import sqlite3
-    c = sqlite3.connect(str(tmp_path / "car.db"))
-    linked = c.execute(
-        "SELECT COUNT(*) FROM authentication WHERE native LIKE '%session_guid%'").fetchone()[0]
+    from byakugan import store
+    linked = sum(1 for row in store.read_object_jsonl(str(tmp_path), "authentication")
+                if "session_guid" in json.dumps(row.get("native") or {}))
     assert linked == 1616   # 4624 (target LUID) + 4672 (subject LUID) all cascade-linked
     row = json.loads(open(tmp_path / "car_authentication.jsonl").readline())
     assert row["native"].get("target_session_guid") or row["native"].get("subject_session_guid")
@@ -65,10 +64,10 @@ def test_batch_discovery_and_isolation(tmp_path):
     out = tmp_path / "car"
     results = pipeline.run_batch(str(tmp_path), str(out))
     assert all("error" not in r for r in results)
-    # ISOLATION: each source got its OWN car.db
-    assert (out / "windows_logs_hostA" / "car.db").is_file()
-    assert (out / "zeek_cap1" / "car.db").is_file()
-    assert (out / "godfir_toolz_hostB" / "car.db").is_file()
+    # ISOLATION: each source got its OWN materialised tree
+    assert (out / "windows_logs_hostA" / "car_relationships.jsonl").is_file()
+    assert (out / "zeek_cap1" / "car_relationships.jsonl").is_file()
+    assert (out / "godfir_toolz_hostB" / "car_relationships.jsonl").is_file()
     # idempotent: second run skips both
     again = pipeline.run_batch(str(tmp_path), str(out))
     assert all(r.get("skipped") == "exists" for r in again)

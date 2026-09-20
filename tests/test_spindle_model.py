@@ -457,9 +457,10 @@ def _raw_l2t(rec, parser, ts_us=1600262070462820):
 
 def test_every_minted_row_of_a_full_pipeline_run_remints_from_its_own_key(tmp_path):
     """The invariant over a REAL run — a raw l2t container split, routed,
-    normalized, enriched, stored — read back from car.db: every row carrying
-    native.spindle_key re-mints to its guid (ids.guid_of == the one seam),
-    validates as a spindle, and every other row (Sysmon) keeps its raw guid."""
+    normalized, enriched, materialised — read back from the JSONL tree: every
+    row carrying native.spindle_key re-mints to its guid (ids.guid_of == the
+    one seam), validates as a spindle, and every other row (Sysmon) keeps its
+    raw guid."""
     from byakugan import derive, pipeline
     src = tmp_path / "in"
     src.mkdir()
@@ -487,7 +488,7 @@ def test_every_minted_row_of_a_full_pipeline_run_remints_from_its_own_key(tmp_pa
                                                       {"@Name": "Image", "#text": r"C:\a.exe"}]}})}) + "\n",
         encoding="utf-8")
     s = pipeline.process_file(str(src), str(tmp_path / "out"))
-    events = derive.load_events(str(tmp_path / "out" / "car.db"))
+    events = derive.load_events(str(tmp_path / "out"))
     assert s["events"] == len(events) >= 8
     minted = [e for e in events if "spindle_key" in e["_native"]]
     assert len(minted) >= 7 and all(e["guid"] for e in events)

@@ -39,10 +39,7 @@ model/
 ├── superset/
 │   ├── model-objects.yml            the CAR + ATT&CK object catalogue (38)
 │   ├── relationship-types.yml       the ATT&CK relationship vocabulary (243 edge-types)
-│   └── relationship-schema.yml      the relationship-instance table shape
-├── sql/
-│   ├── car.sql                      schema-only dump of a fresh car.db
-│   └── superset.sql                 schema + reference-model seed of superset.db
+│   └── relationship-schema.yml      the relationship-instance row shape
 └── spindle/
     ├── identity.yml                 the spindle row-identity registry, resolved against the maps
     ├── record.yml                   the shape of a spindle — a minted-identity CAR row
@@ -82,10 +79,10 @@ its `car_action` list (from the superset `model_object.actions`), and its
 - **`relationship-types.yml`** — the 243 identified ATT&CK relationships, each a
   `source --relationship--> target` edge, grouped by source element for
   navigability. This is the cascade *vocabulary*.
-- **`relationship-schema.yml`** — the column shape of the `relationship`
-  instance table in `superset.db` (`id`, `timestamp`, `source_host`,
-  `relationship`, `source_object`, `source_guid`, `target_object`,
-  `target_guid`, `confidence`, `method`).
+- **`relationship-schema.yml`** — the row shape of `SupersetStore.relationships`
+  (`timestamp`, `source_host`, `relationship`, `source_object`, `source_guid`,
+  `target_object`, `target_guid`, `confidence`, `method`, `class`,
+  `identity_key`, `inferred_end`, `corroborated_by` — `superset.REL_COLUMNS`).
 
 > **Identifier note.** `relationship-types.yml` uses the upstream ATT&CK
 > *data-element labels* (spaced, lower-case — e.g. `application log`), whereas
@@ -93,21 +90,13 @@ its `car_action` list (from the superset `model_object.actions`), and its
 > (underscored — e.g. `application_log`). They correspond one-to-one but are
 > **not string-identical**, so don't join the two files on the raw label.
 
-### `sql/` — the SQL schema snapshots
-
-Frozen `.sql` dumps of the pipeline's two SQLite databases, produced by invoking
-the **same store classes the pipeline uses** and dumping with `sqlite3`'s
-`iterdump()` — no schema is re-implemented.
-
-| File | What it holds |
-|------|---------------|
-| `car.sql` | **Schema only** — the 13 CAR-object tables, each with its canonical property columns plus `guid`/`timestamp` indexes. No event rows: CAR events only exist after evidence ingestion. |
-| `superset.sql` | Schema (`model_object`, `relationship_type`, `relationship` + indexes) **plus the reference model seed**: `model_object` (38 rows) and `relationship_type` (243 rows), reconstructed from the pinned CAR + ATT&CK model. The `relationship` instance table is empty (those rows are cascaded from evidence). |
-
-These committed snapshots are a **deliberate exception** to the repo's "nothing
-generated is committed" convention — a point-in-time record kept for safekeeping
-and easy inspection, not a live artifact. The live source of truth remains the
-pinned submodules and the store code.
+`relationship-schema.yml` is the row shape of `SupersetStore.relationships`
+(`byakugan/superset.py`'s `REL_COLUMNS`) — the engine holds this collection in
+memory for the duration of a build and writes only `car_relationships.jsonl`;
+there is no SQLite schema to snapshot any more (the `sql/` directory that used
+to hold `car.sql`/`superset.sql` dumps of the old per-source SQLite stores is
+gone — Byakugan is an elastic engine now, and the materialised JSONL tree is
+its only on-disk product; see [docs/Architecture.md](../docs/Architecture.md)).
 
 ### `spindle/` — the spindle row identity
 
@@ -183,8 +172,8 @@ python model/generate.py
 ```
 
 [`model/generate.py`](generate.py) reproduces **every** file above — the
-per-object YAML, the superset YAML, and both SQL dumps — deterministically from
-the pinned submodules. It re-uses the project's own model code rather than
+per-object YAML and the superset YAML — deterministically from the pinned
+submodules. It re-uses the project's own model code rather than
 re-implementing anything:
 
 - [`byakugan/carmodel.py`](../byakugan/carmodel.py) — loads the 13
@@ -192,9 +181,9 @@ re-implementing anything:
 - [`byakugan/build_data_model.py`](../byakugan/build_data_model.py) —
   builds the CAR + ATT&CK superset (objects) and the relationship catalogue.
 - [`byakugan/store.py`](../byakugan/store.py) — the `CarStore`
-  schema (common header + per-object columns) and `car.sql`.
+  header (`HEADER`, common to every CAR object).
 - [`byakugan/superset.py`](../byakugan/superset.py) — the
-  `SupersetStore` schema, the model/relationship-type seed, and `superset.sql`.
+  `SupersetStore` row shapes (`REL_COLUMNS`/`INFERRED_COLUMNS`).
 - [`byakugan/spindle.py`](../byakugan/spindle.py) — the spindle
   registry resolved against the maps, and the spindle record shape (`spindle/`).
 

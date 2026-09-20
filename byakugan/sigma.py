@@ -515,15 +515,12 @@ def run_rule(an: CarAnalytic, rows) -> list:
     return hits
 
 
-def flag_store(car_db: str, analytics: list[CarAnalytic]) -> list:
-    """Sigma-compiled analytics over a finished car.db -> behaviour hits."""
+def flag_store(car_dir: str, analytics: list[CarAnalytic]) -> list:
+    """Sigma-compiled analytics over a materialised source tree (car_<object>.jsonl,
+    no SQLite involved) -> behaviour hits."""
     from . import store
-    st = store.CarStore(car_db)
-    try:
-        objects = {a.car_object for a in analytics if a.runnable}
-        rows_by_object = {obj: list(st.iter_object(obj)) for obj in objects}
-    finally:
-        st.close()
+    objects = {a.car_object for a in analytics if a.runnable}
+    rows_by_object = {obj: list(store.read_object_jsonl(car_dir, obj)) for obj in objects}
     hits = []
     for an in analytics:
         if an.runnable:
@@ -547,24 +544,24 @@ def coverage_report(analytics: list[CarAnalytic]) -> dict:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """`python -m byakugan.sigma --rules <dir> [--car <db>]` — compile the
-    Sigma corpus to CAR analytics; with a car.db, run them and report the
-    behaviour hits (Byakugan detection over the cascaded CAR)."""
+    """`python -m byakugan.sigma --rules <dir> [--car-dir <dir>]` — compile the
+    Sigma corpus to CAR analytics; with a materialised car_dir, run them and
+    report the behaviour hits (Byakugan detection over the cascaded CAR)."""
     import argparse
     import collections
     import json
     ap = argparse.ArgumentParser(prog="byakugan.sigma",
                                  description="Byakugan — Sigma detection over CAR objects")
     ap.add_argument("--rules", required=True, help="a Sigma rules directory (walked for *.yml)")
-    ap.add_argument("--car", help="a finished car.db to run the rules over")
+    ap.add_argument("--car-dir", help="a materialised source tree (car_<object>.jsonl) to run the rules over")
     ap.add_argument("--include-noisy", action="store_true",
                     help="compile the whole corpus (do NOT honor hayabusa's "
                          "noisy/exclude lists or skip deprecated rules)")
     args = ap.parse_args(argv)
     ans = load_sigma_analytics(args.rules, honor_lists=not args.include_noisy)
     report = coverage_report(ans)
-    if args.car:
-        hits = flag_store(args.car, [a for a in ans if a.runnable])
+    if args.car_dir:
+        hits = flag_store(args.car_dir, [a for a in ans if a.runnable])
         techs = collections.Counter(c.technique for h in hits for c in h.coverage)
         report["hits"] = len(hits)
         report["rules_fired"] = len({h.analytic_id for h in hits})

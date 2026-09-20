@@ -2,10 +2,11 @@
 
 **Hand-authored. Validated by `validate.py`. Engine: `byakugan/stix.py`.**
 
-This directory is the one place that decides *how the finished stores become
-STIX 2.1 at export*. The projection is **derived from CAR** — `car.db` (the
-object events), `superset.db` (both relationship classes, the reconstructed
-nodes, the content-keyed attribution layer) and the `native` bag — and from
+This directory is the one place that decides *how the materialised CAR
+becomes STIX 2.1 at export*. The projection is **derived from CAR** — the
+object events (`car_<object>.jsonl`), the relationship timeline (both classes,
+the reconstructed nodes, the content-keyed attribution layer) and the
+`native` bag — and from
 nothing else. There is no parser-side STIX and no second extraction path: a
 re-export of the same stores reproduces the same bundle, byte for byte. OpenCTI
 (or any STIX consumer) is an **exchange interface only**; the stores stay the
@@ -34,15 +35,15 @@ model/stix/
 
 | STIX object | from | one per |
 |---|---|---|
-| SCOs (`process`, `file`, `directory`, `windows-registry-key`, `network-traffic`, `user-account`, `ipv4-addr`/`ipv6-addr`, `domain-name`, `url`, `email-addr`, `email-message`, `x-car-thread`) | car.db rows | entity a row observes (superset-filled across rows) |
+| SCOs (`process`, `file`, `directory`, `windows-registry-key`, `network-traffic`, `user-account`, `ipv4-addr`/`ipv6-addr`, `domain-name`, `url`, `email-addr`, `email-message`, `x-car-thread`) | object event rows | entity a row observes (superset-filled across rows) |
 | content SCOs (`file` by hash, `user-account` by real SID) | superset `content_node` (derive's content pass over the same events) | content |
-| `observed-data` | car.db rows | row with an identity and a time — the observation, `x_car_*` header, `x_car_native` verbatim, `x_car_fields` for what no SCO property homed (a guid-less row keys nothing off itself: its content/path SCOs stand, no observation — `observations_skipped_no_identity`) |
+| `observed-data` | object event rows | row with an identity and a time — the observation, `x_car_*` header, `x_car_native` verbatim, `x_car_fields` for what no SCO property homed (a guid-less row keys nothing off itself: its content/path SCOs stand, no observation — `observations_skipped_no_identity`) |
 | `relationship` | superset `relationship` | row, both classes, labelled `car:declared` / `car:derived` + `car:<method>` |
 | `x-car-inferred-node` | superset `inferred_node` | reconstructed node — flagged, never an SCO, never inside an observation |
 | `attack-pattern` | runnable CAR analytics' coverage | distinct ATT&CK id (technique / subtechnique) — **global**, content-keyed |
 | `indicator` | runnable CAR analytic | analytic (the detection, `pattern_type: car`) — **global**, keyed by the analytic id |
 | `relationship` (`indicates`) | analytic coverage | `indicator → attack-pattern`, one per technique an analytic covers — **global** |
-| `sighting` | `analytics.flag_store` over car.db | behaviour hit — a Sighting of the indicator over the row's observed-data — **case-scoped** |
+| `sighting` | `analytics` over the object events | behaviour hit — a Sighting of the indicator over the row's observed-data — **case-scoped** |
 | `identity` | — | the producer; plus one per host (`identity_class: system`) where a behaviour was sighted |
 
 ## Ids — the two scopes
@@ -83,20 +84,20 @@ observation and as STIX `confidence` (100 / 50 / 20) on the SRO.
    (`executed_as_process_guid`, `flow_guid`, `target_session_guid`,
    `target_process_guid`, `coalesced_sources`, `coalesced_conflicts`, …). The
    projection carries them verbatim and never re-derives an SRO or a `_ref` from
-   them — every SRO comes from superset.db. A spoke never mints its owner: its
+   them — every SRO comes from the relationship timeline. A spoke never mints its owner: its
    acting-process columns fill the owning process SCO only when the cascade
    resolved `owning_guid`; an unresolved owner is derive's inferred node.
 3. **The two native-only join keys** — `http.native.resp_fuids` (→ `file.guid`,
    the Zeek fuid; rule `http_file_transfer`) and `thread.native.TargetProcessGuid`
    (→ `process.guid`, the Sysmon 8 target; rule `injection_target`). They have no
    CAR column, live in native only, and the projection reads them from nowhere:
-   the derived SROs they yield come from superset.db.
+   the derived SROs they yield come from the relationship timeline.
 
 ## The behaviour layer — Sightings of ATT&CK techniques
 
 The third pillar (*normalise → relate → **flag TTPs***). After the SCOs,
-observations and SROs are projected, the finished `car.db` is read back through
-the **runnable MITRE CAR analytics** (`analytics.py`, `flag_store` — car.db
+observations and SROs are projected, the finished object events are read back
+through the **runnable MITRE CAR analytics** (`analytics.py` — the events
 only, so the "derived from the stores" contract holds) and each hit becomes STIX:
 
 - one **`attack-pattern`** per distinct ATT&CK id the analytics cover

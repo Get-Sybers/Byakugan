@@ -2,7 +2,6 @@
 1:1 links, and reconstruction into flagged inferred nodes — never CAR rows."""
 import json
 import os
-import sqlite3
 
 from byakugan import derive, enrich, store, superset
 
@@ -69,26 +68,25 @@ def test_derived_link_on_shared_hash_and_content_entities(tmp_path):
         # a well-known SID identifies no account: no content node
         _ev("user_session", "login", "U1", uid="S-1-5-18", user="SYSTEM"),
     ]
-    sup = str(tmp_path / "superset.db")
-    superset.SupersetStore(sup).close()
-    out = derive.derive(events, sup, str(tmp_path))
+    sup_store = superset.SupersetStore()
+    out = derive.derive(events, sup_store, str(tmp_path))
     assert out["derived"] == 1 and out["content_nodes"] == 2
-    c = sqlite3.connect(sup)
-    row = c.execute('SELECT "class", relationship, source_object, source_guid, target_object, '
-                    "target_guid, confidence, method, identity_key, inferred_end, corroborated_by "
-                    "FROM relationship").fetchone()
-    assert row[:10] == ("derived", "executed", "process", "P1", "file", "F1",
-                        "definitive", "shared_hash", "sha256_hash", None)
-    assert json.loads(row[10]) == ["P1", "F1"]
+    row = sup_store.relationships[0]
+    assert tuple(row[k] for k in ("class", "relationship", "source_object", "source_guid",
+                                  "target_object", "target_guid", "confidence", "method",
+                                  "identity_key", "inferred_end")) == (
+        "derived", "executed", "process", "P1", "file", "F1",
+        "definitive", "shared_hash", "sha256_hash", None)
+    assert row["corroborated_by"] == ["P1", "F1"]
     # content-keyed entities: deterministic by content, case-normalized
-    nodes = {r[0]: r for r in c.execute("SELECT node_id, kind, ref_count, properties FROM content_node")}
+    nodes = sup_store.content_nodes
     assert set(nodes) == {f"sha256:{_SHA}", "sid:S-1-5-21-1-2-3-1001"}
-    assert nodes[f"sha256:{_SHA}"][1:3] == ("file_content", 3)
-    props = json.loads(nodes[f"sha256:{_SHA}"][3])
+    assert (nodes[f"sha256:{_SHA}"]["kind"], nodes[f"sha256:{_SHA}"]["ref_count"]) == ("file_content", 3)
+    props = nodes[f"sha256:{_SHA}"]["properties"]
     assert set(props["file_path"]) == {r"C:\Tools\EVIL.EXE", r"C:\backup\evil.bak"}
-    assert json.loads(nodes["sid:S-1-5-21-1-2-3-1001"][3])["user"] == ["alice"]
+    assert nodes["sid:S-1-5-21-1-2-3-1001"]["properties"]["user"] == ["alice"]
     # every record carrying the identity references the node, with its ROLE
-    refs = set(c.execute("SELECT object, guid, node_id, identity_key FROM entity_ref"))
+    refs = {(r["object"], r["guid"], r["node_id"], r["identity_key"]) for r in sup_store.entity_refs}
     assert ("process", "P1", "sid:S-1-5-21-1-2-3-1001", "sid") in refs
     assert ("file", "F1", "sid:S-1-5-21-1-2-3-1001", "owner_uid") in refs
     assert ("file", "F2", f"sha256:{_SHA}", "sha256_hash") in refs
@@ -167,45 +165,44 @@ def test_reconstruction_creates_flagged_inferred_node_not_car_row(tmp_path):
         _ev("process", "terminate", "P9", owning_guid_native="P9"),
     ]
     events = enrich.enrich(events)
-    car = store.CarStore(str(tmp_path / "car.db"))
+    car = store.CarStore()               # in memory only — never exported here, on purpose
     car.insert_events(events)
-    sup = superset.build_superset_db(str(tmp_path), events)
-    out = derive.derive(events, sup["superset_db"], str(tmp_path))
+    sup_store = superset.build_from_events(str(tmp_path), events)
+    out = derive.derive(events, sup_store, str(tmp_path))
     assert out["inferred_nodes"] == 2 and out["derived"] == 4
 
-    c = sqlite3.connect(sup["superset_db"])
-    nodes = {r[0]: r for r in c.execute(
-        "SELECT node_id, object, identity_key, identity_value, method, corroborated_by, "
-        "properties, reason, first_seen, last_seen FROM inferred_node")}
+    nodes = sup_store.inferred_nodes
     n = nodes[gone]
-    assert n[1:5] == ("process", "guid", gone, "native_guid")
-    assert json.loads(n[5]) == ["M1", "F1", "P2"]           # every corroborating record
-    props = json.loads(n[6])
+    assert (n["object"], n["identity_key"], n["identity_value"], n["method"]) == (
+        "process", "guid", gone, "native_guid")
+    assert n["corroborated_by"] == ["M1", "F1", "P2"]        # every corroborating record
+    props = n["properties"]
     assert props["pid"] == 4242 and props["image_path"] == r"C:\evil.exe"
-    assert "reconstructed, not evidence" in n[7] and "owning_process+parent_process" in n[7]
-    assert (n[8], n[9]) == (_T0, "2020-01-01T00:00:05Z")
+    assert "reconstructed, not evidence" in n["reason"] and "owning_process+parent_process" in n["reason"]
+    assert (n["first_seen"], n["last_seen"]) == (_T0, "2020-01-01T00:00:05Z")
     # the memory owner: the guid Anamnesis would have minted for that offset
     m = nodes["proc-1a2b"]
-    assert m[1:5] == ("process", "offset", str(0x1a2b), "memory_offset")
-    assert json.loads(m[6]) == {"pid": 99}
+    assert (m["object"], m["identity_key"], m["identity_value"], m["method"]) == (
+        "process", "offset", str(0x1a2b), "memory_offset")
+    assert m["properties"] == {"pid": 99}
 
-    edges = set(c.execute(
-        'SELECT "class", relationship, source_object, source_guid, target_object, target_guid, '
-        "confidence, inferred_end, identity_key FROM relationship WHERE \"class\" = 'derived'"))
+    edges = {tuple(r[k] for k in ("class", "relationship", "source_object", "source_guid",
+                                  "target_object", "target_guid", "confidence", "inferred_end",
+                                  "identity_key"))
+             for r in sup_store.relationships if r["class"] == "derived"}
     assert ("derived", "loaded", "process", gone, "module", "M1", "inferred", "source", "guid") in edges
     assert ("derived", "modified", "process", gone, "file", "F1", "inferred", "source", "guid") in edges
     assert ("derived", "created", "process", gone, "process", "P2", "inferred", "source", "guid") in edges
     assert ("derived", "created", "process", "proc-1a2b", "thread", "T1", "inferred", "source", "offset") in edges
     # the declared cascade edge for the RESOLVED owner is untouched, and no
     # derived row was made for it
-    assert c.execute("SELECT count(*) FROM relationship WHERE \"class\"='declared' "
-                     "AND source_guid='P9' AND target_guid='R1'").fetchone()[0] == 1
+    assert sum(1 for r in sup_store.relationships
+              if r["class"] == "declared" and r["source_guid"] == "P9" and r["target_guid"] == "R1") == 1
     assert not [e for e in edges if "P9" in e]
 
-    # NEVER a fabricated CAR row: car.db holds only the observed processes
-    procs = {r[0] for r in car.conn.execute("SELECT guid FROM process")}
+    # NEVER a fabricated CAR row: the object events hold only the observed processes
+    procs = {row["guid"] for row in car.iter_object("process")}
     assert procs == {"P2", "P9"}
-    car.close()
     # the inferred nodes go to their OWN stream, flagged, not to car_process
     lines = [json.loads(l) for l in open(tmp_path / "car_inferred.jsonl")]
     assert {l["node_id"] for l in lines} == {gone, "proc-1a2b"}
@@ -226,44 +223,15 @@ def test_rederive_over_a_store_is_idempotent(tmp_path):
         _ev("file", "create", "F1", file_path=r"C:\a.exe", sha256_hash=_SHA),
         _proc("P2", _native={"ParentProcessGuid": "{LOST}"}),
     ])
-    st = store.CarStore(str(tmp_path / "car.db"))
+    st = store.CarStore()
     st.insert_events(events)
-    st.close()
-    superset.build_superset_db(str(tmp_path), events)
-    first = derive.run(str(tmp_path))            # from the store, natively kept refs only
-    again = derive.run(str(tmp_path))
+    st.export_jsonl(str(tmp_path))
+    superset.build_from_events(str(tmp_path), events)
+    first = derive.run(str(tmp_path))            # from the materialised tree, natively kept refs only
+    again = derive.run(str(tmp_path))             # recompute-fresh-each-run: same result, byte for byte
     assert first["derived"] == again["derived"] == 2
     assert first["inferred_nodes"] == again["inferred_nodes"] == 1
     assert first["relationships"] == again["relationships"]
-
-
-# --------------------------------------------------------------------------- #
-# superset.db shape: backward-compatible
-# --------------------------------------------------------------------------- #
-def test_superset_schema_is_backward_compatible(tmp_path):
-    old = str(tmp_path / "old.db")
-    c = sqlite3.connect(old)
-    c.executescript("""
-        CREATE TABLE relationship (
-            id INTEGER PRIMARY KEY, timestamp TEXT, source_host TEXT, relationship TEXT,
-            source_object TEXT, source_guid TEXT, target_object TEXT, target_guid TEXT,
-            confidence TEXT, method TEXT);
-        INSERT INTO relationship VALUES (1,'t','H','created','process','P','file','F','definitive','native_guid');
-    """)
-    c.commit(); c.close()
-    st = superset.SupersetStore(old)             # opens the old shape in place
-    cols = [r[1] for r in st.conn.execute("PRAGMA table_info(relationship)")]
-    assert cols[:10] == ["id", "timestamp", "source_host", "relationship", "source_object",
-                         "source_guid", "target_object", "target_guid", "confidence", "method"]
-    assert cols[10:] == ["class", "identity_key", "inferred_end", "corroborated_by"]
-    # the pre-existing row is intact; a cascade edge inserted now is DECLARED
-    assert st.conn.execute("SELECT source_guid, \"class\" FROM relationship").fetchone() == ("P", None)
-    st.insert_edges(superset.edges_from_events([_ev("module", "load", "M", owning_guid="P")]))
-    assert st.conn.execute("SELECT \"class\" FROM relationship WHERE id=2").fetchone() == ("declared",)
-    for t in ("inferred_node", "content_node", "entity_ref"):
-        assert st.conn.execute(f"SELECT count(*) FROM {t}").fetchone() == (0,)
-    assert st.counts()["relationships"] == 2 and st.counts()["derived"] == 0
-    st.close()
 
 
 def test_pipeline_derive_stage_is_optional(tmp_path):

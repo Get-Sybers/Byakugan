@@ -9,7 +9,8 @@ The canonical MITRE CAR model: `authentication, driver, email, file, flow, http,
 module, process, registry, service, socket, thread, user_session`. Reconstructed
 by `carmodel.load()` from `third_party/car/data_model/*.yaml` (the pinned
 [mitre-attack/car](https://github.com/mitre-attack/car) fork). CAR is the source
-of **scalar fields** — the columns of every `car.db` table.
+of **scalar fields** — the row shape of every object `store.CarStore` holds
+(and every `car_<object>.jsonl` line materialises).
 
 ## Superset — CAR + ATT&CK data-sources
 
@@ -25,7 +26,7 @@ pinned `third_party/attack-datasources` submodule):
 
 **Never a replace, always a superset** — ATT&CK data-sources carry no scalar
 fields (they describe an object as relationships to *other objects*), so replacing
-CAR would lose the car.db columns.
+CAR would lose the object model's own columns.
 
 ## Relationships — the cascade vocabulary
 
@@ -36,7 +37,8 @@ proven-relationship vocabulary. The cascade's own edges (owning-process, parent,
 auth↔session by LUID, file→process by image path, thread injection) are typed
 instances of it: `cascade_relationships.yml` maps each cascade edge to a verb, and
 a test enforces every verb exists in the reconstructed ATT&CK catalogue. The
-relationship *instances* land in `superset.db` as a timestamped timeline (see
+relationship *instances* land in `SupersetStore.relationships`, exported as
+`car_relationships.jsonl` — a timestamped timeline (see
 [Architecture.md](Architecture.md)).
 
 ## Regenerating / inspecting

@@ -1,13 +1,13 @@
 # HAND-AUTHORED contract — validated by `python elastic/projection/validate.py`.
-# Projection of a superset.db `inferred_node` row (byakugan/superset.py
-# SupersetStore._create, table `inferred_node`) onto the logs-car.inferred-<namespace>
+# Projection of an inferred-node row (byakugan/superset.py
+# INFERRED_COLUMNS, exported as car_inferred.jsonl) onto the logs-car.inferred-<namespace>
 # data stream — the stream superset.py's export_inferred_jsonl docstring already
 # promises ("car_inferred.jsonl ... destined for its own stream (logs-car.inferred-*),
 # never a car_<object>").
 #
 # An inferred_node is a node no source OBSERVED — reconstructed from what other
 # records reference (byakugan/derive.py reconstruct()); it is NEVER written as
-# a car.db event row, so it is not one of the 13 CAR objects either. Like
+# an object event row, so it is not one of the 13 CAR objects either. Like
 # relationships.yml, it is checked on its own terms (see validate.py's
 # rel/inferred checks): `fields:` must cover exactly the `inferred_node`
 # table's columns (minus the SQLite `id` autoincrement).

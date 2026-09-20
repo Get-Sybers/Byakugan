@@ -186,7 +186,7 @@ def test_enrich_two_tier_owner_and_inheritance():
 
 def test_store_roundtrip_and_jsonl_export(tmp_path):
     ev = go_normalize("evtx_security", _SEC_4624)
-    st = store.CarStore(str(tmp_path / "car.db"))
+    st = store.CarStore()
     assert st.insert_events(enrich.enrich([ev])) == 1
     assert st.counts() == {"authentication": 1}
     written = st.export_jsonl(str(tmp_path / "json"))
