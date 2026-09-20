@@ -307,6 +307,28 @@ def test_push_mode_chunks_and_verifies(tmp_path, es_stub):
     assert len(state["indices"][stream]) == 2500
 
 
+def test_push_mode_es_url_scheme_is_plain_http_not_https(tmp_path, es_stub):
+    """`--es-url` takes the URL's OWN scheme — push mode never requires or
+    assumes https. The standalone lab stack (elastic/, HTTP TLS off — see
+    elastic/README.md) is reached over plain http://127.0.0.1:9201, so this
+    makes that contract explicit rather than incidental: every `es_stub` push
+    test above already runs over http (the stub only ever serves plain HTTP),
+    proving it end to end; this test just names why that is safe. `load.run`
+    always builds a TLS `ssl_context` (`byakugan._http.ssl_context`, shared
+    with `byakugan.timeline --elastic`) regardless of `--es-url`'s scheme —
+    `urllib` simply never consults an SSL context for a plain http:// request,
+    so passing one is harmless and pushing to an http:// stack works exactly
+    like pushing to an https:// one would."""
+    es_url, _state = es_stub
+    assert es_url.startswith("http://") and not es_url.startswith("https://")
+    car = str(tmp_path / "car")
+    _build_tree(car, sources=("s1",))
+    out = str(tmp_path / "out")
+    summary = load.run(car, out, "default", es_url=es_url)
+    assert summary["status"] == "ok" and summary["mode"] == "push"
+    assert summary["streams"]["logs-car.process-default"]["created"] == 1
+
+
 def test_push_mode_conflict_is_already_present(tmp_path, es_stub):
     es_url, state = es_stub
     car = str(tmp_path / "car")

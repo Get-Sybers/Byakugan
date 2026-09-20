@@ -24,15 +24,19 @@ environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else)
     byakugan car-vocab   {object: [car_actions]} — the canonical car_action
                          vocabulary the verify gate checks values against; its
                          stdout IS that JSON, one line
-    byakugan load        bulk-load a materialised car tree into the DX_DFIR
-                         Elastic stack's logs-car.* data streams (the CAR->ECS
-                         projection contract, byakugan.projection/byakugan.load):
+    byakugan load        bulk-load a materialised car tree into an Elastic
+                         stack's logs-car.* data streams (the CAR->ECS
+                         projection contract, byakugan.projection/byakugan.load)
+                         — the DX_DFIR-integrated stack, Byakugan's own
+                         standalone one (elastic/), or any other Elasticsearch
+                         that serves the same contract:
                          load BYAKUGAN_LOAD_INPUT_DIR --out BYAKUGAN_LOAD_OUT_DIR
                          --namespace BYAKUGAN_LOAD_NAMESPACE [--force] — offline
                          Elasticsearch _bulk NDJSON bundles by default, or also
-                         pushed over HTTPS when BYAKUGAN_LOAD_ES_URL is set
-                         (push mode: [--es-url …] [--es-api-key … | --es-user …
-                         --es-password …|--es-password-file …] [--es-ca-file …]
+                         pushed over HTTP(S) when BYAKUGAN_LOAD_ES_URL is set
+                         (the URL's own scheme; push mode: [--es-url …]
+                         [--es-api-key … | --es-user … --es-password …|
+                         --es-password-file …] [--es-ca-file …]
                          [--setup [--kibana-url …]])
 
 Each batch sub-tool reads its own env block — BYAKUGAN_<SUBTOOL>_INPUT_DIR

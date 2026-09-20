@@ -1,6 +1,9 @@
-"""`byakugan load` — a materialised CAR tree -> the DX_DFIR Elastic stack's
+"""`byakugan load` — a materialised CAR tree -> an Elastic stack's
 `logs-car.*` data streams (epic #99 phase 2), per the projection contract
-`byakugan.projection` implements. Runtime dependencies stay stdlib + pyyaml
+`byakugan.projection` implements — the DX_DFIR-integrated stack, Byakugan's
+own standalone one (`elastic/`), or any other Elasticsearch that serves the
+same contract; push mode dials whatever `--es-url` names, over that URL's own
+scheme (http or https). Runtime dependencies stay stdlib + pyyaml
 (via `byakugan.projection`) only — no elasticsearch client library; every
 network call is stdlib `urllib`.
 
