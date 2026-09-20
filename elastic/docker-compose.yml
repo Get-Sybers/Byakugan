@@ -9,10 +9,11 @@ name: byakugan-standalone
 # es_docker_stack Ansible role uses for its local/dev Elastic
 # (deploy/ansible/roles/es_docker_stack/tasks/elasticsearch.yml: security IS
 # on, only HTTP TLS is off; every port stays bound to 127.0.0.1). Byakugan's
-# OWN certificate/CA code path (byakugan/load.py --es-ca-file, byakugan/_http.py
-# ssl_context) is exercised for real against the DX_DFIR-integrated stack
-# (../../DX_DFIR/docker/elastic/), which DOES run HTTP+transport TLS behind a
-# generated CA. Nothing about that contract changes here — this stack is
+# OWN certificate/CA code path (byakugan/elastic/load.py --es-ca-file,
+# byakugan/elastic/_http.py ssl_context) is exercised for real against the
+# DX_DFIR-integrated stack (../../DX_DFIR/docker/elastic/), which DOES run
+# HTTP+transport TLS behind a generated CA. Nothing about that contract
+# changes here — this stack is
 # reachable over plain http://127.0.0.1:9201, authenticated, nothing more.
 #
 # Project name `byakugan-standalone` (this line) is deliberately NOT
@@ -87,7 +88,7 @@ services:
       TELEMETRY_OPTIN: "false"
       # no XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY / XPACK_SECURITY_ENCRYPTIONKEY:
       # this stack imports only a data view + a saved search (--setup, via
-      # `byakugan.load`) — nothing that needs encrypted saved objects (no
+      # `byakugan.elastic.load`) — nothing that needs encrypted saved objects (no
       # Fleet, no alerting). Kibana self-generates an ephemeral session key
       # and logs a one-line warning about it; fine for a disposable lab
       # stack, restart-stable state is not a goal here.

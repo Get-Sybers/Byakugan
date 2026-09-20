@@ -26,10 +26,10 @@ environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else)
                          stdout IS that JSON, one line
     byakugan load        bulk-load a materialised car tree into an Elastic
                          stack's logs-car.* data streams (the CAR->ECS
-                         projection contract, byakugan.projection/byakugan.load)
-                         — the DX_DFIR-integrated stack, Byakugan's own
-                         standalone one (elastic/), or any other Elasticsearch
-                         that serves the same contract:
+                         projection contract, byakugan.elastic.projection/
+                         byakugan.elastic.load) — the DX_DFIR-integrated
+                         stack, Byakugan's own standalone one (elastic/), or
+                         any other Elasticsearch that serves the same contract:
                          load BYAKUGAN_LOAD_INPUT_DIR --out BYAKUGAN_LOAD_OUT_DIR
                          --namespace BYAKUGAN_LOAD_NAMESPACE [--force] — offline
                          Elasticsearch _bulk NDJSON bundles by default, or also
@@ -380,11 +380,12 @@ def _slugify_namespace(raw: str) -> str | None:
 
 
 def _load(cfg: Config, run: _Run) -> int:
-    """`byakugan load`: BYAKUGAN_LOAD_* -> `byakugan.load`'s own CLI, wired
-    like build/timeline (run_engine + its one JSON summary line as `engine`).
-    Bundle mode (BYAKUGAN_LOAD_ES_URL unset) never touches the network; the
-    ES_* / KIBANA_URL / SETUP variables are only even resolved in push mode."""
-    from .load import main as load_main
+    """`byakugan load`: BYAKUGAN_LOAD_* -> `byakugan.elastic.load`'s own CLI,
+    wired like build/timeline (run_engine + its one JSON summary line as
+    `engine`). Bundle mode (BYAKUGAN_LOAD_ES_URL unset) never touches the
+    network; the ES_* / KIBANA_URL / SETUP variables are only even resolved
+    in push mode."""
+    from .elastic.load import main as load_main
     s = run.summary
     ns = _slugify_namespace(cfg.get("NAMESPACE", "default"))
     if ns is None:
@@ -525,7 +526,7 @@ def main(argv: list[str] | None = None) -> int:
         from .verify import main as verify_main
         return verify_main(argv[1:])
     if argv[0] == "load":
-        from .load import main as load_main
+        from .elastic.load import main as load_main
         return load_main(argv[1:])
     if argv[0] == "car-vocab":
         usage()

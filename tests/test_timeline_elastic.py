@@ -1,13 +1,14 @@
 """`byakugan timeline --elastic`: the SAME timeline.jsonl, byte-for-byte,
 whether it is built from car.db/superset.db or from the logs-car.* data
 streams `byakugan load` populated (epic #99 phase 5) — the correctness
-anchor for byakugan/inverse_projection.py + timeline.py's Elastic source.
+anchor for byakugan/elastic/inverse_projection.py + timeline.py's Elastic
+source.
 
 A: the LOCAL timeline (build_timeline + write_jsonl) over a synthetic
    materialised tree.
-B: `byakugan.load` bundle mode over the SAME tree, served from a stdlib
-   http.server ES stub (point-in-time + search_after, 2+ pages), fetched
-   with `timeline.build_timeline_from_elastic` + write_jsonl.
+B: `byakugan.elastic.load` bundle mode over the SAME tree, served from a
+   stdlib http.server ES stub (point-in-time + search_after, 2+ pages),
+   fetched with `timeline.build_timeline_from_elastic` + write_jsonl.
 
 A == B, byte-for-byte — ordering, filtering and JSON rendering all come from
 the exact same shared code (timeline._filter_and_sort / _sort_key /
@@ -23,7 +24,8 @@ import threading
 
 import pytest
 
-from byakugan import load, store, superset, timeline
+from byakugan import store, superset, timeline
+from byakugan.elastic import load
 
 NAMESPACE = "default"
 
@@ -34,7 +36,7 @@ NAMESPACE = "default"
 # given in a form that round-trips byte-exactly through ECS coercion/
 # normalisation (native Python types for typed fields, canonical-form
 # strings for the rules.verbatim normalisations) — see
-# byakugan/inverse_projection.py's own docstring for exactly which cases
+# byakugan/elastic/inverse_projection.py's own docstring for exactly which cases
 # that sidesteps and why they are not phase-5's to fix.
 # --------------------------------------------------------------------------- #
 def _events(host: str, prefix: str) -> list[dict]:
@@ -107,7 +109,7 @@ def _build_tree(root: str, sources=("sysmon1", "sysmon2")) -> str:
 
 # --------------------------------------------------------------------------- #
 # The ES stub: point-in-time open/close + search_after paging, serving the
-# EXACT (doc_id, doc) pairs `byakugan.load` bundle mode rendered (no _bulk
+# EXACT (doc_id, doc) pairs `byakugan.elastic.load` bundle mode rendered (no _bulk
 # round-trip needed -- bundle mode already produced the real projected
 # bytes; this just loads them into the stub's per-stream store).
 # --------------------------------------------------------------------------- #
@@ -251,13 +253,13 @@ def test_elastic_timeline_matches_local_byte_for_byte(tmp_path, es_stub, monkeyp
     out_a = str(tmp_path / "local.jsonl")
     timeline.write_jsonl(rows_a, out_a)
 
-    # B: byakugan.load bundle mode over the SAME tree -> the exact bulk
-    # (doc_id, doc) pairs a push would have sent -> the stub's own indices.
+    # B: byakugan.elastic.load bundle mode over the SAME tree -> the exact
+    # bulk (doc_id, doc) pairs a push would have sent -> the stub's own indices.
     out_dir = str(tmp_path / "out")
     summary = load.run(car, out_dir, NAMESPACE)
     assert summary["status"] == "ok"
     state["indices"] = _seed_from_bundles(os.path.join(out_dir, "elastic"))
-    assert state["indices"], "byakugan.load produced no bundles to seed the stub with"
+    assert state["indices"], "byakugan.elastic.load produced no bundles to seed the stub with"
 
     rows_b = timeline.build_timeline_from_elastic(es_url, NAMESPACE)
     out_b = str(tmp_path / "elastic.jsonl")
@@ -305,7 +307,7 @@ def test_elastic_timeline_host_filter_matches_local(tmp_path, es_stub, monkeypat
 
 
 def test_elastic_fetch_never_touches_the_inferred_stream_even_unfiltered_locally(tmp_path, es_stub):
-    """byakugan.projection.SKIP_NO_TIMESTAMP-independent sanity check: the
+    """byakugan.elastic.projection.SKIP_NO_TIMESTAMP-independent sanity check: the
     inferred stream genuinely holds documents in this fixture (so its
     absence from streams_seen in the tests above is not just because there
     was nothing there to find)."""

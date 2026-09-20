@@ -71,7 +71,7 @@ Legend — **action**: which socket action the row carries. **mapped?**: `yes+wh
 ### `local_path` — AF_UNIX socket filesystem path (`/tmp/foo`)
 | source (native → field) | action | mapped? | confidence & caveats |
 |---|---|---|---|
-| — | — | **NO SOURCE (honest gap)** | Only a **Linux/AF_UNIX** concept. Would require **auditd `SOCKADDR`** (`saddr` unix path) — not implemented (`plaso_linux.py` has no socket mapping). Windows memory netscan is IP-only; 5158 has no path. **Even the upstream CAR coverage map leaves `local_path` empty for all three actions** (`docs/data_model/socket.md`). The ECS projection reserves `local_path → file.path` (`model/projection/objects/socket.yml`), but nothing feeds it. |
+| — | — | **NO SOURCE (honest gap)** | Only a **Linux/AF_UNIX** concept. Would require **auditd `SOCKADDR`** (`saddr` unix path) — not implemented (`plaso_linux.py` has no socket mapping). Windows memory netscan is IP-only; 5158 has no path. **Even the upstream CAR coverage map leaves `local_path` empty for all three actions** (`docs/data_model/socket.md`). The ECS projection reserves `local_path → file.path` (`elastic/projection/objects/socket.yml`), but nothing feeds it. |
 
 ### `local_port` — bound port at the local end
 | source (native → field) | action | mapped? | confidence & caveats |

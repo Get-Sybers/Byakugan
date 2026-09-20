@@ -131,7 +131,7 @@ id_derivation:
       those ids; the global ids are already conformant.
 
 # ---------------------------------------------------------------------------
-# Identity conventions — mirror model/projection/conventions.yml (CAR -> ECS).
+# Identity conventions — mirror elastic/projection/conventions.yml (CAR -> ECS).
 identity_conventions:
   guid: >-
     observed-data.x_car_event_id (ECS event.id) — the row identity, in one of four forms, never

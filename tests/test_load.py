@@ -8,7 +8,8 @@ import threading
 
 import pytest
 
-from byakugan import cli, load, projection, store, superset
+from byakugan import cli, store, superset
+from byakugan.elastic import load, projection
 
 
 # --------------------------------------------------------------------------- #
@@ -314,7 +315,7 @@ def test_push_mode_es_url_scheme_is_plain_http_not_https(tmp_path, es_stub):
     makes that contract explicit rather than incidental: every `es_stub` push
     test above already runs over http (the stub only ever serves plain HTTP),
     proving it end to end; this test just names why that is safe. `load.run`
-    always builds a TLS `ssl_context` (`byakugan._http.ssl_context`, shared
+    always builds a TLS `ssl_context` (`byakugan.elastic._http.ssl_context`, shared
     with `byakugan.timeline --elastic`) regardless of `--es-url`'s scheme —
     `urllib` simply never consults an SSL context for a plain http:// request,
     so passing one is harmless and pushing to an http:// stack works exactly

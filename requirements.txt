@@ -22,7 +22,7 @@
 #   2. pip install -r requirements.txt
 #   3. re-prove the repo:
 #        python -m pytest -q
-#        python model/projection/validate.py
+#        python elastic/projection/validate.py
 #        python model/stix/validate.py
 #        python -m byakugan.gen_sources --check
 #        python -m byakugan.spindle --check

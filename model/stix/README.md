@@ -11,7 +11,7 @@ re-export of the same stores reproduces the same bundle, byte for byte. OpenCTI
 (or any STIX consumer) is an **exchange interface only**; the stores stay the
 truth.
 
-Like `model/projection/` (CAR → ECS), nothing here is generated: a projection
+Like `elastic/projection/` (CAR → ECS), nothing here is generated: a projection
 is a *decision* (is a Windows service a `process` with `windows-service-ext`,
 or nothing? — a process), and decisions are authored, reviewed and versioned by
 hand. What is mechanical is keeping them in step with the generated CAR model
@@ -152,6 +152,6 @@ python -m byakugan --in <src> --out <dir> --derive --stix   # export as a pipeli
 ## What this is not
 
 - Not an OpenCTI connector or data model — the bundle is the interface.
-- Not the CAR → ECS loader contract (`model/projection/`) — the two mirror the
+- Not the CAR → ECS loader contract (`elastic/projection/`) — the two mirror the
   same identity conventions and are otherwise independent.
 - Not a replacement for the JSONL exports; additive.

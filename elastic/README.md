@@ -37,17 +37,18 @@ top-level README's "Quickstart"). Then wire it straight into this stack:
 
 ```sh
 set -a; source .env; set +a       # so $ELASTIC_PASSWORD below is the one you just set
-python -m byakugan.load <car-tree> \
+python -m byakugan.elastic.load <car-tree> \
     --es-url http://127.0.0.1:9201 \
     --es-user elastic --es-password "$ELASTIC_PASSWORD" \
     --setup --kibana-url http://127.0.0.1:5602 \
     --namespace <case>
 ```
 
-(Flags are `byakugan.load`'s own — `--es-url`, `--es-user`/`--es-password`
+(Flags are `byakugan.elastic.load`'s own — `--es-url`, `--es-user`/`--es-password`
 [or `--es-password-file`, or `--es-api-key`], `--es-ca-file` (not needed here:
-no HTTP TLS), `--setup`, `--kibana-url`, `--namespace`; see `byakugan/load.py`'s
-module docstring or `python -m byakugan.load --help`. The container form is
+no HTTP TLS), `--setup`, `--kibana-url`, `--namespace`; see
+`byakugan/elastic/load.py`'s module docstring or
+`python -m byakugan.elastic.load --help`. The container form is
 `BYAKUGAN_LOAD_ES_URL=http://127.0.0.1:9201 BYAKUGAN_LOAD_ES_USER=elastic
 BYAKUGAN_LOAD_ES_PASSWORD=... BYAKUGAN_LOAD_SETUP=1
 BYAKUGAN_LOAD_KIBANA_URL=http://127.0.0.1:5602 BYAKUGAN_LOAD_NAMESPACE=<case>
@@ -57,14 +58,14 @@ This one command:
 
 1. projects every `car_<object>.jsonl` / `car_relationships.jsonl` /
    `car_inferred.jsonl` under `<car-tree>` through the CAR->ECS contract
-   (`model/projection/`) into `_bulk` NDJSON and POSTs it to
+   (`elastic/projection/`) into `_bulk` NDJSON and POSTs it to
    `logs-car.<object>-<case>` / `logs-car.rel-<case>` / `logs-car.inferred-<case>`
    data streams, verifying per-stream document counts;
 2. `--setup` PUTs the contract's rendered component templates then index
-   templates (`model/projection/rendered/{component_templates,index_templates}/*.json`)
+   templates (`elastic/projection/rendered/{component_templates,index_templates}/*.json`)
    first — skipping any already applied unchanged, so re-running `--setup` is
    safe;
-3. `--kibana-url` additionally imports `model/projection/rendered/kibana/logs-car-views.ndjson`:
+3. `--kibana-url` additionally imports `elastic/projection/rendered/kibana/logs-car-views.ndjson`:
    a `logs-car.*` data view, a `car-timeline` saved search, a
    `car-timeline-histogram` Lens visualisation and a `car-timeline-dashboard`
    dashboard — open Kibana at `http://127.0.0.1:5602` and go to that
@@ -110,7 +111,7 @@ Server and Filebeat as the raw-evidence shipper, HTTP+transport TLS behind a
 generated CA, and a least-privilege `byakugan_loader` identity for routine
 loads — built for DX_DFIR's wider multi-tool orchestration. Both are single-node,
 Basic-licence Elastic; **both consume exactly the same rendered contract**
-(`model/projection/rendered/`) through the exact same `byakugan.load`
+(`elastic/projection/rendered/`) through the exact same `byakugan.elastic.load`
 (bundle or push) and `byakugan.timeline --elastic` this engine ships — nothing
 about the CAR->ECS projection, the data-stream names or the loader's argv
 differs between them. Pick this stack when Byakugan is the whole job; point

@@ -1,0 +1,97 @@
+# HAND-AUTHORED contract — validated by `python elastic/projection/validate.py`.
+# Projection of a superset.db `inferred_node` row (byakugan/superset.py
+# SupersetStore._create, table `inferred_node`) onto the logs-car.inferred-<namespace>
+# data stream — the stream superset.py's export_inferred_jsonl docstring already
+# promises ("car_inferred.jsonl ... destined for its own stream (logs-car.inferred-*),
+# never a car_<object>").
+#
+# An inferred_node is a node no source OBSERVED — reconstructed from what other
+# records reference (byakugan/derive.py reconstruct()); it is NEVER written as
+# a car.db event row, so it is not one of the 13 CAR objects either. Like
+# relationships.yml, it is checked on its own terms (see validate.py's
+# rel/inferred checks): `fields:` must cover exactly the `inferred_node`
+# table's columns (minus the SQLite `id` autoincrement).
+object: inferred
+stream: logs-car.inferred-*
+dataset: car.inferred
+
+# Same shape as relationships.yml constants; no car.object here either — an
+# inferred_node is reconstructed evidence about an object, not a CAR object
+# event itself. `object` (the CAR object type it would have been) is a DATA
+# field below (car.inferred.object), exactly as source_object/target_object
+# are data fields on the rel stream.
+constants:
+  event.kind: event
+  event.module: car
+  event.dataset: car.inferred
+  data_stream.type: logs
+  data_stream.dataset: car.inferred
+  ecs.version: '8.11.0'
+
+document_id:
+  recipe: node_id
+  note: >-
+    node_id verbatim — already deterministic by construction (derive.py mints it as the
+    referenced guid itself, or the artefact's own minted form of it; byakugan/superset.py:
+    "the deterministic handle a derived relationship's inferred end resolves to"). No hash
+    needed: re-deriving the same evidence reconstructs the same node_id, so loading it twice
+    is already idempotent.
+
+fields:
+  - car: first_seen
+    ecs: '@timestamp'
+    type: date
+    also: car.inferred.first_seen
+    also_type: date
+    note: >-
+      the stream's time axis (earliest corroborating record); no verbatim-string concern here
+      (unlike relationships.yml timestamp) since document_id is node_id, not a hash of this
+      value — so the also: copy stays a clean date, for range queries scoped to car.inferred.*.
+  - car: last_seen
+    ecs: car.inferred.last_seen
+    type: date
+    note: the latest corroborating record's timestamp.
+  - car: source_host
+    ecs: host.name
+    type: keyword
+    note: the evidence host — same convention as every object stream's header source_host.
+  - car: node_id
+    ecs: car.inferred.node_id
+    type: keyword
+    note: kept as ordinary data too, alongside its use as the document_id (a reader should not have to decode the id to recover it).
+  - car: object
+    ecs: car.inferred.object
+    type: keyword
+    note: the CAR object this node would have been (process, file, ...) had a source observed it.
+  - car: identity_key
+    ecs: car.inferred.identity_key
+    type: keyword
+    note: the reference field the reconstruction matched on (byakugan/derive.py rule identity).
+  - car: identity_value
+    ecs: car.inferred.identity_value
+    type: keyword
+    note: the value of that reference (the guid string, the offset, ...) — the reconstructed node's own identity.
+  - car: reason
+    ecs: car.inferred.reason
+    type: text
+    note: >-
+      a generated sentence, not a code (byakugan/derive.py reconstruct(): "<rule>: referenced by
+      N observed record(s) via <identity_key>; no <object> event observed (reconstructed, not
+      evidence)") — free text, like the object streams' own prose fields (car.<object>.content /
+      message_body / call_trace), so `text` rather than `keyword`.
+  - car: method
+    ecs: car.inferred.method
+    type: keyword
+    note: the reconstruction rule's method name (byakugan/derive.py rule.method) — open vocabulary, see relationships.yml method.
+  - car: corroborated_by
+    ecs: car.inferred.corroborated_by
+    type: keyword
+    note: the observed-record guids that reference this node (byakugan/superset.py _JSON_COLS) — an ECS array of keyword; array-valued.
+  - car: properties
+    ecs: car.inferred.properties
+    type: flattened
+    note: >-
+      the JSON bag of properties the reconstruction could recover off the referencing records
+      (byakugan/derive.py reconstruct(): additive, a disagreement kept under a nested
+      `conflicts` key rather than overwritten) — shape varies by object and rule, so flattened,
+      exactly like the object streams' car.native.

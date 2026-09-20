@@ -70,8 +70,8 @@ python -m byakugan.timeline <car-dir> --elastic <es-url> --namespace <ns>   # ti
 
 python -m byakugan.verify <car-dir>                 # verify: the CAR run-through (correctness gate)
 
-python -m byakugan.load <car-dir>                   # load: bundle mode — offline _bulk NDJSON, no network
-python -m byakugan.load <car-dir> --es-url <url> --es-user <u> --es-password <p>   # load: push mode — also POSTs it
+python -m byakugan.elastic.load <car-dir>                   # load: bundle mode — offline _bulk NDJSON, no network
+python -m byakugan.elastic.load <car-dir> --es-url <url> --es-user <u> --es-password <p>   # load: push mode — also POSTs it
 
 byakugan car-vocab                                  # the canonical car_action vocabulary, one JSON line
 byakugan build|timeline|verify|car-vocab|load       # env-driven (BYAKUGAN_<SUBTOOL>_*): one JSON summary line
@@ -107,7 +107,7 @@ Each evidence source becomes a **materialised CAR tree** —
 granular relationship-instance timeline), plus `car_inferred.jsonl` with
 `--derive` — and that JSONL is **the interchange every consumer reads**:
 downstream ingestion, `byakugan.timeline`, `byakugan.verify` and
-`byakugan.load` all read it, never the databases behind it directly.
+`byakugan.elastic.load` all read it, never the databases behind it directly.
 
 Behind that tree sit the engine's own **per-source working stores** — kept
 alongside the JSONL for inspection, never a second contract to read:
@@ -119,7 +119,7 @@ alongside the JSONL for inspection, never a second contract to read:
   car.db events — a second, more granular relationship timeline.
 
 `byakugan load` projects that same materialised tree, through the CAR→ECS
-projection contract (`model/projection/`), into `logs-car.*` Elasticsearch
+projection contract (`elastic/projection/`), into `logs-car.*` Elasticsearch
 data streams — the **served, queryable tier**: bundle mode renders the
 `_bulk` NDJSON offline (the air-gap path); push mode also POSTs it, to
 DX_DFIR's integrated stack, Byakugan's own standalone one

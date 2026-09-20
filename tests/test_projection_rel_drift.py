@@ -1,6 +1,6 @@
-"""relationships.yml / inferred.yml (model/projection/) declare the exact
+"""relationships.yml / inferred.yml (elastic/projection/) declare the exact
 column lists of superset.db's `relationship` / `inferred_node` tables (minus
-the `id` autoincrement). model/projection/validate.py checks that declaration
+the `id` autoincrement). elastic/projection/validate.py checks that declaration
 is internally consistent (no dup, no unknown key, every column covered)
 against a list it hardcodes, since it stays pyyaml-only and cannot import
 byakugan. This is the other half: it derives the REAL, live column list from
@@ -18,7 +18,7 @@ import yaml
 from byakugan import superset
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
-PROJECTION = REPO_ROOT / "model" / "projection"
+PROJECTION = REPO_ROOT / "elastic" / "projection"
 
 
 def _table_columns(conn: sqlite3.Connection, table: str) -> list:
@@ -39,7 +39,7 @@ def test_relationships_yml_matches_the_live_relationship_schema(tmp_path):
     declared = _declared_columns("relationships.yml")
     assert len(declared) == len(set(declared)), "relationships.yml: duplicate car: entries"
     assert set(declared) == set(live), (
-        "model/projection/relationships.yml is out of step with byakugan.superset's live "
+        "elastic/projection/relationships.yml is out of step with byakugan.superset's live "
         f"`relationship` schema -- missing {sorted(set(live) - set(declared))}, "
         f"extra {sorted(set(declared) - set(live))}")
 
@@ -52,6 +52,6 @@ def test_inferred_yml_matches_the_live_inferred_node_schema(tmp_path):
     declared = _declared_columns("inferred.yml")
     assert len(declared) == len(set(declared)), "inferred.yml: duplicate car: entries"
     assert set(declared) == set(live), (
-        "model/projection/inferred.yml is out of step with byakugan.superset's live "
+        "elastic/projection/inferred.yml is out of step with byakugan.superset's live "
         f"`inferred_node` schema -- missing {sorted(set(live) - set(declared))}, "
         f"extra {sorted(set(declared) - set(live))}")

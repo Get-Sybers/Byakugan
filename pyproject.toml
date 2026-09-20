@@ -40,7 +40,11 @@ pythonpath = ["tests"]
 [tool.setuptools]
 # byakugan.adapters is gone: the winevt/jlecmd/l2t-split plumbing it held now
 # lives in the Go parse engine (go/internal/{adapt,split}).
-packages = ["byakugan", "byakugan.mappings"]
+# byakugan.elastic is the Elastic runtime (load/projection/inverse_projection/
+# _http); the projection CONTRACT it reads is not code and is not packaged
+# here — it lives at the repo root's elastic/projection/, read from the
+# checked-out source tree like the CAR model itself.
+packages = ["byakugan", "byakugan.mappings", "byakugan.elastic"]
 
 [tool.setuptools.package-data]
 # the CAR/superset models + ATT&CK relationships are reconstructed live from the

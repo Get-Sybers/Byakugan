@@ -1,5 +1,8 @@
 # The served store: SQLite → Elasticsearch — decision and cross-repo plan
 
+*(Since implemented; the projection contract now lives in
+`elastic/projection/` and the Elastic runtime in `byakugan/elastic/`.)*
+
 **Status: proposed.** This document decides what replaces SQLite as the
 database Byakugan's consumers query, and lays out the migration across the
 repos that produce, package and consume CAR data. It was researched against

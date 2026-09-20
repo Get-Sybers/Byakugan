@@ -12,14 +12,14 @@ aggregate every source under it.
 SOURCE (epic #99 phase 5): the same rows can come from Elasticsearch instead
 of car.db/superset.db — `--elastic <es-url>` (with `--namespace`, default
 "default") builds the timeline from the `logs-car.*-<namespace>` data
-streams `byakugan load` populated, via `byakugan.inverse_projection`'s
-ECS->CAR inverse of the SAME projection contract `byakugan.load` projects
-forward. `<car_dir>` is then only the default --out directory (no car.db is
-read). Auth/TLS: `--es-api-key`, or `--es-user` with `--es-password` /
-`--es-password-file`, and `--es-ca-file` for the server's CA bundle — the
-same flags/shapes `byakugan.load`'s push mode takes, via the same shared
-`byakugan._http` helpers. --host/--after/--before, --objects-only/
---edges-only, the output ordering and timeline.jsonl bytes are unchanged
+streams `byakugan load` populated, via `byakugan.elastic.inverse_projection`'s
+ECS->CAR inverse of the SAME projection contract `byakugan.elastic.load`
+projects forward. `<car_dir>` is then only the default --out directory (no
+car.db is read). Auth/TLS: `--es-api-key`, or `--es-user` with
+`--es-password` / `--es-password-file`, and `--es-ca-file` for the server's
+CA bundle — the same flags/shapes `byakugan.elastic.load`'s push mode takes,
+via the same shared `byakugan.elastic._http` helpers. --host/--after/--before,
+--objects-only/--edges-only, the output ordering and timeline.jsonl bytes are unchanged
 either way: an Elastic-sourced row is converted to the exact same entry
 shape a local row already has, then handed to the SAME filter/sort/write
 code (`_sort_key`, `write_jsonl`) — this module does not know or care
@@ -34,8 +34,8 @@ import os
 import sqlite3
 import sys
 
-from . import inverse_projection
-from ._http import auth_headers, http_json, ssl_context
+from .elastic import inverse_projection
+from .elastic._http import auth_headers, http_json, ssl_context
 # the one tolerant ISO-8601 parser (mixed renderings, any fraction width) —
 # shared with the engine's ts_before marker and the STIX projection
 from .normalize import parse_ts as _parse_ts
@@ -160,8 +160,8 @@ def _filter_and_sort(rows: list[dict], host: str | None, after: str | None,
 # SOURCE: Elasticsearch (epic #99 phase 5) — point-in-time + search_after over
 # logs-car.*-<namespace>, excluding event.dataset car.inferred (never part of
 # the timeline: an inferred_node is reconstructed evidence about an object,
-# never a car.db event row — see model/projection/inferred.yml), each hit
-# inverted back to the local entry shape (byakugan.inverse_projection), then
+# never a car.db event row — see elastic/projection/inferred.yml), each hit
+# inverted back to the local entry shape (byakugan.elastic.inverse_projection), then
 # handed to the exact same _filter_and_sort/write_jsonl as the local source.
 # --------------------------------------------------------------------------- #
 def _pit_open(es_url: str, namespace: str, headers: dict, context) -> str:
@@ -218,8 +218,8 @@ def _fetch_hits(es_url: str, namespace: str, headers: dict, context, page_size: 
 
 def _invert_hit(source: dict) -> tuple[bool, dict]:
     """(is_relationship, entry) — the one place a hit's `event.dataset` is
-    read to pick which inverse projector (byakugan.inverse_projection) owns
-    it."""
+    read to pick which inverse projector (byakugan.elastic.inverse_projection)
+    owns it."""
     if (source.get("event") or {}).get("dataset") == "car.rel":
         return True, inverse_projection.invert_relationship(source)
     return False, inverse_projection.invert_object(source)
