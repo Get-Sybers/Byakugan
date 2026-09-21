@@ -248,8 +248,7 @@ def push_stream(es_url: str, stream: str, docs: list[tuple[str, dict]], headers:
         # keeping the loader inside the least-privilege writer role (a
         # standalone refresh needs the `maintenance` privilege logs_car_writer
         # deliberately does not have).
-        url = (f"{es_url}/{stream}/_bulk?refresh=wait_for"
-              "&filter_path=errors,items.*.create.status,items.*.create.error")
+        url = f"{es_url}/{stream}/_bulk?refresh=wait_for"
         body = "".join(f"{action}\n{doc_body}\n" for _id, action, doc_body in chunk)
         try:
             status, parsed, raw = http_json(
