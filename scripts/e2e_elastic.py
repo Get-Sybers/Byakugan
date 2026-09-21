@@ -336,8 +336,11 @@ def step_e_timeline_bytecompare(args, car_dir: str, work_dir: str) -> None:
     local_path = os.path.join(work_dir, "timeline.local.jsonl")
     timeline.write_jsonl(local_rows, local_path)
 
-    remote_rows = timeline.build_timeline_from_elastic(
-        args.es_url, args.namespace, es_user=args.es_user, es_password=args.es_password)
+    try:
+        remote_rows = timeline.build_timeline_from_elastic(
+            args.es_url, args.namespace, es_user=args.es_user, es_password=args.es_password)
+    except SystemExit as e:
+        raise RuntimeError(f"build_timeline_from_elastic failed (exit {e.code})") from e
     remote_path = os.path.join(work_dir, "timeline.elastic.jsonl")
     timeline.write_jsonl(remote_rows, remote_path)
 
