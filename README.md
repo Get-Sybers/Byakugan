@@ -1,4 +1,7 @@
 # Byakugan
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2b524ed3-0bb0-48a1-a28e-a887b6124e8c" alt="Project Banner" width="85%">
+</p>
 
 **Turn raw DFIR evidence into one MITRE-aligned timeline — normalise every
 artefact into MITRE CAR, relate the objects through proven relationships, and
