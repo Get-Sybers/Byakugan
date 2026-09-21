@@ -31,8 +31,9 @@ name: byakugan-standalone
 #   sudo sysctl -w vm.max_map_count=262144
 #
 # Bring-up order: elasticsearch (starts immediately — no certs to wait on) ->
-# setup (waits for Elasticsearch, then sets the kibana_system password) ->
-# kibana. See elastic/README.md.
+# setup (waits for Elasticsearch, then sets the kibana_system password and
+# creates the least-privilege byakugan_loader identity) -> kibana. See
+# elastic/README.md.
 
 services:
   elasticsearch:
@@ -62,13 +63,15 @@ services:
       retries: 30
 
   # One-shot: waits for Elasticsearch, then sets the kibana_system password
-  # (idempotent). No certificate generation — see the header comment above.
+  # and creates the least-privilege byakugan_loader identity (both
+  # idempotent). No certificate generation — see the header comment above.
   setup:
     image: "docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-9.4.3}"
     command: ["bash", "/usr/local/bin/byakugan-standalone-setup"]
     environment:
       ELASTIC_PASSWORD: "${ELASTIC_PASSWORD:?set it in elastic/.env (see .env.example)}"
       KIBANA_SYSTEM_PASSWORD: "${KIBANA_SYSTEM_PASSWORD:?set it in elastic/.env (see .env.example)}"
+      BYAKUGAN_LOADER_PASSWORD: "${BYAKUGAN_LOADER_PASSWORD:?set it in elastic/.env (see .env.example)}"
     volumes:
       - ./config/setup.sh:/usr/local/bin/byakugan-standalone-setup:ro
 
