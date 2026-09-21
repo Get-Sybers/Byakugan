@@ -231,7 +231,8 @@ def step_b_first_load(args, car_dir: str, out_dir: str) -> dict:
                        es_user=args.es_user, es_password=args.es_password,
                        kibana_url=args.kibana_url, setup=True, force=True)
     _check(summary["status"] == "ok",
-          f"step B: load status={summary['status']!r} (expected 'ok'); failures={summary.get('failures')}")
+          f"step B: load status={summary['status']!r} (expected 'ok'); "
+          f"failures={summary.get('failures')}; setup={summary.get('setup')}")
 
     expected_streams = {f"logs-car.{o}-{args.namespace}" for o in (*STREAM_OBJECTS, "rel")}
     got_streams = set(summary["streams"])
@@ -312,7 +313,8 @@ def step_d_idempotent_least_priv(args, car_dir: str, out_dir: str) -> dict:
     summary = load.run(car_dir, out_dir, args.namespace, es_url=args.es_url,
                        es_user=args.loader_user, es_password=args.loader_password, force=True)
     _check(summary["status"] == "ok",
-          f"step D: load status={summary['status']!r} (expected 'ok'); failures={summary.get('failures')}")
+          f"step D: load status={summary['status']!r} (expected 'ok'); "
+          f"failures={summary.get('failures')}; setup={summary.get('setup')}")
     for name, st in sorted(summary["streams"].items()):
         _check(st["created"] == 0, f"step D: stream {name}: created={st['created']} (expected 0)")
         _check(st["failed"] == 0, f"step D: stream {name}: failed={st['failed']} (expected 0)")

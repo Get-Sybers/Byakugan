@@ -15,7 +15,9 @@ stack" below.
 
 ```sh
 cd elastic
-cp .env.example .env             # then replace ELASTIC_PASSWORD / KIBANA_SYSTEM_PASSWORD / BYAKUGAN_LOADER_PASSWORD
+cp .env.example .env             # then replace every change-me value: the three passwords,
+                                 # and the three Kibana encryption keys (`openssl rand -hex 32` each —
+                                 # Kibana 9.x refuses to finish Fleet setup without them)
 sudo sysctl -w vm.max_map_count=262144
 docker compose up -d
 docker compose ps                # setup exits 0; elasticsearch/kibana go (healthy)

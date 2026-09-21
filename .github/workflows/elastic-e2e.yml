@@ -56,6 +56,9 @@ jobs:
           ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
           KIBANA_SYSTEM_PASSWORD=${KIBANA_SYSTEM_PASSWORD}
           BYAKUGAN_LOADER_PASSWORD=${BYAKUGAN_LOADER_PASSWORD}
+          KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY=$(openssl rand -hex 32)
+          KIBANA_SECURITY_ENCRYPTION_KEY=$(openssl rand -hex 32)
+          KIBANA_REPORTING_ENCRYPTION_KEY=$(openssl rand -hex 32)
           ES_JAVA_OPTS=-Xms1g -Xmx1g
           EOF
       - name: Bring up the standalone Elastic stack

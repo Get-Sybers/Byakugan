@@ -89,12 +89,14 @@ services:
       ELASTICSEARCH_USERNAME: kibana_system
       ELASTICSEARCH_PASSWORD: "${KIBANA_SYSTEM_PASSWORD:?set it in elastic/.env (see .env.example)}"
       TELEMETRY_OPTIN: "false"
-      # no XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY / XPACK_SECURITY_ENCRYPTIONKEY:
-      # this stack imports only a data view + a saved search (--setup, via
-      # `byakugan.elastic.load`) — nothing that needs encrypted saved objects (no
-      # Fleet, no alerting). Kibana self-generates an ephemeral session key
-      # and logs a one-line warning about it; fine for a disposable lab
-      # stack, restart-stable state is not a goal here.
+      # The three Kibana encryption keys (>= 32 chars each; openssl rand -hex 32).
+      # Not optional even for this lab stack: Kibana 9.x runs its Fleet setup
+      # unconditionally at boot, and without the saved-objects key it retries
+      # forever (FleetEncryptedSavedObjectEncryptionKeyRequired) — the live e2e
+      # gate caught exactly that. Same var names as the DX_DFIR stack.
+      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: "${KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY:?set it in elastic/.env (see .env.example)}"
+      XPACK_SECURITY_ENCRYPTIONKEY: "${KIBANA_SECURITY_ENCRYPTION_KEY:?set it in elastic/.env (see .env.example)}"
+      XPACK_REPORTING_ENCRYPTIONKEY: "${KIBANA_REPORTING_ENCRYPTION_KEY:?set it in elastic/.env (see .env.example)}"
     mem_limit: 1g
     volumes:
       - kibanadata:/usr/share/kibana/data
