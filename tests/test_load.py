@@ -5,6 +5,7 @@ import http.server
 import json
 import os
 import threading
+import urllib.parse
 
 import pytest
 
@@ -226,6 +227,8 @@ class _StubES(http.server.BaseHTTPRequestHandler):
         if len(parts) == 2 and parts[1] == "_bulk":
             stream = parts[0]
             st["bulk_calls"].append(stream)
+            query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
+            st["bulk_queries"].append(query)
             index = st["indices"].setdefault(stream, {})
             lines = raw.decode("utf-8").splitlines()
             items = []
@@ -240,6 +243,9 @@ class _StubES(http.server.BaseHTTPRequestHandler):
                 else:
                     index[doc_id] = doc
                     items.append({"create": {"status": 201}})
+            if st["drop_bulk_items_when_filter_path"] and "filter_path" in query:
+                self._json(200, {"errors": any(it["create"]["status"] >= 300 for it in items)})
+                return
             self._json(200, {"errors": any(it["create"]["status"] >= 300 for it in items), "items": items})
             return
         if len(parts) == 2 and parts[1] == "_search":
@@ -259,8 +265,9 @@ class _StubES(http.server.BaseHTTPRequestHandler):
 
 @pytest.fixture
 def es_stub():
-    state = {"component": {}, "index": {}, "indices": {}, "bulk_calls": [], "puts": [],
-            "kibana_imports": [], "fail_streams": set()}
+    state = {"component": {}, "index": {}, "indices": {}, "bulk_calls": [], "bulk_queries": [],
+            "puts": [], "kibana_imports": [], "fail_streams": set(),
+            "drop_bulk_items_when_filter_path": False}
     server = http.server.HTTPServer(("127.0.0.1", 0), _StubES)
     server.state = state
     t = threading.Thread(target=server.serve_forever, daemon=True)
@@ -326,6 +333,21 @@ def test_push_mode_es_url_scheme_is_plain_http_not_https(tmp_path, es_stub):
     summary = load.run(car, out, "default", es_url=es_url)
     assert summary["status"] == "ok" and summary["mode"] == "push"
     assert summary["streams"]["logs-car.process-default"]["created"] == 1
+
+
+def test_push_mode_does_not_filter_bulk_item_statuses(tmp_path, es_stub):
+    es_url, state = es_stub
+    state["drop_bulk_items_when_filter_path"] = True
+    car = str(tmp_path / "car")
+    _build_tree(car, sources=("s1",))
+    out = str(tmp_path / "out")
+    summary = load.run(car, out, "default", es_url=es_url)
+
+    assert summary["status"] == "ok"
+    assert summary["streams"]["logs-car.process-default"]["created"] == 1
+    assert state["bulk_queries"]
+    assert all(q.get("refresh") == ["wait_for"] for q in state["bulk_queries"])
+    assert all("filter_path" not in q for q in state["bulk_queries"])
 
 
 def test_push_mode_conflict_is_already_present(tmp_path, es_stub):

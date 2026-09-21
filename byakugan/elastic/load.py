@@ -240,8 +240,15 @@ def push_stream(es_url: str, stream: str, docs: list[tuple[str, dict]], headers:
     created = already_present = failed = 0
     errors: list[str] = []
     for chunk in _chunk_docs(docs, BULK_MAX_ACTIONS, BULK_MAX_BYTES):
-        url = (f"{es_url}/{stream}/_bulk"
-              "?filter_path=errors,items.*.create.status,items.*.create.error")
+        # refresh=wait_for: a bulk write is not SEARCHABLE until a refresh,
+        # and the ids-query verification runs immediately after the push —
+        # without this it undercounts and books the shortfall as failed (the
+        # live e2e gate caught exactly that). wait_for guarantees searchability
+        # before the next request without forcing an immediate segment flush,
+        # keeping the loader inside the least-privilege writer role (a
+        # standalone refresh needs the `maintenance` privilege logs_car_writer
+        # deliberately does not have).
+        url = f"{es_url}/{stream}/_bulk?refresh=wait_for"
         body = "".join(f"{action}\n{doc_body}\n" for _id, action, doc_body in chunk)
         try:
             status, parsed, raw = http_json(

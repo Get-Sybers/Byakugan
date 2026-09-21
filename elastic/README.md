@@ -15,7 +15,9 @@ stack" below.
 
 ```sh
 cd elastic
-cp .env.example .env             # then replace ELASTIC_PASSWORD / KIBANA_SYSTEM_PASSWORD
+cp .env.example .env             # then replace every change-me value: the three passwords,
+                                 # and the three Kibana encryption keys (`openssl rand -hex 32` each —
+                                 # Kibana 9.x refuses to finish Fleet setup without them)
 sudo sysctl -w vm.max_map_count=262144
 docker compose up -d
 docker compose ps                # setup exits 0; elasticsearch/kibana go (healthy)
@@ -25,8 +27,8 @@ docker compose ps                # setup exits 0; elasticsearch/kibana go (healt
 - Kibana -> `http://127.0.0.1:5602` (log in as `elastic`)
 
 `config/setup.sh` refuses to run while `ELASTIC_PASSWORD` / `KIBANA_SYSTEM_PASSWORD`
-still hold the `.env.example` placeholders. `.env` is gitignored — **never
-commit real secrets**.
+/ `BYAKUGAN_LOADER_PASSWORD` still hold the `.env.example` placeholders.
+`.env` is gitignored — **never commit real secrets**.
 
 ## Load a materialised CAR tree — one command
 
@@ -71,7 +73,31 @@ This one command:
    dashboard — open Kibana at `http://127.0.0.1:5602` and go to that
    dashboard once the load finishes.
 
-A re-run of the same command is a no-op (deterministic content-derived
+### Two identities: the first load vs. every load after that
+
+Like DX_DFIR's own integrated stack, this one has two loader identities.
+**The first load** (above) authenticates as `elastic`: `--setup` manages
+index/component templates and imports the Kibana bundle — privileges
+`byakugan_loader` deliberately does not have. **Every load after that**
+authenticates as `byakugan_loader` instead — created by `config/setup.sh`
+with the least-privilege `logs_car_writer` role (`create_doc`/`create_index`/
+`read`/`view_index_metadata` on `logs-car.*` only, no cluster privileges: it
+cannot alter or delete what it has already written, and cannot touch
+templates or Kibana at all):
+
+```sh
+python -m byakugan.elastic.load <car-tree> \
+    --es-url http://127.0.0.1:9201 \
+    --es-user byakugan_loader --es-password "$BYAKUGAN_LOADER_PASSWORD" \
+    --namespace <case>
+```
+
+(`$BYAKUGAN_LOADER_PASSWORD` is set the same way as `$ELASTIC_PASSWORD` above
+— `set -a; source .env; set +a`. The container form is the same
+`BYAKUGAN_LOAD_*` block, `BYAKUGAN_LOAD_ES_USER=byakugan_loader` and no
+`BYAKUGAN_LOAD_SETUP`/`BYAKUGAN_LOAD_KIBANA_URL`.)
+
+A re-run of either command is a no-op (deterministic content-derived
 document ids + a manifest) unless the car tree changed or you pass `--force`.
 
 ## Reading it back as a timeline
@@ -106,16 +132,18 @@ something else. Run both at once, or either alone.
 **This is the standalone lab stack** — everything Byakugan needs to be
 queryable as its own component, nothing else. DX_DFIR's own `docker/elastic/`
 (in the DX_DFIR repository — a separate checkout, typically alongside this
-one) is **the integrated stack** — the same Elasticsearch + Kibana core plus Fleet, a Fleet
-Server and Filebeat as the raw-evidence shipper, HTTP+transport TLS behind a
-generated CA, and a least-privilege `byakugan_loader` identity for routine
-loads — built for DX_DFIR's wider multi-tool orchestration. Both are single-node,
-Basic-licence Elastic; **both consume exactly the same rendered contract**
-(`elastic/projection/rendered/`) through the exact same `byakugan.elastic.load`
-(bundle or push) and `byakugan.timeline --elastic` this engine ships — nothing
-about the CAR->ECS projection, the data-stream names or the loader's argv
-differs between them. Pick this stack when Byakugan is the whole job; point
-at DX_DFIR's when Byakugan is embedded in it.
+one) is **the integrated stack** — the same Elasticsearch + Kibana core plus
+Fleet, a Fleet Server and Filebeat as the raw-evidence shipper, and
+HTTP+transport TLS behind a generated CA — built for DX_DFIR's wider
+multi-tool orchestration. Both are single-node, Basic-licence Elastic; **both
+consume exactly the same rendered contract** (`elastic/projection/rendered/`)
+through the exact same `byakugan.elastic.load` (bundle or push) and
+`byakugan.timeline --elastic` this engine ships, and **both carry the same
+least-privilege `byakugan_loader` identity** for routine loads — nothing
+about the CAR->ECS projection, the data-stream names or the loader's identity
+differs between them, only the TLS posture and the certificate dance it
+requires. Pick this stack when Byakugan is the whole job; point at DX_DFIR's
+when Byakugan is embedded in it.
 
 ## Teardown
 
