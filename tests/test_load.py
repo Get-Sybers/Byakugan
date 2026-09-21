@@ -8,7 +8,8 @@ import threading
 
 import pytest
 
-from byakugan import cli, load, projection, store, superset
+from byakugan import cli, store, superset
+from byakugan.elastic import load, projection
 
 
 # --------------------------------------------------------------------------- #
@@ -39,12 +40,10 @@ def _build_tree(root, sources=("sysmon1", "sysmon2")):
         d = os.path.join(root, name)
         os.makedirs(d, exist_ok=True)
         events = _events(f"HOST{i}", f"{name}-")
-        st = store.CarStore(os.path.join(d, "car.db"))
+        st = store.CarStore()
         st.insert_events(events)
         st.export_jsonl(d)
-        st.close()
-        sup = superset.SupersetStore(os.path.join(d, "superset.db"))
-        sup.seed_model()
+        sup = superset.SupersetStore()
         sup.insert_edges(superset.edges_from_events(events))
         sup.insert_inferred_nodes([
             {"node_id": f"{name}-inferred-1", "source_host": f"HOST{i}", "object": "process",
@@ -305,6 +304,28 @@ def test_push_mode_chunks_and_verifies(tmp_path, es_stub):
     # chunking observed: 2500 actions at <=1000/chunk needs >= 3 _bulk calls
     assert state["bulk_calls"].count(stream) >= 3
     assert len(state["indices"][stream]) == 2500
+
+
+def test_push_mode_es_url_scheme_is_plain_http_not_https(tmp_path, es_stub):
+    """`--es-url` takes the URL's OWN scheme — push mode never requires or
+    assumes https. The standalone lab stack (elastic/, HTTP TLS off — see
+    elastic/README.md) is reached over plain http://127.0.0.1:9201, so this
+    makes that contract explicit rather than incidental: every `es_stub` push
+    test above already runs over http (the stub only ever serves plain HTTP),
+    proving it end to end; this test just names why that is safe. `load.run`
+    always builds a TLS `ssl_context` (`byakugan.elastic._http.ssl_context`, shared
+    with `byakugan.timeline --elastic`) regardless of `--es-url`'s scheme —
+    `urllib` simply never consults an SSL context for a plain http:// request,
+    so passing one is harmless and pushing to an http:// stack works exactly
+    like pushing to an https:// one would."""
+    es_url, _state = es_stub
+    assert es_url.startswith("http://") and not es_url.startswith("https://")
+    car = str(tmp_path / "car")
+    _build_tree(car, sources=("s1",))
+    out = str(tmp_path / "out")
+    summary = load.run(car, out, "default", es_url=es_url)
+    assert summary["status"] == "ok" and summary["mode"] == "push"
+    assert summary["streams"]["logs-car.process-default"]["created"] == 1
 
 
 def test_push_mode_conflict_is_already_present(tmp_path, es_stub):

@@ -9,9 +9,13 @@ gated behind the capability determination — never part of the per-file product
     python -m byakugan --in <file> --out <dir> [--artefacts k1,k2]
 
 One input file -> route to its artefact map(s) -> normalize -> enrich
-(self-contained) -> <out>/car.db + <out>/car_<object>.jsonl (the downstream
-ingest contract — DX_DFIR ships the JSONL to Elastic).
-An Anamnesis car.db input passes through 1:1 (already finished CAR).
+(self-contained, in memory) -> <out>/car_<object>.jsonl + car_relationships.jsonl
+(the downstream ingest contract — DX_DFIR ships the JSONL to Elastic). No
+SQLite is written anywhere in this pipeline; the materialised JSONL tree is
+the only on-disk product of a build.
+An Anamnesis car.db input passes through 1:1 (already finished CAR) — the one
+place this repo still reads a `car.db`, because that file is Anamnesis's own
+output format, not Byakugan's store (see byakugan/readers.py).
 
 Routing is by filename when --artefacts is not given; a Security log feeds BOTH
 its authentication and its user_session maps (same file — the in-file LUID join
@@ -257,8 +261,9 @@ def split_l2t(path: str, out_dir: str) -> dict[str, str]:
 def _iter_source_files(in_path: str):
     """The files that make up ONE source. A directory (a Zeek capture, a host's
     event-log export) is a single source: every file under it is routed and
-    merged into ONE car.db, so within-source cross-log enrichment can run and no
-    other source is depended on. A single file is a one-file source."""
+    merged into ONE in-memory working store, so within-source cross-log
+    enrichment can run and no other source is depended on. A single file is a
+    one-file source."""
     if os.path.isdir(in_path):
         for root, _dirs, files in os.walk(in_path):
             for fn in sorted(files):
@@ -274,9 +279,10 @@ def process_file(in_path: str, out_dir: str, artefacts: list[str] | None = None,
     protocol logs; a host's event-log channels) — same isolation either way.
 
     `derive_pass` (optional, off by default) adds the DERIVED relationship stage
-    (derive.py): data-driven 1:1 links, inferred nodes and content entities
-    written into superset.db. The additive fold of same-event rows is not
-    part of it — enrich folds on every run (relationships.yml dedupe.fold)."""
+    (derive.py): data-driven 1:1 links, inferred nodes and content entities,
+    exported into car_relationships.jsonl/car_inferred.jsonl beside the object
+    JSONL. The additive fold of same-event rows is not part of it — enrich
+    folds on every run (relationships.yml dedupe.fold)."""
     os.makedirs(out_dir, exist_ok=True)
     name = os.path.basename(in_path.rstrip("/"))
 
@@ -336,42 +342,47 @@ def process_file(in_path: str, out_dir: str, artefacts: list[str] | None = None,
     # event become ONE entry holding every contributor's properties
     events = enrich.enrich(events)
 
-    db_path = os.path.join(out_dir, "car.db")
-    if os.path.exists(db_path):
-        os.remove(db_path)                     # rebuilt from this file each run
-    st = store.CarStore(db_path)
+    # the engine's working store is IN MEMORY for the duration of this build;
+    # export_jsonl is the only on-disk product (car_<object>.jsonl, re-written
+    # fresh from this file each run — nothing is ever appended to a stale tree)
+    st = store.CarStore()
     st.insert_events(events)
     counts = st.counts()
     written = st.export_jsonl(out_dir)
-    st.close()
 
     # USE the source-manifest structure: emit the manifest for every source that
-    # actually contributed (traceability — the car.db is now paired with a hard
-    # file saying "this source gives these objects/actions/properties, derived by
-    # this wrapper"), and CAR-validity-check what those sources emit.
+    # actually contributed (traceability — the materialised tree is paired with
+    # a hard file saying "this source gives these objects/actions/properties,
+    # derived by this wrapper"), and CAR-validity-check what those sources emit.
     source_ids, source_issues = _write_source_manifests(out_dir, used)
 
-    # the SUPERSET-MODEL database beside car.db: the data model + ATT&CK
-    # relationship edge-types, plus the relationship INSTANCES the cascade
-    # produced between these events — a second, granular relationship timeline
-    # linking the car.db rows by guid.
+    # the SUPERSET relationship timeline beside the object events: the
+    # relationship INSTANCES the cascade produced between these events — a
+    # second, granular relationship timeline linking the object rows by guid.
+    # car_relationships.jsonl is written unconditionally (below), even when
+    # empty — it is the build's done-marker (run_batch's idempotency skip).
     from . import superset
-    sup = superset.build_superset_db(out_dir, events)
+    sup_store = superset.build_from_events(out_dir, events)
+    result = {"input": in_path, "artefacts": used, "events": sum(counts.values()),
+              "objects": counts, "exported": written, "car_dir": out_dir,
+              "sources": source_ids, "source_manifests": os.path.join(out_dir, "sources.yaml"),
+              "source_issues": source_issues,
+              "relationships": sup_store.counts()["relationships"],
+              "relationships_exported": sup_store.counts()["relationships"]}
     if derive_pass:
         # the DERIVED class: strong-identity 1:1 links, reconstructed (flagged)
-        # nodes, content entities — into the same superset.db, beside car.db
+        # nodes, content entities — recomputed fresh into the SAME in-memory
+        # store, then re-exported (both classes) over the declared-only file
         from . import derive
-        sup.update(derive.derive(events, sup["superset_db"], out_dir))
-    return {"input": in_path, "artefacts": used, "events": sum(counts.values()),
-            "objects": counts, "exported": written, "car_db": db_path,
-            "sources": source_ids, "source_manifests": os.path.join(out_dir, "sources.yaml"),
-            "source_issues": source_issues, **sup}
+        result.update(derive.derive(events, sup_store, out_dir))
+    return result
 
 
 def _write_source_manifests(out_dir: str, used: list[str]) -> tuple[list[str], list[str]]:
     """Write the source (sensor) manifests for the artefacts that contributed to
-    this car.db, and return (source_ids, CAR-validity problems). Makes each store
-    traceable to how it was derived; the manifests are generated from the maps."""
+    this source's materialised tree, and return (source_ids, CAR-validity
+    problems). Makes each source traceable to how it was derived; the manifests
+    are generated from the maps."""
     import yaml
     from . import mappings, sources_model
     docs, ids = [], []
@@ -462,7 +473,7 @@ def _godfir_toolz_sources(gt: str):
 
 def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
     """The CAR sources under a processed tree, honouring the isolation rule
-    (one source -> one car.db). Returns (source_name, in_path, default_host).
+    (one source -> one working store). Returns (source_name, in_path, default_host).
     The GoDFIR-toolz framework lanes write one folder per item; the older
     per-host / per-image layouts are still recognised beside them:
 
@@ -505,15 +516,17 @@ def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
 
 def run_batch(processed_dir: str, out_root: str, force: bool = False,
               derive_pass: bool = False, stix_export: bool = False) -> list[dict]:
-    """Every discovered source -> <out_root>/<source_name>/car.db + car_*.jsonl.
-    Idempotent: a source whose output car.db already exists is skipped unless
-    `force`. Sources run SEQUENTIALLY (bounded load); one failing source never
-    stops the rest. `stix_export` adds the STIX projection step (stix.py) over
-    each finished store, case-scoped by the source name."""
+    """Every discovered source -> <out_root>/<source_name>/car_*.jsonl.
+    Idempotent: a source whose output car_relationships.jsonl already exists
+    (the build's done-marker — written unconditionally, even empty, by
+    superset.build_from_events) is skipped unless `force`. Sources run
+    SEQUENTIALLY (bounded load); one failing source never stops the rest.
+    `stix_export` adds the STIX projection step (stix.py) over each finished
+    tree, case-scoped by the source name."""
     results = []
     for name, in_path, host in discover_sources(processed_dir):
         dst = os.path.join(out_root, name)
-        if not force and os.path.isfile(os.path.join(dst, "car.db")):
+        if not force and os.path.isfile(os.path.join(dst, "car_relationships.jsonl")):
             results.append({"source": name, "skipped": "exists"})
             continue
         try:
@@ -531,18 +544,20 @@ def run_batch(processed_dir: str, out_root: str, force: bool = False,
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         prog="byakugan",
-        description="one ingested source -> its own enriched CAR database "
+        description="one ingested source -> its own enriched, in-memory CAR event collection "
                     "+ per-object JSONL for downstream ingestion")
     ap.add_argument("--in", dest="in_path", help="one processed artefact file/dir (single-source mode)")
-    ap.add_argument("--out", dest="out_dir", help="output dir (single-source: this source's car.db; batch: the car/ root)")
+    ap.add_argument("--out", dest="out_dir", help="output dir (single-source: this source's materialised "
+                    "car_<object>.jsonl tree; batch: the car/ root)")
     ap.add_argument("--artefacts", default=None, help="comma-separated artefact map keys (default: route by filename)")
     ap.add_argument("--host", default=None, help="fallback source_host where the map derives none")
     ap.add_argument("--batch", dest="batch_dir", default=None,
                     help="discover every source under this processed dir and run each (idempotent)")
-    ap.add_argument("--force", action="store_true", help="batch: rebuild sources whose car.db already exists")
+    ap.add_argument("--force", action="store_true",
+                    help="batch: rebuild sources whose car_relationships.jsonl already exists")
     ap.add_argument("--derive", action="store_true",
                     help="also run the DERIVED relationship pass (strong-identity 1:1 links, "
-                         "inferred nodes, content entities) into superset.db")
+                         "inferred nodes, content entities) into car_relationships.jsonl/car_inferred.jsonl")
     ap.add_argument("--stix", action="store_true",
                     help="also derive the STIX 2.1 bundle (stix_bundle.json) from the finished "
                          "stores (python -m byakugan.stix export)")

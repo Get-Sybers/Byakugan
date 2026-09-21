@@ -405,11 +405,11 @@ def test_stix_observation_and_entity_key_off_the_spindle_guid(tmp_path):
         go_normalize("plaso_exec_prefetch", _wrap("prefetch", _PREFETCH, record_id=1,
                                                          ts="2009-11-20T09:31:29.671875Z")),
         go_normalize("l2t_filestat", _wrap("filestat", _FILESTAT, record_id=2))])
-    st = store.CarStore(str(tmp_path / "car.db"))
+    st = store.CarStore()
     st.insert_events(events)
-    st.close()
-    sup = superset.build_superset_db(str(tmp_path), events)
-    derive.derive(events, sup["superset_db"], str(tmp_path))
+    st.export_jsonl(str(tmp_path))
+    sup_store = superset.build_from_events(str(tmp_path), events)
+    derive.derive(events, sup_store, str(tmp_path))
     summary = stix.export(str(tmp_path), case="c")
     with open(summary["bundle"], encoding="utf-8") as fh:
         objects = json.load(fh)["objects"]

@@ -1,8 +1,8 @@
-"""The CAR->ECS forward projector (byakugan/projection.py), driven by the
-model/projection/ contract (epic #99 phase 2)."""
+"""The CAR->ECS forward projector (byakugan/elastic/projection.py), driven by
+the elastic/projection/ contract (epic #99 phase 2)."""
 import hashlib
 
-from byakugan import projection as pj
+from byakugan.elastic import projection as pj
 
 
 def _process_event(**over):

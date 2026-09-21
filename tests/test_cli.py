@@ -220,7 +220,7 @@ def test_build_batches_the_framework_layouts(tmp_path, env, capsys):
     assert s["outputs"] == sorted(str(out / name) for name in expected)
     assert {r["source"] for r in s["engine"]} == set(expected)
     for name in expected:
-        assert (out / name / "car.db").is_file()
+        assert (out / name / "car_relationships.jsonl").is_file()   # the build's done-marker
     # idempotent: the second run skips every source and is still ok
     assert cli.main(["build"]) == 0
     s, _err = _summary(capsys)

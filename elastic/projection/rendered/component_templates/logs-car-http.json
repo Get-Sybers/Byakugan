@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "generated_by": "python elastic/projection/render_elastic.py",
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "elastic/projection/conventions.yml",
+      "elastic/projection/objects/http.yml",
+      "elastic/projection/ecs_types.yml"
+    ],
+    "version": 3
+  },
+  "template": {
+    "mappings": {
+      "properties": {
+        "car": {
+          "properties": {
+            "http": {
+              "properties": {
+                "hostname": {
+                  "path": "host.hostname",
+                  "type": "alias"
+                },
+                "http_version": {
+                  "path": "http.version",
+                  "type": "alias"
+                },
+                "request_body_bytes": {
+                  "path": "http.request.body.bytes",
+                  "type": "alias"
+                },
+                "request_body_content": {
+                  "path": "http.request.body.content",
+                  "type": "alias"
+                },
+                "request_referrer": {
+                  "path": "http.request.referrer",
+                  "type": "alias"
+                },
+                "requester_ip_address": {
+                  "path": "source.ip",
+                  "type": "alias"
+                },
+                "response_body_bytes": {
+                  "path": "http.response.body.bytes",
+                  "type": "alias"
+                },
+                "response_body_content": {
+                  "path": "http.response.body.content",
+                  "type": "alias"
+                },
+                "response_status_code": {
+                  "path": "http.response.status_code",
+                  "type": "alias"
+                },
+                "url_domain": {
+                  "path": "url.domain",
+                  "type": "alias"
+                },
+                "url_full": {
+                  "path": "url.full",
+                  "type": "alias"
+                },
+                "url_remainder": {
+                  "path": "url.path",
+                  "type": "alias"
+                },
+                "url_scheme": {
+                  "path": "url.scheme",
+                  "type": "alias"
+                },
+                "user_agent_device": {
+                  "path": "user_agent.device.name",
+                  "type": "alias"
+                },
+                "user_agent_full": {
+                  "path": "user_agent.original",
+                  "type": "alias"
+                },
+                "user_agent_name": {
+                  "path": "user_agent.name",
+                  "type": "alias"
+                },
+                "user_agent_version": {
+                  "path": "user_agent.version",
+                  "type": "alias"
+                }
+              }
+            }
+          }
+        },
+        "host": {
+          "properties": {
+            "hostname": {
+              "type": "keyword"
+            }
+          }
+        },
+        "http": {
+          "properties": {
+            "request": {
+              "properties": {
+                "body": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "content": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "method": {
+                  "type": "keyword"
+                },
+                "referrer": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "response": {
+              "properties": {
+                "body": {
+                  "properties": {
+                    "bytes": {
+                      "type": "long"
+                    },
+                    "content": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "status_code": {
+                  "type": "long"
+                }
+              }
+            },
+            "version": {
+              "type": "keyword"
+            }
+          }
+        },
+        "related": {
+          "properties": {
+            "hosts": {
+              "type": "keyword"
+            },
+            "ip": {
+              "type": "ip"
+            }
+          }
+        },
+        "source": {
+          "properties": {
+            "ip": {
+              "type": "ip"
+            }
+          }
+        },
+        "url": {
+          "properties": {
+            "domain": {
+              "type": "keyword"
+            },
+            "full": {
+              "type": "keyword"
+            },
+            "path": {
+              "type": "keyword"
+            },
+            "scheme": {
+              "type": "keyword"
+            }
+          }
+        },
+        "user_agent": {
+          "properties": {
+            "device": {
+              "properties": {
+                "name": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "original": {
+              "type": "keyword"
+            },
+            "version": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}

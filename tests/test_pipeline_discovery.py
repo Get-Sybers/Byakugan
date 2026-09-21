@@ -105,7 +105,7 @@ def test_framework_sources_are_ingested_one_store_each(tmp_path):
     for name, obj in expected.items():
         r = results[name]
         assert "error" not in r, r
-        assert (out / name / "car.db").is_file()                   # ISOLATION: its own store
+        assert (out / name / "car_relationships.jsonl").is_file()  # ISOLATION: its own materialised tree
         if obj:
             assert r["objects"].get(obj, 0) >= 1, (name, r["objects"])
             assert (out / name / f"car_{obj}.jsonl").is_file()

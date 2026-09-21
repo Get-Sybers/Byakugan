@@ -2,7 +2,7 @@
 
 Authoritative "find once, done" map of every canonical `email` field to every artefact/source that can supply it, what the Byakugan engine maps **today**, and what an unmapped field **would** need. Grounded in-repo; honest about the gaps.
 
-- **Object semantics:** `byakugan/third_party/car/data_model/email.yaml`, `.../docs/data_model/email.md`, `python model/car/objects/email.yml`, `python model/projection/objects/email.yml` (ECS projection).
+- **Object semantics:** `byakugan/third_party/car/data_model/email.yaml`, `.../docs/data_model/email.md`, `python model/car/objects/email.yml`, `python elastic/projection/objects/email.yml` (ECS projection).
 - **Engine mapping (the only email mapper):** `byakugan/byakugan/mappings/zeek_extra.py` (map `zeek_smtp`), contract `byakugan/sources/zeek_smtp.yaml`, helpers `byakugan/byakugan/normalize.py`.
 - **Design record / caveats:** `docs/CAR-Relations.md` § "email (no artefact yet — principles recorded for the first mapper)".
 - **Evidence checked:** `data_store/processed/zeek/*` (DFIRdump, ME_FOR_1308, keylogging).

@@ -1,23 +1,28 @@
-"""The DX_DFIR CAR-event store + the per-object JSONL downstream ingest consumes (epic #86).
+"""The DX_DFIR CAR-event store — an in-memory event collection + the per-object
+JSONL downstream ingest consumes (epic #86, the PURGE increment).
 
-The same database model proven in Anamnesis's car.db: one SQLite table per CAR
-object (all 13), each row a finished CAR event — a common header plus the
-object's canonical properties as nullable columns:
+Byakugan is an elastic engine: it holds a source's finished CAR events in
+memory for the duration of a build and writes only the materialised tree —
+`export_jsonl()` writes one `car_<object>.jsonl` per populated object, each
+line a flat event object — consumed by downstream ingestion (DX_DFIR ships it
+to Elastic) and by every in-repo reader (verify.py, timeline.py, crosssource.py,
+stix.py, analytics.py, sigma.py, `byakugan.elastic.load`). No SQLite is
+written anywhere in this module; `read_object_jsonl`/`read_events` are the
+read-back counterparts, shared by every consumer of an already-materialised
+tree instead of each re-implementing its own JSONL walk.
 
     event_id · timestamp · car_action · guid · owning_pid · owning_guid ·
     parent_pid · parent_guid · link_confidence · source_artefact · source_host ·
     native (JSON: kept fields with no CAR home — never faked into CAR columns)
 
-The store is the pipeline artifact (car.db under the processed tree); the
-**JSON output** is the downstream ingest contract: `export_jsonl()` writes one
-`car_<object>.jsonl` per populated object, each line a flat event object —
-consumed by downstream ingestion (DX_DFIR ships it to Elastic).
+(`event_id` above is Anamnesis's own row id, never carried through; see
+byakugan/readers.py, the one place this repo still reads a `car.db` — that
+file is Anamnesis's OUTPUT FORMAT, not Byakugan's own store.)
 """
 from __future__ import annotations
 
 import json
 import os
-import sqlite3
 
 from . import carmodel
 
@@ -54,72 +59,36 @@ HEADER = ["timestamp", "car_action", "guid", "owning_guid", "volume_guid",
           "source_host", "native"]
 
 
-def _q(name: str) -> str:
-    return '"' + name.replace('"', '""') + '"'
-
-
 class CarStore:
-    """Create/open a car.db and read/write finished CAR events."""
+    """One source's finished CAR events, held in memory, one list per object —
+    the engine's working store for the duration of a build. `export_jsonl` is
+    the only on-disk product; the materialised tree it writes is the contract
+    (verify/timeline/load/DX_DFIR already read it, never this object)."""
 
-    def __init__(self, path: str):
-        self.path = path
+    def __init__(self):
         self.model = carmodel.load()
-        self.conn = sqlite3.connect(path)
-        self.conn.row_factory = sqlite3.Row
-        self._create()
+        self._rows: dict[str, list[dict]] = {obj: [] for obj in self.model}
 
     def _cols(self, obj: str) -> list[str]:
         return HEADER + [f for f in self.model[obj]["fields"] if f not in HEADER]
 
-    def _create(self):
-        cur = self.conn.cursor()
-        for obj in self.model:
-            cols = ", ".join(_q(c) for c in self._cols(obj))
-            cur.execute(f"CREATE TABLE IF NOT EXISTS {_q(obj)} "
-                        f"(event_id INTEGER PRIMARY KEY, {cols})")
-            cur.execute(f"CREATE INDEX IF NOT EXISTS {_q('ix_' + obj + '_guid')} "
-                        f"ON {_q(obj)} (guid)")
-            cur.execute(f"CREATE INDEX IF NOT EXISTS {_q('ix_' + obj + '_ts')} "
-                        f"ON {_q(obj)} (timestamp)")
-        self.conn.commit()
-
     def insert_events(self, events: list[dict]) -> int:
         n = 0
-        cur = self.conn.cursor()
         for ev in events:
             obj = ev["car_object"]
-            cols = self._cols(obj)
-            row = []
-            for c in cols:
-                if c == "native":
-                    row.append(json.dumps(ev.get("_native") or {}, default=str))
-                else:
-                    v = ev.get(c)
-                    row.append(json.dumps(v, default=str) if isinstance(v, (list, dict)) else v)
-            cur.execute(f"INSERT INTO {_q(obj)} "
-                        f"({', '.join(_q(c) for c in cols)}) "
-                        f"VALUES ({', '.join('?' for _ in cols)})", row)
+            row: dict = {}
+            for c in self._cols(obj):
+                row[c] = (ev.get("_native") or {}) if c == "native" else ev.get(c)
+            row["car_object"] = obj
+            self._rows[obj].append(row)
             n += 1
-        self.conn.commit()
         return n
 
     def iter_object(self, obj: str):
-        for row in self.conn.execute(f"SELECT * FROM {_q(obj)} ORDER BY event_id"):
-            d = dict(row)
-            d["car_object"] = obj
-            try:
-                d["native"] = json.loads(d.get("native") or "{}")
-            except (TypeError, ValueError):
-                pass
-            yield d
+        yield from self._rows.get(obj, [])
 
     def counts(self) -> dict[str, int]:
-        out = {}
-        for obj in self.model:
-            (n,) = self.conn.execute(f"SELECT COUNT(*) FROM {_q(obj)}").fetchone()
-            if n:
-                out[obj] = n
-        return out
+        return {obj: len(rows) for obj, rows in self._rows.items() if rows}
 
     # -- the JSONL ingest contract --------------------------------------------
 
@@ -132,12 +101,64 @@ class CarStore:
         for obj, count in self.counts().items():
             path = os.path.join(out_dir, f"car_{obj}.jsonl")
             with open(path, "w", encoding="utf-8") as fh:
-                for ev in self.iter_object(obj):
-                    ev.pop("event_id", None)
-                    fh.write(json.dumps(ev, sort_keys=False, default=str))
+                for row in self.iter_object(obj):
+                    fh.write(json.dumps(row, sort_keys=False, default=str))
                     fh.write("\n")
             written[obj] = count
         return written
 
-    def close(self):
-        self.conn.close()
+    def close(self) -> None:
+        """No-op — an in-memory store holds no file handle. Kept so a caller
+        that still treats the store as a closable resource works unchanged."""
+
+
+# --------------------------------------------------------------------------- #
+# Read-back: the shared counterpart to export_jsonl/insert_events, over an
+# already-materialised tree. One implementation — timeline.py, analytics.py,
+# sigma.py, derive.py, stix.py and crosssource.py all consume it, rather than
+# each re-walking car_<object>.jsonl its own way.
+# --------------------------------------------------------------------------- #
+def read_jsonl(path: str):
+    """Every JSON object on its own line of `path`, in file order. A missing
+    file yields nothing; a blank or unparseable line is skipped (a vanished
+    or partially-written file never crashes a reader)."""
+    try:
+        fh = open(path, encoding="utf-8")
+    except OSError:
+        return
+    with fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(row, dict):
+                yield row
+
+
+def read_object_jsonl(car_dir: str, obj: str):
+    """One source's `car_<obj>.jsonl` under `car_dir`, row by row — the
+    read-back counterpart to `export_jsonl`/`iter_object`: same row shape
+    (`native` a nested dict, `car_object` present)."""
+    for row in read_jsonl(os.path.join(car_dir, f"car_{obj}.jsonl")):
+        row.setdefault("car_object", obj)
+        yield row
+
+
+def read_events(car_dir: str, objects=None) -> list[dict]:
+    """Every object's rows under one source's materialised tree, as the
+    in-memory event shape enrich/derive/stix consume (`native` -> `_native`,
+    no `event_id`) — the read-back counterpart to `insert_events` +
+    `export_jsonl`. `objects` limits which `car_<object>.jsonl` are read
+    (default: every CAR object in the model)."""
+    model = carmodel.load()
+    out: list[dict] = []
+    for obj in (objects if objects is not None else model):
+        for row in read_object_jsonl(car_dir, obj):
+            nat = row.pop("native", None)
+            row["_native"] = nat if isinstance(nat, dict) else {}
+            out.append(row)
+    return out

@@ -1,6 +1,13 @@
 # The served store: SQLite → Elasticsearch — decision and cross-repo plan
 
-**Status: proposed.** This document decides what replaces SQLite as the
+**Status: implemented** (epic #99 — and since extended past this plan: the
+projection contract now lives in `elastic/projection/`, the Elastic runtime
+in `byakugan/elastic/`, the repo ships its own standalone stack under
+`elastic/`, and the engine no longer writes SQLite at all). The text below is
+the original decision record, kept as written — path and store references in
+it describe the repos as they stood on 2026-09-20.
+
+This document decides what replaces SQLite as the
 database Byakugan's consumers query, and lays out the migration across the
 repos that produce, package and consume CAR data. It was researched against
 the current heads of Byakugan, GoDFIR-toolz, DX_DFIR, Anamnesis and uSaid

@@ -1,25 +1,28 @@
-"""Build one property-rich, time-ordered CAR timeline from the stores.
+"""Build one property-rich, time-ordered CAR timeline from the materialised
+tree.
 
-Unions the OBJECT events (car.db — every populated CAR field plus the `native`
-evidence) and the RELATIONSHIP instances (superset.db — source→verb→target with
-confidence/method) into a single timestamp-ordered stream, written as
-timeline.jsonl. Point it at one source's car directory, or at a parent tree to
-aggregate every source under it.
+Unions the OBJECT events (car_<object>.jsonl — every populated CAR field plus
+the `native` evidence) and the RELATIONSHIP instances (car_relationships.jsonl
+— source→verb→target with confidence/method) into a single timestamp-ordered
+stream, written as timeline.jsonl. Point it at one source's car directory, or
+at a parent tree to aggregate every source under it. No SQLite is read here —
+the LOCAL source is the same materialised JSONL tree every other consumer
+(verify.py, byakugan.elastic.load, downstream ingest) reads.
 
   python -m byakugan.timeline <car-dir-or-tree> [--out FILE]
          [--host H] [--after ISO] [--before ISO] [--objects-only | --edges-only]
 
 SOURCE (epic #99 phase 5): the same rows can come from Elasticsearch instead
-of car.db/superset.db — `--elastic <es-url>` (with `--namespace`, default
+of the local JSONL tree — `--elastic <es-url>` (with `--namespace`, default
 "default") builds the timeline from the `logs-car.*-<namespace>` data
-streams `byakugan load` populated, via `byakugan.inverse_projection`'s
-ECS->CAR inverse of the SAME projection contract `byakugan.load` projects
-forward. `<car_dir>` is then only the default --out directory (no car.db is
-read). Auth/TLS: `--es-api-key`, or `--es-user` with `--es-password` /
-`--es-password-file`, and `--es-ca-file` for the server's CA bundle — the
-same flags/shapes `byakugan.load`'s push mode takes, via the same shared
-`byakugan._http` helpers. --host/--after/--before, --objects-only/
---edges-only, the output ordering and timeline.jsonl bytes are unchanged
+streams `byakugan load` populated, via `byakugan.elastic.inverse_projection`'s
+ECS->CAR inverse of the SAME projection contract `byakugan.elastic.load`
+projects forward. `<car_dir>` is then only the default --out directory (no
+local file is read). Auth/TLS: `--es-api-key`, or `--es-user` with
+`--es-password` / `--es-password-file`, and `--es-ca-file` for the server's
+CA bundle — the same flags/shapes `byakugan.elastic.load`'s push mode takes,
+via the same shared `byakugan.elastic._http` helpers. --host/--after/--before,
+--objects-only/--edges-only, the output ordering and timeline.jsonl bytes are unchanged
 either way: an Elastic-sourced row is converted to the exact same entry
 shape a local row already has, then handed to the SAME filter/sort/write
 code (`_sort_key`, `write_jsonl`) — this module does not know or care
@@ -31,11 +34,11 @@ import argparse
 import glob
 import json
 import os
-import sqlite3
 import sys
 
-from . import inverse_projection
-from ._http import auth_headers, http_json, ssl_context
+from . import store
+from .elastic import inverse_projection
+from .elastic._http import auth_headers, http_json, ssl_context
 # the one tolerant ISO-8601 parser (mixed renderings, any fraction width) —
 # shared with the engine's ts_before marker and the STIX projection
 from .normalize import parse_ts as _parse_ts
@@ -49,72 +52,57 @@ _PIT_KEEP_ALIVE = "2m"
 
 
 def _find_stores(path: str) -> list[str]:
-    """The store directories under `path`: `path` itself if it holds a car.db,
-    else every directory beneath it that does (aggregate mode)."""
-    if os.path.isfile(os.path.join(path, "car.db")):
+    """The store directories under `path`: `path` itself if it holds any
+    car_*.jsonl (car_relationships.jsonl — the build's done-marker, always
+    written — or any car_<object>.jsonl), else every directory beneath it
+    that does (aggregate mode). Mirrors byakugan.elastic.load's own
+    find_sources — the same materialised tree, discovered the same way."""
+    if glob.glob(os.path.join(path, "car_*.jsonl")):
         return [path]
     return sorted({os.path.dirname(p)
-                   for p in glob.glob(os.path.join(path, "**", "car.db"),
+                   for p in glob.glob(os.path.join(path, "**", "car_*.jsonl"),
                                       recursive=True)})
 
 
-def _object_entries(car_db: str):
-    """One entry per object event, carrying every populated CAR field + native."""
-    c = sqlite3.connect(car_db)
-    c.row_factory = sqlite3.Row
-    try:
-        tables = [r[0] for r in c.execute(
-            "SELECT name FROM sqlite_master WHERE type='table'")]
-        for t in tables:
-            qt = '"' + t.replace('"', '""') + '"'    # escape the identifier quote
-            # only CAR object tables carry the event header; a producer may add
-            # its own auxiliary table (Anamnesis's car.db has `image_context`:
-            # source_image/source_plugin/record, no timestamp) — skip anything
-            # without the header rather than crashing the whole timeline on it
-            cols = {r[1] for r in c.execute(f'PRAGMA table_info({qt})')}
-            if "timestamp" not in cols:
+def _object_entries(car_dir: str):
+    """One entry per object event, carrying every populated CAR field +
+    native — over every car_<object>.jsonl actually present under `car_dir`
+    (not a fixed object list: whatever this source populated)."""
+    for path in sorted(glob.glob(os.path.join(car_dir, "car_*.jsonl"))):
+        name = os.path.basename(path)[len("car_"):-len(".jsonl")]
+        if name in ("relationships", "inferred"):
+            continue                              # not an object stream
+        for row in store.read_jsonl(path):
+            if row.get("timestamp") is None:
                 continue
-            for r in c.execute(f'SELECT * FROM {qt} WHERE timestamp IS NOT NULL'):
-                entry = {"timestamp": r["timestamp"], "kind": "object", "object": t}
-                for k in r.keys():
-                    if k in ("event_id", "native", "timestamp"):
-                        continue
-                    if r[k] not in (None, ""):
-                        entry[k] = r[k]
-                if r["native"]:
-                    try:
-                        nat = {k: v for k, v in json.loads(r["native"]).items()
-                               if v not in (None, "")}
-                        if nat:
-                            entry["native"] = nat
-                    except (ValueError, TypeError):
-                        pass
-                yield entry
-    finally:
-        c.close()
+            entry = {"timestamp": row["timestamp"], "kind": "object",
+                     "object": row.get("car_object") or name}
+            for k, v in row.items():
+                if k in ("timestamp", "native", "car_object"):
+                    continue
+                if v not in (None, ""):
+                    entry[k] = v
+            nat = row.get("native")
+            if isinstance(nat, dict) and nat:
+                nat2 = {k: v for k, v in nat.items() if v not in (None, "")}
+                if nat2:
+                    entry["native"] = nat2
+            yield entry
 
 
-def _edge_entries(superset_db: str):
+def _edge_entries(car_dir: str):
     """One entry per relationship instance (source→verb→target, confidence)."""
-    if not os.path.exists(superset_db):
-        return
-    c = sqlite3.connect(superset_db)
-    c.row_factory = sqlite3.Row
-    try:
-        if not c.execute("SELECT 1 FROM sqlite_master WHERE type='table' "
-                         "AND name='relationship'").fetchone():
-            return
-        for r in c.execute("SELECT * FROM relationship WHERE timestamp IS NOT NULL"):
-            yield {
-                "timestamp": r["timestamp"], "kind": "relationship",
-                "source_host": r["source_host"],
-                "relationship": r["relationship"],
-                "source_object": r["source_object"], "source_guid": r["source_guid"],
-                "target_object": r["target_object"], "target_guid": r["target_guid"],
-                "confidence": r["confidence"], "method": r["method"],
-            }
-    finally:
-        c.close()
+    for row in store.read_jsonl(os.path.join(car_dir, "car_relationships.jsonl")):
+        if row.get("timestamp") is None:
+            continue
+        yield {
+            "timestamp": row["timestamp"], "kind": "relationship",
+            "source_host": row.get("source_host"),
+            "relationship": row.get("relationship"),
+            "source_object": row.get("source_object"), "source_guid": row.get("source_guid"),
+            "target_object": row.get("target_object"), "target_guid": row.get("target_guid"),
+            "confidence": row.get("confidence"), "method": row.get("method"),
+        }
 
 
 def build_timeline(path: str, host: str | None = None, after: str | None = None,
@@ -123,20 +111,20 @@ def build_timeline(path: str, host: str | None = None, after: str | None = None,
     """The merged, time-ordered timeline (objects + relationship edges)."""
     stores = _find_stores(path)
     if not stores:
-        raise SystemExit(f"no car.db found under {path!r}")
+        raise SystemExit(f"no materialised CAR under {path!r}")
     rows: list[dict] = []
     for d in stores:
         if not edges_only:
-            rows.extend(_object_entries(os.path.join(d, "car.db")))
+            rows.extend(_object_entries(d))
         if not objects_only:
-            rows.extend(_edge_entries(os.path.join(d, "superset.db")))
+            rows.extend(_edge_entries(d))
     return _filter_and_sort(rows, host, after, before)
 
 
 def _filter_and_sort(rows: list[dict], host: str | None, after: str | None,
                      before: str | None) -> list[dict]:
     """--host/--after/--before + the canonical ordering — shared by every
-    SOURCE (car.db/superset.db locally, or Elasticsearch — see
+    SOURCE (the local materialised JSONL tree, or Elasticsearch — see
     build_timeline_from_elastic), so which tier answered the query decides
     nothing about filtering, ordering or (via write_jsonl) the output bytes."""
     if host is not None:
@@ -160,9 +148,9 @@ def _filter_and_sort(rows: list[dict], host: str | None, after: str | None,
 # SOURCE: Elasticsearch (epic #99 phase 5) — point-in-time + search_after over
 # logs-car.*-<namespace>, excluding event.dataset car.inferred (never part of
 # the timeline: an inferred_node is reconstructed evidence about an object,
-# never a car.db event row — see model/projection/inferred.yml), each hit
-# inverted back to the local entry shape (byakugan.inverse_projection), then
-# handed to the exact same _filter_and_sort/write_jsonl as the local source.
+# never a car_<object>.jsonl event row — see elastic/projection/inferred.yml),
+# each hit inverted back to the local entry shape (byakugan.elastic.inverse_projection),
+# then handed to the exact same _filter_and_sort/write_jsonl as the local source.
 # --------------------------------------------------------------------------- #
 def _pit_open(es_url: str, namespace: str, headers: dict, context) -> str:
     status, parsed, raw = http_json(
@@ -218,8 +206,8 @@ def _fetch_hits(es_url: str, namespace: str, headers: dict, context, page_size: 
 
 def _invert_hit(source: dict) -> tuple[bool, dict]:
     """(is_relationship, entry) — the one place a hit's `event.dataset` is
-    read to pick which inverse projector (byakugan.inverse_projection) owns
-    it."""
+    read to pick which inverse projector (byakugan.elastic.inverse_projection)
+    owns it."""
     if (source.get("event") or {}).get("dataset") == "car.rel":
         return True, inverse_projection.invert_relationship(source)
     return False, inverse_projection.invert_object(source)
@@ -232,8 +220,9 @@ def build_timeline_from_elastic(es_url: str, namespace: str = "default", *,
                                 es_password: str = "", es_ca_file: str | None = None,
                                 page_size: int | None = None) -> list[dict]:
     """The merged, time-ordered timeline built from `logs-car.*-<namespace>`
-    instead of car.db/superset.db — same rows, same filters, same order, same
-    write_jsonl bytes as `build_timeline` (see module docstring)."""
+    instead of the local materialised JSONL tree — same rows, same filters,
+    same order, same write_jsonl bytes as `build_timeline` (see module
+    docstring)."""
     headers = auth_headers(es_api_key, es_user, es_password)
     context = ssl_context(es_ca_file)
     rows: list[dict] = []
@@ -270,8 +259,8 @@ def _primary_key(e: dict):
 def _tie(e: dict) -> str:
     """The collision tiebreak: the entry's own canonical JSON, which makes
     the order (and so, via write_jsonl, the output BYTES) depend only on each
-    row's own DATA — never on which tier produced it (car.db/superset.db's
-    SQLite enumeration order, or the arbitrary order Elasticsearch's
+    row's own DATA — never on which tier produced it (the local materialised
+    JSONL tree's own file/line order, or the arbitrary order Elasticsearch's
     search_after pagination happens to return hits in — the --elastic source,
     epic #99 phase 5) or on the otherwise-implementation-defined order rows
     were appended in before the sort. A genuine, byte-identical duplicate row
@@ -318,10 +307,10 @@ def write_jsonl(rows: list[dict], out: str) -> int:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(
         prog="byakugan.timeline",
-        description="one property-rich, time-ordered CAR timeline from car.db + superset.db, "
-                    "or (--elastic) from the logs-car.* data streams")
+        description="one property-rich, time-ordered CAR timeline from the local materialised "
+                    "JSONL tree, or (--elastic) from the logs-car.* data streams")
     ap.add_argument("car_dir", help="a source's car directory, or a tree to aggregate "
-                    "(--elastic: only the default --out directory; no car.db is read)")
+                    "(--elastic: only the default --out directory; no local file is read)")
     ap.add_argument("--out", help="output path (default: <car_dir>/timeline.jsonl)")
     ap.add_argument("--host", help="only events whose source_host matches")
     ap.add_argument("--after", help="only events at/after this ISO timestamp")

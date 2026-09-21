@@ -30,13 +30,13 @@ def test_cert_converges_with_matching_content_by_hash(tmp_path):
     ev = go_normalize("zeek_x509", dict(_X509))
     ev["source_host"] = "cap"
     dd = f"{d}/x509"; import os; os.makedirs(dd)
-    st = store.CarStore(f"{dd}/car.db"); st.insert_events([ev]); st.close()
+    st = store.CarStore(); st.insert_events([ev]); st.export_jsonl(dd)
     # the same bytes seen elsewhere (e.g. a memory-carved file of that cert)
     other = {"car_object": "file", "car_action": "create", "guid": "mem-c",
              "source_host": "cap", "timestamp": "2024-04-21T06:34:49Z",
              "file_name": "berylia.crt", "sha256_hash": _FP.upper()}
     dm = f"{d}/mem"; os.makedirs(dm)
-    st = store.CarStore(f"{dm}/car.db"); st.insert_events([other]); st.close()
+    st = store.CarStore(); st.insert_events([other]); st.export_jsonl(dm)
     hits = [c for c in crosssource.converge(d) if c["tier"] == "definitive_content"]
     assert hits and set(hits[0]["sources"]) == {"x509", "mem"}   # same cert bytes converge
 

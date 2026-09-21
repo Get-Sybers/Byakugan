@@ -1,5 +1,6 @@
-"""The unified CAR timeline: objects (car.db) + relationship edges (superset.db)
-merged into one property-rich, time-ordered stream (epic #12)."""
+"""The unified CAR timeline: objects (car_<object>.jsonl) + relationship
+edges (car_relationships.jsonl) merged into one property-rich, time-ordered
+stream (epic #12)."""
 import json
 import os
 
@@ -21,30 +22,29 @@ def _events():
 
 
 def _make(tmp: str):
-    st = store.CarStore(os.path.join(tmp, "car.db"))
+    st = store.CarStore()
     st.insert_events(_events())
-    st.close()
-    superset.build_superset_db(tmp, _events())
+    st.export_jsonl(tmp)
+    superset.build_from_events(tmp, _events())
 
 
-def test_timeline_skips_auxiliary_tables_without_a_header(tmp_path):
-    # a producer may add its own non-CAR table (Anamnesis's car.db carries
-    # `image_context`: source_image/source_plugin/record, no timestamp). The
-    # timeline must skip it, not crash on the missing header column.
-    import sqlite3
+def test_timeline_never_treats_relationships_or_inferred_as_object_streams(tmp_path):
+    # car_relationships.jsonl and car_inferred.jsonl sit right beside the
+    # object streams and match the SAME car_*.jsonl glob discovery walks —
+    # the old car.db equivalent (a producer's own auxiliary table, e.g.
+    # Anamnesis's image_context, skipped by its missing timestamp header) is
+    # replaced by excluding them BY NAME in _object_entries, never by
+    # accident; a stray non-CAR row in car_inferred.jsonl (no full object
+    # header at all) must not surface as an "inferred" object either.
     d = str(tmp_path)
-    st = store.CarStore(os.path.join(d, "car.db"))
-    st.insert_events(_events())
-    st.close()
-    con = sqlite3.connect(os.path.join(d, "car.db"))
-    con.execute("CREATE TABLE image_context (source_image TEXT, source_plugin TEXT, record TEXT)")
-    con.execute("INSERT INTO image_context VALUES ('mem.raw', 'windows.pslist', 'x')")
-    con.commit()
-    con.close()
+    _make(d)
+    with open(os.path.join(d, "car_inferred.jsonl"), "w", encoding="utf-8") as fh:
+        fh.write(json.dumps({"node_id": "X", "object": "process",
+                             "first_seen": "2020-01-01T00:00:02Z"}) + "\n")
     rows = timeline.build_timeline(d)                 # must not raise
     objs = {r["object"] for r in rows if r["kind"] == "object"}
-    assert "image_context" not in objs                # the aux table is skipped
-    assert objs == {"process", "module"}              # the CAR objects survive
+    assert "inferred" not in objs and "relationships" not in objs
+    assert objs == {"process", "module"}              # the real CAR objects survive
 
 
 def test_timeline_merges_objects_and_edges_ordered(tmp_path):
@@ -81,22 +81,21 @@ def test_timeline_edges_only(tmp_path):
 
 def test_timeline_excludes_timestamp_less_records(tmp_path):
     # a record with no observation time (a PE's compile stamp is not an event)
-    # is stored in car.db — and stays OFF the timeline rather than mis-placed
-    import contextlib
-    import sqlite3
+    # is still materialised into car_file.jsonl — and stays OFF the timeline
+    # rather than mis-placed
     events = _events() + [
         {"car_object": "file", "car_action": "create", "guid": None,
          "source_host": "H", "timestamp": None, "file_path": r"C:\a.exe",
          "_native": {"compile_time": "2019-06-01T00:00:00Z"}}]
-    st = store.CarStore(os.path.join(tmp_path, "car.db"))
+    st = store.CarStore()
     st.insert_events(events)
-    st.close()
-    superset.build_superset_db(str(tmp_path), events)
+    st.export_jsonl(str(tmp_path))
+    superset.build_from_events(str(tmp_path), events)
     rows = timeline.build_timeline(str(tmp_path))
     assert rows and all(r["timestamp"] for r in rows)
     assert not any(r.get("object") == "file" for r in rows)
-    with contextlib.closing(sqlite3.connect(os.path.join(tmp_path, "car.db"))) as c:
-        assert c.execute("SELECT COUNT(*) FROM file WHERE timestamp IS NULL").fetchone()[0] == 1
+    file_rows = list(store.read_object_jsonl(str(tmp_path), "file"))
+    assert sum(1 for r in file_rows if r["timestamp"] is None) == 1
 
 
 def test_timeline_after_before_by_instant(tmp_path):
@@ -135,8 +134,8 @@ def test_sort_orders_by_instant_not_string(tmp_path):
         {"car_object": "process", "car_action": "create", "guid": "A",
          "source_host": "H", "timestamp": "2020-01-01T00:00:00Z"},
     ]
-    st = store.CarStore(os.path.join(str(tmp_path), "car.db"))
+    st = store.CarStore()
     st.insert_events(events)
-    st.close()
+    st.export_jsonl(str(tmp_path))
     rows = timeline.build_timeline(str(tmp_path), objects_only=True)
     assert [r["guid"] for r in rows] == ["A", "B"]   # 00.000 before 00.500

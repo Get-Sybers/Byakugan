@@ -25,14 +25,29 @@
 - **Confidence is explicit.** Every enrichment link is tagged `definitive` (a
   natively-carried guid) or `heuristic` (a pid + create-time-window match).
 
-## Two stores per source
+## The materialised tree + the in-memory engine
 
-- **`car.db`** — the CAR **object** events: one SQLite table per CAR object, one
-  row per finished CAR event, plus `car_<object>.jsonl` exports.
-- **`superset.db`** — the CAR + ATT&CK **superset model** (as reference data) and
-  the **relationship instances** the cascade produces between the car.db events —
-  `source → relationship → target` edges, timestamped, linking car.db rows by
-  guid: a second, more granular *relationship* timeline (`car_relationships.jsonl`).
+Byakugan is an elastic engine: for the duration of one source's build it holds
+that source's finished CAR events and relationship edges **in memory** —
+`store.CarStore` (the object events) and `superset.SupersetStore` (the
+relationship instances) — and writes only the materialised JSONL tree.
+There is no SQLite anywhere in the engine (the one exception is
+`byakugan/readers.py`'s read of an Anamnesis `car.db` — Anamnesis's own output
+format, a component boundary, not Byakugan's store).
+
+- **`store.CarStore`** — the CAR **object** events: one in-memory list per CAR
+  object, one row per finished CAR event, exported as one `car_<object>.jsonl`
+  each.
+- **`superset.SupersetStore`** — the **relationship instances** the cascade
+  produces between the object events — `source → relationship → target` edges,
+  timestamped, linking the object rows by guid: a second, more granular
+  *relationship* timeline, exported as `car_relationships.jsonl` (always
+  written, even empty — the build's done-marker) and, with `--derive`,
+  `car_inferred.jsonl`.
+
+That materialised JSONL tree — never the in-memory stores behind it — is the
+one contract every consumer reads: downstream ingestion, `byakugan.verify`,
+`byakugan.timeline`, `byakugan.elastic.load`, `byakugan.stix`, `byakugan.crosssource`.
 
 ## Components
 
@@ -46,9 +61,9 @@
 | `byakugan/relationships.yml` | the within-source cascade & inheritance rules, as data |
 | `byakugan/cascade_relationships.yml` | the CAR-action → ATT&CK-verb bridge for relationship instances |
 | `byakugan/enrich.py` | the cascade: identity, two-tier owner/parent links, LUID auth↔session join, file→process, null-only inheritance, dedupe |
-| `byakugan/superset.py` | builds `superset.db`: seeds the superset model + edge-types, materialises relationship instances |
+| `byakugan/superset.py` | the in-memory `SupersetStore`: materialises relationship instances, exports `car_relationships.jsonl`/`car_inferred.jsonl` |
 | `byakugan/sources_model.py` + `gen_sources.py` | generates the per-source manifests (objects/actions/properties + provenance) from the maps |
-| `byakugan/store.py` | the car.db store + JSONL export |
+| `byakugan/store.py` | the in-memory `CarStore` + `car_<object>.jsonl` export/read-back |
 | `byakugan/pipeline.py` | source discovery, routing, batch mode; drives the parse engine per file |
 
 ## Coverage

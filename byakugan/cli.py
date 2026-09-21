@@ -11,8 +11,8 @@ environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else)
                          timeline BYAKUGAN_TIMELINE_INPUT_DIR
                          --out BYAKUGAN_TIMELINE_OUT_DIR/timeline.jsonl [--host …]
                          — or, from the logs-car.* Elastic data streams instead
-                         of car.db/superset.db (epic #99 phase 5), by passing
-                         timeline.py's own [--elastic ES_URL --namespace NS
+                         of the local materialised JSONL tree (epic #99 phase 5),
+                         by passing timeline.py's own [--elastic ES_URL --namespace NS
                          --es-api-key … | --es-user … --es-password …] through
                          BYAKUGAN_TIMELINE_ARGS (no dedicated env var: the
                          container's env-block contract is frozen)
@@ -24,15 +24,19 @@ environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else)
     byakugan car-vocab   {object: [car_actions]} — the canonical car_action
                          vocabulary the verify gate checks values against; its
                          stdout IS that JSON, one line
-    byakugan load        bulk-load a materialised car tree into the DX_DFIR
-                         Elastic stack's logs-car.* data streams (the CAR->ECS
-                         projection contract, byakugan.projection/byakugan.load):
+    byakugan load        bulk-load a materialised car tree into an Elastic
+                         stack's logs-car.* data streams (the CAR->ECS
+                         projection contract, byakugan.elastic.projection/
+                         byakugan.elastic.load) — the DX_DFIR-integrated
+                         stack, Byakugan's own standalone one (elastic/), or
+                         any other Elasticsearch that serves the same contract:
                          load BYAKUGAN_LOAD_INPUT_DIR --out BYAKUGAN_LOAD_OUT_DIR
                          --namespace BYAKUGAN_LOAD_NAMESPACE [--force] — offline
                          Elasticsearch _bulk NDJSON bundles by default, or also
-                         pushed over HTTPS when BYAKUGAN_LOAD_ES_URL is set
-                         (push mode: [--es-url …] [--es-api-key … | --es-user …
-                         --es-password …|--es-password-file …] [--es-ca-file …]
+                         pushed over HTTP(S) when BYAKUGAN_LOAD_ES_URL is set
+                         (the URL's own scheme; push mode: [--es-url …]
+                         [--es-api-key … | --es-user … --es-password …|
+                         --es-password-file …] [--es-ca-file …]
                          [--setup [--kibana-url …]])
 
 Each batch sub-tool reads its own env block — BYAKUGAN_<SUBTOOL>_INPUT_DIR
@@ -50,9 +54,10 @@ Exit codes follow the framework's uniform table:
     0  ok            build: every source processed or already up to date;
                      timeline: written (or kept); verify: the gate PASSED;
                      load: every stream bundled (push mode: pushed+verified)
-    1  nothing       build: no source produced events; timeline: no car.db;
-                     verify: no materialised CAR under the input dir — or the
-                     gate FAILED (status `failed`, `failed` = the failed checks,
+    1  nothing       build: no source produced events; timeline: no
+                     materialised CAR under the input dir; verify: no
+                     materialised CAR under the input dir — or the gate
+                     FAILED (status `failed`, `failed` = the failed checks,
                      `failures` names them); load: no materialised CAR under
                      the input dir (status `nothing`) — or, push mode, every
                      stream failed to push (status `failed`)
@@ -314,7 +319,7 @@ def _timeline(cfg: Config, run: _Run) -> int:
     if message is not None:
         s["error"] = message
         cfg.log(0, f"engine: {message}")
-        if message.startswith("no car.db"):
+        if message.startswith("no materialised CAR"):
             return run.finish("nothing", EXIT_NOTHING)
         return run.finish("config_error", EXIT_CONFIG)
     engine = _engine_json(out, cfg, s, default={})
@@ -376,11 +381,12 @@ def _slugify_namespace(raw: str) -> str | None:
 
 
 def _load(cfg: Config, run: _Run) -> int:
-    """`byakugan load`: BYAKUGAN_LOAD_* -> `byakugan.load`'s own CLI, wired
-    like build/timeline (run_engine + its one JSON summary line as `engine`).
-    Bundle mode (BYAKUGAN_LOAD_ES_URL unset) never touches the network; the
-    ES_* / KIBANA_URL / SETUP variables are only even resolved in push mode."""
-    from .load import main as load_main
+    """`byakugan load`: BYAKUGAN_LOAD_* -> `byakugan.elastic.load`'s own CLI,
+    wired like build/timeline (run_engine + its one JSON summary line as
+    `engine`). Bundle mode (BYAKUGAN_LOAD_ES_URL unset) never touches the
+    network; the ES_* / KIBANA_URL / SETUP variables are only even resolved
+    in push mode."""
+    from .elastic.load import main as load_main
     s = run.summary
     ns = _slugify_namespace(cfg.get("NAMESPACE", "default"))
     if ns is None:
@@ -521,7 +527,7 @@ def main(argv: list[str] | None = None) -> int:
         from .verify import main as verify_main
         return verify_main(argv[1:])
     if argv[0] == "load":
-        from .load import main as load_main
+        from .elastic.load import main as load_main
         return load_main(argv[1:])
     if argv[0] == "car-vocab":
         usage()

@@ -1,0 +1,112 @@
+name: byakugan-standalone
+
+# Byakugan's STANDALONE Elastic stack — consumption mode 1 ("fully standalone,
+# with its own Elasticsearch": see the top-level README's "Three ways to run
+# it"). Elasticsearch + Kibana, single node, security ON (Basic licence).
+#
+# This is a LOOPBACK-PUBLISHED LAB STACK: HTTP TLS is deliberately OFF
+# (xpack.security.http.ssl.enabled: false) — the same posture uSaid's
+# es_docker_stack Ansible role uses for its local/dev Elastic
+# (deploy/ansible/roles/es_docker_stack/tasks/elasticsearch.yml: security IS
+# on, only HTTP TLS is off; every port stays bound to 127.0.0.1). Byakugan's
+# OWN certificate/CA code path (byakugan/elastic/load.py --es-ca-file,
+# byakugan/elastic/_http.py ssl_context) is exercised for real against the
+# DX_DFIR-integrated stack (../../DX_DFIR/docker/elastic/), which DOES run
+# HTTP+transport TLS behind a generated CA. Nothing about that contract
+# changes here — this stack is
+# reachable over plain http://127.0.0.1:9201, authenticated, nothing more.
+#
+# Project name `byakugan-standalone` (this line) is deliberately NOT
+# `byakugan` — DX_DFIR's own stack (../../DX_DFIR/docker/elastic/) uses THAT
+# project name. Two different project names means two independent sets of
+# containers/networks/volumes: both stacks can run on the same host at once
+# (see elastic/README.md "Coexisting with DX_DFIR").
+#
+# Ports are bound to 127.0.0.1 and OFFSET from DX_DFIR's own 9200/5601 —
+# 9201/5602 — for the same coexistence reason; override with
+# BYAKUGAN_STANDALONE_ES_PORT / BYAKUGAN_STANDALONE_KIBANA_PORT if even those
+# collide with something else already running.
+#
+# Host prerequisite (Elasticsearch, like any single-node ES container):
+#   sudo sysctl -w vm.max_map_count=262144
+#
+# Bring-up order: elasticsearch (starts immediately — no certs to wait on) ->
+# setup (waits for Elasticsearch, then sets the kibana_system password) ->
+# kibana. See elastic/README.md.
+
+services:
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-9.4.3}"
+    environment:
+      discovery.type: single-node
+      ELASTIC_PASSWORD: "${ELASTIC_PASSWORD:?set it in elastic/.env (see .env.example)}"
+      xpack.security.enabled: "true"
+      xpack.security.http.ssl.enabled: "false"
+      xpack.license.self_generated.type: basic
+      # a lab-sane default heap; bump both ES_JAVA_OPTS and mem_limit together
+      # if you load a large case (keep the heap at <= ~50% of mem_limit)
+      ES_JAVA_OPTS: "${ES_JAVA_OPTS:--Xms1g -Xmx1g}"
+    mem_limit: 2g
+    ulimits:
+      memlock: {soft: -1, hard: -1}
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - "127.0.0.1:${BYAKUGAN_STANDALONE_ES_PORT:-9201}:9200"
+    healthcheck:
+      # security answers AND rejects the unauthenticated call: the posture
+      # check (no TLS here, so no --cacert, unlike DX_DFIR's own healthcheck)
+      test: ["CMD-SHELL", "curl -s http://localhost:9200 | grep -q 'missing authentication credentials'"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  # One-shot: waits for Elasticsearch, then sets the kibana_system password
+  # (idempotent). No certificate generation — see the header comment above.
+  setup:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-9.4.3}"
+    command: ["bash", "/usr/local/bin/byakugan-standalone-setup"]
+    environment:
+      ELASTIC_PASSWORD: "${ELASTIC_PASSWORD:?set it in elastic/.env (see .env.example)}"
+      KIBANA_SYSTEM_PASSWORD: "${KIBANA_SYSTEM_PASSWORD:?set it in elastic/.env (see .env.example)}"
+    volumes:
+      - ./config/setup.sh:/usr/local/bin/byakugan-standalone-setup:ro
+
+  kibana:
+    image: "docker.elastic.co/kibana/kibana:${ELASTIC_VERSION:-9.4.3}"
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      SERVER_NAME: byakugan-standalone-kibana
+      SERVER_PUBLICBASEURL: "http://127.0.0.1:${BYAKUGAN_STANDALONE_KIBANA_PORT:-5602}"
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: kibana_system
+      ELASTICSEARCH_PASSWORD: "${KIBANA_SYSTEM_PASSWORD:?set it in elastic/.env (see .env.example)}"
+      TELEMETRY_OPTIN: "false"
+      # no XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY / XPACK_SECURITY_ENCRYPTIONKEY:
+      # this stack imports only a data view + a saved search (--setup, via
+      # `byakugan.elastic.load`) — nothing that needs encrypted saved objects (no
+      # Fleet, no alerting). Kibana self-generates an ephemeral session key
+      # and logs a one-line warning about it; fine for a disposable lab
+      # stack, restart-stable state is not a goal here.
+    mem_limit: 1g
+    volumes:
+      - kibanadata:/usr/share/kibana/data
+    ports:
+      - "127.0.0.1:${BYAKUGAN_STANDALONE_KIBANA_PORT:-5602}:5601"
+    healthcheck:
+      # ready once the login redirect is served (503 "not ready yet" until then)
+      test: ["CMD-SHELL", "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302'"]
+      interval: 10s
+      timeout: 5s
+      retries: 40
+
+volumes:
+  # bare names: compose prefixes every volume with the project name above
+  # (byakugan-standalone_esdata, ...), which is what actually keeps this
+  # stack's data apart from DX_DFIR's own byakugan_esdata/byakugan_kibanadata.
+  esdata:
+  kibanadata:

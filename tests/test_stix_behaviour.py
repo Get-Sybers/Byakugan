@@ -24,14 +24,15 @@ def _proc(guid, ts=_T0, **kw):
 
 
 def _build(d, events):
-    """The finished stores the pipeline leaves behind: car.db + superset.db."""
+    """The materialised tree the pipeline leaves behind: car_<object>.jsonl +
+    car_relationships.jsonl/car_inferred.jsonl."""
     d.mkdir(parents=True, exist_ok=True)
     events = enrich.enrich(events)
-    st = store.CarStore(str(d / "car.db"))
+    st = store.CarStore()
     st.insert_events(events)
-    st.close()
-    sup = superset.build_superset_db(str(d), events)
-    derive.derive(events, sup["superset_db"], str(d))
+    st.export_jsonl(str(d))
+    sup_store = superset.build_from_events(str(d), events)
+    derive.derive(events, sup_store, str(d))
     return d
 
 

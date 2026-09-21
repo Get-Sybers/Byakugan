@@ -1,0 +1,202 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "generated_by": "python elastic/projection/render_elastic.py",
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "elastic/projection/conventions.yml",
+      "elastic/projection/objects/email.yml",
+      "elastic/projection/ecs_types.yml"
+    ],
+    "version": 3
+  },
+  "template": {
+    "mappings": {
+      "properties": {
+        "car": {
+          "properties": {
+            "email": {
+              "properties": {
+                "action_reason": {
+                  "path": "event.reason",
+                  "type": "alias"
+                },
+                "attachment_mime_type": {
+                  "path": "email.attachments.file.mime_type",
+                  "type": "alias"
+                },
+                "attachment_name": {
+                  "path": "email.attachments.file.name",
+                  "type": "alias"
+                },
+                "attachment_size": {
+                  "path": "email.attachments.file.size",
+                  "type": "alias"
+                },
+                "date": {
+                  "path": "email.origination_timestamp",
+                  "type": "alias"
+                },
+                "dest_address": {
+                  "path": "email.to.address",
+                  "type": "alias"
+                },
+                "dest_ip": {
+                  "path": "destination.ip",
+                  "type": "alias"
+                },
+                "dest_port": {
+                  "path": "destination.port",
+                  "type": "alias"
+                },
+                "from": {
+                  "path": "email.from.address",
+                  "type": "alias"
+                },
+                "message_body": {
+                  "type": "text"
+                },
+                "message_links": {
+                  "type": "keyword"
+                },
+                "message_type": {
+                  "path": "email.content_type",
+                  "type": "alias"
+                },
+                "return_address": {
+                  "path": "email.reply_to.address",
+                  "type": "alias"
+                },
+                "server_relay": {
+                  "type": "text"
+                },
+                "smtp_uid": {
+                  "path": "email.message_id",
+                  "type": "alias"
+                },
+                "src_address": {
+                  "path": "email.sender.address",
+                  "type": "alias"
+                },
+                "src_domain": {
+                  "type": "keyword"
+                },
+                "src_ip": {
+                  "path": "source.ip",
+                  "type": "alias"
+                },
+                "src_port": {
+                  "path": "source.port",
+                  "type": "alias"
+                },
+                "subject": {
+                  "path": "email.subject",
+                  "type": "alias"
+                },
+                "to": {
+                  "path": "email.to.address",
+                  "type": "alias"
+                }
+              }
+            }
+          }
+        },
+        "destination": {
+          "properties": {
+            "ip": {
+              "type": "ip"
+            },
+            "port": {
+              "type": "long"
+            }
+          }
+        },
+        "email": {
+          "properties": {
+            "attachments": {
+              "properties": {
+                "file": {
+                  "properties": {
+                    "mime_type": {
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "size": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            },
+            "content_type": {
+              "type": "keyword"
+            },
+            "from": {
+              "properties": {
+                "address": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "message_id": {
+              "type": "keyword"
+            },
+            "origination_timestamp": {
+              "type": "date"
+            },
+            "reply_to": {
+              "properties": {
+                "address": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "sender": {
+              "properties": {
+                "address": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "subject": {
+              "type": "keyword"
+            },
+            "to": {
+              "properties": {
+                "address": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "event": {
+          "properties": {
+            "reason": {
+              "type": "keyword"
+            }
+          }
+        },
+        "related": {
+          "properties": {
+            "ip": {
+              "type": "ip"
+            }
+          }
+        },
+        "source": {
+          "properties": {
+            "ip": {
+              "type": "ip"
+            },
+            "port": {
+              "type": "long"
+            }
+          }
+        }
+      }
+    }
+  }
+}

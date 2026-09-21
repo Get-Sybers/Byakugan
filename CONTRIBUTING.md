@@ -52,7 +52,7 @@ After ANY dependency change, re-prove the repo:
 
 ```
 python -m pytest -q
-python model/projection/validate.py && python model/stix/validate.py
+python elastic/projection/validate.py && python model/stix/validate.py
 python -m byakugan.gen_sources --check && python -m byakugan.spindle --check
 python -m byakugan.export_ir --check && make -C go build test
 ```

@@ -1,6 +1,6 @@
 """DERIVED relationships — the data-driven class of the D4 relationship model.
 
-superset.db carries two CLASSES of relationship instance:
+The superset relationship timeline carries two CLASSES of relationship instance:
 
 - **DECLARED** (class=declared): the validated cascade edges enrich.py resolves
   and superset.edges_from_events materializes — rule-driven (relationships.yml,
@@ -39,7 +39,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sys
 from collections import defaultdict
@@ -85,7 +84,8 @@ def _normalize(ident: dict, value) -> str:
 
 def _values(v) -> list:
     """A join value as a list — a kept Zeek fuids list matches any element; a
-    list column read back from car.db arrives as JSON text."""
+    list-valued field usually arrives as a real list, but tolerate JSON text
+    too (an older encoding, or a hand-built value)."""
     if v in _MISSING:
         return []
     if isinstance(v, str) and v.startswith("["):
@@ -338,66 +338,58 @@ def reconstruct(events: list[dict], observed: set) -> tuple[list[dict], list[dic
 # --------------------------------------------------------------------------- #
 # The pass
 # --------------------------------------------------------------------------- #
-def derive(events: list[dict], superset_db, out_dir: str | None = None) -> dict:
-    """Run the derived pass over ONE source's enriched events into its
-    superset.db (a path, or an open SupersetStore); re-export the relationship
-    timeline (now both classes) and car_inferred.jsonl under `out_dir`.
-    Idempotent: a previous derived layer is cleared first; the declared edges
-    and every car.db row are untouched."""
-    own = isinstance(superset_db, str)
-    st = superset.SupersetStore(superset_db) if own else superset_db
-    try:
-        st.clear_derived()
-        observed = {(ev.get("source_host"), ev["car_object"], str(ev["guid"]))
-                    for ev in events if ev.get("guid") is not None}
-        edges = link_edges(events)
-        nodes, redges = reconstruct(events, observed)
-        cnodes, refs = content_entities(events)
-        st.insert_edges(edges + redges)
-        st.insert_inferred_nodes(nodes)
-        st.insert_content_nodes(cnodes)
-        st.insert_entity_refs(refs)
-        summary = st.counts()
-        if out_dir:
-            summary["relationships_exported"] = st.export_jsonl(out_dir)
-            summary["inferred_exported"] = st.export_inferred_jsonl(out_dir)
-    finally:
-        if own:
-            st.close()
+def derive(events: list[dict], sup_store: superset.SupersetStore, out_dir: str | None = None) -> dict:
+    """Run the derived pass over ONE source's enriched events into `sup_store`
+    — an in-memory SupersetStore that already holds the DECLARED edges (e.g.
+    from superset.build_from_events); adds the DERIVED layer on top and, with
+    `out_dir`, re-exports the relationship timeline (now both classes) and
+    car_inferred.jsonl. There is no persistent store to selectively clear a
+    stale derived layer from any more: `sup_store` is trusted to be either
+    fresh or already derived-free — `run()` below gives it exactly that."""
+    observed = {(ev.get("source_host"), ev["car_object"], str(ev["guid"]))
+                for ev in events if ev.get("guid") is not None}
+    edges = link_edges(events)
+    nodes, redges = reconstruct(events, observed)
+    cnodes, refs = content_entities(events)
+    sup_store.insert_edges(edges + redges)
+    sup_store.insert_inferred_nodes(nodes)
+    sup_store.insert_content_nodes(cnodes)
+    sup_store.insert_entity_refs(refs)
+    summary = sup_store.counts()
+    if out_dir:
+        summary["relationships_exported"] = sup_store.export_jsonl(out_dir)
+        summary["inferred_exported"] = sup_store.export_inferred_jsonl(out_dir)
     return summary
 
 
-def load_events(car_db: str) -> list[dict]:
-    """A finished car.db as the in-memory event shape the pass consumes (native
-    -> _native). Enrich's transient inputs (owning_guid_native, owning_offset)
-    are not stored, so a re-derive over a store sees only the natively KEPT
-    references (ParentProcessGuid, TargetProcessGuid, fuids …)."""
-    st = store.CarStore(car_db)
-    try:
-        out = []
-        for obj in st.model:
-            for row in st.iter_object(obj):
-                row.pop("event_id", None)
-                nat = row.pop("native", None)
-                row["_native"] = nat if isinstance(nat, dict) else {}
-                out.append(row)
-    finally:
-        st.close()
-    return out
+def load_events(car_dir: str) -> list[dict]:
+    """A materialised source tree's car_<object>.jsonl as the in-memory event
+    shape the pass consumes (native -> _native) — store.read_events under its
+    derive-side name. Enrich's transient inputs (owning_guid_native,
+    owning_offset) are never exported, so a re-derive over a tree sees only
+    the natively KEPT references (ParentProcessGuid, TargetProcessGuid, fuids
+    …)."""
+    return store.read_events(car_dir)
 
 
 def run(car_dir: str) -> dict:
-    """(Re)derive over an existing <car_dir>/car.db + superset.db."""
-    car_db, sup_db = os.path.join(car_dir, "car.db"), os.path.join(car_dir, "superset.db")
-    if not os.path.isfile(car_db):
-        raise SystemExit(f"no car.db under {car_dir!r}")
-    return derive(load_events(car_db), sup_db, car_dir)
+    """(Re)derive over an existing materialised <car_dir>: read its events
+    back from car_<object>.jsonl, recompute BOTH relationship classes fresh
+    into a new in-memory store — recompute-fresh-each-run, replacing the old
+    clear-just-the-derived-layer contract a persistent superset.db needed —
+    and re-export car_relationships.jsonl/car_inferred.jsonl."""
+    events = load_events(car_dir)
+    if not events:
+        raise SystemExit(f"no materialised CAR under {car_dir!r}")
+    sup_store = superset.SupersetStore()
+    sup_store.insert_edges(superset.edges_from_events(events))
+    return derive(events, sup_store, car_dir)
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="byakugan.derive",
-                                 description="the DERIVED relationship pass over one source's store")
-    ap.add_argument("car_dir", help="a source's car directory (car.db + superset.db)")
+                                 description="the DERIVED relationship pass over one source's materialised tree")
+    ap.add_argument("car_dir", help="a source's car directory (car_<object>.jsonl)")
     args = ap.parse_args(argv)
     json.dump(run(args.car_dir), sys.stdout, default=str)
     sys.stdout.write("\n")

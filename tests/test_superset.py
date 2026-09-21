@@ -1,9 +1,11 @@
-"""The superset-model database + relationship timeline (epic #12).
+"""The superset relationship timeline (epic #12).
 
-car.db holds object events; superset.db holds the superset data model + the
-relationship INSTANCES the cascade produces between those events — each a
-timestamped edge linking car.db rows by guid (the granular relationship timeline).
+byakugan.store.CarStore holds the object events in memory; byakugan.superset's
+SupersetStore holds the relationship INSTANCES the cascade produces between
+those events — each a timestamped edge linking the object events by guid (the
+granular relationship timeline), exported as car_relationships.jsonl.
 """
+import json
 import os
 
 from byakugan import superset
@@ -113,22 +115,23 @@ def test_all_emittable_verbs_are_attack_vocabulary():
     assert emitted <= vocab, f"verbs not in ATT&CK vocabulary: {emitted - vocab}"
 
 
-def test_superset_db_seeds_model_and_stores_edges(tmp_path):
+def test_superset_builds_in_memory_and_exports_the_relationship_timeline(tmp_path):
     events = [_proc("P1"),
               {"car_object": "file", "car_action": "create", "guid": "F1",
                "source_host": "H", "timestamp": "2020-01-01T00:00:01Z",
                "owning_guid": "P1", "link_confidence": "definitive"}]
-    out = superset.build_superset_db(str(tmp_path), events)
-    assert out["relationships"] >= 1
-    assert os.path.exists(os.path.join(tmp_path, "superset.db"))
+    sup_store = superset.build_from_events(str(tmp_path), events)
+    assert sup_store.counts()["relationships"] >= 1
     assert os.path.exists(os.path.join(tmp_path, "car_relationships.jsonl"))
+    assert not os.path.exists(os.path.join(tmp_path, "superset.db"))  # no SQLite, ever
 
-    import sqlite3
-    c = sqlite3.connect(os.path.join(tmp_path, "superset.db"))
-    # the model + ATT&CK edge-types are seeded as reference data
-    assert c.execute("select count(*) from model_object").fetchone()[0] == 38
-    assert c.execute("select count(*) from relationship_type").fetchone()[0] > 100
     # the process--created-->file relationship instance is stored, linking guids
-    row = c.execute("select relationship, source_guid, target_guid, confidence "
-                    "from relationship").fetchone()
-    assert row == ("created", "P1", "F1", "definitive")
+    row = sup_store.relationships[0]
+    assert (row["relationship"], row["source_guid"], row["target_guid"], row["confidence"]) == (
+        "created", "P1", "F1", "definitive")
+    # and the export round-trips the exact same row (superset.REL_COLUMNS order)
+    with open(os.path.join(tmp_path, "car_relationships.jsonl"), encoding="utf-8") as fh:
+        exported = json.loads(fh.readline())
+    assert list(exported) == list(superset.REL_COLUMNS)
+    assert (exported["relationship"], exported["source_guid"], exported["target_guid"],
+           exported["confidence"]) == ("created", "P1", "F1", "definitive")

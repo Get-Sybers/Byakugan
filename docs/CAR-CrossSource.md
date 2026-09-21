@@ -5,10 +5,11 @@ the per-source databases. It is deferred by design: nothing here runs until the
 per-source model is complete and an explicit investigation-scope grouping exists.
 It is documented so the analysis is not lost.
 
-Per-source enrichment is self-contained (one source → one `car.db`, see
-[CAR-Pipeline.md](CAR-Pipeline.md)) and its within-source inference cascade (see
-[CAR-Relations.md](CAR-Relations.md)) stays entirely inside that one database.
-This stage is the optional final correlation **across** those databases; it never
+Per-source enrichment is self-contained (one source → one materialised tree —
+its own set of `car_<object>.jsonl` files, see [CAR-Pipeline.md](CAR-Pipeline.md))
+and its within-source inference cascade (see [CAR-Relations.md](CAR-Relations.md))
+stays entirely inside that one source's own in-memory working store. This stage
+is the optional final correlation **across** those materialised trees; it never
 mixes into the per-source products.
 
 ## The sources may be completely unrelated origins (read first)
@@ -44,8 +45,8 @@ verdict below is conditional on that.
 
 ## Data assessment (measured on the real per-source stores)
 
-Nine real `car.db` sources from the batch run, plus the memory and godfir-toolz
-stores. Key facts, measured:
+Nine real per-source materialised trees from the batch run, plus the memory
+and godfir-toolz sources. Key facts, measured:
 
 **1. Host identity is fragmented across lanes — the master blocker.**
 The SAME physical host (LoneWolf) renders differently per lane, and many
@@ -132,7 +133,7 @@ WITHIN-source property (guid) and must stay there.
    raw cross-lane evidence for analyst query instead.
 5. **Fail safe**: with no scope input, the stage does nothing rather than guess.
 6. Keep it an **opt-in end stage over the aggregate**; never mixed into a
-   per-source `car.db`.
+   per-source materialised tree.
 
 ## Still to measure (Phase E field-coverage audit)
 A per-(artefact × object) fill-rate audit across the full real corpus — pairs

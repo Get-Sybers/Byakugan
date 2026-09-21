@@ -156,7 +156,7 @@ def _dump_rels(rels: list[dict]) -> str:
               "# source->relationship->target edges between data elements (mostly object\n"
               "# references). This is the cascade vocabulary (goal B) — our within-source\n"
               "# joins (owning-process, parent, auth<->session, file->process) are typed\n"
-              "# instances of these. NOT scalar fields; never car.db columns.\n")
+              "# instances of these. NOT scalar fields; never CAR object columns.\n")
     return header + yaml.safe_dump({"relationships": rels}, sort_keys=False,
                                    allow_unicode=True)
 
