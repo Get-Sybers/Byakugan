@@ -48,12 +48,14 @@ _retry() {
   while [ "$attempt" -le "$max" ]; do
     CURL_LAST_RESPONSE=
     "$@" && return 0
-    echo "setup | ${desc}: attempt ${attempt}/${max} failed, retrying in ${delay}s" >&2
     if [ -n "${CURL_LAST_RESPONSE-}" ]; then
       echo "setup | ${desc}: last response: ${CURL_LAST_RESPONSE}" >&2
     fi
+    if [ "$attempt" -lt "$max" ]; then
+      echo "setup | ${desc}: attempt ${attempt}/${max} failed, retrying in ${delay}s" >&2
+      sleep "$delay"
+    fi
     attempt=$(( attempt + 1 ))
-    sleep "$delay"
   done
   echo "setup | ${desc}: gave up after ${max} attempts" >&2
   exit 1
@@ -89,7 +91,7 @@ _retry 30 5 "create logs_car_writer role" -- \
 
 echo "setup | creating the byakugan_loader user"
 _retry 30 5 "create byakugan_loader user" -- \
-  _curl_grep '"created"' -X PUT \
+  _curl_grep '"created":\(true\|false\)' -X PUT \
     -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" \
     "${ES_URL}/_security/user/byakugan_loader" \
     -d "{\"password\":\"${BYAKUGAN_LOADER_PASSWORD}\",\"roles\":[\"logs_car_writer\"],\"full_name\":\"byakugan load (CAR to logs-car.*)\"}"
