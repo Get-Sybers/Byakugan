@@ -92,20 +92,25 @@ def _edge(ts, host, rel, s_obj, s_guid, t_obj, t_guid, conf, method, properties=
             "properties": properties or None}
 
 
-# Per-spoke association properties carried ON the edge — facts of the
-# process->object relationship itself, not of either endpoint object. Read from
-# the spoke event's native. Today: a File handle's access mask and handle value
-# (Anamnesis windows.anamnesis.files -> file/access); extend per (object,
-# action) as new association evidence arrives.
-def _edge_properties(obj: str, act: str, nat: dict) -> dict | None:
-    if obj == "file" and act == "access":
-        props = {}
-        if nat.get("GrantedAccess") is not None:
-            props["access_level"] = nat["GrantedAccess"]
-        if nat.get("HandleValue") is not None:
-            props["handle_value"] = nat["HandleValue"]
-        return props or None
-    return None
+# Association properties carried ON the edge — facts of the relationship
+# itself, not of either endpoint object (the #108 file-handle pattern). The
+# registry is DATA (cascade_relationships.yml `association_properties`, keyed
+# "<object>/<action>" for spoke edges and "edge:<name>" for special edges);
+# this is only the mechanics: each property names its sources on the emitting
+# event row (a CAR field, or native.<Key>) and the first non-null wins. A
+# property is duplicated onto the edge, never moved off the row.
+def _edge_properties(key: str, ev: dict, nat: dict) -> dict | None:
+    spec = (rules().get("association_properties") or {}).get(key)
+    if not spec:
+        return None
+    props = {}
+    for name, sources in spec.items():
+        for src in ([sources] if isinstance(sources, str) else sources):
+            v = nat.get(src[len("native."):]) if src.startswith("native.") else ev.get(src)
+            if v is not None and v != "":
+                props[name] = v
+                break
+    return props or None
 
 
 def edges_from_events(events: list[dict]) -> list[dict]:
@@ -124,7 +129,7 @@ def edges_from_events(events: list[dict]) -> list[dict]:
         if og and g and obj != "process" and og != g:
             out.append(_edge(ts, host, _spoke_verb(obj, act),
                              "process", og, obj, g, ev.get("link_confidence"), _method(ev),
-                             _edge_properties(obj, act, nat)))
+                             _edge_properties(f"{obj}/{act}", ev, nat)))
         # process create -> its parent process
         if obj == "process" and act == "create" and ev.get("parent_guid") \
                 and ev["parent_guid"] != g:
@@ -132,22 +137,42 @@ def edges_from_events(events: list[dict]) -> list[dict]:
                              ev["parent_guid"], "process", g,
                              ev.get("link_confidence"), _method(ev)))
         # process ACCESS (Sysmon 10): source process -> the target it opened
-        # (target_guid is a canonical process field, not the record guid)
+        # (target_guid is a canonical process field, not the record guid); the
+        # access's own facts (granted mask, call trace) ride the edge
         if obj == "process" and act == "access" and og and ev.get("target_guid") \
                 and og != ev["target_guid"]:
             out.append(_edge(ts, host, _edge_verb("process_access"), "process", og,
                              "process", ev["target_guid"], ev.get("link_confidence"),
-                             _method(ev)))
+                             _method(ev), _edge_properties("edge:process_access", ev, nat)))
+        # process MODIFY (tampering/hollowing): the modifier --modified--> this
+        # process, when a source names the modifier (native.modifier_process_guid
+        # — the declared native-key contract, like TargetProcessGuid for injection)
+        if obj == "process" and act == "modify":
+            mg = nat.get("modifier_process_guid")
+            if mg and g and mg != g:
+                out.append(_edge(ts, host, _edge_verb("process_modify"), "process", mg,
+                                 "process", g, nat.get("modifier_process_link"),
+                                 "native_guid"))
+        # R3 materialised: a zeek spoke (http/file) rides a connection — the
+        # flow CONTAINS it (shared capture uid, resolved by enrich into
+        # native.flow_guid; Network Traffic Content aliased)
+        fg = nat.get("flow_guid")
+        if fg and g and obj != "flow" and fg != g:
+            out.append(_edge(ts, host, _edge_verb("flow_contains"), "flow", fg,
+                             obj, g, nat.get("flow_link"), "capture_uid"))
         # file -> the process that executed it (CAR-2014-02-001, image_path)
         ep = nat.get("executed_as_process_guid")
         if ep and g and ep != g:
             out.append(_edge(ts, host, _edge_verb("file_executed"), "process", ep,
                              "file", g, nat.get("executed_as_process_link"), "image_path"))
-        # CreateRemoteThread injection: source process -> target process
+        # CreateRemoteThread injection: source process -> target process; where
+        # execution begins IN the target (start address/module/function, the
+        # created thread id) are facts of the injection — they ride the edge
         tg = nat.get("target_process_guid")
         if tg and og and tg != og:
             out.append(_edge(ts, host, _edge_verb("thread_injection"), "process", og,
-                             "process", tg, nat.get("target_process_link"), "native_guid"))
+                             "process", tg, nat.get("target_process_link"), "native_guid",
+                             _edge_properties("edge:thread_injection", ev, nat)))
         # authentication -> the logon session it opened / was requested from
         for gk, lk in (("target_session_guid", "target_session_link"),
                        ("subject_session_guid", "subject_session_link")):

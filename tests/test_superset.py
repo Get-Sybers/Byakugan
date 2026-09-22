@@ -92,48 +92,146 @@ def test_process_access_edges_source_to_target():
     assert (e["source_guid"], e["relationship"], e["target_guid"]) == ("SRC", "accessed", "TGT")
 
 
+# The decision-flagged (object, action) pairs deliberately left to the default
+# verb — docs/research/relationship-model-gaps.md §1/§9 (D1/D2): no catalogue
+# verb fits, held for the owner. Everything else must be declared explicitly.
+_UNDECLARED_BY_DECISION = {
+    ("email", "deliver"), ("email", "block"), ("email", "redirect"),
+    ("email", "quarantine"), ("email", "delete"),
+    ("service", "pause"), ("socket", "close"), ("thread", "suspend"),
+}
+
+
 def test_all_emittable_verbs_are_attack_vocabulary():
     """Every relationship verb the cascade can emit must be a real ATT&CK verb
-    (in the seeded catalogue) — the 'typed edge' contract, self-enforcing."""
-    from byakugan import build_data_model, superset
+    (in the seeded catalogue) — the 'typed edge' contract, self-enforcing.
+    Sweeps EVERY superset (object, action) pair as a spoke, plus every special
+    edge branch, so a new declaration is covered the moment it lands."""
+    from byakugan import build_data_model, carmodel, superset
     _, rels = build_data_model.build_superset()
     vocab = {r["relationship"] for r in rels}
-    # exercise every edge branch to collect the verbs actually emitted
-    events = [
-        {"car_object": "module", "car_action": "load", "guid": "M", "owning_guid": "P",
-         "source_host": "H", "timestamp": "t"},
-        {"car_object": "file", "car_action": "read", "guid": "F", "owning_guid": "P",
-         "source_host": "H", "timestamp": "t"},
-        {"car_object": "file", "car_action": "delete", "guid": "F2", "owning_guid": "P",
-         "source_host": "H", "timestamp": "t"},
-        {"car_object": "registry", "car_action": "value_edit", "guid": "R", "owning_guid": "P",
-         "source_host": "H", "timestamp": "t"},
-        {"car_object": "flow", "car_action": "start", "guid": "FL", "owning_guid": "P",
-         "source_host": "H", "timestamp": "t"},
-        {"car_object": "service", "car_action": "stop", "guid": "SV", "owning_guid": "P",
-         "source_host": "H", "timestamp": "t"},
-        {"car_object": "socket", "car_action": "bind", "guid": "SK", "owning_guid": "P",
-         "source_host": "H", "timestamp": "t"},
+    events, i = [], 0
+    for obj, spec in carmodel.load().items():
+        if obj == "process":
+            continue
+        for act in spec["actions"]:
+            i += 1
+            events.append({"car_object": obj, "car_action": act, "guid": f"S{i}",
+                           "owning_guid": "P", "source_host": "H", "timestamp": "t"})
+    # the special edge branches
+    events += [
         {"car_object": "thread", "car_action": "remote_create", "guid": "TH", "owning_guid": "P",
          "source_host": "H", "timestamp": "t", "_native": {"target_process_guid": "PT"}},
-        {"car_object": "user_session", "car_action": "login", "guid": "U", "owning_guid": "P",
-         "source_host": "H", "timestamp": "t"},
-        {"car_object": "user_session", "car_action": "logout", "guid": "U2", "owning_guid": "P",
-         "source_host": "H", "timestamp": "t"},
-        {"car_object": "user_session", "car_action": "unlock", "guid": "U3", "owning_guid": "P",
-         "source_host": "H", "timestamp": "t"},
         {"car_object": "authentication", "car_action": "success", "guid": "A", "owning_guid": "P",
          "source_host": "H", "timestamp": "t", "_native": {"target_session_guid": "S"}},
         {"car_object": "process", "car_action": "create", "guid": "C", "parent_guid": "P",
          "source_host": "H", "timestamp": "t"},
         {"car_object": "process", "car_action": "access", "guid": "REC", "owning_guid": "P",
          "target_guid": "PT2", "source_host": "H", "timestamp": "t"},
+        {"car_object": "process", "car_action": "modify", "guid": "PM", "source_host": "H",
+         "timestamp": "t", "_native": {"modifier_process_guid": "P"}},
         {"car_object": "file", "car_action": "create", "guid": "FX", "source_host": "H",
          "timestamp": "t", "_native": {"executed_as_process_guid": "P"}},
+        {"car_object": "http", "car_action": "get", "guid": "HT", "source_host": "H",
+         "timestamp": "t", "_native": {"flow_guid": "FL", "flow_link": "definitive"}},
     ]
     emitted = {e["relationship"] for e in superset.edges_from_events(events)}
     assert emitted, "no edges emitted"
     assert emitted <= vocab, f"verbs not in ATT&CK vocabulary: {emitted - vocab}"
+
+
+def test_every_superset_pair_is_declared_or_decision_flagged():
+    """The spoke_owner table is COMPLETE: every superset (object, action) pair
+    of the 13 CAR objects carries an explicit verb, except the pinned
+    decision-flagged pairs (register §9 D1/D2) — the default verb is reserved
+    for those and for drift, never a silent home for a legal pair."""
+    from byakugan import carmodel, superset
+    spoke = superset.rules()["spoke_owner"]
+    undeclared = set()
+    for obj, spec in carmodel.load().items():
+        if obj == "process":        # the hub: its actions are the edges: section
+            continue
+        for act in spec["actions"]:
+            if act not in (spoke.get(obj) or {}):
+                undeclared.add((obj, act))
+    assert undeclared == _UNDECLARED_BY_DECISION, (
+        f"pairs missing a declared verb (declare, or pin as a decision): "
+        f"{undeclared - _UNDECLARED_BY_DECISION}; "
+        f"decision-pins now declared (unpin): {_UNDECLARED_BY_DECISION - undeclared}")
+
+
+def test_flow_containment_edge_from_r3_link():
+    from byakugan import superset
+    # R3 resolved a zeek http/file spoke to its connection (native.flow_guid);
+    # the flow CONTAINS the transaction/file-in-transit — materialised edge.
+    edges = superset.edges_from_events([
+        {"car_object": "http", "car_action": "get", "guid": "http-U-1", "source_host": "H",
+         "timestamp": "t", "_native": {"flow_guid": "U", "flow_link": "definitive"}},
+        {"car_object": "file", "car_action": "create", "guid": "FdE", "source_host": "H",
+         "timestamp": "t", "_native": {"flow_guid": "U", "flow_link": "definitive"}}])
+    triples = {(e["source_object"], e["relationship"], e["target_object"],
+                e["source_guid"], e["target_guid"], e["confidence"], e["method"])
+               for e in edges}
+    assert ("flow", "contained", "http", "U", "http-U-1", "definitive", "capture_uid") in triples
+    assert ("flow", "contained", "file", "U", "FdE", "definitive", "capture_uid") in triples
+    # a flow row never contains itself
+    assert not superset.edges_from_events([
+        {"car_object": "flow", "car_action": "start", "guid": "U", "source_host": "H",
+         "timestamp": "t", "_native": {"flow_guid": "U"}}])
+
+
+def test_process_modify_edge_from_modifier_contract():
+    from byakugan import superset
+    # a process/modify row naming its modifier (native.modifier_process_guid)
+    # yields modifier --modified--> the tampered process
+    edges = superset.edges_from_events([
+        {"car_object": "process", "car_action": "modify", "guid": "TGT", "source_host": "H",
+         "timestamp": "t",
+         "_native": {"modifier_process_guid": "SRC", "modifier_process_link": "definitive"}}])
+    assert [(e["source_guid"], e["relationship"], e["target_guid"], e["confidence"])
+            for e in edges] == [("SRC", "modified", "TGT", "definitive")]
+    # without the native contract key, no edge (the modifier is unknown)
+    assert not superset.edges_from_events([
+        {"car_object": "process", "car_action": "modify", "guid": "TGT", "source_host": "H",
+         "timestamp": "t"}])
+
+
+def test_association_properties_ride_their_edges():
+    from byakugan import superset
+    # process ACCESS: the granted mask / call trace are facts of the access
+    # itself (CAR field wording: "at which the TARGET process is accessed")
+    acc = superset.edges_from_events([
+        {"car_object": "process", "car_action": "access", "guid": "REC", "source_host": "H",
+         "timestamp": "t", "owning_guid": "SRC", "target_guid": "TGT",
+         "access_level": "0x1010", "call_trace": "C:\\W\\a.dll+123"}])
+    assert acc[0]["properties"] == {"access_level": "0x1010", "call_trace": "C:\\W\\a.dll+123"}
+    # thread INJECTION: where execution begins in the target + the new thread id
+    inj = superset.edges_from_events([
+        {"car_object": "thread", "car_action": "remote_create", "guid": "TH", "source_host": "H",
+         "timestamp": "t", "owning_guid": "SRC", "start_address": "0xFFAA",
+         "start_module": "C:\\W\\evil.dll", "start_function": "LoadLibraryA", "tgt_tid": 4242,
+         "_native": {"target_process_guid": "TGT"}}])
+    by_verb = {e["relationship"]: e for e in inj}
+    assert by_verb["accessed"]["properties"] == {
+        "start_address": "0xFFAA", "start_function": "LoadLibraryA",
+        "start_module": "C:\\W\\evil.dll", "new_thread_id": 4242}
+    # the spoke edge for the same thread row carries nothing (no thread/… entry)
+    assert by_verb["created"]["properties"] is None
+    # module LOAD: the base address is where the image sits in the LOADER
+    mod = superset.edges_from_events([
+        {"car_object": "module", "car_action": "load", "guid": "M", "source_host": "H",
+         "timestamp": "t", "owning_guid": "P", "base_address": "0x7ff0", "tid": 8}])
+    assert mod[0]["properties"] == {"base_address": "0x7ff0", "tid": 8}
+    # registry VALUE_EDIT: what THIS edit wrote
+    reg = superset.edges_from_events([
+        {"car_object": "registry", "car_action": "value_edit", "guid": "R", "source_host": "H",
+         "timestamp": "t", "owning_guid": "P", "new_content": "evil.exe"}])
+    assert reg[0]["properties"] == {"new_content": "evil.exe"}
+    # file TIMESTOMP: the pre-tamper creation time (the change is the fact)
+    ts = superset.edges_from_events([
+        {"car_object": "file", "car_action": "timestomp", "guid": "F", "source_host": "H",
+         "timestamp": "t", "owning_guid": "P", "previous_creation_time": "2019-01-01T00:00:00Z"}])
+    assert ts[0]["properties"] == {"previous_creation_time": "2019-01-01T00:00:00Z"}
 
 
 def test_superset_builds_in_memory_and_exports_the_relationship_timeline(tmp_path):
