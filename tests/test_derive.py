@@ -70,7 +70,12 @@ def test_derived_link_on_shared_hash_and_content_entities(tmp_path):
     ]
     sup_store = superset.SupersetStore()
     out = derive.derive(events, sup_store, str(tmp_path))
-    assert out["derived"] == 1 and out["content_nodes"] == 2
+    # two derived edges: the shared-hash 1:1 link AND the actor edge the real
+    # SID on P1's create row grounds (D3) — the well-known SID grounds none
+    assert out["derived"] == 2 and out["content_nodes"] == 2
+    assert ("user_account", "sid:S-1-5-21-1-2-3-1001", "created", "process", "P1") in {
+        (r["source_object"], r["source_guid"], r["relationship"],
+         r["target_object"], r["target_guid"]) for r in sup_store.relationships}
     row = sup_store.relationships[0]
     assert tuple(row[k] for k in ("class", "relationship", "source_object", "source_guid",
                                   "target_object", "target_guid", "confidence", "method",
@@ -95,6 +100,13 @@ def test_derived_link_on_shared_hash_and_content_entities(tmp_path):
     assert lines[0]["class"] == "derived" and lines[0]["corroborated_by"] == ["P1", "F1"]
     # nothing was reconstructed
     assert out["inferred_nodes"] == 0 and os.path.getsize(tmp_path / "car_inferred.jsonl") == 0
+    # the content nodes export to their own stream file (D5), CONTENT_COLUMNS
+    # shape, ordered by node_id — global rows: no source_host column at all
+    assert out["content_exported"] == 2
+    cl = [json.loads(l) for l in open(tmp_path / "car_content.jsonl")]
+    assert [l["node_id"] for l in cl] == [f"sha256:{_SHA}", "sid:S-1-5-21-1-2-3-1001"]
+    assert all(list(l) == list(superset.CONTENT_COLUMNS) for l in cl)
+    assert cl[0]["kind"] == "file_content" and cl[0]["ref_count"] == 3
 
 
 def test_derived_link_on_shared_guid_zeek_fuid():
@@ -136,7 +148,48 @@ def test_all_derived_verbs_are_attack_vocabulary():
     verbs = {r["relationship"] for r in derive.rules()["links"]}
     verbs |= {r["relationship"] for r in derive.rules()["reconstruct"]
               if r["relationship"] != "spoke_owner"}
+    verbs |= {r["relationship"] for r in derive.rules().get("actors") or []}
     assert verbs and verbs <= vocab, f"verbs not in ATT&CK vocabulary: {verbs - vocab}"
+
+
+# --------------------------------------------------------------------------- #
+# actor edges: the user dimension, grounded in real SIDs (D3)
+# --------------------------------------------------------------------------- #
+def test_actor_edges_ground_the_user_dimension_in_sids():
+    S1, S2 = "S-1-5-21-1-2-3-1001", "S-1-5-21-1-2-3-500"
+    events = [
+        # a process created under a real account -> user_account --created--> process
+        _proc("P1", sid=S1),
+        # a session logged in by a real account -> user_account --created--> user_session
+        _ev("user_session", "login", "U1", uid=S1),
+        # an authentication where the SUBJECT differs from the TARGET: the
+        # logged-in-as / impersonation transaction, account -> account
+        _ev("authentication", "success", "A1", uid=S1, target_uid=S2),
+        # subject == target: a normal self-logon, never an impersonation edge
+        _ev("authentication", "success", "A2", uid=S1, target_uid=S1),
+        # a well-known SID identifies no account: gated out entirely
+        _proc("P2", sid="S-1-5-18"),
+        _ev("authentication", "success", "A3", uid="S-1-5-18", target_uid=S2),
+    ]
+    edges = derive.actor_edges(events)
+    got = {(e["source_object"], e["source_guid"], e["relationship"],
+            e["target_object"], e["target_guid"]) for e in edges}
+    assert got == {
+        ("user_account", f"sid:{S1}", "created", "process", "P1"),
+        ("user_account", f"sid:{S1}", "created", "user_session", "U1"),
+        ("user_account", f"sid:{S1}", "attempted to authenticate", "user_account", f"sid:{S2}"),
+    }
+    for e in edges:
+        assert e["class"] == "derived" and e["method"] == "actor_sid" \
+            and e["confidence"] == "definitive" and e["inferred_end"] is None
+    by_tgt = {e["target_guid"]: e for e in edges}
+    assert by_tgt["P1"]["identity_key"] == "sid" and by_tgt["P1"]["corroborated_by"] == ["P1"]
+    assert by_tgt[f"sid:{S2}"]["identity_key"] == "uid" \
+        and by_tgt[f"sid:{S2}"]["corroborated_by"] == ["A1"]
+    # every actor end has a backing content node minted from the SAME rows
+    nodes, _refs = derive.content_entities(events)
+    node_ids = {n["node_id"] for n in nodes}
+    assert {f"sid:{S1}", f"sid:{S2}"} <= node_ids
 
 
 # --------------------------------------------------------------------------- #

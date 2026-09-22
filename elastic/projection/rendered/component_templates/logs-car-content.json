@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "generated_by": "python elastic/projection/render_elastic.py",
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "elastic/projection/conventions.yml",
+      "elastic/projection/content.yml"
+    ],
+    "version": 3
+  },
+  "template": {
+    "mappings": {
+      "properties": {
+        "car": {
+          "properties": {
+            "content": {
+              "properties": {
+                "first_seen": {
+                  "type": "date"
+                },
+                "identity_key": {
+                  "type": "keyword"
+                },
+                "identity_value": {
+                  "type": "keyword"
+                },
+                "kind": {
+                  "type": "keyword"
+                },
+                "last_seen": {
+                  "type": "date"
+                },
+                "node_id": {
+                  "type": "keyword"
+                },
+                "properties": {
+                  "type": "flattened"
+                },
+                "ref_count": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

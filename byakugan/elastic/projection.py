@@ -90,6 +90,7 @@ CONVENTIONS_PATH = os.path.join(MODEL_DIR, "conventions.yml")
 OBJECTS_DIR = os.path.join(MODEL_DIR, "objects")
 RELATIONSHIPS_PATH = os.path.join(MODEL_DIR, "relationships.yml")
 INFERRED_PATH = os.path.join(MODEL_DIR, "inferred.yml")
+CONTENT_PATH = os.path.join(MODEL_DIR, "content.yml")
 ECS_TYPES_PATH = os.path.join(MODEL_DIR, "ecs_types.yml")
 
 # The one, always-the-same reason project_event/project_relationship/
@@ -418,6 +419,7 @@ def load_contract() -> dict:
         "objects": objects,
         "relationships": _compile_edge(_yaml(RELATIONSHIPS_PATH)),
         "inferred": _compile_edge(_yaml(INFERRED_PATH)),
+        "content": _compile_edge(_yaml(CONTENT_PATH)),
     }
     return _cache
 
@@ -698,3 +700,20 @@ def project_inferred(row: dict, namespace: str):
     if _blank(node_id):
         raise ValueError("inferred_node row has no node_id (document_id: node_id verbatim)")
     return f"logs-car.inferred-{namespace}", node_id, doc
+
+
+def project_content(row: dict, namespace: str):
+    """A `car_content.jsonl` line (byakugan/superset.py CONTENT_COLUMNS — the
+    content-keyed attribution nodes) -> `(stream, doc_id, doc)`, or `None`
+    when `row["first_seen"]` does not parse (SKIP_NO_TIMESTAMP — see
+    content.yml). `document_id` is `node_id` verbatim: deterministic by
+    content (content.yml), never hashed; GLOBAL, so a re-load or a second
+    source carrying the same content overwrites, last write wins."""
+    plan = load_contract()["content"]
+    doc = _project_edge(row, namespace, plan)
+    if doc is None:
+        return None
+    node_id = row.get("node_id")
+    if _blank(node_id):
+        raise ValueError("content_node row has no node_id (document_id: node_id verbatim)")
+    return f"logs-car.content-{namespace}", node_id, doc

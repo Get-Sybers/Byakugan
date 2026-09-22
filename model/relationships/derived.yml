@@ -79,6 +79,37 @@ derived_relationships:
     join:
       source: native.resp_fuids
       target: guid
+  actors:
+  - name: user_created_process
+    'on': process/create
+    form: user_account --created--> process
+    typing: exact
+    identity: sid
+    source:
+    - sid
+    - uid
+    method: actor_sid
+    confidence: definitive
+  - name: user_created_session
+    'on': user_session/login
+    form: user_account --created--> user_session
+    typing: exact
+    identity: sid
+    source:
+    - uid
+    method: actor_sid
+    confidence: definitive
+  - name: auth_subject_target
+    'on': authentication
+    form: user_account --attempted to authenticate--> user_account
+    typing: extension
+    identity: sid
+    source:
+    - uid
+    method: actor_sid
+    confidence: definitive
+    target_source:
+    - target_uid
   reconstruct:
   - name: owning_process
     'on': spokes

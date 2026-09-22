@@ -4,13 +4,16 @@
 # attack-datasources submodule); tests/test_superset.py enforces it.
 #
 # COVERAGE: every superset (object, action) pair of the 13 CAR objects has an
-# explicit verb here, EXCEPT the eight decision-flagged pairs of
-# docs/research/relationship-model-gaps.md §1/§9 (email's five actions,
-# service/pause, socket/close, thread/suspend — no catalogue verb fits; held
-# for the owner). tests/test_superset.py pins that exception list, so a new
-# upstream action surfaces as a test failure, not a silent default.
-# The grounding per verb — which ATT&CK data component, and whether the typed
-# triple is exact or a Byakugan extension — is the register §1 table.
+# explicit verb here — the once decision-flagged pairs (email's five actions,
+# service/pause, socket/close, thread/suspend) were ratified by the owner
+# (register §9 D1/D2): email's verbs ground in the CAR action definitions
+# themselves (data_model/email.yaml — CAR is upstream too), and the other
+# three resolved under the vectors/transactions/associations reading
+# (register §10). tests/test_superset.py pins the exception list (now empty),
+# so a new upstream action surfaces as a test failure, not a silent default.
+# The grounding per verb — which ATT&CK data component (or CAR action
+# definition), and whether the typed triple is exact or a Byakugan extension —
+# is the register §1 table.
 
 # process --verb--> spoke, keyed by the spoke's (car_object, car_action).
 spoke_owner:
@@ -59,10 +62,19 @@ spoke_owner:
     enumerate: listed                       # Service Enumeration (exact)
     metadata: retrieved information about   # Service Metadata (exact)
     access: accessed                        # Service Access (user-sourced upstream; extension)
+    pause: modified                         # D2 (register §10): a pause is a run-state
+                                            # MODIFICATION of the service (SERVICE_CONTROL_PAUSE
+                                            # changes state without ending it) — Service
+                                            # Modification, an exact triple; the precise
+                                            # transition stays in car_action
   thread:
     remote_create: created
     create: created                         # Process Creation: process --created--> thread (exact)
     terminate: terminated                   # termination-family verb (extension)
+    suspend: accessed                       # D2 (register §10): a suspend is an exercised ACCESS
+                                            # on the running thread (THREAD_SUSPEND_RESUME) — the
+                                            # access-family transaction; the exercised right is
+                                            # the association layer when a source supplies it
   http:
     get: created
     post: created
@@ -71,6 +83,9 @@ spoke_owner:
   socket:
     bind: bound to
     listen: listened on                     # process --listened on--> port (exact)
+    close: terminated                       # D2 (register §10): the transaction ENDS the socket
+                                            # vector's lifetime — the same reading as
+                                            # user_session/logout -> terminated (extension)
   user_session:
     login: created
     reconnect: created
@@ -84,6 +99,19 @@ spoke_owner:
     success: requested
     failure: requested
     error: requested
+  # D1 (register §9): email's verbs ground in CAR's OWN action definitions
+  # (data_model/email.yaml — the owner's ruling: CAR is upstream research too);
+  # every verb still from the ATT&CK catalogue. The acting process is the mail
+  # server (CAR-Relations §email: only `deliver` asserts server-side delivery).
+  email:
+    deliver: created                        # "sent to an end recipient" — the message comes to
+                                            # exist at the recipient side (extension)
+    block: stopped                          # "blocked by the email server" — the server stopped
+                                            # the delivery transaction (extension)
+    redirect: modified                      # "being redirected" — its routing changed (extension)
+    quarantine: locked                      # "quarantined for security reasons" — isolated,
+                                            # retrievable: the locked-account analogue (extension)
+    delete: deleted                         # deletion-family verb (extension)
 
 # the verb for a spoke whose (object, action) is not listed above — reserved
 # for the decision-flagged pairs and for drift; a pair that is neither is a

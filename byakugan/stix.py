@@ -773,6 +773,11 @@ class Projection:
                                "reason": "referenced by a derived relationship only; "
                                          "no observed record (reconstructed, not evidence)"})
             return nid
+        # a user_account end (an actor edge): the sid:<SID> content node — the
+        # SAME global user-account SCO the content layer minted from that SID
+        if obj == "user_account" and str(guid).startswith("sid:"):
+            uid = global_id("user-account", {"user_id": str(guid)[len("sid:"):]})
+            return uid if uid in self.objs else None
         key = (host, obj, str(guid))
         if OBJECTS.get(obj, {}).get("sro_end") == "observed-data":
             return self.obs.get(key)

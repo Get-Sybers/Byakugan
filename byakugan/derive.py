@@ -59,7 +59,7 @@ def rules() -> dict:
     loader re-keys a boolean-True key back to "on" so a future unquoted edit
     degrades to working, not to scopeless."""
     r = enrich.rules()["derived"]
-    for rec in r.get("reconstruct") or []:
+    for rec in (r.get("reconstruct") or []) + (r.get("actors") or []):
         if True in rec and "on" not in rec:
             rec["on"] = rec.pop(True)
     return r
@@ -247,6 +247,57 @@ def link_edges(events: list[dict]) -> list[dict]:
 
 
 # --------------------------------------------------------------------------- #
+# Actor edges — the user dimension, grounded in the sid content identity
+# --------------------------------------------------------------------------- #
+def _first_accepted(ev: dict, fields: list, ident: dict):
+    """(field, normalized value) for the first field whose value passes the
+    identity's accept gate; (None, None) when none does."""
+    for f in fields:
+        v = ev.get(f)
+        if v in _MISSING or not _accepts(ident, v):
+            continue
+        return f, _normalize(ident, v)
+    return None, None
+
+
+def actor_edges(events: list[dict]) -> list[dict]:
+    """The ACTOR edges (relationships.yml derived.actors): a row whose account
+    field passes the REAL-SID gate names its actor — the edge runs from the
+    user_account content node (sid:<SID>, the node content_entities mints from
+    the same row) to the row it acted in, or account -> account for an
+    authentication's subject/target pair (the logged-in-as / impersonation
+    transaction). One timestamped edge per observing row: these are timeline
+    transactions, not a deduplicated summary."""
+    idents = rules()["identities"]
+    out = []
+    for rule in rules().get("actors") or []:
+        ident = idents[rule["identity"]]
+        prefix = rule["identity"]
+        for ev in events:
+            if ev.get("guid") is None or not _in_scope(rule.get("on"), ev):
+                continue
+            sf, sval = _first_accepted(ev, rule["source"], ident)
+            if sval is None:
+                continue
+            if "target_source" in rule:
+                _tf, tval = _first_accepted(ev, rule["target_source"], ident)
+                if tval is None or tval == sval:
+                    continue          # no gated target account, or self: not an impersonation
+                t_obj, t_guid = "user_account", f"{prefix}:{tval}"
+            else:
+                t_obj, t_guid = ev["car_object"], ev["guid"]
+            out.append({"timestamp": ev.get("timestamp"), "source_host": ev.get("source_host"),
+                        "relationship": rule["relationship"],
+                        "source_object": "user_account", "source_guid": f"{prefix}:{sval}",
+                        "target_object": t_obj, "target_guid": t_guid,
+                        "confidence": rule.get("confidence", "definitive"),
+                        "method": rule["method"], "class": superset.DERIVED,
+                        "identity_key": sf, "inferred_end": None,
+                        "corroborated_by": [ev["guid"]]})
+    return out
+
+
+# --------------------------------------------------------------------------- #
 # Reconstruction — the referenced end is absent
 # --------------------------------------------------------------------------- #
 def _in_scope(on, ev: dict) -> bool:
@@ -365,7 +416,7 @@ def derive(events: list[dict], sup_store: superset.SupersetStore, out_dir: str |
     fresh or already derived-free — `run()` below gives it exactly that."""
     observed = {(ev.get("source_host"), ev["car_object"], str(ev["guid"]))
                 for ev in events if ev.get("guid") is not None}
-    edges = link_edges(events)
+    edges = link_edges(events) + actor_edges(events)
     nodes, redges = reconstruct(events, observed)
     cnodes, refs = content_entities(events)
     sup_store.insert_edges(edges + redges)
@@ -376,6 +427,7 @@ def derive(events: list[dict], sup_store: superset.SupersetStore, out_dir: str |
     if out_dir:
         summary["relationships_exported"] = sup_store.export_jsonl(out_dir)
         summary["inferred_exported"] = sup_store.export_inferred_jsonl(out_dir)
+        summary["content_exported"] = sup_store.export_content_jsonl(out_dir)
     return summary
 
 

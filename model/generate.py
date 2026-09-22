@@ -391,6 +391,19 @@ def gen_relationships() -> tuple[int, int]:
             **({"join": rule["join"]} if "join" in rule else {}),
             **({"prefer": rule["prefer"]} if "prefer" in rule else {}),
         })
+    actors = []
+    for rule in d.get("actors") or []:
+        tgt = "user_account" if "target_source" in rule \
+            else (rule.get("on") or "").partition("/")[0]
+        a = {"name": rule["name"], "on": rule.get("on"),
+             "form": f"user_account --{rule['relationship']}--> {tgt}",
+             "typing": _typing(triples, "user_account", rule["relationship"], tgt),
+             "identity": rule["identity"], "source": list(rule["source"]),
+             "method": rule["method"],
+             "confidence": rule.get("confidence", "definitive")}
+        if "target_source" in rule:
+            a["target_source"] = list(rule["target_source"])
+        actors.append(a)
     recon = []
     for rule in d.get("reconstruct") or []:
         verb = rule["relationship"]
@@ -419,7 +432,8 @@ def gen_relationships() -> tuple[int, int]:
                "# becomes a flagged inferred_node. Rendered from byakugan/relationships.yml\n"
                "# `derived:`; the engine is byakugan/derive.py."),
            _yaml({"derived_relationships": {
-               "identities": identities, "links": links, "reconstruct": recon}}))
+               "identities": identities, "links": links, "actors": actors,
+               "reconstruct": recon}}))
     return n, len(edges)
 
 
