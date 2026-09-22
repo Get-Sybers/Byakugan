@@ -371,28 +371,37 @@ or external form.
 
 ## 8. Stage-2 execution order (smallest-risk first, each item names its layer)
 
-1. **Complete `spoke_owner`** — the 35 pairs of §1 minus the eight
+Status: items 1–7 are **shipped on this branch** as noted; what remains open
+is the decision set (§9) and the two flagged follow-ons below.
+
+1. ✅ **Complete `spoke_owner`** — the 35 pairs of §1 minus the eight
    decision-flagged ones (email ×5, service/pause, socket/close,
-   thread/suspend — held for the owner if not ratified by then). Layer 1 YAML
-   only; extend
-   `test_all_emittable_verbs_are_attack_vocabulary` to sweep every superset
-   (object, action) pair, and add the declared-pair-completeness test.
-2. **Materialise R3** — `edges: flow_contains: contained` + the
-   `edges_from_events` branch on `native.flow_guid`; declare
-   `edges: process_modify: modified` (§3.2.2) while in the file.
-3. **Association properties as data** — move `_edge_properties` into
-   `cascade_relationships.yml` (`association_properties:`), then land the §4
-   register (process_access, thread_injection, module/driver load, registry
-   edits, timestomp). `test_superset` grows one case per edge.
-4. **`luid` identity + auth→session reconstruct** (§3.2.4); implement or
-   strike R4/R7 (§7).
-5. **Spindle externals** — the ten declarations of §5 with their stability
-   wording; file the Anamnesis hex/decimal alignment as an Anamnesis issue
-   (its fix re-mints filescan guids → coordinated bump).
-6. **STIX `x_car_properties`** — contract v5 (§6.1).
-7. **The readable rendering** — generated `model/relationships/` + the
-   `verify.py` gates + CAR-Relations refresh (§6.3–6.4).
-8. **Owner decisions** (§9), then their fallout.
+   thread/suspend — held for the owner). Shipped: the 27 declarations, the
+   generic vocabulary sweep and the declared-pair-completeness test pinning
+   exactly the eight decision defaults.
+2. ✅ **Materialise R3** — `edges: flow_contains: contained` + the
+   `edges_from_events` branch on `native.flow_guid`; `edges: process_modify:
+   modified` declared with its `native.modifier_process_guid` contract.
+3. ✅ **Association properties as data** — `_edge_properties` reads the new
+   `association_properties:` block; the §4 register landed (process_access,
+   thread_injection, module/driver load, registry edits, timestomp,
+   acl_modify), tests per set.
+4. ✅/⏳ **`luid` identity + auth→session reconstruct** shipped (§3.2.4) —
+   including the accept gate (null/well-known LUIDs never mint) and a fix
+   for a latent bug it exposed: every reconstruct rule's `on:` scope had
+   been parsed as YAML-1.1 boolean True and silently ignored. **R4/R7
+   remain specs**: CAR-Relations.md now labels them honestly; implement or
+   strike is still open.
+5. ✅/⏳ **Spindle externals** — the eleven interchange declarations of §5
+   shipped (`carried_by:` is the registry's third holder). Open: file the
+   Anamnesis hex/decimal alignment as an Anamnesis issue (its fix re-mints
+   filescan guids → coordinated bump).
+6. ✅ **STIX `x_car_properties`** — contract v5 (§6.1).
+7. ✅ **The readable rendering** — generated `model/relationships/`
+   (declared.yml + derived.yml, typing-tiered) + the `verify.py`
+   relationship gates (class-aware confidence, model-declared verbs,
+   registry-declared property names) + the CAR-Relations refresh (§6.3–6.4).
+8. ⏳ **Owner decisions** (§9), then their fallout.
 
 Validation per increment, as #109 specifies: `python model/generate.py` ·
 `python model/stix/validate.py` · `python elastic/projection/validate.py` ·

@@ -78,12 +78,47 @@ def test_relationship_edges_are_checked(tmp_path):
     _write(tmp_path, "s", "relationships", [
         {"relationship": "created", "source_guid": "a", "target_guid": "", "confidence": "definitive"},
         {"relationship": "", "source_guid": "a", "target_guid": "b", "confidence": "guessed"},
+        # not a verb the model declares anywhere
+        {"relationship": "obliterated", "source_guid": "a", "target_guid": "b",
+         "confidence": "definitive"},
+        # an association property name outside the registry; properties not a mapping
+        {"relationship": "accessed", "source_guid": "a", "target_guid": "b",
+         "confidence": "definitive", "properties": {"granted": 1}},
+        {"relationship": "accessed", "source_guid": "a", "target_guid": "b",
+         "confidence": "definitive", "properties": "0x1010"},
+        # an unknown class
+        {"relationship": "created", "source_guid": "a", "target_guid": "b",
+         "confidence": "definitive", "class": "guessed"},
     ])
     c = verify.run(str(tmp_path))
     failed = _failures(c)
     assert any("source and target guid" in line for line in failed)
-    assert any("verb" in line for line in failed)
-    assert any("confidence" in line for line in failed)
+    assert any("edge has a verb" in line for line in failed)
+    assert any("declared confidence" in line for line in failed)
+    assert any("verb is one the model declares" in line for line in failed)
+    assert any("registry-declared" in line for line in failed)
+    assert any("mapping or null" in line for line in failed)
+    assert any("class in" in line for line in failed)
+
+
+def test_relationship_derived_class_confidence_is_open_but_never_empty(tmp_path):
+    _write(tmp_path, "s", "process", [_row("process", "create", command_line="x")])
+    _write(tmp_path, "s", "relationships", [
+        # a reconstruct edge: derived, confidence `inferred` — legal (open word)
+        {"relationship": "created", "source_guid": "A1", "target_guid": "user_session-0x51ca9",
+         "confidence": "inferred", "class": "derived", "method": "luid"},
+        # the #108 handle facts on a declared edge: registry-named keys — legal
+        {"relationship": "accessed", "source_guid": "p", "target_guid": "f",
+         "confidence": "definitive", "properties": {"access_level": 1179785, "handle_value": 4}},
+    ])
+    c = verify.run(str(tmp_path))
+    assert c.failed == 0, _failures(c)
+    # but an empty derived confidence is a failure
+    _write(tmp_path, "s", "relationships", [
+        {"relationship": "created", "source_guid": "a", "target_guid": "b",
+         "confidence": "", "class": "derived"}])
+    failed = _failures(verify.run(str(tmp_path)))
+    assert any("derived edge names its confidence" in line for line in failed)
 
 
 def test_empty_tree_fails_preflight_and_main_exits_2(tmp_path):
