@@ -92,14 +92,12 @@ def test_process_access_edges_source_to_target():
     assert (e["source_guid"], e["relationship"], e["target_guid"]) == ("SRC", "accessed", "TGT")
 
 
-# The decision-flagged (object, action) pairs deliberately left to the default
-# verb — docs/research/relationship-model-gaps.md §1/§9 (D1/D2): no catalogue
-# verb fits, held for the owner. Everything else must be declared explicitly.
-_UNDECLARED_BY_DECISION = {
-    ("email", "deliver"), ("email", "block"), ("email", "redirect"),
-    ("email", "quarantine"), ("email", "delete"),
-    ("service", "pause"), ("socket", "close"), ("thread", "suspend"),
-}
+# (object, action) pairs deliberately left to the default verb. EMPTY since
+# the owner ratified D1/D2 (docs/research/relationship-model-gaps.md §9-§10):
+# email's verbs ground in CAR's own action definitions; pause/close/suspend
+# resolved under the vectors/transactions/associations reading. The mechanism
+# stays: a pair pinned here is the ONLY legal default — anything else is drift.
+_UNDECLARED_BY_DECISION: set[tuple[str, str]] = set()
 
 
 def test_all_emittable_verbs_are_attack_vocabulary():

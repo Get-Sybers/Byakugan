@@ -290,6 +290,35 @@ def test_project_inferred_no_timestamp_is_none_and_missing_node_id_raises():
         pj.project_inferred(_inferred_row(node_id=None), "default")
 
 
+def _content_row(**kw):
+    return dict({"node_id": "sid:S-1-5-21-1-2-3-1001", "kind": "user_account",
+                 "identity_key": "sid", "identity_value": "S-1-5-21-1-2-3-1001",
+                 "ref_count": 3, "properties": {"user": ["alice"]},
+                 "first_seen": "2024-01-01T00:00:00Z",
+                 "last_seen": "2024-01-01T00:05:00Z"}, **kw)
+
+
+def test_project_content():
+    stream, doc_id, doc = pj.project_content(_content_row(), "default")
+    assert stream == "logs-car.content-default"
+    assert doc_id == "sid:S-1-5-21-1-2-3-1001"          # node_id verbatim, never hashed
+    assert doc["@timestamp"] == "2024-01-01T00:00:00Z"
+    c = doc["car"]["content"]
+    assert (c["node_id"], c["kind"], c["identity_key"], c["identity_value"]) == (
+        "sid:S-1-5-21-1-2-3-1001", "user_account", "sid", "S-1-5-21-1-2-3-1001")
+    assert c["ref_count"] == 3 and c["properties"] == {"user": ["alice"]}
+    assert doc["event"]["dataset"] == "car.content"
+    # global by content: no host on the document
+    assert "host" not in doc
+
+
+def test_project_content_no_timestamp_is_none_and_missing_node_id_raises():
+    import pytest
+    assert pj.project_content(_content_row(first_seen=""), "default") is None
+    with pytest.raises(ValueError):
+        pj.project_content(_content_row(node_id=None), "default")
+
+
 # --- the shared document_id helper ------------------------------------------
 
 def test_sha1_id_hand_computed_vector():

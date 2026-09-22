@@ -70,7 +70,7 @@ def _relationship_vocab():
         verbs.add(r.get("default_spoke_verb"))
         verbs.update((r.get("edges") or {}).values())
         d = enrich.rules().get("derived") or {}
-        for rule in (d.get("links") or []) + (d.get("reconstruct") or []):
+        for rule in (d.get("links") or []) + (d.get("reconstruct") or []) + (d.get("actors") or []):
             v = rule.get("relationship")
             if v and v != "spoke_owner":       # spoke_owner resolves to the table above
                 verbs.add(v)

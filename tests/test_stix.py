@@ -107,6 +107,25 @@ def test_content_keyed_file_gets_spec_global_id_across_runs_and_cases(tmp_path):
     assert again.read_bytes() == pathlib.Path(s1["bundle"]).read_bytes()
 
 
+def test_actor_edge_sro_ends_on_the_global_user_account(tmp_path):
+    """A D3 actor edge (user_account sid:<SID> --created--> process) resolves
+    its account end to the SAME global user-account SCO the content layer
+    mints from that SID — never a second account object."""
+    sid = "S-1-5-21-1-2-3-1001"
+    b = _bundle(stix.export(str(_build(tmp_path, [
+        _proc("P1", sid=sid, user="alice", pid=10)])), case="c")["bundle"])
+    (acct,) = [o for o in _of(b, "user-account") if o.get("user_id") == sid]
+    (proc,) = _of(b, "process")
+    actor = [r for r in _of(b, "relationship")
+             if r["x_car_method"] == "actor_sid"]
+    assert len(actor) == 1
+    r = actor[0]
+    assert (r["relationship_type"], r["source_ref"], r["target_ref"]) == (
+        "created", acct["id"], proc["id"])
+    assert r["x_car_class"] == "derived" and r["x_car_identity_key"] == "sid" \
+        and r["x_car_corroborated_by"] == ["P1"]
+
+
 # --------------------------------------------------------------------------- #
 # both relationship classes are SROs, labelled by class + method
 # --------------------------------------------------------------------------- #

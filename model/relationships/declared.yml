@@ -45,20 +45,25 @@ declared_relationships:
       typing: exact
     email:
     - car_action: deliver
-      relationship: null
-      status: 'decision-flagged (register §9 D1/D2): undeclared, the default verb ''accessed'' applies'
+      relationship: created
+      form: process --created--> email
+      typing: extension
     - car_action: block
-      relationship: null
-      status: 'decision-flagged (register §9 D1/D2): undeclared, the default verb ''accessed'' applies'
+      relationship: stopped
+      form: process --stopped--> email
+      typing: extension
     - car_action: redirect
-      relationship: null
-      status: 'decision-flagged (register §9 D1/D2): undeclared, the default verb ''accessed'' applies'
+      relationship: modified
+      form: process --modified--> email
+      typing: extension
     - car_action: quarantine
-      relationship: null
-      status: 'decision-flagged (register §9 D1/D2): undeclared, the default verb ''accessed'' applies'
+      relationship: locked
+      form: process --locked--> email
+      typing: extension
     - car_action: delete
-      relationship: null
-      status: 'decision-flagged (register §9 D1/D2): undeclared, the default verb ''accessed'' applies'
+      relationship: deleted
+      form: process --deleted--> email
+      typing: extension
     file:
     - car_action: access
       relationship: accessed
@@ -255,8 +260,9 @@ declared_relationships:
       form: process --modified--> service
       typing: exact
     - car_action: pause
-      relationship: null
-      status: 'decision-flagged (register §9 D1/D2): undeclared, the default verb ''accessed'' applies'
+      relationship: modified
+      form: process --modified--> service
+      typing: exact
     - car_action: start
       relationship: started
       form: process --started--> service
@@ -275,16 +281,18 @@ declared_relationships:
       form: process --listened on--> socket
       typing: exact
     - car_action: close
-      relationship: null
-      status: 'decision-flagged (register §9 D1/D2): undeclared, the default verb ''accessed'' applies'
+      relationship: terminated
+      form: process --terminated--> socket
+      typing: extension
     thread:
     - car_action: create
       relationship: created
       form: process --created--> thread
       typing: exact
     - car_action: suspend
-      relationship: null
-      status: 'decision-flagged (register §9 D1/D2): undeclared, the default verb ''accessed'' applies'
+      relationship: accessed
+      form: process --accessed--> thread
+      typing: extension
     - car_action: terminate
       relationship: terminated
       form: process --terminated--> thread

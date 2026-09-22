@@ -16,7 +16,7 @@ Two modes, selected by `--es-url` (empty = bundle, the default — no network
 is ever opened without it, the same opt-in shape as ANAMNESIS_SYMBOLS_ONLINE):
 
   bundle  render `<out>/elastic/logs-car.<stream>-<ns>.ndjson` (one file per
-          data stream actually populated — 13 CAR objects + rel + inferred,
+          data stream actually populated — 13 CAR objects + rel + inferred + content,
           Elasticsearch `_bulk` NDJSON: a `{"create": {"_id": ...}}` line then
           the document, compact + sorted-key JSON for byte-determinism) plus
           `elastic/manifest.json` (contract version, namespace, per-stream
@@ -128,6 +128,8 @@ def project_tree(car_dir: str, sources: list[str], namespace: str) -> dict:
                  projection.project_relationship, namespace, streams, stats, skip_reasons, failures)
         _consume(os.path.join(source, "car_inferred.jsonl"), key,
                  projection.project_inferred, namespace, streams, stats, skip_reasons, failures)
+        _consume(os.path.join(source, "car_content.jsonl"), key,
+                 projection.project_content, namespace, streams, stats, skip_reasons, failures)
         per_source[key] = stats
     return {"streams": streams, "per_source": per_source, "skip_reasons": skip_reasons,
            "failures": failures}

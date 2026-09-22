@@ -15,7 +15,8 @@ them.
 Held per source alongside the object events, so a source's events and their
 relationship timeline stay together for the duration of a build; the ONLY
 on-disk product is the materialised JSONL tree (`export_jsonl`/
-`export_inferred_jsonl`) — no SQLite is written anywhere in this module. The
+`export_inferred_jsonl`/`export_content_jsonl`) — no SQLite is written
+anywhere in this module. The
 former reference-model seed (`model_object`/`relationship_type`, a copy of
 build_data_model's own output) is gone: nothing at runtime ever read it back,
 so a consumer that wants the superset model calls `build_data_model.build_superset()`
@@ -53,6 +54,11 @@ REL_COLUMNS = ("timestamp", "source_host", "relationship", "source_object", "sou
 INFERRED_COLUMNS = ("node_id", "source_host", "object", "identity_key", "identity_value",
                     "reason", "method", "corroborated_by", "properties", "first_seen",
                     "last_seen")
+# the content-node row (car_content.jsonl -> logs-car.content-*; D5): GLOBAL by
+# content (no source_host — the same bytes / the same account are the same node
+# wherever seen), so the columns differ from INFERRED_COLUMNS deliberately
+CONTENT_COLUMNS = ("node_id", "kind", "identity_key", "identity_value", "ref_count",
+                   "properties", "first_seen", "last_seen")
 
 # relationship-instance verbs are DATA (cascade_relationships.yml), validated
 # against the ATT&CK catalogue by test_superset.
@@ -256,6 +262,15 @@ class SupersetStore:
         destined for its own stream (logs-car.inferred-*), never a car_<object>."""
         ordered = sorted(self.inferred_nodes.values(), key=lambda n: n.get("first_seen") or "")
         return self._export(out_dir, "car_inferred.jsonl", ordered)
+
+    def export_content_jsonl(self, out_dir: str) -> int:
+        """The content-keyed nodes (the attribution layer: a hash, a real SID)
+        as JSONL — car_content.jsonl, destined for logs-car.content-* (D5),
+        never a car_<object>. Ordered by node_id: content nodes are global and
+        may carry no time at all, so the id is the deterministic axis."""
+        ordered = [{c: n.get(c) for c in CONTENT_COLUMNS}
+                   for n in sorted(self.content_nodes.values(), key=lambda n: n["node_id"])]
+        return self._export(out_dir, "car_content.jsonl", ordered)
 
     def close(self) -> None:
         """No-op — an in-memory store holds no file handle. Kept so a caller

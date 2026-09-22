@@ -12,6 +12,7 @@ under elastic/projection/rendered/ (committed output, like model/sql/*.sql):
       component_templates/logs-car-<object>.json (13)   one CAR object's own fields
       component_templates/logs-car-rel.json             the relationship-timeline stream
       component_templates/logs-car-inferred.json        the inferred-node stream
+      component_templates/logs-car-content.json         the content-node stream (the attribution layer)
       index_templates/logs-car-<object>.json (13)       index_patterns + composed_of
       index_templates/logs-car-rel.json
       index_templates/logs-car-inferred.json
@@ -43,6 +44,7 @@ CONVENTIONS_PATH = os.path.join(HERE, "conventions.yml")
 OBJECTS_DIR = os.path.join(HERE, "objects")
 RELATIONSHIPS_PATH = os.path.join(HERE, "relationships.yml")
 INFERRED_PATH = os.path.join(HERE, "inferred.yml")
+CONTENT_PATH = os.path.join(HERE, "content.yml")
 ECS_TYPES_PATH = os.path.join(HERE, "ecs_types.yml")
 RENDERED_DIR = os.path.join(HERE, "rendered")
 
@@ -457,6 +459,7 @@ def render_all() -> tuple[dict[str, str], list[str]]:
         objects[os.path.splitext(os.path.basename(path))[0]] = _load(path)
     relationships = _load(RELATIONSHIPS_PATH)
     inferred = _load(INFERRED_PATH)
+    content = _load(CONTENT_PATH)
     ecs_types = (_load(ECS_TYPES_PATH) or {}).get("types") or {}
 
     files: dict[str, str] = {}
@@ -482,6 +485,11 @@ def render_all() -> tuple[dict[str, str], list[str]]:
         render_edge_component(inferred, header_paths, contract, "elastic/projection/inferred.yml"))
     files["index_templates/logs-car-inferred.json"] = _dump_json(render_index_template(
         "logs-car.inferred-*", "logs-car-inferred", ["elastic/projection/inferred.yml"], contract))
+
+    files["component_templates/logs-car-content.json"] = _dump_json(
+        render_edge_component(content, header_paths, contract, "elastic/projection/content.yml"))
+    files["index_templates/logs-car-content.json"] = _dump_json(render_index_template(
+        "logs-car.content-*", "logs-car-content", ["elastic/projection/content.yml"], contract))
 
     files["kibana/logs-car-views.ndjson"] = render_kibana_ndjson()
 

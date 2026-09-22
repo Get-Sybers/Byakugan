@@ -73,8 +73,10 @@ fields:
     type: keyword
     note: >-
       the source endpoint's event.id — a join key back to its logs-car.<source_object>-* (or,
-      when inferred_end=source, logs-car.inferred-*) row. Not aliased to ECS event.id itself:
-      an edge document names TWO endpoints, and event.id is singular per ECS document.
+      when inferred_end=source, logs-car.inferred-*) row; a user_account end (an ACTOR edge —
+      source_object user_account, guid sid:<SID>) joins logs-car.content-* by node_id instead.
+      Not aliased to ECS event.id itself: an edge document names TWO endpoints, and event.id
+      is singular per ECS document.
   - car: target_object
     ecs: car.rel.target.object
     type: keyword

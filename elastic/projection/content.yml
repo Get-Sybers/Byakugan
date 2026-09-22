@@ -1,0 +1,88 @@
+# HAND-AUTHORED contract — validated by `python elastic/projection/validate.py`.
+# Projection of a content-node row (byakugan/superset.py CONTENT_COLUMNS,
+# exported as car_content.jsonl) onto the logs-car.content-<namespace> data
+# stream — the attribution layer made ECS-streamable (the D5 decision,
+# docs/research/relationship-model-gaps.md §6.2/§9: STIX stays the exchange
+# model for seeing the data; processed data is all ECS streamable).
+#
+# A content_node names the SAME content wherever it appears — a file's bytes
+# by hash, a real account by SID (byakugan/derive.py content_entities; the
+# identities are relationships.yml derived.identities of kind `content`). It
+# is GLOBAL by construction: no source_host, no car.object — the node is not
+# an event and not one of the 13 CAR objects. It is also the join target of
+# the ACTOR edges' user_account ends (car.rel.source/target.guid = the
+# node_id, e.g. sid:S-1-5-21-…).
+object: content
+stream: logs-car.content-*
+dataset: car.content
+
+# Same shape as relationships.yml / inferred.yml constants; no car.object and
+# no host.name — content is content wherever it was seen.
+constants:
+  event.kind: event
+  event.module: car
+  event.dataset: car.content
+  data_stream.type: logs
+  data_stream.dataset: car.content
+  ecs.version: '8.11.0'
+
+document_id:
+  recipe: node_id
+  note: >-
+    node_id verbatim — deterministic by content (sha256:<hex>, sid:<SID>; byakugan/derive.py
+    content_entities), so re-deriving the same evidence yields the same id and re-loading is
+    idempotent. Because the id is GLOBAL, two sources (or two batches) carrying the same
+    content write the same document: last write wins, so per-load context (ref_count, the
+    properties union) reflects the most recent load rather than a cross-load union — the STIX
+    lane unions instead (its content SCOs are built over the whole case). An additive
+    cross-load merge would need an update-by-script transform; deliberately not done here.
+
+fields:
+  - car: first_seen
+    ecs: '@timestamp'
+    type: date
+    also: car.content.first_seen
+    also_type: date
+    note: >-
+      the earliest record carrying the content (byakugan/derive.py _seen). A node whose
+      carrying records have no parseable time is SKIPPED, exactly like the inferred stream
+      (SKIP_NO_TIMESTAMP): a data stream document needs its time axis; the node still reaches
+      STIX, which has no such constraint.
+  - car: last_seen
+    ecs: car.content.last_seen
+    type: date
+    note: the latest carrying record's timestamp.
+  - car: node_id
+    ecs: car.content.node_id
+    type: keyword
+    note: >-
+      kept as ordinary data too, alongside its use as the document_id — and the value a
+      car.rel.source.guid / car.rel.target.guid of a user_account end joins on (the D3 actor
+      edges).
+  - car: kind
+    ecs: car.content.kind
+    type: keyword
+    note: >-
+      the node kind the identity declares (relationships.yml derived.identities.<name>.node) —
+      file_content | user_account today; open as identities are added.
+  - car: identity_key
+    ecs: car.content.identity_key
+    type: keyword
+    note: the field the node was minted from (sha256_hash, sid, owner_uid, ...) — the record's ROLE lives on entity refs, not here.
+  - car: identity_value
+    ecs: car.content.identity_value
+    type: keyword
+    note: the normalized content identity (the hash hex lowered, the SID uppered) — node_id minus its kind prefix.
+  - car: ref_count
+    ecs: car.content.ref_count
+    type: long
+    note: how many records of THIS load carried the identity (see the document_id note on last-write-wins).
+  - car: properties
+    ecs: car.content.properties
+    type: flattened
+    note: >-
+      the context the carrying records gave the node, unioned additively and capped
+      (byakugan/derive.py _PROP_CAP — a hash seen at many paths): file_path/image_path/
+      module_path/file_name/signer for content files, user/hostname for accounts
+      (relationships.yml derived.identities.<name>.properties). Shape varies per kind, so
+      flattened, like car.native.

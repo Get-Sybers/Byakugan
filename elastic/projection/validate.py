@@ -58,6 +58,7 @@ CONVENTIONS_PATH = os.path.join(HERE, "conventions.yml")
 OBJECTS_DIR = os.path.join(HERE, "objects")
 RELATIONSHIPS_PATH = os.path.join(HERE, "relationships.yml")
 INFERRED_PATH = os.path.join(HERE, "inferred.yml")
+CONTENT_PATH = os.path.join(HERE, "content.yml")
 ECS_TYPES_PATH = os.path.join(HERE, "ecs_types.yml")
 
 # ECS 8.x top-level field sets (+ the base fields). A cheap guard against
@@ -90,6 +91,8 @@ REL_COLUMNS = ["timestamp", "source_host", "relationship", "source_object", "sou
 INFERRED_COLUMNS = ["node_id", "source_host", "object", "identity_key", "identity_value",
                     "reason", "method", "corroborated_by", "properties", "first_seen",
                     "last_seen"]
+CONTENT_COLUMNS = ["node_id", "kind", "identity_key", "identity_value", "ref_count",
+                   "properties", "first_seen", "last_seen"]
 EDGE_ENTRY_KEYS = {"car", "ecs", "type", "also", "also_type", "note"}
 _RECIPE_SHA1 = re.compile(r"^sha1\((.*)\)$")
 
@@ -367,7 +370,8 @@ def _validate_edge(where: str, doc: dict, expected_object: str, expected_stream:
 
 
 def _collect_used_ecs_paths(conventions: dict, objects: dict[str, dict],
-                            rel_doc: dict, inferred_doc: dict) -> set[str]:
+                            rel_doc: dict, inferred_doc: dict,
+                            content_doc: dict | None = None) -> set[str]:
     """Every ECS/car.* target path any contract file actually names — what
     ecs_types.yml's dead-override check treats as 'used'."""
     used: set[str] = set()
@@ -390,7 +394,7 @@ def _collect_used_ecs_paths(conventions: dict, objects: dict[str, dict],
         for d in doc.get("derived") or []:
             if isinstance(d, dict) and d.get("ecs"):
                 used.add(str(d["ecs"]))
-    for doc in (rel_doc, inferred_doc):
+    for doc in (rel_doc, inferred_doc, content_doc):
         for e in (doc or {}).get("fields") or []:
             if not isinstance(e, dict):
                 continue
@@ -418,31 +422,37 @@ def _validate_ecs_types(ecs_types: dict, used_paths: set[str], errors: list[str]
                           "(conventions.yml, objects/*.yml, relationships.yml, inferred.yml) — dead override")
 
 
-def load_edge_docs() -> tuple[dict, dict, dict]:
-    """(relationships.yml doc, inferred.yml doc, ecs_types.yml {path: {type, note}})."""
+def load_edge_docs() -> tuple[dict, dict, dict, dict]:
+    """(relationships.yml doc, inferred.yml doc, content.yml doc,
+    ecs_types.yml {path: {type, note}})."""
     ecs_types = (_load(ECS_TYPES_PATH) or {}).get("types") or {}
-    return _load(RELATIONSHIPS_PATH), _load(INFERRED_PATH), ecs_types
+    return _load(RELATIONSHIPS_PATH), _load(INFERRED_PATH), _load(CONTENT_PATH), ecs_types
 
 
 def validate_edges(conventions: dict, objects: dict[str, dict], rel_doc: dict,
-                   inferred_doc: dict, ecs_types: dict) -> list[str]:
-    """Every relationships.yml / inferred.yml / ecs_types.yml problem; [] means in step.
-    Kept separate from validate() (which stays exactly the objects/*.yml <-> CAR-model
-    check it always was) so neither check's signature or behaviour disturbs the other."""
+                   inferred_doc: dict, content_doc: dict, ecs_types: dict) -> list[str]:
+    """Every relationships.yml / inferred.yml / content.yml / ecs_types.yml problem;
+    [] means in step. Kept separate from validate() (which stays exactly the
+    objects/*.yml <-> CAR-model check it always was) so neither check's signature
+    or behaviour disturbs the other."""
     errors: list[str] = []
     used_paths: set[str] = set()
     _validate_edge("relationships.yml", rel_doc, "rel", "logs-car.rel-*", "car.rel",
                   REL_COLUMNS, ecs_types, errors, used_paths)
     _validate_edge("inferred.yml", inferred_doc, "inferred", "logs-car.inferred-*", "car.inferred",
                   INFERRED_COLUMNS, ecs_types, errors, used_paths)
-    used_paths |= _collect_used_ecs_paths(conventions, objects, rel_doc, inferred_doc)
+    _validate_edge("content.yml", content_doc, "content", "logs-car.content-*", "car.content",
+                  CONTENT_COLUMNS, ecs_types, errors, used_paths)
+    used_paths |= _collect_used_ecs_paths(conventions, objects, rel_doc, inferred_doc,
+                                          content_doc)
     _validate_ecs_types(ecs_types, used_paths, errors)
     return errors
 
 
-def edge_summary(rel_doc: dict, inferred_doc: dict) -> str:
+def edge_summary(rel_doc: dict, inferred_doc: dict, content_doc: dict) -> str:
     return (f" | rel: {len(rel_doc.get('fields') or [])} fields, "
-            f"inferred: {len(inferred_doc.get('fields') or [])} fields")
+            f"inferred: {len(inferred_doc.get('fields') or [])} fields, "
+            f"content: {len(content_doc.get('fields') or [])} fields")
 
 
 def validate(car: dict[str, dict], conventions: dict, objects: dict[str, dict]) -> list[str]:
@@ -481,15 +491,15 @@ def main() -> int:
         print(f"no CAR objects found under {CAR_OBJECTS_DIR}", file=sys.stderr)
         return 1
     conventions, objects = load_contract()
-    rel_doc, inferred_doc, ecs_types = load_edge_docs()
+    rel_doc, inferred_doc, content_doc, ecs_types = load_edge_docs()
     errors = validate(car, conventions, objects)
-    errors += validate_edges(conventions, objects, rel_doc, inferred_doc, ecs_types)
+    errors += validate_edges(conventions, objects, rel_doc, inferred_doc, content_doc, ecs_types)
     if errors:
         print(f"car-ecs projection DRIFT: {len(errors)} problem(s)", file=sys.stderr)
         for e in errors:
             print(f"  - {e}", file=sys.stderr)
         return 1
-    print(summary(car, conventions, objects) + edge_summary(rel_doc, inferred_doc))
+    print(summary(car, conventions, objects) + edge_summary(rel_doc, inferred_doc, content_doc))
     return 0
 
 

@@ -150,6 +150,44 @@ derived:
       normalize: upper
       properties: [user, hostname]
 
+  # ACTOR edges (D3 — the user dimension, owner-ratified, register §3.2.1/§9):
+  # the acting account, grounded in the SID exactly as CAR states it (the
+  # row's `sid`/`uid`/`target_uid` fields, through the derived.identities.sid
+  # REAL-account gate). The edge runs from the user_account content node
+  # (sid:<SID> — the same node the attribution layer mints from the same row)
+  # to the observed row; or account --> account for an authentication's
+  # subject/target pair — the logged-in-as / impersonation transaction, typed
+  # with the catalogue's `attempted to authenticate` (`impersonated` is not
+  # in the ATT&CK vocabulary; the register §10 records the reading). The
+  # association layer on that SID — non-domain emails, alias accounts —
+  # accrues on the node itself (identities.sid.properties) as evidence
+  # arrives; a mailbox address maps to an account only through an external
+  # directory (CAR-Relations §email), so no email<->sid rule exists yet.
+  actors:
+    - name: user_created_process
+      identity: sid
+      source: [sid, uid]            # the acting account, strongest field first
+      "on": process/create
+      relationship: created         # user --created--> process (exact ATT&CK)
+      method: actor_sid
+      confidence: definitive
+    - name: user_created_session
+      identity: sid
+      source: [uid]
+      "on": user_session/login
+      relationship: created         # user --created--> logon session (exact ATT&CK)
+      method: actor_sid
+      confidence: definitive
+    - name: auth_subject_target
+      identity: sid
+      source: [uid]                 # the SUBJECT (requesting) account
+      target_source: [target_uid]   # the TARGET account being authenticated as
+      "on": authentication
+      relationship: attempted to authenticate   # the impersonation transaction; subject==target
+                                                # never emits (a normal self-logon is not one)
+      method: actor_sid
+      confidence: definitive
+
   # 1:1 links where BOTH ends are observed records. `join` names the field on
   # each end (a plain CAR field, or native.<key> for a kept native value; a list
   # value matches any element). A content identity joins on its own fields.

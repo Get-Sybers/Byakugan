@@ -45,3 +45,13 @@ def test_inferred_yml_matches_the_live_inferred_node_schema():
     assert set(declared) == set(live), (
         "elastic/projection/inferred.yml is out of step with byakugan.superset.INFERRED_COLUMNS -- "
         f"missing {sorted(set(live) - set(declared))}, extra {sorted(set(declared) - set(live))}")
+
+
+def test_content_yml_matches_the_live_content_node_schema():
+    live = list(superset.CONTENT_COLUMNS)
+
+    declared = _declared_columns("content.yml")
+    assert len(declared) == len(set(declared)), "content.yml: duplicate car: entries"
+    assert set(declared) == set(live), (
+        "elastic/projection/content.yml is out of step with byakugan.superset.CONTENT_COLUMNS -- "
+        f"missing {sorted(set(live) - set(declared))}, extra {sorted(set(declared) - set(live))}")
