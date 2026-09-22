@@ -351,6 +351,20 @@ external:
     SourceFile: /in/fb3b.automaticDestinations-ms
     EntryNumber: 1
   guid: file-/in/fb3b.automaticDestinations-ms-1
+- name: memory_driver_offset
+  kind: entity
+  source: synthetic
+  car_object: driver
+  values:
+    Offset: 6700
+  guid: driver-6700
+- name: memory_file_mft
+  kind: record
+  source: synthetic
+  car_object: file
+  values:
+    value: 843
+  guid: file-mft-843
 - name: memory_file_object
   kind: entity
   source: synthetic
@@ -358,6 +372,32 @@ external:
   values:
     offset: 6699
   guid: file-1a2b
+- name: memory_file_scan_offset
+  kind: entity
+  source: synthetic
+  car_object: file
+  values:
+    Offset: 6699
+  guid: file-6699
+- name: memory_flow_tuple
+  kind: entity
+  source: synthetic
+  car_object: flow
+  values:
+    Proto: TCPv4
+    LocalAddr: 10.0.0.5
+    LocalPort: 49713
+    ForeignAddr: 100.101.0.42
+    ForeignPort: 443
+  guid: flow-TCPv4-10.0.0.5-49713-100.101.0.42-443
+- name: memory_module_load
+  kind: entity
+  source: synthetic
+  car_object: module
+  values:
+    PID: 10
+    Base: 1904640
+  guid: module-10-1904640
 - name: memory_proc_offset
   kind: entity
   source: synthetic
@@ -365,6 +405,54 @@ external:
   values:
     offset: 6699
   guid: proc-1a2b
+- name: memory_registry_value
+  kind: entity
+  source: synthetic
+  car_object: registry
+  values:
+    Hive: \REGISTRY\MACHINE\SOFTWARE
+    Key: Microsoft\Windows\CurrentVersion\Run
+    ValueName: Updater
+  guid: registry-\REGISTRY\MACHINE\SOFTWARE-Microsoft\Windows\CurrentVersion\Run-Updater
+- name: memory_service_offset
+  kind: entity
+  source: synthetic
+  car_object: service
+  values:
+    Offset: 6701
+  guid: service-6701
+- name: memory_session_index
+  kind: entity
+  source: synthetic
+  car_object: user_session
+  values:
+    Session ID: 1
+    User Name: jo
+  guid: user_session-1-jo
+- name: memory_session_luid
+  kind: entity
+  source: synthetic
+  car_object: user_session
+  values:
+    value: '0x51ca9'
+  guid: user_session-0x51ca9
+- name: memory_socket_tuple
+  kind: entity
+  source: synthetic
+  car_object: socket
+  values:
+    Proto: TCPv4
+    LocalAddr: 0.0.0.0
+    LocalPort: 135
+    PID: 924
+  guid: socket-TCPv4-0.0.0.0-135-924
+- name: memory_thread_offset
+  kind: entity
+  source: synthetic
+  car_object: thread
+  values:
+    Offset: 6699
+  guid: thread-6699
 - name: prefetch_dump_pf
   kind: entity
   source: real

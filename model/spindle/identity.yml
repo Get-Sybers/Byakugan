@@ -825,6 +825,27 @@ external:
   car_object:
   - file
   stable_across: one DestList entry of one jump-list file (JLECmd's own numbering)
+- name: memory_driver_offset
+  kind: entity
+  form:
+    fields:
+    - Offset
+  maps: []
+  car_object:
+  - driver
+  stable_across: one memory image — the driver object's offset (windows.modules)
+  carried_by: anamnesis
+- name: memory_file_mft
+  kind: record
+  form:
+    form: file-mft-{value}
+  maps: []
+  car_object:
+  - file
+  stable_across: one memory image — the in-memory $MFT record number the mftscan fold keys its file row
+    on; record numbers recycle after deletion, so never comparable across images (the disk lane's l2t_mft
+    uses the FULL NTFS reference — entry | sequence<<48 — which this form does not)
+  carried_by: anamnesis
 - name: memory_file_object
   kind: entity
   form:
@@ -833,6 +854,48 @@ external:
   car_object:
   - file
   stable_across: one memory image — the FILE_OBJECT offset Anamnesis mints file-<hex> from
+- name: memory_file_scan_offset
+  kind: entity
+  form:
+    fields:
+    - Offset
+  maps: []
+  car_object:
+  - file
+  stable_across: 'one memory image — the FILE_OBJECT offset again, but windows.filescan renders it DECIMAL
+    through the generic fields form while windows.anamnesis.files mints file-<HEX> (memory_file_object):
+    the same offset yields two identities that share a prefix and never equate. Declared so the divergence
+    is on record; the fix (one rendering) is Anamnesis-side and re-mints filescan guids when it lands'
+  carried_by: anamnesis
+- name: memory_flow_tuple
+  kind: entity
+  form:
+    fields:
+    - Proto
+    - LocalAddr
+    - LocalPort
+    - ForeignAddr
+    - ForeignPort
+  maps: []
+  car_object:
+  - flow
+  stable_across: 'ONE memory snapshot — a connection by its 5-tuple (netscan/netstat/anamnesis.network).
+    NOT stable across snapshots of the same host: ephemeral-port reuse re-mints the tuple for a DIFFERENT
+    connection, so cross-snapshot equality on this form false-equates — the exact caveat this registry
+    exists to record'
+  carried_by: anamnesis
+- name: memory_module_load
+  kind: entity
+  form:
+    fields:
+    - PID
+    - Base
+  maps: []
+  car_object:
+  - module
+  stable_across: one memory image — a load is identified by the owning pid + the base it is mapped at
+    (windows.dlllist / windows.anamnesis.modules); pid reuse makes it meaningless across boots or images
+  carried_by: anamnesis
 - name: memory_proc_offset
   kind: entity
   form:
@@ -841,6 +904,79 @@ external:
   car_object:
   - process
   stable_across: one memory image — the _EPROCESS offset Anamnesis mints proc-<hex> from
+- name: memory_registry_value
+  kind: entity
+  form:
+    fields:
+    - Hive
+    - Key
+    - ValueName
+  maps: []
+  car_object:
+  - registry
+  stable_across: one memory image — value-level (hive + key + value name, windows.anamnesis.registry),
+    unlike the disk lane's key-level plaso_registry snapshot identity
+  carried_by: anamnesis
+- name: memory_service_offset
+  kind: entity
+  form:
+    fields:
+    - Offset
+  maps: []
+  car_object:
+  - service
+  stable_across: one memory image — the service record's offset (windows.svcscan, an enumerate snapshot);
+    never comparable across images
+  carried_by: anamnesis
+- name: memory_session_index
+  kind: entity
+  form:
+    fields:
+    - Session ID
+    - User Name
+  maps: []
+  car_object:
+  - user_session
+  stable_across: one memory image — the windows.sessions row by session id + user; session ids recycle
+    across boots
+  carried_by: anamnesis
+- name: memory_session_luid
+  kind: entity
+  form:
+    form: user_session-{value}
+  maps: []
+  car_object:
+  - user_session
+  stable_across: one boot of one host — the logon-session LUID (windows.anamnesis.sessions), the same
+    key the auth_session_luid join uses; the well-known per-boot singletons (0x3e4/0x3e5/0x3e7) recur
+    every boot and identify nothing across boots
+  carried_by: anamnesis
+- name: memory_socket_tuple
+  kind: entity
+  form:
+    fields:
+    - Proto
+    - LocalAddr
+    - LocalPort
+    - PID
+  maps: []
+  car_object:
+  - socket
+  stable_across: 'ONE memory snapshot — a bound/listening endpoint by protocol + local endpoint + owner
+    pid (netscan/netstat/anamnesis.network). NOT stable across snapshots of the same host: a rebind after
+    restart coincides on the tuple without being the same socket — never equate across snapshots'
+  carried_by: anamnesis
+- name: memory_thread_offset
+  kind: entity
+  form:
+    fields:
+    - Offset
+  maps: []
+  car_object:
+  - thread
+  stable_across: one memory image — the _ETHREAD offset (windows.thrdscan / windows.anamnesis.threads);
+    never comparable across images
+  carried_by: anamnesis
 - name: prefetch_dump_pf
   kind: entity
   form:
