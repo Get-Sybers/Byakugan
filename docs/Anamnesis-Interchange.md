@@ -215,17 +215,19 @@ What actually happens, precisely (verified by
 Two tests hold this contract to the evidence, not to memory of it:
 
 - `tests/test_anamnesis_interchange.py::test_car_model_matches_the_anamnesis_fixture_exactly`
-  — `byakugan.carmodel.load()` (reconstructed **live** from the pinned
-  `third_party/car` submodule) against
+  — **Byakugan owns the CAR model** (`model/car/objects` — the CAR + ATT&CK
+  superset; `byakugan.carmodel.load()` reconstructs it live from the pinned
+  submodules). Anamnesis is a producer that **conforms** to it, embedding a
+  copy in `internal/carmodel/car_data_model.json`. This test holds the
+  producer's copy to Byakugan's model:
   [`tests/fixtures/anamnesis_car_data_model.json`](../tests/fixtures/anamnesis_car_data_model.json)
-  (a committed, byte-for-byte copy of Anamnesis's own embedded
-  `internal/carmodel/car_data_model.json`, pinned at commit `afb06ae`): the
-  object set and every object's field/action set must match **exactly**, in
-  **both** directions. A car-submodule pin bump on either repo fails this
-  test until the fixture is consciously refreshed (`cp
-  <anamnesis>/internal/carmodel/car_data_model.json
-  tests/fixtures/anamnesis_car_data_model.json`) — the assertion messages
-  say so.
+  (a committed copy of the producer's embedded model) must match
+  `byakugan.carmodel.load()` **exactly**, in **both** directions — object set
+  and every object's field/action set. If they diverge, Anamnesis has drifted
+  from the model it must conform to; refresh the fixture only once Anamnesis is
+  re-aligned (`cp <anamnesis>/internal/carmodel/car_data_model.json
+  tests/fixtures/anamnesis_car_data_model.json`) — the assertion messages say
+  so.
 - `tests/test_anamnesis_interchange.py::test_load_anamnesis_car_translation_rules`
   and `::test_anamnesis_passthrough_survives_the_full_pipeline` — a fixture
   `car.db` built with Anamnesis's **exact** schema (derived from the pinned
@@ -235,7 +237,8 @@ Two tests hold this contract to the evidence, not to memory of it:
   guids/`owning_guid`/`parent_guid` survive into `car_<object>.jsonl` and
   that `car_relationships.jsonl`'s edges reference them.
 
-**The rule: a change to either side's schema is a change to this contract.**
+**The rule: Byakugan owns the CAR model; a change to it, or to how either
+side reads/writes it, is a change to this contract.**
 A Byakugan change to `readers.py`'s translation, to the CAR header either
 store uses, or to `enrich.py`'s owner/parent cascade; or an Anamnesis change
 to `store.go`'s header, `ProcGUID`, or its own enrichment's confidence

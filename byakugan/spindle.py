@@ -443,7 +443,12 @@ def verify_registry() -> list[str]:
         if name not in referenced:
             problems.append(f"{name}: registry entry referenced by no map")
 
-    offset_form = (((enrich.rules().get("derived") or {}).get("identities") or {}).get("offset") or {}).get("guid_form")
+    # Every guid_form a derived identity declares (a memory object offset renders
+    # its own form: proc-{hex}, file-{hex}, …). A form-shaped external must be
+    # exactly one of these — a producer's own rendering, held to a derive rule.
+    derived_ids = ((enrich.rules().get("derived") or {}).get("identities") or {})
+    offset_forms = {d.get("guid_form") for d in derived_ids.values()
+                    if isinstance(d, dict) and d.get("guid_form")}
     for name, e in (r.get("external") or {}).items():
         if not isinstance(e, dict):
             problems.append(f"external {name}: entry must be a mapping")
@@ -466,9 +471,9 @@ def verify_registry() -> list[str]:
         if set(gv) != _form_names(form, e) or any(v in (None, "") for v in gv.values()):
             problems.append(f"external {name}: golden.values must sample exactly {sorted(_form_names(form, e))}")
         if "form" in form:
-            if form["form"] != offset_form:
-                problems.append(f"external {name}: form {form['form']!r} != relationships.yml "
-                                f"derived.identities.offset.guid_form {offset_form!r}")
+            if form["form"] not in offset_forms:
+                problems.append(f"external {name}: form {form['form']!r} is not a "
+                                f"relationships.yml derived.identities guid_form {sorted(offset_forms)}")
         elif name not in ext_used:
             problems.append(f"external {name}: carried by no map leaf")
     return problems

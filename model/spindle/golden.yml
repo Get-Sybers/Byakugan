@@ -351,6 +351,13 @@ external:
     SourceFile: /in/fb3b.automaticDestinations-ms
     EntryNumber: 1
   guid: file-/in/fb3b.automaticDestinations-ms-1
+- name: memory_file_object
+  kind: entity
+  source: synthetic
+  car_object: file
+  values:
+    offset: 6699
+  guid: file-1a2b
 - name: memory_proc_offset
   kind: entity
   source: synthetic

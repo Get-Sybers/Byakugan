@@ -825,6 +825,14 @@ external:
   car_object:
   - file
   stable_across: one DestList entry of one jump-list file (JLECmd's own numbering)
+- name: memory_file_object
+  kind: entity
+  form:
+    form: file-{hex}
+  maps: []
+  car_object:
+  - file
+  stable_across: one memory image — the FILE_OBJECT offset Anamnesis mints file-<hex> from
 - name: memory_proc_offset
   kind: entity
   form:

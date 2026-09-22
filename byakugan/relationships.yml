@@ -119,6 +119,9 @@ derived:
     offset:
       kind: instance          # a memory-image object offset (Anamnesis owning_offset = the owning _EPROCESS)
       guid_form: "proc-{hex}" # the guid Anamnesis mints for that object (proc-<offset hex>)
+    file_offset:
+      kind: instance          # a memory-image FILE_OBJECT offset (Anamnesis mints file-<hex> from it)
+      guid_form: "file-{hex}"
     hash:
       kind: content
       node: file_content
