@@ -123,3 +123,12 @@ fields:
     note: >-
       the guids corroborating a DERIVED edge (byakugan/superset.py _JSON_COLS: stored as JSON
       text, decoded on export) — an ECS array of keyword, not a nested object; array-valued.
+  - car: properties
+    ecs: car.rel.properties
+    type: flattened
+    note: >-
+      the association's OWN properties — facts of the process->object edge, not of either
+      endpoint object (a File handle's access_level = GrantedAccess, and handle_value; see
+      byakugan/superset.py _edge_properties). Null on an edge with none. flattened, like
+      car.native / the inferred-node properties: shape varies per (object, action), every key
+      searchable without a per-key mapping. Descriptive, so NOT a document_id discriminator.

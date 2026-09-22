@@ -49,7 +49,7 @@ DECLARED, DERIVED = "declared", "derived"
 # tests/test_projection_rel_drift.py re-pins the two against each other.
 REL_COLUMNS = ("timestamp", "source_host", "relationship", "source_object", "source_guid",
               "target_object", "target_guid", "confidence", "method", "class",
-              "identity_key", "inferred_end", "corroborated_by")
+              "identity_key", "inferred_end", "corroborated_by", "properties")
 INFERRED_COLUMNS = ("node_id", "source_host", "object", "identity_key", "identity_value",
                     "reason", "method", "corroborated_by", "properties", "first_seen",
                     "last_seen")
@@ -84,11 +84,28 @@ def _method(ev: dict) -> str | None:
     return {"definitive": "native_guid", "heuristic": "pid_window"}.get(c)
 
 
-def _edge(ts, host, rel, s_obj, s_guid, t_obj, t_guid, conf, method):
+def _edge(ts, host, rel, s_obj, s_guid, t_obj, t_guid, conf, method, properties=None):
     return {"timestamp": ts, "source_host": host, "relationship": rel,
             "source_object": s_obj, "source_guid": s_guid,
             "target_object": t_obj, "target_guid": t_guid,
-            "confidence": conf, "method": method, "class": DECLARED}
+            "confidence": conf, "method": method, "class": DECLARED,
+            "properties": properties or None}
+
+
+# Per-spoke association properties carried ON the edge — facts of the
+# process->object relationship itself, not of either endpoint object. Read from
+# the spoke event's native. Today: a File handle's access mask and handle value
+# (Anamnesis windows.anamnesis.files -> file/access); extend per (object,
+# action) as new association evidence arrives.
+def _edge_properties(obj: str, act: str, nat: dict) -> dict | None:
+    if obj == "file" and act == "access":
+        props = {}
+        if nat.get("GrantedAccess") is not None:
+            props["access_level"] = nat["GrantedAccess"]
+        if nat.get("HandleValue") is not None:
+            props["handle_value"] = nat["HandleValue"]
+        return props or None
+    return None
 
 
 def edges_from_events(events: list[dict]) -> list[dict]:
@@ -106,7 +123,8 @@ def edges_from_events(events: list[dict]) -> list[dict]:
         # below (parent, access).
         if og and g and obj != "process" and og != g:
             out.append(_edge(ts, host, _spoke_verb(obj, act),
-                             "process", og, obj, g, ev.get("link_confidence"), _method(ev)))
+                             "process", og, obj, g, ev.get("link_confidence"), _method(ev),
+                             _edge_properties(obj, act, nat)))
         # process create -> its parent process
         if obj == "process" and act == "create" and ev.get("parent_guid") \
                 and ev["parent_guid"] != g:

@@ -21,5 +21,6 @@ relationship_instance:
   - name: identity_key
   - name: inferred_end
   - name: corroborated_by
+  - name: properties
   description: 'One row per materialized edge: a source_object --relationship--> target_object instance,
     timestamped and pointing back at the object events by guid. See byakugan/superset.py (REL_COLUMNS).'

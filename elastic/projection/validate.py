@@ -86,7 +86,7 @@ OUTCOMES = {"success", "failure", "unknown"}
 # until these two contract files (and this list) get a decision.
 REL_COLUMNS = ["timestamp", "source_host", "relationship", "source_object", "source_guid",
               "target_object", "target_guid", "confidence", "method", "class",
-              "identity_key", "inferred_end", "corroborated_by"]
+              "identity_key", "inferred_end", "corroborated_by", "properties"]
 INFERRED_COLUMNS = ["node_id", "source_host", "object", "identity_key", "identity_value",
                     "reason", "method", "corroborated_by", "properties", "first_seen",
                     "last_seen"]
