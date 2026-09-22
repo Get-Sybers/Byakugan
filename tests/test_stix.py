@@ -115,7 +115,8 @@ def test_declared_and_derived_relationships_are_sros_labelled_by_class(tmp_path)
               _ev("file", "create", "F1", ts="2020-01-01T00:00:01Z", file_path=r"C:\a.exe",
                   sha256_hash=_SHA),
               _ev("module", "load", "M1", ts="2020-01-01T00:00:02Z", owning_guid_native="P1",
-                  image_path=r"C:\a.exe", module_path=r"C:\x.dll", pid=10)]
+                  image_path=r"C:\a.exe", module_path=r"C:\x.dll", pid=10,
+                  base_address="0x7ff65be20000")]
     b = _bundle(stix.export(str(_build(tmp_path, events)), case="c")["bundle"])
     rels = _of(b, "relationship")
     by = {(r["x_car_class"], r["relationship_type"], r["x_car_method"]): r for r in rels}
@@ -133,6 +134,13 @@ def test_declared_and_derived_relationships_are_sros_labelled_by_class(tmp_path)
     assert declared["labels"] == ["car:declared", "car:image_path"] and declared["confidence"] == 50
     assert derived["labels"] == ["car:derived", "car:shared_hash"] and derived["confidence"] == 100
     assert derived["x_car_identity_key"] == "sha256_hash" and derived["x_car_corroborated_by"] == ["P1", "F1"]
+    # the edge's association properties reach the SRO verbatim (contract v5):
+    # the module-load edge carries where the image sits in the loader
+    loaded = by[("declared", "loaded", "native_guid")]
+    assert loaded["x_car_properties"] == {"base_address": "0x7ff65be20000"}
+    assert (loaded["source_ref"], loaded["target_ref"]) == (proc["id"], dll["id"])
+    # an edge with no association evidence carries no x_car_properties at all
+    assert "x_car_properties" not in declared and "x_car_properties" not in derived
     loaded = by[("declared", "loaded", "native_guid")]
     assert (loaded["source_ref"], loaded["target_ref"]) == (proc["id"], dll["id"])
     assert loaded["start_time"] == "2020-01-01T00:00:02.000Z" and loaded["confidence"] == 100

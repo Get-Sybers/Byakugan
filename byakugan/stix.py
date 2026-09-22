@@ -802,6 +802,12 @@ class Projection:
                 corr = json.loads(corr)
             except ValueError:
                 corr = [corr]
+        props = e.get("properties")
+        if isinstance(props, str):
+            try:
+                props = json.loads(props)
+            except ValueError:
+                props = None
         rid = case_id(self.ns, "relationship", cls, verb, s, t, e.get("timestamp"), e.get("method"))
         self._put({"type": "relationship", "spec_version": SPEC, "id": rid, "created": ts,
                    "modified": ts, "created_by_ref": PRODUCER["id"], "relationship_type": verb,
@@ -811,7 +817,7 @@ class Projection:
                    "x_car_class": cls, "x_car_method": e.get("method"),
                    "x_car_confidence": e.get("confidence"), "x_car_identity_key": e.get("identity_key"),
                    "x_car_inferred_end": inf, "x_car_corroborated_by": corr,
-                   "x_car_source_host": host})
+                   "x_car_properties": props, "x_car_source_host": host})
         self.stats[f"relationships_{cls}"] += 1
 
     # -- the behaviour layer (analytics.py hits over the in-memory events) ------
