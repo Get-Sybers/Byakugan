@@ -51,8 +51,18 @@ _re_cache: dict[str, re.Pattern] = {}
 
 
 def rules() -> dict:
-    """The `derived:` block of relationships.yml (beside the declared rules)."""
-    return enrich.rules()["derived"]
+    """The `derived:` block of relationships.yml (beside the declared rules).
+
+    YAML 1.1 footgun, absorbed here: an unquoted `on:` key parses as the
+    BOOLEAN True (like off/yes/no), which silently voided every reconstruct
+    rule's scope until it was quoted. The registry quotes it ("on":) and this
+    loader re-keys a boolean-True key back to "on" so a future unquoted edit
+    degrades to working, not to scopeless."""
+    r = enrich.rules()["derived"]
+    for rec in r.get("reconstruct") or []:
+        if True in rec and "on" not in rec:
+            rec["on"] = rec.pop(True)
+    return r
 
 
 def _get(ev: dict, path: str):
@@ -250,10 +260,14 @@ def _in_scope(on, ev: dict) -> bool:
 
 def _as_guid(value, ident: dict) -> str | None:
     """The guid the missing node would carry for this identity value: the value
-    itself, or the form the artefact mints for it (offset -> proc-<hex>)."""
+    itself, the identity-normalized value in a form ({value} -> a LUID's
+    user_session-<luid>), or the form the artefact mints for it (offset ->
+    proc-<hex>)."""
     form = ident.get("guid_form")
     if not form:
         return str(value)
+    if "{value}" in form:
+        return form.replace("{value}", _normalize(ident, value))
     try:
         return form.replace("{hex}", format(int(value), "x"))
     except (TypeError, ValueError):
@@ -276,6 +290,9 @@ def reconstruct(events: list[dict], observed: set) -> tuple[list[dict], list[dic
             ref = _get(ev, rule["reference"])
             if ref in _MISSING or ev.get("guid") is None:
                 continue
+            if not _accepts(ident, ref):
+                continue                        # the identity's accept gate (a null/
+                                                # well-known LUID never mints a node)
             linked = rule.get("unless_linked")
             if linked and _get(ev, linked) not in _MISSING:
                 continue                        # the cascade found it: observed

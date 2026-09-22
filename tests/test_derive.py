@@ -210,6 +210,53 @@ def test_reconstruction_creates_flagged_inferred_node_not_car_row(tmp_path):
     assert not os.path.exists(tmp_path / "car_process.jsonl")
 
 
+def test_reconstruct_rules_carry_a_working_scope():
+    """Every reconstruct rule's scope survives YAML loading as the string key
+    "on" (unquoted `on:` is YAML-1.1 boolean True — the loader re-keys it),
+    and _in_scope actually discriminates on it."""
+    recs = derive.rules()["reconstruct"]
+    assert recs and all(isinstance(r.get("on"), str) and True not in r for r in recs)
+    by_name = {r["name"]: r for r in recs}
+    assert not derive._in_scope(by_name["auth_session_target"]["on"],
+                                {"car_object": "authentication", "car_action": "failure"})
+    assert not derive._in_scope(by_name["parent_process"]["on"],
+                                {"car_object": "process", "car_action": "terminate"})
+    assert not derive._in_scope(by_name["owning_process"]["on"],
+                                {"car_object": "process", "car_action": "create"})
+
+
+def test_auth_session_reconstruct_by_luid():
+    """A successful auth names the session it opened (TargetLogonId) but no
+    source observed a user_session for that LUID: the session is reconstructed
+    (flagged), keyed user_session-<luid> — never for the null session, the
+    per-boot singletons, a failure, or a LUID the cascade already linked."""
+    events = [
+        _ev("authentication", "success", "A1",
+            target_user="jo", target_uid="S-1-5-21-1-2-3-1001",
+            _native={"TargetLogonId": "0x51CA9"}),
+        # the cascade LINKED this one (a session row existed): nothing to infer
+        _ev("authentication", "success", "A2",
+            _native={"TargetLogonId": "0x60000", "target_session_guid": "SESS-2"}),
+        # a failure opens NO session (the rule is scoped to success)
+        _ev("authentication", "failure", "A3", _native={"TargetLogonId": "0x70000"}),
+        # the null session and a per-boot singleton never mint an identity
+        _ev("authentication", "success", "A4", _native={"TargetLogonId": "0x0"}),
+        _ev("authentication", "success", "A5", _native={"TargetLogonId": "0x3E7"}),
+    ]
+    nodes, edges = derive.reconstruct(events, set())
+    assert len(nodes) == 1 and len(edges) == 1
+    n = nodes[0]
+    assert (n["node_id"], n["object"], n["identity_key"], n["identity_value"], n["method"]) == (
+        "user_session-0x51ca9", "user_session", "luid", "0x51CA9", "luid")
+    assert n["properties"] == {"login_id": "0x51CA9", "user": "jo",
+                               "uid": "S-1-5-21-1-2-3-1001"}
+    e = edges[0]
+    assert (e["source_object"], e["source_guid"], e["relationship"],
+            e["target_object"], e["target_guid"], e["inferred_end"], e["confidence"]) == (
+        "authentication", "A1", "created", "user_session", "user_session-0x51ca9",
+        "target", "inferred")
+
+
 def test_reconstruction_skips_nodes_observed_or_already_linked():
     events = [_proc("P1", _native={"ParentProcessGuid": "PP"}, parent_guid="PP"),   # linked by the cascade
               _proc("PX"), _ev("file", "create", "F", owning_guid_native="PX")]      # owner observed
