@@ -59,6 +59,27 @@ def test_no_process_owner_self_loops():
     assert edges == []
 
 
+def test_file_handle_edge_carries_association_properties():
+    from byakugan import superset
+    # a File handle: process --accessed--> the FILE_OBJECT, the edge carrying the
+    # handle's own facts (access mask, handle value) — association properties, not
+    # object properties.
+    edges = superset.edges_from_events([
+        {"car_object": "file", "car_action": "access", "guid": "file-f11e",
+         "source_host": "H", "timestamp": "t", "owning_guid": "proc-a",
+         "link_confidence": "definitive",
+         "_native": {"GrantedAccess": 0x120089, "HandleValue": 4}}])
+    assert len(edges) == 1
+    e = edges[0]
+    assert (e["source_guid"], e["relationship"], e["target_guid"]) == ("proc-a", "accessed", "file-f11e")
+    assert e["properties"] == {"access_level": 0x120089, "handle_value": 4}
+    # an edge with no association evidence carries no properties
+    plain = superset.edges_from_events([
+        {"car_object": "file", "car_action": "access", "guid": "file-1",
+         "source_host": "H", "timestamp": "t", "owning_guid": "proc-b"}])
+    assert plain[0]["properties"] is None
+
+
 def test_process_access_edges_source_to_target():
     from byakugan import superset
     # Sysmon 10: source --accessed--> TARGET (target_guid), not the record guid
