@@ -234,7 +234,10 @@ def step_b_first_load(args, car_dir: str, out_dir: str) -> dict:
           f"step B: load status={summary['status']!r} (expected 'ok'); "
           f"failures={summary.get('failures')}; setup={summary.get('setup')}")
 
-    expected_streams = {f"logs-car.{o}-{args.namespace}" for o in (*STREAM_OBJECTS, "rel")}
+    # "rel" = the relationship timeline; "content" = the attribution layer
+    # (the seeded hashes mint content nodes — global by content key — so
+    # car_content.jsonl populates logs-car.content-* since the D5 stream landed)
+    expected_streams = {f"logs-car.{o}-{args.namespace}" for o in (*STREAM_OBJECTS, "rel", "content")}
     got_streams = set(summary["streams"])
     _check(got_streams == expected_streams,
           f"step B: populated streams {sorted(got_streams)} != expected {sorted(expected_streams)}")
