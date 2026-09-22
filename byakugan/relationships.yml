@@ -113,6 +113,13 @@ derived:
   # sensor-minted guid, a memory object offset); `content` identities name the
   # same content wherever it appears and become content_node rows (the
   # attribution layer) with an entity_ref from every record carrying them.
+  # A must field (an identity-anchoring field) lists its authoritative
+  # `sources`, strongest first — always more than one (uSaid authority-control
+  # pattern; register §10.6). class: issuer = mints/owns the value,
+  # computed = derived from the content itself, recorded = written by an OS
+  # artefact at event time, observed = read live from memory, mapping = a
+  # cross-reference table. New maps grow the spindle by naming which declared
+  # source their artefact carries.
   identities:
     guid:
       kind: instance          # Sysmon ProcessGuid / ParentProcessGuid / TargetProcessGuid, a Zeek uid/fuid
@@ -123,16 +130,14 @@ derived:
       kind: instance          # a memory-image FILE_OBJECT offset (Anamnesis mints file-<hex> from it)
       guid_form: "file-{hex}"
     luid:
-      kind: instance          # a Windows logon-session LUID — per boot per host, the same key
-                              # the joins.auth_session_luid cascade join uses (CAR-Relations
-                              # §authentication); Security TargetLogonId names it
-      guid_form: "user_session-{value}"   # the session-identity form the missing node takes
+      kind: instance          # logon-session LUID, per boot per host (joins.auth_session_luid)
+      guid_form: "user_session-{value}"
       normalize: lower        # hex case differs between artefacts
-      # never a node for the null session or the per-boot singletons: 0x0 names no
-      # session, and 0x3e4/0x3e5/0x3e7 recur EVERY boot — minting one identity for
-      # them across a multi-boot log would merge boots (the joins.auth_session_luid
-      # caveat, applied to reconstruction where it asserts identity, so excluded)
+      # 0x0 names no session; the per-boot singletons recur every boot — excluded
       accept: ['(?i)^0x(?!0$|3e4$|3e5$|3e7$)[0-9a-f]+$']
+      sources:
+        - {authority: LSA logon-session table, class: observed, carries: the live LUIDs (memory windows.anamnesis.sessions)}
+        - {authority: Security event log, class: recorded, carries: TargetLogonId / SubjectLogonId (4624/4634/4647/4672)}
     hash:
       kind: content
       node: file_content
@@ -140,6 +145,10 @@ derived:
       accept: ['^[0-9A-Fa-f]{64}$', '^[0-9A-Fa-f]{40}$', '^[0-9A-Fa-f]{32}$']
       normalize: lower
       properties: [file_path, image_path, module_path, file_name, signer]   # context unioned onto the node
+      sources:
+        - {authority: the bytes themselves, class: computed, carries: hashes computed from content (disk image / zeek files.log)}
+        - {authority: sensor at event time, class: recorded, carries: Sysmon-computed hashes (EID 1/6/7/11/15/23)}
+        - {authority: Amcache / PE metadata, class: recorded, carries: recorded SHA-1 / header hashes — may lag the bytes}
     sid:
       kind: content
       node: user_account
@@ -149,20 +158,18 @@ derived:
       accept: ['^S-1-5-21-\d+-\d+-\d+-\d+$', '^S-1-12-1-\d+-\d+-\d+-\d+$']
       normalize: upper
       properties: [user, hostname]
+      sources:                    # the D3 exemplar: where a SID can be sourced from
+        - {authority: Active Directory (ntds.dit), class: issuer, carries: domain account SIDs}
+        - {authority: SAM hive, class: issuer, carries: local account SIDs (machine SID + RID)}
+        - {authority: Security event log, class: recorded, carries: Subject/Target SIDs (4624/4688/4907/4720-family)}
+        - {authority: process token, class: observed, carries: the token's user and group SIDs (memory)}
+        - {authority: NTFS $Secure / owner, class: recorded, carries: owner SIDs (file owner_uid)}
+        - {authority: registry ProfileList, class: mapping, carries: SID -> profile path (SOFTWARE hive)}
 
-  # ACTOR edges (D3 — the user dimension, owner-ratified, register §3.2.1/§9):
-  # the acting account, grounded in the SID exactly as CAR states it (the
-  # row's `sid`/`uid`/`target_uid` fields, through the derived.identities.sid
-  # REAL-account gate). The edge runs from the user_account content node
-  # (sid:<SID> — the same node the attribution layer mints from the same row)
-  # to the observed row; or account --> account for an authentication's
-  # subject/target pair — the logged-in-as / impersonation transaction, typed
-  # with the catalogue's `attempted to authenticate` (`impersonated` is not
-  # in the ATT&CK vocabulary; the register §10 records the reading). The
-  # association layer on that SID — non-domain emails, alias accounts —
-  # accrues on the node itself (identities.sid.properties) as evidence
-  # arrives; a mailbox address maps to an account only through an external
-  # directory (CAR-Relations §email), so no email<->sid rule exists yet.
+  # ACTOR edges (D3): the acting account, grounded in the SID through the
+  # identities.sid gate — user_account(sid:<SID>) --> the row, or account -->
+  # account for an auth's subject/target pair (the impersonation transaction).
+  # Reasoning + follow-ons: register §10.3.
   actors:
     - name: user_created_process
       identity: sid
@@ -180,11 +187,10 @@ derived:
       confidence: definitive
     - name: auth_subject_target
       identity: sid
-      source: [uid]                 # the SUBJECT (requesting) account
-      target_source: [target_uid]   # the TARGET account being authenticated as
+      source: [uid]                 # subject account
+      target_source: [target_uid]   # target account; subject==target never emits
       "on": authentication
-      relationship: attempted to authenticate   # the impersonation transaction; subject==target
-                                                # never emits (a normal self-logon is not one)
+      relationship: attempted to authenticate
       method: actor_sid
       confidence: definitive
 
@@ -269,12 +275,8 @@ derived:
       method: native_guid
       properties: {pid: tgt_pid}
     - name: auth_session_target
-      # a SUCCESSFUL authentication names the session it opened (TargetLogonId)
-      # — MITRE-worded, a success opens a session — but no source carries a
-      # user_session row for that LUID (no winlogon/TS/utmp coverage, or the
-      # log was cleared): the session EXISTED; reconstruct it, flagged, from
-      # what the auth record says. The LUID join (enrich._link_auth_sessions)
-      # already linked every observable pair, so this fires only for the rest.
+      # a success names the session it opened; when no source carries a row for
+      # that LUID the session still existed — reconstruct it, flagged (§3.2.4)
       identity: luid
       reference: native.TargetLogonId
       unless_linked: native.target_session_guid

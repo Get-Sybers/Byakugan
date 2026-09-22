@@ -522,3 +522,16 @@ observed mix of exact vs extension edges per object becomes a measurable
 signal — a pin bump that silently downgrades an exact-typed edge to
 extension (or the data never exercising an exact edge) is the trigger for
 revisiting test enforcement. Nothing to build until that data exists.
+
+### 10.6 Authority sources for must fields (the uSaid pattern)
+
+Adopted from uSaid's authority control (`docs/authority-control.md` and its
+governed authority file): an identity-anchoring **must field always lists
+the multiple authoritative sources it can be sourced from**, ranked
+strongest first, each classed issuer | computed | recorded | observed |
+mapping — the analogue of uSaid's register-key order and its
+verified-keys-only rule. Declared as `sources:` on
+`relationships.yml derived.identities` (sid — the ruling's exemplar — plus
+hash and luid today), rendered in `model/relationships/derived.yml`. New
+maps grow the spindle by naming which declared source their artefact
+carries; a source not yet listed is declared before it is used.

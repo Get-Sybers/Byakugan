@@ -4,16 +4,8 @@
 # attack-datasources submodule); tests/test_superset.py enforces it.
 #
 # COVERAGE: every superset (object, action) pair of the 13 CAR objects has an
-# explicit verb here — the once decision-flagged pairs (email's five actions,
-# service/pause, socket/close, thread/suspend) were ratified by the owner
-# (register §9 D1/D2): email's verbs ground in the CAR action definitions
-# themselves (data_model/email.yaml — CAR is upstream too), and the other
-# three resolved under the vectors/transactions/associations reading
-# (register §10). tests/test_superset.py pins the exception list (now empty),
-# so a new upstream action surfaces as a test failure, not a silent default.
-# The grounding per verb — which ATT&CK data component (or CAR action
-# definition), and whether the typed triple is exact or a Byakugan extension —
-# is the register §1 table.
+# explicit verb (tests/test_superset.py pins the exception set — empty).
+# Grounding per verb: docs/research/relationship-model-gaps.md §1, §10.
 
 # process --verb--> spoke, keyed by the spoke's (car_object, car_action).
 spoke_owner:
@@ -62,19 +54,12 @@ spoke_owner:
     enumerate: listed                       # Service Enumeration (exact)
     metadata: retrieved information about   # Service Metadata (exact)
     access: accessed                        # Service Access (user-sourced upstream; extension)
-    pause: modified                         # D2 (register §10): a pause is a run-state
-                                            # MODIFICATION of the service (SERVICE_CONTROL_PAUSE
-                                            # changes state without ending it) — Service
-                                            # Modification, an exact triple; the precise
-                                            # transition stays in car_action
+    pause: modified                         # run-state modification (exact; §10.2)
   thread:
     remote_create: created
     create: created                         # Process Creation: process --created--> thread (exact)
     terminate: terminated                   # termination-family verb (extension)
-    suspend: accessed                       # D2 (register §10): a suspend is an exercised ACCESS
-                                            # on the running thread (THREAD_SUSPEND_RESUME) — the
-                                            # access-family transaction; the exercised right is
-                                            # the association layer when a source supplies it
+    suspend: accessed                       # exercised access, THREAD_SUSPEND_RESUME (§10.2)
   http:
     get: created
     post: created
@@ -83,9 +68,7 @@ spoke_owner:
   socket:
     bind: bound to
     listen: listened on                     # process --listened on--> port (exact)
-    close: terminated                       # D2 (register §10): the transaction ENDS the socket
-                                            # vector's lifetime — the same reading as
-                                            # user_session/logout -> terminated (extension)
+    close: terminated                       # ends the vector's lifetime, like logout (§10.2)
   user_session:
     login: created
     reconnect: created
@@ -99,19 +82,12 @@ spoke_owner:
     success: requested
     failure: requested
     error: requested
-  # D1 (register §9): email's verbs ground in CAR's OWN action definitions
-  # (data_model/email.yaml — the owner's ruling: CAR is upstream research too);
-  # every verb still from the ATT&CK catalogue. The acting process is the mail
-  # server (CAR-Relations §email: only `deliver` asserts server-side delivery).
-  email:
-    deliver: created                        # "sent to an end recipient" — the message comes to
-                                            # exist at the recipient side (extension)
-    block: stopped                          # "blocked by the email server" — the server stopped
-                                            # the delivery transaction (extension)
-    redirect: modified                      # "being redirected" — its routing changed (extension)
-    quarantine: locked                      # "quarantined for security reasons" — isolated,
-                                            # retrievable: the locked-account analogue (extension)
-    delete: deleted                         # deletion-family verb (extension)
+  email:                                    # verbs ground in CAR's own action definitions (§10.1)
+    deliver: created
+    block: stopped
+    redirect: modified
+    quarantine: locked
+    delete: deleted
 
 # the verb for a spoke whose (object, action) is not listed above — reserved
 # for the decision-flagged pairs and for drift; a pair that is neither is a
@@ -125,20 +101,14 @@ edges:
   thread_injection: accessed   # source --accessed--> target (CreateRemoteThread = Process Access)
   file_executed: executed      # process --executed--> file (image_path, CAR-2014-02-001)
   auth_session: created        # authentication --created--> logon session (LUID)
-  flow_contains: contained     # flow --contained--> http/file riding it (R3, the shared zeek uid;
-                               # Network Traffic Content aliased)
-  process_modify: modified     # modifier --modified--> process (Process Modification: tampering /
-                               # hollowing; fires on native.modifier_process_guid — the declared
-                               # native-key contract, like TargetProcessGuid for injection)
+  flow_contains: contained     # flow --contained--> http/file riding it (R3, zeek uid)
+  process_modify: modified     # tampering; fires on native.modifier_process_guid
 
 # ---------------------------------------------------------------------------
 # Association properties — facts OF a relationship, not of either endpoint
-# (the #107/#108 file-handle pattern; register §4). Carried in the edge row's
-# `properties` (-> car.rel.properties). Keyed by "<object>/<action>" for a
-# spoke->owner edge, or "edge:<name>" for a special edge. Each property names
-# its sources on the EMITTING event row — a CAR field, or native.<Key> —
-# first non-null wins. A property is DUPLICATED onto the edge, never moved:
-# the row keeps its column (the object model is not changed here).
+# (the #108 pattern; register §4). Keyed "<object>/<action>" or "edge:<name>";
+# each property lists its sources on the emitting row (CAR field or
+# native.<Key>), first non-null wins; duplicated onto the edge, never moved.
 association_properties:
   file/access:                              # the handle's own facts (#108)
     access_level: [native.GrantedAccess]

@@ -1,17 +1,10 @@
 # HAND-AUTHORED contract — validated by `python elastic/projection/validate.py`.
 # Projection of a content-node row (byakugan/superset.py CONTENT_COLUMNS,
-# exported as car_content.jsonl) onto the logs-car.content-<namespace> data
-# stream — the attribution layer made ECS-streamable (the D5 decision,
-# docs/research/relationship-model-gaps.md §6.2/§9: STIX stays the exchange
-# model for seeing the data; processed data is all ECS streamable).
-#
-# A content_node names the SAME content wherever it appears — a file's bytes
-# by hash, a real account by SID (byakugan/derive.py content_entities; the
-# identities are relationships.yml derived.identities of kind `content`). It
-# is GLOBAL by construction: no source_host, no car.object — the node is not
-# an event and not one of the 13 CAR objects. It is also the join target of
-# the ACTOR edges' user_account ends (car.rel.source/target.guid = the
-# node_id, e.g. sid:S-1-5-21-…).
+# car_content.jsonl) onto logs-car.content-* — the attribution layer made
+# ECS-streamable (D5, register §9). A content_node names the SAME content
+# wherever seen (bytes by hash, a real account by SID); GLOBAL by
+# construction — no source_host, no car.object — and the join target of the
+# actor edges' user_account ends (node_id, e.g. sid:S-1-5-21-…).
 object: content
 stream: logs-car.content-*
 dataset: car.content
@@ -29,13 +22,10 @@ constants:
 document_id:
   recipe: node_id
   note: >-
-    node_id verbatim — deterministic by content (sha256:<hex>, sid:<SID>; byakugan/derive.py
-    content_entities), so re-deriving the same evidence yields the same id and re-loading is
-    idempotent. Because the id is GLOBAL, two sources (or two batches) carrying the same
-    content write the same document: last write wins, so per-load context (ref_count, the
-    properties union) reflects the most recent load rather than a cross-load union — the STIX
-    lane unions instead (its content SCOs are built over the whole case). An additive
-    cross-load merge would need an update-by-script transform; deliberately not done here.
+    node_id verbatim — deterministic by content (sha256:<hex>, sid:<SID>), so re-loading is
+    idempotent. The id is GLOBAL: two sources carrying the same content write the same
+    document, last write wins — ref_count and the properties union reflect the most recent
+    load, not a cross-load union (the STIX lane unions instead).
 
 fields:
   - car: first_seen
