@@ -703,6 +703,14 @@ external:
       source: synthetic
       object: process
       values: {offset: 6699}
+  memory_file_object:
+    kind: entity
+    form: {form: 'file-{hex}'}
+    stable_across: one memory image — the FILE_OBJECT offset Anamnesis mints file-<hex> from
+    golden:                     # synthetic: 0x1a2b -> file-1a2b
+      source: synthetic
+      object: file
+      values: {offset: 6699}
 
 # ---------------------------------------------------------------------------
 # CROSS-SOURCE EQUALITY — the rule #41 (PR B, union_edges in crosssource)

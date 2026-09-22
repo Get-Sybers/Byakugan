@@ -302,9 +302,13 @@ def test_external_forms_are_exactly_the_raw_guid_forms_the_maps_carry():
             hits = [n for n, f in forms.items() if f == form]
             assert len(hits) == 1, (key, leaf["guid"])               # exactly one declared form
             carried.add(hits[0])
-    # every map-shaped form is carried; the memory form is the derive rule's
-    assert carried == set(forms) - {"memory_proc_offset"}
-    assert forms["memory_proc_offset"]["form"] == enrich.rules()["derived"]["identities"]["offset"]["guid_form"]
+    # every map-shaped form is carried; the memory-offset forms are derive rules'
+    memory_forms = {"memory_proc_offset", "memory_file_object"}
+    assert carried == set(forms) - memory_forms
+    derived_forms = {d["guid_form"] for d in enrich.rules()["derived"]["identities"].values()
+                     if isinstance(d, dict) and d.get("guid_form")}
+    for n in memory_forms:
+        assert forms[n]["form"] in derived_forms
     assert {e["kind"] for e in spindle.externals().values()} == {"record", "entity"}
     # the golden vectors are what the engine renders for the samples
     doc = yaml.safe_load((MODEL_SPINDLE / "golden.yml").read_text(encoding="utf-8"))
@@ -321,7 +325,7 @@ def test_external_forms_are_exactly_the_raw_guid_forms_the_maps_carry():
         "esedump_srum_network": "flow-102-8-1689399632855040-2024-02-20T07:50:00Z-2100-1440",
         "esedump_srum_application": "process-388-951-2024-02-20T07:50:59Z",
         "prefetch_dump_pf": "process-ADDINUTIL.EXE-0x4E6085D4",
-        "memory_proc_offset": "proc-1a2b"}
+        "memory_proc_offset": "proc-1a2b", "memory_file_object": "file-1a2b"}
     for e in doc["external"]:
         assert e["guid"] == spindle.external_vector(spindle.externals()[e["name"]])
         assert e["kind"] == spindle.externals()[e["name"]]["kind"] and e["source"] in ("real", "synthetic")
@@ -351,7 +355,7 @@ def test_external_and_equality_drift_is_caught(monkeypatch):
     assert any(p.startswith("zeek_files") and "raw guid form {'fields': ['fuid']} matches 0 external entries" in p
                for p in problems.splitlines())
     assert "external nobody_carries_me: carried by no map leaf" in problems
-    assert "external memory_proc_offset: form 'eprocess-{hex}' != relationships.yml" in problems
+    assert "external memory_proc_offset: form 'eprocess-{hex}' is not a relationships.yml derived.identities guid_form" in problems
     assert "external recmd_value: kind must be one of" in problems
     assert "external zeek_uid: golden.values must sample exactly ['uid']" in problems
     assert "external evtx_record: form must be exactly one of" in problems

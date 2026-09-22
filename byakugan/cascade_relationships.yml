@@ -6,6 +6,7 @@
 # process --verb--> spoke, keyed by the spoke's (car_object, car_action).
 spoke_owner:
   file:
+    access: accessed
     create: created
     read: accessed
     write: modified
