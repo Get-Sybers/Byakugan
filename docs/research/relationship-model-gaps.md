@@ -371,8 +371,13 @@ or external form.
 
 ## 8. Stage-2 execution order (smallest-risk first, each item names its layer)
 
-Status: items 1–7 are **shipped on this branch** as noted; what remains open
-is the decision set (§9) and the two flagged follow-ons below.
+Status: items 1–7 shipped in the first branch (merged as #110); item 8 — the
+decision set — was **ruled by the owner and shipped in the decisions round**
+(§9–§10): all eight held verbs declared (the pin set is now empty), the
+ACTOR edges landed (D3), and the content stream shipped (D5). Still open:
+R4/R7 implement-or-strike, the Anamnesis hex/decimal alignment issue, and
+the evidence-blocked follow-ons §10 names (mailbox↔SID, the suspend-count
+association, an impersonation verb if a future pin adds one).
 
 1. ✅ **Complete `spoke_owner`** — the 35 pairs of §1 minus the eight
    decision-flagged ones (email ×5, service/pause, socket/close,
@@ -407,13 +412,113 @@ Validation per increment, as #109 specifies: `python model/generate.py` ·
 `python model/stix/validate.py` · `python elastic/projection/validate.py` ·
 `python -m byakugan.spindle --check` · `pytest -q`.
 
-## 9. Decisions needed from the owner (everything else above is execution)
+## 9. Decisions — RULED by the owner (2026-09-22); how each landed
 
-| # | decision | recommendation |
-|---|---|---|
-| D1 | email verbs (deliver/block/redirect/quarantine/delete) — the one object with no ATT&CK grounding | `created`/—/`modified`/`modified`/`deleted`; leave `block` undeclared with rationale |
-| D2 | verbs for actions with no catalogue verb: service/pause, socket/close, thread/suspend | `stopped` / `terminated` / `modified` (all borrowed, flagged as extensions in the rendering) |
-| D3 | user-dimension edges (§3.2.1): entity-ref-only vs materialised `user_account` edges | materialise, scoped to the session/auth/process-create family first |
-| D4 | session-lifecycle pairing stays native-only (no self-edge)? | yes — ratify as a decided non-edge |
-| D5 | content nodes: ECS stream or STIX-only statement (§6.2) | STIX-only statement now; stream when a consumer asks |
-| D6 | triple-typing enforcement: render-only, or test-enforced for exact-typed edges (§2) | render + enforce exactness stability on pin bumps |
+| # | decision | ruling | landed as |
+|---|---|---|---|
+| D1 | email verbs | **email has action verbs — they are in CAR** (`data_model/email.yaml`): CAR is upstream research too, so the verbs ground in CAR's own action definitions, catalogue-typed | all five declared: deliver→`created`, block→`stopped`, redirect→`modified`, quarantine→`locked`, delete→`deleted` (§10.1) |
+| D2 | pause/close/suspend | **needs more detailed research** — "if it doesn't fit neatly it's either not handled correctly or not researched properly; the graph has three layers: vectors, transactions, associations" | researched through that lens (§10.2); all three resolved and declared: pause→`modified` (exact), suspend→`accessed`, close→`terminated` |
+| D3 | user-dimension edges | **user grounds in sid/username as CAR states**; an association layer accrues on the SID (non-domain emails, alias accounts); account→account is a transaction — "logged in as or impersonated, or perhaps it's all impersonate" | the ACTOR edges (§10.3): `derived.actors` rules + `derive.actor_edges` — user→process/session `created` (exact triples), subject→target `attempted to authenticate` (the impersonation transaction; `impersonated` is not a catalogue verb) |
+| D4 | session-lifecycle self-edge | question unclear to the owner — **explained in §10.4**; the default (no self-edge) stands until said otherwise | no change; pairing stays native-only |
+| D5 | content nodes | **STIX for ease of seeing the data; once processed it should all be ECS streamable** | both: STIX stays the exchange model; `car_content.jsonl` + the `logs-car.content-*` stream shipped (contract `elastic/projection/content.yml`), the join target of the actor edges' account ends |
+| D6 | typing enforcement | **defer; note as a candidate** — a byproduct of how the data fills, as a possible way of bumping exactness stability | render-only stands; §10.5 records the deferred candidate |
+
+## 10. The decisions' research record
+
+### 10.1 D1 — email verbs, grounded in CAR's own definitions
+
+The model is CAR ∪ ATT&CK; #109 names both as upstream. Where ATT&CK has no
+data element (email), **CAR's action definitions are the research base** —
+read verbatim from the pin:
+
+| action | CAR definition (`data_model/email.yaml`) | verb | reading |
+|---|---|---|---|
+| deliver | "an email being **sent to an end recipient**" | `created` | the message comes to exist at the recipient side (CAR-Relations §email: only deliver asserts server-side delivery) |
+| block | "an email being **blocked by the email server**" | `stopped` | the server stopped the delivery transaction |
+| redirect | "an email being **redirected**" | `modified` | its routing changed |
+| quarantine | "**quarantined for security reasons**" | `locked` | isolated but retrievable — the exact analogue of a locked account |
+| delete | "an email being **deleted**" | `deleted` | — |
+
+All verbs from the catalogue; all typed `extension` (no email element exists
+to be exact against).
+
+### 10.2 D2 — pause / close / suspend through the three layers
+
+The owner's frame: the graph has **vectors** (the object entities),
+**transactions** (the event edges between them), and **associations** (facts
+riding a relationship — the #108 handle pattern). Re-researched under it,
+none of the three needed a forced verb; each was a mis-framing:
+
+- **thread/suspend** ("suspending a thread which is currently running") —
+  Windows: `SuspendThread`/`NtSuspendThread`, gated on the
+  `THREAD_SUSPEND_RESUME` access right. The transaction is an **exercised
+  access on the running thread** — the same family as process access, where
+  the exercised right is the association layer (exactly how `GrantedAccess`
+  rides the process-access edge). Verb: `accessed` — the old default was
+  accidentally right; what was missing was declaring it *with this reasoning*
+  and the association slot (a suspend count / exercised right, when the
+  memory lane supplies one).
+- **service/pause** ("pausing a currently running service") —
+  `SERVICE_CONTROL_PAUSE` changes the service's run-state without ending it:
+  a **modification of the service vector**, and `process --modified-->
+  service` is an **exact ATT&CK triple** (Service Modification). The precise
+  transition stays in `car_action`; no information is lost.
+- **socket/close** ("a socket being closed") — the transaction **ends the
+  socket vector's lifetime**: the same reading the model already applies to a
+  session (`user_session/logout → terminated`). Verb: `terminated`
+  (extension), symmetric with session termination.
+
+The lesson generalises and is worth keeping: an action with "no fitting verb"
+means the transaction was mis-classified — re-derive it as an access
+(association-bearing), a state modification, or a lifecycle termination
+before reaching for a new verb.
+
+### 10.3 D3 — the user dimension, grounded in the SID
+
+Per the ruling, the user is the **SID** (with the username as its rendering)
+— exactly the existing `derived.identities.sid` real-account gate, whose
+content node (`sid:<SID>`) is already the attribution layer. The ACTOR edges
+(`relationships.yml derived.actors`, engine `derive.actor_edges`) make that
+dimension visible in the relationship timeline:
+
+- `user_account(sid) --created--> process` — from a process/create row's
+  `sid`/`uid` (exact ATT&CK triple: `user --created--> process`);
+- `user_account(sid) --created--> user_session` — from a login row's `uid`
+  (exact: `user --created--> logon session`);
+- `user_account(subject) --attempted to authenticate--> user_account(target)`
+  — from an authentication row where subject and target are BOTH real,
+  DIFFERENT SIDs: the **logged-in-as / impersonation transaction** the
+  ruling names. `impersonated` is not in the 243-verb catalogue, so the
+  attempt family types it (`application --attempted to authenticate-->
+  user` is the borrowed pattern); if a future pin adds an impersonation
+  verb, this is the one rule to retype. Subject == target (a normal
+  self-logon) never emits; well-known SIDs never pass the gate.
+
+Every actor end is backed by the content node the SAME row minted, so the
+edge is joinable: in STIX the end resolves to the global `user-account` SCO;
+in ECS the `sid:<SID>` guid joins `logs-car.content-*` (D5). The
+**association layer on the SID** the ruling describes — non-domain emails,
+other accounts the SID logs in as — accrues on that node: alias accounts
+now surface as the subject→target edges; mailbox↔SID stays declaration-ready
+but evidence-blocked (a mailbox address maps to an account only through an
+external directory — CAR-Relations §email).
+
+### 10.4 D4 — the session-lifecycle question, in plain terms
+
+When a logout row is found for an earlier login row, the engine pairs them
+(R1) and records the pairing inside the two rows' native data
+(`session_login_guid`/`session_logout_guid`/`session_end`). The question
+was only: should the timeline ALSO carry an edge between those two rows?
+Both rows describe the **same session** — an edge would connect the session
+to itself and add nothing a consumer can act on, so the recommendation was
+(and remains) no edge; the lifetime is row metadata, not a relation between
+two things. Standing default unless the owner says otherwise.
+
+### 10.5 D6 — typing enforcement, deferred with a marker
+
+Ruling: defer. The typing tier stays render-only (`model/relationships/`),
+and the candidate is noted for later: **as real data fills the model**, the
+observed mix of exact vs extension edges per object becomes a measurable
+signal — a pin bump that silently downgrades an exact-typed edge to
+extension (or the data never exercising an exact edge) is the trigger for
+revisiting test enforcement. Nothing to build until that data exists.
