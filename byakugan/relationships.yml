@@ -122,6 +122,17 @@ derived:
     file_offset:
       kind: instance          # a memory-image FILE_OBJECT offset (Anamnesis mints file-<hex> from it)
       guid_form: "file-{hex}"
+    luid:
+      kind: instance          # a Windows logon-session LUID — per boot per host, the same key
+                              # the joins.auth_session_luid cascade join uses (CAR-Relations
+                              # §authentication); Security TargetLogonId names it
+      guid_form: "user_session-{value}"   # the session-identity form the missing node takes
+      normalize: lower        # hex case differs between artefacts
+      # never a node for the null session or the per-boot singletons: 0x0 names no
+      # session, and 0x3e4/0x3e5/0x3e7 recur EVERY boot — minting one identity for
+      # them across a multi-boot log would merge boots (the joins.auth_session_luid
+      # caveat, applied to reconstruction where it asserts identity, so excluded)
+      accept: ['(?i)^0x(?!0$|3e4$|3e5$|3e7$)[0-9a-f]+$']
     hash:
       kind: content
       node: file_content
@@ -181,7 +192,7 @@ derived:
       identity: guid
       reference: owning_guid_native
       unless_linked: owning_guid
-      on: spokes
+      "on": spokes
       node: process
       end: source                   # the missing node is the edge SOURCE (owner --verb--> spoke)
       relationship: spoke_owner     # verb from cascade_relationships spoke_owner[(object, action)]
@@ -191,7 +202,7 @@ derived:
       identity: offset
       reference: owning_offset
       unless_linked: owning_guid
-      on: spokes
+      "on": spokes
       node: process
       end: source
       relationship: spoke_owner
@@ -201,7 +212,7 @@ derived:
       identity: guid
       reference: native.ParentProcessGuid
       unless_linked: parent_guid
-      on: process/create
+      "on": process/create
       node: process
       end: source
       relationship: created
@@ -212,10 +223,26 @@ derived:
       identity: guid
       reference: native.TargetProcessGuid
       unless_linked: native.target_process_guid
-      on: thread
+      "on": thread
       node: process
       end: target                   # owner --accessed--> (missing) target
       observed: {field: owning_guid, object: process}   # the observed end is the spoke's OWNER
       relationship: accessed
       method: native_guid
       properties: {pid: tgt_pid}
+    - name: auth_session_target
+      # a SUCCESSFUL authentication names the session it opened (TargetLogonId)
+      # — MITRE-worded, a success opens a session — but no source carries a
+      # user_session row for that LUID (no winlogon/TS/utmp coverage, or the
+      # log was cleared): the session EXISTED; reconstruct it, flagged, from
+      # what the auth record says. The LUID join (enrich._link_auth_sessions)
+      # already linked every observable pair, so this fires only for the rest.
+      identity: luid
+      reference: native.TargetLogonId
+      unless_linked: native.target_session_guid
+      "on": authentication/success
+      node: user_session
+      end: target                   # the observed auth --created--> the missing session
+      relationship: created         # same verb as the declared auth_session edge
+      method: luid
+      properties: {login_id: native.TargetLogonId, user: target_user, uid: target_uid}

@@ -8,7 +8,7 @@
 
 contract:
   name: car-stix-projection
-  version: 4                       # bump on any change to an id recipe or a target property
+  version: 5                       # bump on any change to an id recipe or a target property
                                    # 2: the row identity's forms (the spindle uuid5 + native.spindle_*),
                                    #    the fold's native keys (contributions / contributed_by)
                                    # 3: the behaviour layer — attack-pattern / indicator / indicates
@@ -16,6 +16,10 @@ contract:
                                    #    runnable CAR analytics over the object events (analytics.py; see `behaviour`)
                                    # 4: CAR_NS re-seeded to the byakugan URL and the producer to
                                    #    identity|byakugan / "Byakugan" — every deterministic id re-mints
+                                   # 5: SROs carry the edge's association properties verbatim
+                                   #    (x_car_properties <- car_relationships properties; the #108
+                                   #    handle facts and the cascade_relationships.yml
+                                   #    association_properties registry). Additive: no id moves.
   stix_version: '2.1'
   engine: byakugan/stix.py
   validated_by: model/stix/validate.py
@@ -202,7 +206,12 @@ relationships:
   labels: ['car:<class>', 'car:<method>']
   confidence: {definitive: 100, heuristic: 50, inferred: 20}
   start_time: the edge timestamp (absent when the row has none)
-  x_car: [class, method, confidence, identity_key, inferred_end, corroborated_by, source_host]
+  x_car: [class, method, confidence, identity_key, inferred_end, corroborated_by, properties, source_host]
+  properties: >-
+    x_car_properties = the edge row's association properties verbatim (the facts OF the
+    relationship — a handle's access mask, an injection's start address; the
+    cascade_relationships.yml association_properties registry) — the ECS car.rel.properties
+    peer. Absent on an edge with none; never a source of SCO properties or refs.
   ends: >-
     objects.yml <object>.sro_end — the row's entity SCO, or the row's observed-data for the event
     objects (authentication, user_session) that are not things; an inferred_end resolves to the

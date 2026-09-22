@@ -56,6 +56,30 @@ def _model_actions():
     return {obj: set(spec.get("actions") or []) for obj, spec in model.items()}
 
 
+def _relationship_vocab():
+    """The verbs the model can emit and the association property names its
+    registry declares — read from the same rules the engine reads
+    (cascade_relationships.yml spoke_owner/default/edges/association_properties
+    + relationships.yml derived links/reconstruct verbs). ``(None, None)``
+    when the rules cannot load (the gate then reports it, rather than
+    crashing)."""
+    try:
+        from byakugan import enrich, superset
+        r = superset.rules()
+        verbs = {v for m in (r.get("spoke_owner") or {}).values() for v in m.values()}
+        verbs.add(r.get("default_spoke_verb"))
+        verbs.update((r.get("edges") or {}).values())
+        d = enrich.rules().get("derived") or {}
+        for rule in (d.get("links") or []) + (d.get("reconstruct") or []):
+            v = rule.get("relationship")
+            if v and v != "spoke_owner":       # spoke_owner resolves to the table above
+                verbs.add(v)
+        props = {p for spec in (r.get("association_properties") or {}).values() for p in spec}
+        return {v for v in verbs if v}, props
+    except Exception:
+        return None, None
+
+
 # ---- the materialised CAR tree ---------------------------------------------
 def car_files(car_dir: str, obj: str) -> list[str]:
     """Every ``car_<obj>.jsonl`` under car_dir — one per source that produced
@@ -270,8 +294,30 @@ def run(car_dir: str = ".") -> _Checker:
                "relationships: every edge names a source and target guid")
         c.zero(RELATIONSHIPS, lambda r: empty(r.get("relationship")),
                "relationships: every edge has a verb")
-        c.zero(RELATIONSHIPS, lambda r: (r.get("confidence") or "") not in ("definitive", "heuristic", ""),
-               "relationships: confidence in {definitive, heuristic}")
+        c.zero(RELATIONSHIPS, lambda r: (r.get("class") or "declared") not in ("declared", "derived"),
+               "relationships: class in {declared, derived}")
+        # confidence is class-aware: the DECLARED cascade's vocabulary is
+        # closed; a DERIVED edge's word is open (a rule's own word, `inferred`
+        # on a reconstruct — elastic/projection/relationships.yml) but never empty
+        c.zero(RELATIONSHIPS, lambda r: (r.get("class") or "declared") == "declared"
+               and (r.get("confidence") or "") not in ("definitive", "heuristic", ""),
+               "relationships: declared confidence in {definitive, heuristic}")
+        c.zero(RELATIONSHIPS, lambda r: r.get("class") == "derived" and empty(r.get("confidence")),
+               "relationships: a derived edge names its confidence word")
+        vocab, prop_names = _relationship_vocab()
+        if vocab is None:
+            c._fail("relationships: model vocabulary unavailable "
+                    "(byakugan.superset/enrich rules failed to load)")
+        else:
+            c.zero(RELATIONSHIPS,
+                   lambda r: not empty(r.get("relationship")) and r["relationship"] not in vocab,
+                   "relationships: every verb is one the model declares")
+            c.zero(RELATIONSHIPS,
+                   lambda r: r.get("properties") not in (None, "") and not isinstance(r.get("properties"), dict),
+                   "relationships: properties is a mapping or null")
+            c.zero(RELATIONSHIPS,
+                   lambda r: isinstance(r.get("properties"), dict) and not set(r["properties"]) <= prop_names,
+                   "relationships: association property names are registry-declared")
     else:
         c.skip("relationships (car_relationships empty)")
 

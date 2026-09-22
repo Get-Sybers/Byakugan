@@ -40,11 +40,32 @@ model/
 │   ├── model-objects.yml            the CAR + ATT&CK object catalogue (38)
 │   ├── relationship-types.yml       the ATT&CK relationship vocabulary (243 edge-types)
 │   └── relationship-schema.yml      the relationship-instance row shape
+├── relationships/
+│   ├── declared.yml                 the DECLARED relationship model: per object the owner-edge
+│   │                                verb per action, the special edges, the association
+│   │                                properties each edge carries — typing-tiered (exact |
+│   │                                extension) against the pinned ATT&CK catalogue
+│   └── derived.yml                  the DERIVED relationship model: strong identities, 1:1
+│                                    links, reconstruction rules
 └── spindle/
     ├── identity.yml                 the spindle row-identity registry, resolved against the maps
     ├── record.yml                   the shape of a spindle — a minted-identity CAR row
     └── golden.yml                   the golden vectors: the guid the engine mints per entry's sample
 ```
+
+### `relationships/` — the declared + derived relationship model, readable
+
+The hand-authored relationship sources (`byakugan/cascade_relationships.yml`,
+`byakugan/relationships.yml` `derived:`) rendered for the reader — one place to
+see every edge the engine can materialize: the owner-edge verb per (object,
+action) with its association properties (facts *of* the edge, the #108
+pattern), the special edges with their triggers, and the derived
+links/reconstructs with their identities. Every edge carries a **typing
+tier**: `exact` (the triple exists in the pinned ATT&CK catalogue under the
+element aliasing in `generate.py`) or `extension` (a catalogue verb applied
+where Byakugan's evidence is finer-grained than ATT&CK's elements). The gap
+register behind the declarations is
+[`docs/research/relationship-model-gaps.md`](../docs/research/relationship-model-gaps.md).
 
 (`projection/` — the hand-authored CAR -> ECS boundary contract — used to be
 here too; it now lives at [`elastic/projection/`](../elastic/projection/).)

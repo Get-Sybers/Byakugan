@@ -169,7 +169,8 @@ def _form_of(e: dict) -> dict | None:
             and isinstance(f["marker"]["payload"], str):
         from .normalize import payload
         return {"marker": payload(f["marker"]["payload"])}
-    if list(f) == ["form"] and isinstance(f["form"], str) and "{hex}" in f["form"]:
+    if list(f) == ["form"] and isinstance(f["form"], str) \
+            and ("{hex}" in f["form"] or "{value}" in f["form"]):
         return {"form": f["form"]}
     return None
 
@@ -196,7 +197,7 @@ def _form_names(form: dict, e: dict) -> set[str]:
         return {form["field"]}
     if "marker" in form:
         return {e["form"]["marker"]["payload"]}
-    return {"offset"}
+    return {"value"} if "{value}" in form["form"] else {"offset"}
 
 
 def external_vector(e: dict) -> str | None:
@@ -210,7 +211,8 @@ def external_vector(e: dict) -> str | None:
     g = golden(e)
     values, obj = dict(g.get("values") or {}), g.get("object")
     if "form" in form:
-        return derive._as_guid(values.get("offset"), {"guid_form": form["form"]})  # noqa: SLF001
+        key = "value" if "{value}" in form["form"] else "offset"
+        return derive._as_guid(values.get(key), {"guid_form": form["form"]})  # noqa: SLF001
     if "marker" in form:
         key = e["form"]["marker"]["payload"]
         rec = {"Payload": json.dumps({"EventData": {"Data": [{"@Name": key, "#text": str(values.get(key))}]}})}
@@ -378,6 +380,11 @@ def verify_registry() -> list[str]:
                 continue
             form = _leaf_form(gspec)
             hits = [n for n, f in forms.items() if f is not None and f == form]
+            if len(hits) > 1:
+                # a fields-form implicitly carries the leaf's object prefix
+                # (<object>-<v1>-…): entries for different objects may share the
+                # field list, so the leaf's own object disambiguates
+                hits = [n for n in hits if golden(ext[n]).get("object") == leaf.get("object")]
             if len(hits) != 1:
                 problems.append(f"{where}: raw guid form {gspec!r} matches {len(hits)} external entries "
                                 "(spindle.yml external: must declare it exactly once)")
@@ -470,12 +477,19 @@ def verify_registry() -> list[str]:
         gv = g.get("values") if isinstance(g.get("values"), dict) else {}
         if set(gv) != _form_names(form, e) or any(v in (None, "") for v in gv.values()):
             problems.append(f"external {name}: golden.values must sample exactly {sorted(_form_names(form, e))}")
+        carried_by = e.get("carried_by")
+        if carried_by is not None and (not isinstance(carried_by, str) or not carried_by.strip()):
+            problems.append(f"external {name}: carried_by must name the interchange producer "
+                            "whose maps mint the form (a non-empty string)")
+            carried_by = None
         if "form" in form:
-            if form["form"] not in offset_forms:
+            if form["form"] not in offset_forms and not carried_by:
                 problems.append(f"external {name}: form {form['form']!r} is not a "
-                                f"relationships.yml derived.identities guid_form {sorted(offset_forms)}")
-        elif name not in ext_used:
-            problems.append(f"external {name}: carried by no map leaf")
+                                f"relationships.yml derived.identities guid_form {sorted(offset_forms)} "
+                                "and no carried_by producer holds it")
+        elif name not in ext_used and not carried_by:
+            problems.append(f"external {name}: carried by no map leaf "
+                            "(an interchange producer's form declares carried_by: <producer>)")
     return problems
 
 
@@ -520,14 +534,17 @@ def registry_doc() -> dict:
     for name in sorted(externals()):
         e = externals()[name]
         x = xrefs.get(name) or {"maps": set(), "objects": set()}
-        external.append({
+        row = {
             "name": name,
             "kind": e.get("kind"),
             "form": e.get("form"),
             "maps": sorted(x["maps"]),
             "car_object": sorted(x["objects"]) or [golden(e).get("object")],
             "stable_across": e.get("stable_across"),
-        })
+        }
+        if e.get("carried_by"):        # an interchange producer's form: no map
+            row["carried_by"] = e["carried_by"]        # leaf here mints it
+        external.append(row)
     return {
         "spindle": {
             "version": spec.get("version"),

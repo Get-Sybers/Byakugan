@@ -302,13 +302,19 @@ def test_external_forms_are_exactly_the_raw_guid_forms_the_maps_carry():
             hits = [n for n, f in forms.items() if f == form]
             assert len(hits) == 1, (key, leaf["guid"])               # exactly one declared form
             carried.add(hits[0])
-    # every map-shaped form is carried; the memory-offset forms are derive rules'
-    memory_forms = {"memory_proc_offset", "memory_file_object"}
-    assert carried == set(forms) - memory_forms
+    # every map-shaped form is carried by a leaf, is a derive rule's rendering,
+    # or is an interchange producer's own form (carried_by — the Anamnesis
+    # passthrough): the registry's three holders, each explicit
+    derive_held = {"memory_proc_offset", "memory_file_object"}
+    interchange = {n for n, e in spindle.externals().items() if e.get("carried_by")}
+    assert all(spindle.externals()[n]["carried_by"] == "anamnesis" for n in interchange)
+    assert carried == set(forms) - derive_held - interchange
     derived_forms = {d["guid_form"] for d in enrich.rules()["derived"]["identities"].values()
                      if isinstance(d, dict) and d.get("guid_form")}
-    for n in memory_forms:
+    for n in derive_held:
         assert forms[n]["form"] in derived_forms
+    # the session form doubles as the luid reconstruct rule's guid_form
+    assert forms["memory_session_luid"]["form"] in derived_forms
     assert {e["kind"] for e in spindle.externals().values()} == {"record", "entity"}
     # the golden vectors are what the engine renders for the samples
     doc = yaml.safe_load((MODEL_SPINDLE / "golden.yml").read_text(encoding="utf-8"))
@@ -325,7 +331,22 @@ def test_external_forms_are_exactly_the_raw_guid_forms_the_maps_carry():
         "esedump_srum_network": "flow-102-8-1689399632855040-2024-02-20T07:50:00Z-2100-1440",
         "esedump_srum_application": "process-388-951-2024-02-20T07:50:59Z",
         "prefetch_dump_pf": "process-ADDINUTIL.EXE-0x4E6085D4",
-        "memory_proc_offset": "proc-1a2b", "memory_file_object": "file-1a2b"}
+        "memory_proc_offset": "proc-1a2b", "memory_file_object": "file-1a2b",
+        # the Anamnesis interchange forms (carried_by — register §5): the
+        # fields form renders DECIMAL, so file_scan (file-6699) sits beside
+        # the hex FILE_OBJECT form (file-1a2b) — the recorded divergence
+        "memory_thread_offset": "thread-6699",
+        "memory_module_load": "module-10-1904640",
+        "memory_driver_offset": "driver-6700",
+        "memory_service_offset": "service-6701",
+        "memory_socket_tuple": "socket-TCPv4-0.0.0.0-135-924",
+        "memory_flow_tuple": "flow-TCPv4-10.0.0.5-49713-100.101.0.42-443",
+        "memory_registry_value":
+            "registry-\\REGISTRY\\MACHINE\\SOFTWARE-Microsoft\\Windows\\CurrentVersion\\Run-Updater",
+        "memory_session_luid": "user_session-0x51ca9",
+        "memory_session_index": "user_session-1-jo",
+        "memory_file_mft": "file-mft-843",
+        "memory_file_scan_offset": "file-6699"}
     for e in doc["external"]:
         assert e["guid"] == spindle.external_vector(spindle.externals()[e["name"]])
         assert e["kind"] == spindle.externals()[e["name"]]["kind"] and e["source"] in ("real", "synthetic")

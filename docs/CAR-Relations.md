@@ -138,7 +138,10 @@ hand is STARTTLS-encrypted — an empty `car_email` table is the honest output.
 These rules mine each per-source event collection for join keys the base
 cascade does not already exploit. Every rule is **within one source**
 (scoped per `source_host`) and grounded in a concrete key in the evidence,
-implemented in `enrich.py` + `relationships.yml`. Cross-source correlation
+implemented in `enrich.py` + `relationships.yml` — **except R4 and R7,
+which are specified here but not yet implemented** (the relationship-model
+gap register §7 flagged the drift; they stay in the table as specs, honestly
+labelled, until built or struck). Cross-source correlation
 (memory + disk + network) is a separate stage — see
 [CAR-CrossSource.md](CAR-CrossSource.md).
 
@@ -154,8 +157,14 @@ terminated (`enrich._alive_at`), improving owner/parent link correctness.
 | R3 | **zeek uid spoke→flow** — link each http/file to its connection | `uid` (definitive within capture); `fuid` = file identity | http/file inherit `from_owning_flow` (requester_ip, hostname); `_native.flow_guid` |
 | R5 | **thread injection dual-link** — link BOTH source and target process | source + target ProcessGuid (both native, definitive) | owner = source; `_native.target_process_guid` = injected target |
 | R6 | **auth caller-process owner** — link an auth to the process that requested it | 4624/4625 Payload `ProcessId` → owning_pid (heuristic pid+window) | auth `owning_guid` (previously auth linked only to its *session* via LUID) |
-| R4 | **BITS transfer correlation** — assemble one transfer from its events | `transferId` GUID (definitive) | final bytes/URL, completion; owner from the BITS job-created event's process |
-| R7 | **service→process by image** (weak) — link a 7045 install to a run of its binary | 7045 `ImagePath` ↔ 4688 `NewProcessName` exe+window (heuristic) | service `owning_guid` |
+| R4 | **BITS transfer correlation** (SPEC — not yet implemented) — assemble one transfer from its events | `transferId` GUID (definitive) | final bytes/URL, completion; owner from the BITS job-created event's process |
+| R7 | **service→process by image** (SPEC — not yet implemented; weak) — link a 7045 install to a run of its binary | 7045 `ImagePath` ↔ 4688 `NewProcessName` exe+window (heuristic) | service `owning_guid` |
+
+The declared/derived relationship model these rules feed — every emittable
+edge with its verb, typing tier and the association properties it carries —
+is rendered readable at `model/relationships/` (`python model/generate.py`);
+the completeness register behind it is
+[research/relationship-model-gaps.md](research/relationship-model-gaps.md).
 
 **Deferred to the cross-source aggregate stage (different sources):**
 service↔registry service-key writes (evtx and registry are separate sources),
