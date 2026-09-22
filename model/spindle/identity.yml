@@ -862,10 +862,9 @@ external:
   maps: []
   car_object:
   - file
-  stable_across: 'one memory image — the FILE_OBJECT offset again, but windows.filescan renders it DECIMAL
-    through the generic fields form while windows.anamnesis.files mints file-<HEX> (memory_file_object):
-    the same offset yields two identities that share a prefix and never equate. Declared so the divergence
-    is on record; the fix (one rendering) is Anamnesis-side and re-mints filescan guids when it lands'
+  stable_across: 'one memory image — the FILE_OBJECT offset, rendered DECIMAL by windows.filescan while
+    windows.anamnesis.files mints file-<HEX> (memory_file_object): the same offset yields two identities
+    that never equate. On record until the Anamnesis-side rendering is unified'
   carried_by: anamnesis
 - name: memory_flow_tuple
   kind: entity
@@ -880,9 +879,7 @@ external:
   car_object:
   - flow
   stable_across: 'ONE memory snapshot — a connection by its 5-tuple (netscan/netstat/anamnesis.network).
-    NOT stable across snapshots of the same host: ephemeral-port reuse re-mints the tuple for a DIFFERENT
-    connection, so cross-snapshot equality on this form false-equates — the exact caveat this registry
-    exists to record'
+    NOT stable across snapshots: ephemeral-port reuse re-mints the tuple for a different connection'
   carried_by: anamnesis
 - name: memory_module_load
   kind: entity

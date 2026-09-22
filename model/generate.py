@@ -379,7 +379,7 @@ def gen_relationships() -> tuple[int, int]:
         spec = d["identities"][iname]
         identities[iname] = {k: spec[k] for k in
                              ("kind", "guid_form", "normalize", "accept", "node",
-                              "fields", "properties") if k in spec}
+                              "fields", "properties", "sources") if k in spec}
     links = []
     for rule in d.get("links") or []:
         links.append({

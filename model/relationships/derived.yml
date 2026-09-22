@@ -36,12 +36,29 @@ derived_relationships:
       - module_path
       - file_name
       - signer
+      sources:
+      - authority: the bytes themselves
+        class: computed
+        carries: hashes computed from content (disk image / zeek files.log)
+      - authority: sensor at event time
+        class: recorded
+        carries: Sysmon-computed hashes (EID 1/6/7/11/15/23)
+      - authority: Amcache / PE metadata
+        class: recorded
+        carries: recorded SHA-1 / header hashes — may lag the bytes
     luid:
       kind: instance
       guid_form: user_session-{value}
       normalize: lower
       accept:
       - (?i)^0x(?!0$|3e4$|3e5$|3e7$)[0-9a-f]+$
+      sources:
+      - authority: LSA logon-session table
+        class: observed
+        carries: the live LUIDs (memory windows.anamnesis.sessions)
+      - authority: Security event log
+        class: recorded
+        carries: TargetLogonId / SubjectLogonId (4624/4634/4647/4672)
     offset:
       kind: instance
       guid_form: proc-{hex}
@@ -60,6 +77,25 @@ derived_relationships:
       properties:
       - user
       - hostname
+      sources:
+      - authority: Active Directory (ntds.dit)
+        class: issuer
+        carries: domain account SIDs
+      - authority: SAM hive
+        class: issuer
+        carries: local account SIDs (machine SID + RID)
+      - authority: Security event log
+        class: recorded
+        carries: Subject/Target SIDs (4624/4688/4907/4720-family)
+      - authority: process token
+        class: observed
+        carries: the token's user and group SIDs (memory)
+      - authority: NTFS $Secure / owner
+        class: recorded
+        carries: owner SIDs (file owner_uid)
+      - authority: registry ProfileList
+        class: mapping
+        carries: SID -> profile path (SOFTWARE hive)
   links:
   - name: process_image_content
     form: process --executed--> file

@@ -581,16 +581,12 @@ identities:
 # sensor's or tool's OWN id, carried verbatim (never wrapped in uuid5). A form
 # is `fields` (<object>-<f1>-<f2>…, normalize._guid), `field` (the value),
 # `marker: {payload: <name>}` (a value out of the EvtxECmd Payload) or `form`
-# (the guid a producing tool mints, "proc-{hex}" for a memory _EPROCESS
-# offset — relationships.yml derived.identities.offset.guid_form; "{value}"
-# renders the raw value). Each carries a kind and a golden sample;
-# spindle.verify_registry holds every map leaf's guid spec to exactly one of
-# these, and every one of these to a map, to the derive rule, or to an
-# INTERCHANGE producer named by `carried_by` — a tool (Anamnesis) whose own
-# maps mint the form and whose rows arrive verbatim through a passthrough
-# reader (readers.load_anamnesis_car), so this registry still records the
-# form's kind/scope/stability even though no Byakugan map leaf mints it. So
-# no raw form is undeclared and no mapped row is guid-less by design.
+# (the guid a producing tool mints — a derive guid_form; "{value}" renders the
+# raw value). Each carries a kind and a golden sample; verify_registry holds
+# every map leaf's guid spec to exactly one of these, and every one of these
+# to a map, a derive rule, or an interchange producer named by `carried_by`
+# (its rows arrive verbatim through a passthrough reader) — no raw form
+# undeclared, no mapped row guid-less by design.
 external:
   evtx_record:
     kind: record
@@ -715,15 +711,10 @@ external:
       source: synthetic
       object: file
       values: {offset: 6699}
-  # ---- the Anamnesis interchange forms (carried_by: no Byakugan map leaf
-  # mints these; they arrive verbatim through readers.load_anamnesis_car —
-  # docs/Anamnesis-Interchange.md; the producer's own maps are Anamnesis
-  # internal/normalize/mappings.yaml, its fields form rendering values in
-  # DECIMAL via value.Str). Declared per the relationship-model gap register
-  # §5 so their kind/scope/stability are recorded, the whole point of this
-  # registry — the #41 equality predicate treats any external form as
-  # exact-value equatable, so what each form may honestly be equated ACROSS
-  # is stated here, per entry. ---------------------------------------------
+  # ---- Anamnesis interchange forms (carried_by; fields render DECIMAL via
+  # value.Str). Declared so kind/scope/stability are on record — the equality
+  # predicate equates external forms by exact value, so what each form may
+  # honestly be equated ACROSS is stated per entry (register §5). ----------
   memory_thread_offset:
     kind: entity
     carried_by: anamnesis
@@ -786,10 +777,8 @@ external:
     form: {fields: [Proto, LocalAddr, LocalPort, ForeignAddr, ForeignPort]}
     stable_across: >-
       ONE memory snapshot — a connection by its 5-tuple
-      (netscan/netstat/anamnesis.network). NOT stable across snapshots of the
-      same host: ephemeral-port reuse re-mints the tuple for a DIFFERENT
-      connection, so cross-snapshot equality on this form false-equates —
-      the exact caveat this registry exists to record
+      (netscan/netstat/anamnesis.network). NOT stable across snapshots:
+      ephemeral-port reuse re-mints the tuple for a different connection
     golden:                     # synthetic
       source: synthetic
       object: flow
@@ -850,12 +839,10 @@ external:
     carried_by: anamnesis
     form: {fields: [Offset]}    # file-<offset, DECIMAL> (windows.filescan)
     stable_across: >-
-      one memory image — the FILE_OBJECT offset again, but windows.filescan
-      renders it DECIMAL through the generic fields form while
-      windows.anamnesis.files mints file-<HEX> (memory_file_object): the same
-      offset yields two identities that share a prefix and never equate.
-      Declared so the divergence is on record; the fix (one rendering) is
-      Anamnesis-side and re-mints filescan guids when it lands
+      one memory image — the FILE_OBJECT offset, rendered DECIMAL by
+      windows.filescan while windows.anamnesis.files mints file-<HEX>
+      (memory_file_object): the same offset yields two identities that never
+      equate. On record until the Anamnesis-side rendering is unified
     golden:                     # synthetic: offset 6699 -> file-6699 (vs file-1a2b hex)
       source: synthetic
       object: file
