@@ -279,6 +279,62 @@ references resolve to a real `(name, channel)` pair in their referenced
 component — the 3 stragglers are exactly why ingest must count-and-carry
 rather than drop).
 
+**The bundle-level contract** (the docs site's `/schemas/#stix-bundle-object`
+page → `stix-bundle.schema`): a bundle is `{id: bundle--<uuid>, type:
+"bundle", objects: [≥1]}` — nothing more; **STIX 2.1 bundles carry no
+bundle-level `spec_version`** (v19.2's top level is exactly those three
+keys). Three artifacts describe the `objects` array, and only two agree:
+
+- The published page (hand-maintained, its own comment says so) admits all
+  **seventeen** types — Relationship and MarkingDefinition included — which
+  is what `attackObjectsSchema` (`stix-bundle.schema.ts:110-153`, per-object
+  dispatch through a type→schema map) and the exported `AttackObject` union
+  implement, and what real bundles contain.
+- The code's `stixBundleSchema` (`stix-bundle.schema.ts:163-207`) instead
+  enumerates a 15-schema discriminated union that **omits `relationship` and
+  `marking-definition`** — a real ATT&CK bundle (21,262 relationships) can
+  never pass it, and ADM's own loader quietly routes around it (per-object
+  dispatch after a `pick({id,type}).loose()` — the very call that crashes on
+  4.10.1).
+
+What *is* worth taking from `stixBundleSchema` is its three bundle-level
+refinements, which real data honours exactly (measured on v19.2): the
+**first object is the `x-mitre-collection` and there is only one**; every
+`x_mitre_contents` ref resolves to a present object (26,084/26,084 — the
+manifest covers everything except the collection itself and the one
+marking-definition); **no duplicate ids**. Those three assertions become our
+loader's bundle gate.
+
+**The how-to guides** (`/docs/how-to-guides/` — `schema-variants`,
+`manage-data-sources`, `validate-bundles`; all three carry a
+Work-In-Progress notice) split cleanly into advice and code:
+
+- *The advice is our COA.* `manage-data-sources`' takeaways — pin the
+  version in production, keep a fallback source chain, sanity-check after
+  load, cache, environment-based source config — are exactly Phases 0/5
+  (`pin.yml` + sha256, `--offline <bundle>` fallback, index golden checks,
+  the fetch cache, env-driven paths). We implement the guide's design with
+  machinery that runs.
+- *The code samples don't run on `latest`.* `manage-data-sources` is built
+  entirely on `new DataSource({...})` (the class is `DataSourceRegistration`),
+  `filePath:` (real option: `path`) and `requestOptions.headers` (does not
+  exist); `validate-bundles` opens with `stixBundleSchema.parse(bundle)` —
+  which no real ATT&CK bundle can pass (above) — before a
+  `registerDataSource` call that crashes on 4.10.1. Its Step-2 pattern
+  (per-object dispatch through a type→schema map) is the workable one — the
+  same shape as `attackObjectsSchema` and as our stdlib loader.
+- *`schema-variants` is the accurate one*, and the design lesson transfers:
+  since 4.9.0 each refined type ships **Full / Base / Partial** tiers
+  (`campaignSchema` / `campaignBaseSchema` / `campaignPartialSchema`, for
+  campaign, group, malware, tool, technique, relationship) because zod 4
+  forbids `.pick()`/`.omit()`/`.partial()` on refined schemas — shape
+  validation and cross-field rules as separate tiers. Our `--check` mirrors
+  that split in stdlib: shape assertions per object type, referential
+  assertions (analytic→component, contents↔objects) as a distinct pass. The
+  Base/Partial tiers are also the right entry point for dev-time validation
+  of Byakugan-*emitted* objects, which will never carry MITRE-only
+  attribution fields that the Full tier hard-requires.
+
 **Why "use as the specification" and not "run the library"** — findings from
 reading `latest`'s code, which temper the USAGE.md story:
 
@@ -298,9 +354,9 @@ reading `latest`'s code, which temper the USAGE.md story:
   `getAssociatedSoftware()`, …).
 - Strict parsing rejects **live** ATT&CK: closed vocabulary lists predate
   v19 (tactic shortnames miss `stealth` and `defense-impairment`), the
-  malware→tool `revoked-by` (Ngrok) violates its same-type rule, 224 legacy
-  mitigations reuse `T####` ids, and `stixBundleSchema`'s allowed-types list
-  omits `relationship` entirely — a real bundle cannot pass it. Relaxed mode
+  malware→tool `revoked-by` (Ngrok) violates its same-type rule, and 224
+  legacy mitigations reuse `T####` ids — on top of `stixBundleSchema` itself
+  (the bundle-level contract above). Relaxed mode
   keeps invalid objects raw (the docs claim it drops them).
 
 None of that dents the *specification* value — and it is a live warning
@@ -668,7 +724,9 @@ tests move only with the pin, deliberately — the spindle change-protocol
 discipline applied to the ATT&CK pin. Optional lanes, explicitly out of the
 critical path: mobile/ics domains; serving TAXII via the workbench
 taxii-server container beside the Elastic stack; dev-time ADM validation of
-exported bundles; upstreaming the forensic-artifact log sources.
+exported bundles (pin ≥ 4.11, validate per-object, prefer the Base/Partial
+tiers for Byakugan-emitted objects — §3.1); upstreaming the
+forensic-artifact log sources.
 
 #### CI / test surface (all offline)
 
