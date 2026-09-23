@@ -37,8 +37,8 @@ _FIXED = {
 
 def _ir_path() -> str:
     """The committed ir.json. Byakugan runs from a checkout (not a distributed
-    wheel — DX_DFIR pins it by commit via byakugan.ref), so the default is
-    repo-relative; $BYAKUGAN_IR overrides it for any other layout."""
+    wheel — the GoDFIR-toolz image pins it by commit via BYAKUGAN_REF), so the
+    default is repo-relative; $BYAKUGAN_IR overrides it for any other layout."""
     env = os.environ.get("BYAKUGAN_IR")
     if env:
         return env
