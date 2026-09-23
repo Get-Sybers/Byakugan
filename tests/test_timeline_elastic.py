@@ -24,7 +24,7 @@ import threading
 
 import pytest
 
-from byakugan import store, superset, timeline
+from byakugan import derive, store, superset, timeline
 from byakugan.elastic import load
 
 NAMESPACE = "default"
@@ -48,6 +48,9 @@ def _events(host: str, prefix: str) -> list[dict]:
          "device_serial": "SN1", "exe": "a.exe", "command_line": "a -x",
          "image_path": r"C:\a.exe", "pid": 100, "sid": "S-1-5-18",
          "hostname": host, "integrity_level": "System",
+         # the hash mints a content node -> a logs-car.content-* bundle, the
+         # OTHER non-timeline stream the elastic fetch must exclude
+         "sha256_hash": "c1" * 32,
          "env_vars": "A=1\nB=2", "_native": {"EventId": 1}},
         # owning_guid ABSENT: process.entity_id will duplicate event.id on the
         # ECS side (the header's own per_object.process fallback) -- proves
@@ -99,8 +102,11 @@ def _build_tree(root: str, sources=("sysmon1", "sysmon2")) -> str:
              "reason": "reconstructed", "method": "native_guid",
              "corroborated_by": [f"{name}-P1"], "properties": {"pid": 42},
              "first_seen": "2020-01-01T00:00:07Z", "last_seen": "2020-01-01T00:00:07Z"}])
+        cnodes, _refs = derive.content_entities(events)
+        sup.insert_content_nodes(cnodes)
         sup.export_jsonl(d)
         sup.export_inferred_jsonl(d)
+        sup.export_content_jsonl(d)
         sup.close()
     return root
 
@@ -127,11 +133,16 @@ def _seed_from_bundles(elastic_dir: str) -> dict:
     return indices
 
 
-def _has_inferred_exclusion(query: dict) -> bool:
+def _excluded_datasets(query: dict) -> set:
+    """The event.dataset values the query's must_not excludes — both the
+    single `term` shape and the `terms` list shape the engine sends."""
+    out: set = set()
     for clause in ((query or {}).get("bool") or {}).get("must_not") or []:
-        if (clause.get("term") or {}).get("event.dataset") == "car.inferred":
-            return True
-    return False
+        t = (clause.get("term") or {}).get("event.dataset")
+        if t:
+            out.add(t)
+        out.update((clause.get("terms") or {}).get("event.dataset") or [])
+    return out
 
 
 class _StubES(http.server.BaseHTTPRequestHandler):
@@ -152,13 +163,13 @@ class _StubES(http.server.BaseHTTPRequestHandler):
 
     def _matching_triples(self, pattern: str, query: dict):
         st = self.server.state
-        exclude_inferred = _has_inferred_exclusion(query)
+        excluded = _excluded_datasets(query)
         out = []
         for stream, docs in st["indices"].items():
             if not fnmatch.fnmatch(stream, pattern):
                 continue
             for doc_id, doc in docs.items():
-                if exclude_inferred and (doc.get("event") or {}).get("dataset") == "car.inferred":
+                if (doc.get("event") or {}).get("dataset") in excluded:
                     continue
                 out.append((stream, doc_id, doc))
         out.sort(key=lambda t: (t[2].get("@timestamp") or "", t[1]))
@@ -275,11 +286,12 @@ def test_elastic_timeline_matches_local_byte_for_byte(tmp_path, es_stub, monkeyp
     assert state["search_calls"] >= 2
     assert state["pit_opens"] == 1 and state["pit_closes"] == 1
 
-    # the inferred stream was never queried: the stub excludes it from every
-    # page it serves (event.dataset car.inferred, per the query filter this
-    # module's fetch sends), and this proves it not just by construction but
-    # by observing what the stub actually returned across the whole fetch.
+    # the non-timeline streams were never served: the stub applies the query
+    # filter this module's fetch sends (event.dataset car.inferred and
+    # car.content), and this proves it by observing what the stub actually
+    # returned across the whole fetch, not just by construction.
     assert f"logs-car.inferred-{NAMESPACE}" not in state["streams_seen"]
+    assert f"logs-car.content-{NAMESPACE}" not in state["streams_seen"]
     assert any(s.startswith("logs-car.rel-") for s in state["streams_seen"])
     assert any(s.startswith("logs-car.process-") for s in state["streams_seen"])
 
@@ -304,23 +316,26 @@ def test_elastic_timeline_host_filter_matches_local(tmp_path, es_stub, monkeypat
     assert not any(e.get("source_host") == "HOST1" for e in rows_elastic)
 
 
-def test_elastic_fetch_never_touches_the_inferred_stream_even_unfiltered_locally(tmp_path, es_stub):
+def test_elastic_fetch_never_touches_the_non_timeline_streams_even_populated(tmp_path, es_stub):
     """byakugan.elastic.projection.SKIP_NO_TIMESTAMP-independent sanity check: the
-    inferred stream genuinely holds documents in this fixture (so its
-    absence from streams_seen in the tests above is not just because there
-    was nothing there to find)."""
+    inferred AND content streams genuinely hold documents in this fixture
+    (so their absence from streams_seen in the tests above is not just
+    because there was nothing there to find)."""
     es_url, state = es_stub
     car = str(tmp_path / "car")
     _build_tree(car)
     out_dir = str(tmp_path / "out")
     load.run(car, out_dir, NAMESPACE)
     bundles = os.path.join(out_dir, "elastic")
-    assert os.path.isfile(os.path.join(bundles, f"logs-car.inferred-{NAMESPACE}.ndjson"))
+    for stream in (f"logs-car.inferred-{NAMESPACE}", f"logs-car.content-{NAMESPACE}"):
+        assert os.path.isfile(os.path.join(bundles, f"{stream}.ndjson"))
     state["indices"] = _seed_from_bundles(bundles)
-    assert state["indices"][f"logs-car.inferred-{NAMESPACE}"]        # genuinely non-empty
+    for stream in (f"logs-car.inferred-{NAMESPACE}", f"logs-car.content-{NAMESPACE}"):
+        assert state["indices"][stream]                  # genuinely non-empty
 
     timeline.build_timeline_from_elastic(es_url, NAMESPACE)
     assert f"logs-car.inferred-{NAMESPACE}" not in state["streams_seen"]
+    assert f"logs-car.content-{NAMESPACE}" not in state["streams_seen"]
 
 
 def test_elastic_connection_failure_is_a_clean_system_exit_not_a_traceback():

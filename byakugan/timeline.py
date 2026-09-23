@@ -146,9 +146,10 @@ def _filter_and_sort(rows: list[dict], host: str | None, after: str | None,
 
 # --------------------------------------------------------------------------- #
 # SOURCE: Elasticsearch (epic #99 phase 5) — point-in-time + search_after over
-# logs-car.*-<namespace>, excluding event.dataset car.inferred (never part of
-# the timeline: an inferred_node is reconstructed evidence about an object,
-# never a car_<object>.jsonl event row — see elastic/projection/inferred.yml),
+# logs-car.*-<namespace>, excluding the non-timeline datasets car.inferred
+# (reconstructed evidence about an object, never an event row) and
+# car.content (the attribution layer's content nodes — global entities, not
+# events; see elastic/projection/inferred.yml and content.yml),
 # each hit inverted back to the local entry shape (byakugan.elastic.inverse_projection),
 # then handed to the exact same _filter_and_sort/write_jsonl as the local source.
 # --------------------------------------------------------------------------- #
@@ -170,14 +171,15 @@ def _pit_close(es_url: str, pit_id: str, headers: dict, context) -> None:
 
 
 def _fetch_hits(es_url: str, namespace: str, headers: dict, context, page_size: int | None = None):
-    """Every logs-car.*-<namespace> document's `_source`, EXCEPT
-    event.dataset car.inferred — sorted `@timestamp` asc with the PIT
-    tiebreak (`_shard_doc`), `page_size` (default: the module's PAGE_SIZE,
-    looked up fresh so a test's monkeypatch takes effect) per `_search`."""
+    """Every logs-car.*-<namespace> document's `_source`, EXCEPT the
+    non-timeline datasets (event.dataset car.inferred and car.content) —
+    sorted `@timestamp` asc with the PIT tiebreak (`_shard_doc`),
+    `page_size` (default: the module's PAGE_SIZE, looked up fresh so a
+    test's monkeypatch takes effect) per `_search`."""
     if page_size is None:
         page_size = PAGE_SIZE
     headers = {**headers, "Content-Type": "application/json"}
-    query = {"bool": {"must_not": [{"term": {"event.dataset": "car.inferred"}}]}}
+    query = {"bool": {"must_not": [{"terms": {"event.dataset": ["car.inferred", "car.content"]}}]}}
     sort = [{"@timestamp": "asc"}, {"_shard_doc": "asc"}]
     pit_id = _pit_open(es_url, namespace, headers, context)
     try:
