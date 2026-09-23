@@ -13,7 +13,8 @@ library; every network call is stdlib `urllib`.
         [--setup] [--kibana-url URL]
 
 Two modes, selected by `--es-url` (empty = bundle, the default — no network
-is ever opened without it, the same opt-in shape as ANAMNESIS_SYMBOLS_ONLINE):
+is ever opened without it; the explicit default-off opt-in the container
+framework's `network: optional` requires):
 
   bundle  render `<out>/elastic/logs-car.<stream>-<ns>.ndjson` (one file per
           data stream actually populated — 13 CAR objects + rel + inferred + content,
