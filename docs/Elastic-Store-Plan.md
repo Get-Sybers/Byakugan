@@ -76,7 +76,9 @@ should say so plainly:
   cloned at the `BYAKUGAN_REF` pin, `ENTRYPOINT byakugan`, the engine's own
   multi-tool dispatcher), and its framework already sanctions exactly one
   networking shape: `network: optional` behind a default-off env var
-  (the `ANAMNESIS_SYMBOLS_ONLINE` precedent).
+  (`BYAKUGAN_LOAD_ES_URL` is now the framework's one such opt-in — the
+  original precedent, anamnesis's symbols-online fetch, was replaced by a
+  build-time symbol bake and that lane is always offline).
 
 What does **not** exist yet, anywhere: a projection for the relationship /
 inferred-node streams, index templates, the loader itself, Kibana assets, and
