@@ -19,6 +19,13 @@ The question this answers: how can these sources serve Byakugan — as
 enrichment, and as raw material for digesting/pulling apart GUIDs for
 transform/inference?
 
+> **Continued in [guid-truth-sources.md](guid-truth-sources.md)**: the
+> verified truth-source map per tier (license-clean primaries for both
+> gists, the ADSchema tier, edk2, winreg-kb) and the validated dissection
+> recipes — Sysmon ProcessGuid embedded time (fixture-exact), TraceLogging
+> name→GUID derivation (pair-exact), MSI packed product codes (pair-exact),
+> MountedDevices layouts, and the droid ↔ NTFS `$OBJECT_ID` join.
+
 ## TL;DR
 
 - **Every source lands in one of two workstreams**, and both bolt onto
