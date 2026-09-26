@@ -406,17 +406,13 @@ def _write_source_manifests(out_dir: str, used: list[str]) -> tuple[list[str], l
 # A lane's staging directory — `_`-prefixed: processed/_extracted (the shared
 # image export the tools parse), windows_logs/_extracted_evtx and
 # godfir-toolz/_extracted of the older layouts — holds raw artefacts, never
-# processed output, and is not walked. Neither is anything the engine itself
-# writes (byakugan/, byakugan-load/, exchange/) nor the detection lane's tree
-# (detections/ — the exchange's behaviour bridge reads it, not the CAR build).
+# processed output, and is not walked. Discovery only ever enters the lane
+# leaves named in discover_sources, so what the engine itself writes
+# (byakugan/, byakugan-load/, exchange/) and the detection lane's tree
+# (detections/ — the exchange's behaviour bridge reads it, not the CAR build)
+# are never walked either.
 def _is_staging(name: str) -> bool:
     return name.startswith("_")
-
-
-# processed/<leaf> -> (source-name prefix, discoverer). The leaf is the TOOL
-# (DX_DFIR's `processed/<tool>/[<collection>/]…` layout); the older leaves stay
-# so a tree written before the rename keeps building.
-_ENGINE_LEAVES = ("byakugan", "byakugan-load", "exchange", "detections")
 
 
 def _subdirs(path: str) -> list[str]:

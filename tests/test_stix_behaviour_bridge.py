@@ -304,10 +304,11 @@ def test_behaviour_extension_stays_inside_the_published_schema(car_and_detection
 
 
 def test_detections_are_read_from_per_item_and_collection_folders(tmp_path):
-    """The signatures image writes one folder per item — and a collection-scoped
-    run one level down (detections/<lane>/<collection>/<host>/<file>) — with
-    the lane's own file names (eve.json, timeline.jsonl, yara.jsonl,
-    scan.jsonl); every one is read, a staging directory never."""
+    """The signatures image writes one folder per item — a capture, a memory
+    image, a disk image, an event-log host — and a collection-scoped run one
+    level down (detections/<lane>/<collection>/<item>/<file>) — with the
+    lane's own file names (eve.json, timeline.jsonl, yara.jsonl, scan.jsonl);
+    every one is read, a staging directory never."""
     root = tmp_path / "detections"
     (root / "suricata" / "case-a" / "cap.pcap").mkdir(parents=True)
     with open(root / "suricata" / "case-a" / "cap.pcap" / "eve.json", "w") as fh:
