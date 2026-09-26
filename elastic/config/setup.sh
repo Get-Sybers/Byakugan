@@ -64,8 +64,9 @@ _retry 30 5 "set kibana_system password" -- \
     -d "{\"password\":\"${KIBANA_SYSTEM_PASSWORD}\"}"
 
 # least-privilege loader: create_doc/create_index/read/view_index_metadata
-# on logs-car.* only (evidence immutability at the credential layer);
-# --setup runs authenticate as elastic instead. Both calls are idempotent: a PUT role always replaces
+# on logs-car.* only — evidence immutability at the credential layer. A
+# `--setup` run authenticates as elastic instead (elastic/README.md).
+# Both calls are idempotent: a PUT role always replaces
 # the definition in place, and re-creating an existing user updates it (same
 # password, same role) rather than failing.
 echo "setup | creating the logs_car_writer role (least-privilege CAR loader)"
