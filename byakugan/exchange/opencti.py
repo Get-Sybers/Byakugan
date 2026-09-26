@@ -322,12 +322,19 @@ class OpenCTIClient:
         return status, doc, None
 
     def push_bundle(self, bundle: dict) -> PushResult:
-        """Upload ``bundle``; the result says whether the platform accepted it."""
+        """Upload ``bundle``; the result says whether the platform accepted it —
+        which means the mutation's own acknowledgement, never just an
+        error-free HTTP 200 (a proxy's empty 200 is a failed push)."""
         n = len(bundle.get("objects") or [])
         url, headers, body = self.request(bundle)
         status, doc, error = self._graphql(url, headers, body, refused="OpenCTI refused the bundle")
         if error:
             return PushResult(False, status, error, n, doc)
+        data = doc.get("data") if isinstance(doc, dict) else None
+        if not (isinstance(data, dict) and data.get("stixBundlePush")):
+            return PushResult(False, status,
+                              "OpenCTI returned no stixBundlePush acknowledgement: "
+                              f"{json.dumps(doc, default=str)[:300]}", n, doc)
         return PushResult(True, status, f"pushed {n} object(s) to {url}", n, doc)
 
     def pull_indicators(self, *, since: str | None = None, page_size: int = DEFAULT_PAGE_SIZE,

@@ -277,3 +277,27 @@ def test_car_source_dirs_fails_fast_on_user_mistakes(tmp_path):
     marker.write_text("")
     assert b._car_source_dirs([str(marker)]) == [str(src)]
     assert b._car_source_dirs([str(src)]) == [str(src)]
+
+
+def test_behaviour_extension_stays_inside_the_published_schema(car_and_detections):
+    # every extension property a behaviour bundle emits must be one the
+    # published schema names (additionalProperties: false — a strict consumer
+    # validates against it), nested matched/indicator keys included
+    import pathlib
+    car_dir, det_dir = car_and_detections
+    idx = behaviour.CarIndex()
+    idx.add_store(str(car_dir))
+    bundle, _ = behaviour.build_behaviour_bundle(
+        behaviour.load_detections(det_dir), idx, case_id="case-1",
+        attack=attack_index.load_attack_index())
+    schema = json.loads((pathlib.Path(__file__).resolve().parents[1]
+                         / "byakugan/exchange/extension/dxdfir-extension.schema.json").read_text())
+    seen = set()
+    for x in bundle["objects"]:
+        for k, v in objects.extension_of(x).items():
+            assert k in schema["properties"], (x["type"], k)
+            seen.add(k)
+            if isinstance(v, dict):
+                assert set(v) <= set(schema["properties"][k]["properties"]), (k, v)
+    assert {"car_object", "technique", "signature", "matched", "car_guid"} <= seen
+    assert schema["properties"]["matched"]["additionalProperties"] is False

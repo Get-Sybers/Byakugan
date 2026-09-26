@@ -809,3 +809,17 @@ def test_build_index_is_deterministic_and_round_trips(tmp_path):
                 {"format": 1, "techniques": doc["techniques"], "tactics": {"TA1": {"name": "no phase"}}}):
         with pytest.raises(ValueError):
             attack_index.validate_index(bad)
+
+
+def test_push_bundle_requires_the_platform_acknowledgement(rules):
+    # an error-free HTTP 200 without data.stixBundlePush is a FAILED push
+    # (a proxy's empty 200 must never read as accepted)
+    bundle = _bundle(rules, ENVELOPE)
+    for text in ("{}", '{"data": {}}', '{"data": {"stixBundlePush": false}}'):
+        client = opencti.OpenCTIClient("https://opencti.example.test", "tok",
+                                       transport=RecordingTransport(200, text))
+        result = client.push_bundle(bundle)
+        assert not result.ok and "stixBundlePush" in result.message, text
+    ok = opencti.OpenCTIClient("https://opencti.example.test", "tok",
+                               transport=RecordingTransport()).push_bundle(bundle)
+    assert ok.ok

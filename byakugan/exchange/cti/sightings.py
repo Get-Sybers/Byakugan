@@ -208,7 +208,7 @@ def run_sightings(cfg: StixConfig, alert_paths: Iterable[str], *,
     ``summary["ok"]`` is False when validation failed (nothing is written or
     pushed then) or the push was refused. ``ValueError`` when no alert was
     read or none carries an indicator-match enrichment."""
-    summary: dict = {"tool": "stix-sightings", "config": cfg.redacted(), "inputs": [],
+    summary: dict = {"tool": "cti-sightings", "config": cfg.redacted(), "inputs": [],
                      "bundle": None, "validation": {"errors": [], "warnings": []},
                      "push": None, "ok": True}
     alerts: list[dict] = []

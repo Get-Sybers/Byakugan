@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/Get-Sybers/byakugan/main/byakugan/exchange/extension/dxdfir-extension.schema.json",
   "title": "DX_DFIR detection exchange — STIX 2.1 property extension",
-  "description": "The properties the DX_DFIR (Byakugan) detection exchange adds to the STIX 2.1 objects it produces, under extensions[\"extension-definition--0a37fc5b-cf2b-5ae9-84aa-933110a32190\"] (extension_type property-extension, STIX 2.1 §7.3). On an indicator: the detection rule's id, severity and status. On a sighting: the case, run, CAR-object and Elastic alert pointers, the evidence source, and — for an indicator-match sighting — the feed, the matched field / value and the matched indicator's descriptors. On a relationship: whether a rule author declared it or it was derived from evidence. Version 1.0.0.",
+  "description": "The properties the DX_DFIR (Byakugan) detection exchange adds to the STIX 2.1 objects it produces, under extensions[\"extension-definition--0a37fc5b-cf2b-5ae9-84aa-933110a32190\"] (extension_type property-extension, STIX 2.1 §7.3). On an indicator: the detection rule's id, severity and status. On a sighting: the case, run, CAR-object and Elastic alert pointers, the evidence source; for an indicator-match sighting the feed, the matched field / value and the matched indicator's descriptors; for a behaviour sighting the technique, the CAR object table, the detection's signature and its lane's matched-evidence echo. On a relationship: whether a rule author declared it or it was derived from evidence. Version 1.1.0.",
   "type": "object",
   "properties": {
     "extension_type": {
@@ -34,6 +34,18 @@
       "type": "string",
       "description": "The CAR object guid (event.id) the sighted evidence line came from — the pointer back to the CAR row."
     },
+    "car_object": {
+      "type": "string",
+      "description": "Behaviour sighting: the matched CAR row's object table (flow / process / file)."
+    },
+    "technique": {
+      "type": "string",
+      "description": "Behaviour sighting: the ATT&CK technique external id this sighting sights (T1046, T1059.001 ...)."
+    },
+    "signature": {
+      "type": "string",
+      "description": "Behaviour sighting: the detection's human title (the lane's signature / rule / title)."
+    },
     "source": {
       "type": "string",
       "description": "Where the evidence was read: the Elasticsearch index / data stream or the lane's source name."
@@ -49,12 +61,22 @@
     },
     "matched": {
       "type": "object",
-      "description": "Indicator-match sighting: what matched (threat.enrichments[].matched).",
+      "description": "What matched. An indicator-match sighting carries threat.enrichments[].matched (field / atomic / index / id); a behaviour sighting carries its detection lane's matched-evidence echo (the suricata endpoints, the hayabusa record, the yara rule and target).",
       "properties": {
         "field": {"type": "string", "description": "The evidence field that matched (source.ip, file.hash.sha256 ...)."},
         "atomic": {"type": ["string", "number", "boolean"], "description": "The matched value."},
         "index": {"type": "string", "description": "The cti-* index the indicator was matched in."},
-        "id": {"type": "string", "description": "The matched indicator's STIX id (also the sighting_of_ref)."}
+        "id": {"type": "string", "description": "The matched indicator's STIX id (also the sighting_of_ref)."},
+        "ips": {"type": "array", "items": {"type": "string"}, "description": "Behaviour (suricata): the alert's normalised endpoints."},
+        "signature_id": {"type": ["number", "string", "null"], "description": "Behaviour (suricata): the signature id."},
+        "record_id": {"type": ["number", "string", "null"], "description": "Behaviour (hayabusa): the evtx record id."},
+        "channel": {"type": ["string", "null"], "description": "Behaviour (hayabusa): the evtx channel."},
+        "event_id": {"type": ["number", "string", "null"], "description": "Behaviour (hayabusa): the Windows event id."},
+        "level": {"type": ["string", "null"], "description": "Behaviour (hayabusa): the detection level."},
+        "rule": {"type": ["string", "null"], "description": "Behaviour (yara): the matched rule name."},
+        "yara_source": {"type": ["string", "null"], "description": "Behaviour (yara): the ruleset source."},
+        "target": {"type": ["string", "null"], "description": "Behaviour (yara): the matched file / memory target."},
+        "pid": {"type": ["number", "string", "null"], "description": "Behaviour (yara): the matched process id."}
       },
       "additionalProperties": false
     },

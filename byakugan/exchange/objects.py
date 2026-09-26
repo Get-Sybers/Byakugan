@@ -72,11 +72,11 @@ IDENTITY_MODIFIED = "2026-09-03T00:00:00.000Z"
 
 # The DX_DFIR property extension (STIX 2.1 §7.3). One definition, versioned:
 # bump EXTENSION_VERSION and EXTENSION_MODIFIED together when the schema
-# changes; EXTENSION_MODIFIED alone when only the definition's metadata moved
-# (the schema/doc locations moved to the byakugan repo on 2026-09-26).
+# changes (1.1.0: the behaviour sighting's fields joined the schema, and the
+# schema/doc locations moved to the byakugan repo).
 EXTENSION_ID = f"extension-definition--{uuid.uuid5(DX_NAMESPACE, 'extension-definition|dxdfir')}"
 EXTENSION_TYPE = "property-extension"
-EXTENSION_VERSION = "1.0.0"
+EXTENSION_VERSION = "1.1.0"
 EXTENSION_CREATED = "2026-09-03T00:00:00.000Z"
 EXTENSION_MODIFIED = "2026-09-26T00:00:00.000Z"
 EXTENSION_NAME = "DX_DFIR detection exchange"
@@ -265,8 +265,9 @@ def extension_definition(created_by: str) -> dict:
                 name=EXTENSION_NAME,
                 description=("Properties the DX_DFIR (Byakugan) detection exchange adds to its indicators, "
                              "sightings and relationships: the detection rule's id, severity and status; the case, "
-                             "run, CAR-object and alert pointers of a sighting and the indicator-match value it "
-                             "sighted; whether a relationship was declared by a rule author or derived."),
+                             "run, CAR-object and alert pointers of a sighting, the indicator-match value it "
+                             "sighted or the behaviour join's technique and lane evidence; whether a relationship "
+                             "was declared by a rule author or derived."),
                 schema=EXTENSION_SCHEMA_URL, version=EXTENSION_VERSION, extension_types=[EXTENSION_TYPE],
                 external_references=[{"source_name": "dxdfir", "url": EXTENSION_DOC_URL,
                                       "description": "the STIX exchange documentation (docs/STIX-Exchange.md)"}])

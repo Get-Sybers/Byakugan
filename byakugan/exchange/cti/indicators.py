@@ -452,7 +452,7 @@ def run_pull(cfg: StixConfig, *, out: str | None = None, bundle_out: str | None 
     when the platform refused or the bundle failed validation (nothing is
     written then). ``ValueError`` on a bad ``since`` or an input that is not a
     bundle."""
-    summary: dict = {"tool": "stix-pull", "config": cfg.redacted(), "index": cfg.cti_index,
+    summary: dict = {"tool": "cti-pull", "config": cfg.redacted(), "index": cfg.cti_index,
                      "pull": None, "validation": {"errors": [], "warnings": []},
                      "bundle": None, "copy": None, "out": None, "ok": True}
     if from_bundle:

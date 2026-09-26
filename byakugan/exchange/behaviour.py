@@ -447,7 +447,7 @@ def run_behaviour(*, car_paths: Iterable[str], detections_dir: str, case_id: str
     bundle, report = build_behaviour_bundle(detections, car, case_id=case_id, producer=producer,
                                             tlp=tlp, attack=attack)
     errors, warnings = validate_bundle(bundle, external_ids=attack.ids)
-    summary = {"tool": "stix-behaviour-sightings", "case_id": case_id,
+    summary = {"tool": "stix-behaviour", "case_id": case_id,
                "car_stores": car.stores, "detections_dir": detections_dir,
                "report": report, "attack_version": attack.attack_version,
                "summary": summarise(bundle), "bundle_id": bundle.get("id"),
