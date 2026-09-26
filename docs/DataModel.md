@@ -52,3 +52,30 @@ python -m byakugan.build_data_model --write out/
 ```
 
 A model refresh is a **submodule-pin bump**, not a code or data-file edit.
+
+## The stored header
+
+The stored header (`byakugan/store.py` `HEADER`) is deliberately minimal
+and MITRE-faithful: event metadata (`timestamp`, `car_action`), the row
+identity (`guid` — also the MITRE process guid), enrichment confidence
+(`link_confidence`) and provenance — everything else is a MITRE field of
+the object. Two rules keep it honest:
+
+- **No phantom/duplicate columns.** `parent_guid` is a MITRE field of
+  `process` only, so it flows as a process column and never appears as a
+  null column on other objects; `parent_pid`/`owning_pid` are not MITRE
+  fields — they are transient enrichment inputs read off the in-memory
+  event, and the canonical parent/owner pid already lives in the object's
+  own `ppid`/`pid`.
+- **Non-MITRE additions earn a header column only as cross-source join
+  keys the model lacks**, nullable, filled by enrich from the in-memory
+  `_native` blob before it is serialised into the `native` column:
+  - `owning_guid` — the definitive link from a spoke to its owning process;
+  - `volume_guid` (B1) — the globally-unique volume identity
+    (`\\?\Volume{GUID}`), the strongest cross-source key on a disk image
+    (USN ↔ evtx ↔ registry ↔ mount table ↔ cloud-sync);
+  - `mac_address` (B3) — a hardware MAC, literal or recovered from the
+    node of a version-1 (time+MAC) GUID, a device-linkage join key;
+  - `device_serial` (B3) — the USB iSerialNumber from a USBSTOR
+    device-instance path, the physical-device key tying USBSTOR ↔
+    setupapi ↔ DeviceClasses ↔ MountedDevices ↔ EMDMgmt to one stick.

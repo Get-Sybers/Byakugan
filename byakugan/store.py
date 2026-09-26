@@ -26,34 +26,11 @@ import os
 
 from . import carmodel
 
-# The stored header is deliberately minimal and MITRE-faithful: event metadata
-# (timestamp, car_action), the row identity (guid — also the MITRE process guid),
-# the ONE non-MITRE addition the model lacks (owning_guid — the definitive link
-# from a spoke to its owning process), enrichment confidence, and provenance.
-# Everything else is a MITRE field of the object.
-#
-# Deliberately NOT in the header (were phantom/duplicate columns before):
-#   - parent_guid: a MITRE field of `process` ONLY, so it flows as a process
-#     column via _cols and never appears as a null column on other objects;
-#   - parent_pid / owning_pid: not MITRE fields — transient enrichment inputs
-#     (enrich reads them off the in-memory event); the canonical parent/owner
-#     pid already lives in the object's own `ppid`/`pid` MITRE fields.
-#
-# volume_guid is the second non-MITRE addition (B1): the globally-unique volume
-# identity (`\\?\Volume{GUID}`) is the strongest cross-source key on a disk image
-# (it ties USN ↔ evtx ↔ registry ↔ mount table ↔ cloud-sync), but MITRE CAR has
-# no field for it, so like owning_guid it lives in the header as a queryable
-# column on every object (nullable — enrich fills it from the in-memory
-# `_native` blob before it is serialised into the `native` column).
-# mac_address is the third non-MITRE addition (B3): a hardware MAC — literal, or
-# recovered from the node of a version-1 (time+MAC) GUID (a DLT birth-droid) —
-# is a device-linkage join key MITRE CAR has no field for, so like volume_guid
-# it lives in the header (nullable, enrich fills it from `_native`).
-# device_serial is the fourth non-MITRE addition (B3): the USB iSerialNumber from
-# a USBSTOR device-instance path — the physical-device join key tying USBSTOR ↔
-# setupapi ↔ DeviceClasses ↔ MountedDevices ↔ EMDMgmt to one stick — which MITRE
-# CAR has no field for, so like mac_address it lives in the header (nullable,
-# enrich fills it from `_native`).
+# The stored header: minimal and MITRE-faithful — event metadata, the row
+# identity, enrichment confidence, provenance, and the four non-MITRE
+# cross-source join keys (owning_guid, volume_guid, mac_address,
+# device_serial). Rationale, the phantom-column rule and each key's story:
+# docs/DataModel.md "The stored header".
 HEADER = ["timestamp", "car_action", "guid", "owning_guid", "volume_guid",
           "mac_address", "device_serial", "link_confidence", "source_artefact",
           "source_host", "native"]

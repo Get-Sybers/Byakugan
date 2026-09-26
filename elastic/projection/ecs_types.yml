@@ -1,23 +1,9 @@
-# HAND-AUTHORED — mapping-TYPE overrides for the `ecs:` / `also:` / `derived:`
-# target paths used across objects/*.yml, for whichever of those paths is NOT
-# an ECS keyword. Consulted by render_elastic.py when it builds each
-# logs-car-<object> component template; a target path absent here renders as
-# `keyword` — ECS's own overwhelming default, and the honest choice for
-# anything this table does not positively know to be a date / long / ip /
-# float / boolean. A CAR field an objects/*.yml note calls "loose" (a
-# duration string, a formatted byte count) still renders at its real ECS
-# type: rules.fallback/coercion (conventions.yml) is precisely the mechanism
-# that keeps an unparseable value verbatim under car.<object>.<field> without
-# forcing the ECS field itself to be dishonestly widened to keyword — so
-# "conservative" here means matching ECS's own declared type, not
-# second-guessing it because one source's values are messy.
-#
-# `boolean` is a fourth override bucket beyond the three ECS-numeric/temporal
-# ones (date, long, ip) plus float: every `code_signature.valid` target is a
-# genuine ECS boolean, and the objects/*.yml entries that feed it already say
-# so in their own notes — leaving it keyword would silently mistype a real
-# boolean field. `boolean` is already a recognised type in this contract
-# (validate.py NATIVE_TYPES, used today by native: true entries).
+# HAND-AUTHORED — mapping-TYPE overrides for target paths that are NOT ECS
+# keyword (absent = keyword, ECS's own default). A "loose" CAR value still
+# renders at the field's real ECS type: rules.fallback/coercion
+# (conventions.yml) keeps an unparseable value verbatim under
+# car.<object>.<field> instead of dishonestly widening the ECS field —
+# conservative means matching ECS's declared type, never second-guessing it.
 #
 # validate.py checks every path here is ECS-shaped or car.*-shaped, and that
 # every entry is actually used by some contract file (conventions.yml,

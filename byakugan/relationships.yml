@@ -1,15 +1,7 @@
 ---
-# The CAR relationship & inheritance rules the enrichment cascade applies.
-#
-# Like the data model itself (car_data_model.json / the third_party/car
-# submodule), the RELATIONSHIPS are data, not code: which fields a spoke may
-# inherit from its owning process, how identities join, which values are
-# per-boot singletons, what makes two rows the same event. The engine
-# (enrich.py) implements the mechanics; this file declares the rules.
-#
-# The reasoning behind every rule — the MITRE wording that grounds it, the
-# definitive-vs-heuristic tier arguments, the must-never-assert limits — is
-# docs/CAR-Relations.md. Change the rule here; change the reasoning there.
+# The relationship & inheritance rules the cascade applies — DATA, not code
+# (enrich.py implements the mechanics). The reasoning behind every rule is
+# docs/CAR-Relations.md: change the rule here; change the reasoning there.
 
 # ---------------------------------------------------------------------------
 # Inheritance: fills ONLY null fields, and only fields the receiving object

@@ -1,39 +1,12 @@
 name: byakugan-standalone
 
-# Byakugan's STANDALONE Elastic stack — consumption mode 1 ("fully standalone,
-# with its own Elasticsearch": see the top-level README's "Three ways to run
-# it"). Elasticsearch + Kibana, single node, security ON (Basic licence).
-#
-# This is a LOOPBACK-PUBLISHED LAB STACK: HTTP TLS is deliberately OFF
-# (xpack.security.http.ssl.enabled: false) — the same posture uSaid's
-# es_docker_stack Ansible role uses for its local/dev Elastic
-# (deploy/ansible/roles/es_docker_stack/tasks/elasticsearch.yml: security IS
-# on, only HTTP TLS is off; every port stays bound to 127.0.0.1). Byakugan's
-# OWN certificate/CA code path (byakugan/elastic/load.py --es-ca-file,
-# byakugan/elastic/_http.py ssl_context) is exercised for real against the
-# DX_DFIR-integrated stack (../../DX_DFIR/docker/elastic/), which DOES run
-# HTTP+transport TLS behind a generated CA. Nothing about that contract
-# changes here — this stack is
-# reachable over plain http://127.0.0.1:9201, authenticated, nothing more.
-#
-# Project name `byakugan-standalone` (this line) is deliberately NOT
-# `byakugan` — DX_DFIR's own stack (../../DX_DFIR/docker/elastic/) uses THAT
-# project name. Two different project names means two independent sets of
-# containers/networks/volumes: both stacks can run on the same host at once
-# (see elastic/README.md "Coexisting with DX_DFIR").
-#
-# Ports are bound to 127.0.0.1 and OFFSET from DX_DFIR's own 9200/5601 —
-# 9201/5602 — for the same coexistence reason; override with
-# BYAKUGAN_STANDALONE_ES_PORT / BYAKUGAN_STANDALONE_KIBANA_PORT if even those
-# collide with something else already running.
-#
-# Host prerequisite (Elasticsearch, like any single-node ES container):
-#   sudo sysctl -w vm.max_map_count=262144
-#
-# Bring-up order: elasticsearch (starts immediately — no certs to wait on) ->
-# setup (waits for Elasticsearch, then sets the kibana_system password and
-# creates the least-privilege byakugan_loader identity) -> kibana. See
-# elastic/README.md.
+# Byakugan's STANDALONE Elastic stack (posture, coexistence with DX_DFIR's
+# stack and bring-up order: elastic/README.md). A loopback-published LAB
+# stack: security ON, HTTP TLS deliberately OFF — the TLS/CA code path is
+# exercised against the DX_DFIR-integrated stack instead. The project name
+# and the 9201/5602 ports are deliberately offset from DX_DFIR's so both
+# stacks coexist on one host.
+# Host prerequisite: sudo sysctl -w vm.max_map_count=262144
 
 services:
   elasticsearch:

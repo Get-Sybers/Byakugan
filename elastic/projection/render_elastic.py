@@ -288,27 +288,12 @@ def render_index_template(index_pattern: str, component_name: str, extra_sources
 
 
 # --------------------------------------------------------------------------- #
-# Kibana: one data view spanning every logs-car.* stream, one saved search,
-# one Lens date-histogram, and the "CAR timeline" dashboard that carries
-# both. Object/reference shape modelled on
-# /home/user/uSaid/elastic/kibana/*.ndjson (index-pattern: id/type/managed/
-# attributes{title,name,timeFieldName}/references[]; search: +columns/sort/
-# kibanaSavedObjectMeta.searchSourceJSON; lens: state.datasourceStates.
-# formBased.layers + state.visualization, modelled specifically on that
-# bundle's own stix-feed-views.ndjson `sf-types-over-time` — a terms bucket
-# + a date_histogram bucket + a count metric feeding an lnsXY bar chart, the
-# same shape this renders with car.object/@timestamp in place of its
-# stix_type/stix_created; dashboard: panelsJSON (gridData + panelRefName) +
-# references naming each panel by panelRefName, LAST in the file
-# (elastic/projection/test_kibana_assets.py enforces this, uSaid's own
-# tests/test_kibana_views.py convention too).
-#
-# typeMigrationVersion '8.9.0' + coreMigrationVersion '8.8.0' are stamped on
-# the lens object ONLY (uSaid's tests/test_kibana_views.py docstring:
-# without them Kibana 9.5.3 runs the legacy lens migration chain over the
-# MODERN state shape hand-authored here, and the import 500s — falsified
-# live, 2026-09-05; index-pattern/search/dashboard import fine unstamped,
-# exactly as the two objects rendered here already did before this addition).
+# Kibana assets: data view + saved search + Lens histogram + the dashboard,
+# references LAST in the file (test_kibana_assets.py enforces it).
+# typeMigrationVersion 8.9.0 + coreMigrationVersion 8.8.0 go on the LENS
+# object only: without them Kibana 9.5.3 runs the legacy lens migration
+# chain over this modern hand-authored state and the import 500s (falsified
+# live, 2026-09-05); the other objects import fine unstamped.
 # --------------------------------------------------------------------------- #
 DATA_VIEW_ID = "car-logs-all"
 SEARCH_ID = "car-timeline"
