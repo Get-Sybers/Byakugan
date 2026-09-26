@@ -1,8 +1,8 @@
 # Byakugan Elastic detection rule (rules-as-code), indicator-match flavour.
 # Model: ../README.md ("The CTI indicator-match rule"). Validated standalone
-# at image build by ../validate-rules.py; the cti-* index template it reads
-# lives in the Byakugan engine (byakugan.exchange.cti, filled by the
-# cti-pull sub-tool), which carries the deep template checks. Not a registry
+# by ../validate.py (the suite and image build gate); the cti-* template it reads
+# is byakugan.exchange.cti's (filled by the cti-pull sub-tool), and
+# tests/test_rules.py cross-checks the two directly. Not a registry
 # port — CTI matching is Byakugan-native — so it lives beside the top-level
 # rule set (which the tests pin to the Kusto registry) rather than in it.
 id: cti-indicator-match

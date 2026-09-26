@@ -13,8 +13,8 @@
 # LOOKUP JOIN needs the SAME field name on both sides, so the lookup index maps
 # the keys under their ECS names.
 #
-# The image build gate (../../validate-rules.py: CAR_JOIN_KEYS /
-# validate_car_detections) pins the join set below; change the two together.
+# The gate (../validate.py: CAR_JOIN_KEYS / validate_car_detections — run by
+# the suite and the image build) pins the join set below; change the two together.
 
 lookup_index: car-detections
 

@@ -24,6 +24,7 @@ RULES = REPO / "rules"
 # rules/validate.py is a standalone script (it is also the image build gate),
 # so it is imported by path, not as a package.
 _spec = importlib.util.spec_from_file_location("rules_validate", RULES / "validate.py")
+assert _spec is not None and _spec.loader is not None, f"cannot import {RULES / 'validate.py'}"
 rv = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(rv)
 
