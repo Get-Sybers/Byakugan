@@ -1,48 +1,8 @@
 ---
-# The spindle row identity — the registry the engine mints a disk-image row's
-# guid from (normalize._spindle, via ids.mint). Like relationships.yml, this is
-# DATA: WHICH fields identify a row is a rule declared here; the engine only
-# implements the mechanics. A map references an entry by name
-# (`"guid": spindle("<name>")` in mappings/*.py) and never spells identity
-# fields itself, so the registry and the maps cannot drift
-# (byakugan.spindle.verify_registry — tests/test_spindle_model.py and
-# `python -m byakugan.spindle --check`). The resolved, materialized
-# snapshot is model/spindle/identity.yml; the shape of a spindle row is
-# model/spindle/record.yml (both `python model/generate.py`).
-#
-# The recipe (byakugan/ids.py — the one stix.py mints STIX 2.1 §2.9 ids with):
-#
-#     guid       = uuid5(SPINDLE_NS, canonical_json({"_obj": <car_object>, "_v": <version>,
-#                                                    <name>: <value>, ...}))
-#     SPINDLE_NS = uuid5(CAR_NS, "spindle")
-#
-# The identity KEY is the CAR object, the entry's identity-key VERSION and the
-# record's OWN stable-identity fields keyed BY NAME: the names give domain
-# separation (a file_reference and a usn with the same value never collide, nor
-# do two objects); the version re-mints every guid of an entry when what
-# identifies its rows changes; values contribute in their string rendering;
-# the source, parser and artefact NAME are never in the key — that is what
-# must stay invariant so two tools parsing the same image mint the same guid
-# for the same record. The identity NAMES (+ version) are therefore the
-# cross-tool contract: a second tool's map over the same artefact reuses the
-# entry. What a real multi-tool corpus must still confirm is in
-# to-be-validated/spindle_identity.yml.
-#
-# GOLDEN VECTORS — every entry carries a `golden` sample (the identity values
-# as they stand on the normalized event: real M57-JO / dualserver values where
-# a real row exists, `source: real`; otherwise a labelled synthetic sample,
-# `source: synthetic`). model/spindle/golden.yml is the GENERATED vector table:
-# per entry the rendered key and the guid ids.mint yields for it, the
-# positional vector, and the recipe vector (canonical_json + the namespaces).
-#
-# CHANGE PROTOCOL — an entry's identity fields, rendering, names or golden
-# sample change ONLY with a `version` bump: edit the entry, bump its version,
-# regenerate model/spindle/ (python model/generate.py), commit the snapshot
-# (golden.yml included); every guid of that entry re-mints, so existing stores
-# are rebuilt (--batch --force). `python -m byakugan.spindle --check`
-# (and the generator itself) refuse an entry whose golden guid moved without
-# a version bump — or whose version moved without the guid — and a change of
-# the recipe vector, which would move every guid at once.
+# The row-identity registry — the recipe, value sources, golden vectors and
+# the version-bump change protocol: docs/Spindle-Identity.md. Entries are
+# DATA; the engine (ids.mint) implements the mechanics, and
+# `python -m byakugan.spindle --check` holds registry and maps in step.
 
 spindle:
   version: 2                  # 2: CAR_NS re-seeded to the byakugan project URL — a new
@@ -86,25 +46,8 @@ spindle:
       a content-like key: records that COINCIDE on the entity (a path + hash, a path +
       stamp, a program + run time)
 
-# Identity value SOURCES are paths on the NORMALIZED event: a CAR field of the
-# object (its canonical value — the prefix-stripped path, the cleaned URL), the
-# row's `timestamp`, the `owning_pid` enrich input, or native.<key> (a kept /
-# extracted native) — the path convention relationships.yml `derived` uses. A
-# field is `name: <source>` or `name: {source: <source>, normalize: json}`. An
-# entry is named by its map key, or `<map>/<variant>` where one map's variants
-# are different artefacts. Per entry: `kind` (record | entity), `scope`
-# (intrinsic; the positional fallback is the engine's), `version`,
-# `validated_against` (the tools whose maps were shown to render a byte-identical
-# key on a real record — [plaso] until a second tool's map exists: cross-run
-# within the tool is what is validated today), `stable_across` (what the key
-# holds across, in words), the ordered `identity` and the `golden` sample.
-# The event time is part of the identity wherever one
-# entity has several same-action events (a prefetch's eight last-run times, a
-# key's successive snapshots, an $MFT entry's $SI and $FN times): distinct
-# events never collapse, true duplicates (the same record parsed twice) do. A
-# row that asserts NO event (ts None — a PE's compile stamp, an amcache Link
-# Time) is an ENTITY record: the artefact's entity key with no time, so rows
-# differing only in native stamps share it (kind: entity).
+# entry fields and value-source paths: docs/Spindle-Identity.md
+# "Identity value sources"
 identities:
   # ---- Plaso filesystem (mappings/plaso_linux.py) --------------------------
   l2t_filestat:

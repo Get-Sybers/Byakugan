@@ -1,17 +1,8 @@
 #!/usr/bin/env bash
-# Byakugan STANDALONE Elastic bootstrap — runs once per `docker compose up`
-# from the Elasticsearch image (the compose `setup` service). Modelled on
-# DX_DFIR's own docker/elastic/config/setup.sh, minus the certificate dance:
-# this stack runs HTTP TLS off (see docker-compose.yml's header comment), so
-# there is nothing to generate here.
-#   1. refuse to run with the .env.example placeholders still in place;
-#   2. wait for Elasticsearch to answer (security enforcing auth);
-#   3. set the kibana_system password (idempotent);
-#   4. create the logs_car_writer role + byakugan_loader user (idempotent) —
-#      parity with DX_DFIR's own docker/elastic/config/setup.sh: the same
-#      least-privilege loader identity, minus --cacert (this stack is plain
-#      HTTP — see the header comment above).
-# Kibana waits for this script to complete successfully.
+# The standalone stack's one-shot bootstrap (the compose `setup` service):
+# refuse placeholders, wait for ES, set the kibana_system password, create
+# the least-privilege loader identity — DX_DFIR parity minus the certificate
+# dance (this stack is plain HTTP). Kibana waits on it.
 set -euo pipefail
 
 ES_URL=http://elasticsearch:9200
@@ -72,14 +63,9 @@ _retry 30 5 "set kibana_system password" -- \
     "${ES_URL}/_security/user/kibana_system/_password" \
     -d "{\"password\":\"${KIBANA_SYSTEM_PASSWORD}\"}"
 
-# The CAR loader's identity: least-privilege by construction, not by
-# discipline. logs_car_writer can only create_doc/create_index/read/
-# view_index_metadata on logs-car.* — no cluster privileges, so it cannot
-# alter or drop what it writes (evidence immutability at the credential
-# layer) and cannot manage index/component templates or Kibana either;
-# `byakugan load --setup` authenticates as elastic for that (see
-# elastic/README.md). byakugan_loader is every ROUTINE (non --setup) load's
-# identity thereafter. Both calls are idempotent: a PUT role always replaces
+# least-privilege loader: create_doc/create_index/read/view_index_metadata
+# on logs-car.* only (evidence immutability at the credential layer);
+# --setup runs authenticate as elastic instead. Both calls are idempotent: a PUT role always replaces
 # the definition in place, and re-creating an existing user updates it (same
 # password, same role) rather than failing.
 echo "setup | creating the logs_car_writer role (least-privilege CAR loader)"
