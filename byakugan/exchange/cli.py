@@ -205,7 +205,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--tlp", metavar="<str>",
                    help="TLP marking on exported objects: " + "|".join(TLP_LEVELS) + "|none.")
     p.add_argument("--rules-dir", type=Path, metavar="<path>",
-                   help="Rules-as-code directory (required to export hits — the engine ships no rules): an "
+                   help="Rules-as-code directory (required to export hits; the image bakes the repo's rules/ at /rules): an "
                         "indicator's pattern is the rule's query, its pattern_type the language; a hit whose "
                         "rule has no body is skipped and counted.")
     p.add_argument("--push", action="store_true",

@@ -148,6 +148,7 @@ over spindle-keyed observations, and OpenCTI as the wire in both directions —
 | [docs/CAR-CrossSource.md](docs/CAR-CrossSource.md) | the deferred cross-source aggregate stage (correlating across per-source stores) |
 | [docs/Elastic-Store-Plan.md](docs/Elastic-Store-Plan.md) | the served-store decision (SQLite → Elasticsearch, not a graph DB) and the cross-repo migration plan |
 | [docs/STIX-Exchange.md](docs/STIX-Exchange.md) | the STIX 2.1 / OpenCTI exchange: what a hit becomes, ids and versioning, the property extension, the CTI round-trip |
+| [rules/README.md](rules/README.md) | the Elastic detection rules-as-code: the pinned set, the tagged-evidence-line contract, the car-detections lookup contract and the cti indicator-match rule — baked into the image at `/rules` |
 | [elastic/README.md](elastic/README.md) | Byakugan's own standalone Elastic stack: bring-up, the one-command load, coexisting with DX_DFIR |
 | [docs/car-provenance/](docs/car-provenance/README.md) | the property-provenance catalogue: every CAR field → every artefact that can supply it |
 | [docs/research/cross-source-linkage/](docs/research/cross-source-linkage/README.md) | the research arc — resolving entities across sources and lining detections up against them |

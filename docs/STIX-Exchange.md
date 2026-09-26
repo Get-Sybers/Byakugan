@@ -23,7 +23,7 @@ equivalents.
 
 | hit field | STIX |
 |---|---|
-| `DetectionId` / `rule.id` / `detection.id` / `kibana.alert.rule.rule_id` | `indicator` (one per rule, global id). Its `pattern` **is** the rule's `query` from the rules-as-code directory (`--rules-dir`, or the container's `/rules` mount — the rules live with the deployment, [DX_DFIR `detect/rules`](https://github.com/Get-Sybers/DX_DFIR/tree/main/python/get_sybers_dxdfir/detect/rules); the engine ships none), `pattern_type` the rule's `language`, `pattern_version` the Elastic stack version; `created` / `valid_from` / `modified` are the rule's `created` / `updated`; the detection id is a `dxdfir` external reference. A hit whose rule is a stub, undated or missing is **skipped and counted** (`summary.hits.skipped`) — a pattern is never invented |
+| `DetectionId` / `rule.id` / `detection.id` / `kibana.alert.rule.rule_id` | `indicator` (one per rule, global id). Its `pattern` **is** the rule's `query` from the rules-as-code directory (`--rules-dir`, or the container's `/rules` — the canonical set ships in this repo, [`rules/`](../rules/README.md), baked into the image; a runtime mount overrides it), `pattern_type` the rule's `language`, `pattern_version` the Elastic stack version; `created` / `valid_from` / `modified` are the rule's `created` / `updated`; the detection id is a `dxdfir` external reference. A hit whose rule is a stub, undated or missing is **skipped and counted** (`summary.hits.skipped`) — a pattern is never invented |
 | `AttackIds` / `threat.technique.id` / `kibana.alert.rule.threat` | `indicator --indicates--> attack-pattern` SROs whose `target_ref` is **MITRE's own** ATT&CK object id (BP §5.2 / §2.2; [`data/attack-index.json`](../byakugan/exchange/data/attack-index.json)). No attack-pattern is minted locally. The rule's techniques are `relationship_class: declared`, a technique only the hit carries is `derived`; a revoked technique resolves to its replacement (reported under `summary.hits.techniques.substituted`), an unknown one is reported, not invented. The rule's techniques are also `mitre-attack` external references and `kill_chain_phases` on the indicator |
 | the row itself | `sighting` of the indicator (case-scoped id): `created` = the detection time, `first_seen` / `last_seen` = the hit time; identical rows collapse into one sighting with `count` |
 | `host.name` / `Details.Computer` | `identity` (`identity_class: system`) in `where_sighted_refs` |
@@ -197,8 +197,8 @@ byakugan cti-sightings --alerts alerts.json --case CASE-17 --push
    emit a field the template does not map). YARA/Sigma patterns, CIDRs and
    unmapped observables are skipped and counted. `--from-bundle` normalises an
    already-pulled bundle offline, no platform needed.
-3. **Match** — the deployment's indicator-match rule
-   ([DX_DFIR `detect/rules/cti/cti-indicator-match.yml`](https://github.com/Get-Sybers/DX_DFIR/blob/main/python/get_sybers_dxdfir/detect/rules/cti/cti-indicator-match.yml))
+3. **Match** — the indicator-match rule
+   ([`rules/cti/cti-indicator-match.yml`](../rules/cti/cti-indicator-match.yml))
    compares `logs-dxdfir.*` / `logs-car.*` evidence fields with `threat.indicator.*`
    (`threat_mapping`); its alerts carry `threat.enrichments[]` — the indicator's
    fields and `matched.{field,atomic,id,index}`.
