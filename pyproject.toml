@@ -44,10 +44,16 @@ pythonpath = ["tests"]
 # _http); the projection CONTRACT it reads is not code and is not packaged
 # here — it lives at the repo root's elastic/projection/, read from the
 # checked-out source tree like the CAR model itself.
-packages = ["byakugan", "byakugan.mappings", "byakugan.elastic"]
+packages = ["byakugan", "byakugan.mappings", "byakugan.elastic",
+            "byakugan.exchange", "byakugan.exchange.cti"]
 
 [tool.setuptools.package-data]
 # the CAR/superset models + ATT&CK relationships are reconstructed live from the
 # pinned submodules, so they are not shipped; only the owned data files are.
 byakugan = ["cascade_relationships.yml", "relationships.yml", "spindle.yml",
             "car_source_schema.yaml"]
+# the exchange's committed ATT&CK index, CTI field mapping/template and the
+# extension schema ride the package (attack_index/objects resolve them by file)
+"byakugan.exchange" = ["data/attack-index.json", "cti/pattern-mapping.yml",
+                       "cti/cti.index-template.json",
+                       "extension/dxdfir-extension.schema.json"]
