@@ -90,11 +90,18 @@ exits. A sub-tool followed by arguments is instead the pass-through to that
 module's own CLI, exactly as in the Quickstart above (`byakugan timeline
 <car_dir> [flags]`, `byakugan load <car_dir> [flags]`, ...).
 
-`--batch` discovers the processed tree's sources: `windows_logs/<item>/goevtx.jsonl`
-(and `*_EvtxECmd_Output.json` directories), `zeek/<capture>/`,
-`log2timeline/jsonl/<source>/timeline.jsonl` (and raw `<image>.jsonl`
-containers), `godfir-toolz/<tool>/<item>/<tool>.jsonl` (and `godfir-toolz/<host>/`
-trees) and `memory/<image>/car.db` — one isolated store each.
+`--batch` discovers the processed tree's sources by the files each tool
+writes, at any depth under the tool-named leaf — DX_DFIR's
+`processed/<tool>/[<collection>/]<host>/…`: `windowlicker/…/goevtx.jsonl`
+(one event log; `windows_logs/`, and `*_EvtxECmd_Output.json` directories,
+still read), `zeek/…/<capture>/`, `log2timeline/…/<host>/timeline.jsonl`
+(beside the storage file; the older `jsonl/<source>/` folders and raw
+`<image>.jsonl` containers too), every Go-tool item `…/<tool>/…/<item>/<tool>.jsonl`
+under `windowlicker/`, `daemonhunter/` or the older `godfir-toolz/` (and
+`godfir-toolz/<host>/` trees) and `anamnesis/…/<image>/car.db` (`memory/` too)
+— one isolated store each, named after the path under the leaf, so two
+collections never share a store. `_`-prefixed staging (the image exports),
+the engine's own leaves and `detections/` are never sources.
 
 **The parse stage is Go-accelerated.** Everything from a raw processor file to
 the pre-enrichment CAR event stream — line reading, raw-l2t container splitting,

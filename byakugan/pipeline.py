@@ -403,11 +403,20 @@ def _write_source_manifests(out_dir: str, used: list[str]) -> tuple[list[str], l
 # --------------------------------------------------------------------------- #
 # source discovery over a processed tree
 # --------------------------------------------------------------------------- #
-# A lane's staging directory — `_`-prefixed: windows_logs/_extracted_evtx and
-# godfir-toolz/_extracted, the image exports the tools parse — holds raw
-# artefacts, never processed output, and is not walked.
+# A lane's staging directory — `_`-prefixed: processed/_extracted (the shared
+# image export the tools parse), windows_logs/_extracted_evtx and
+# godfir-toolz/_extracted of the older layouts — holds raw artefacts, never
+# processed output, and is not walked. Neither is anything the engine itself
+# writes (byakugan/, byakugan-load/, exchange/) nor the detection lane's tree
+# (detections/ — the exchange's behaviour bridge reads it, not the CAR build).
 def _is_staging(name: str) -> bool:
     return name.startswith("_")
+
+
+# processed/<leaf> -> (source-name prefix, discoverer). The leaf is the TOOL
+# (DX_DFIR's `processed/<tool>/[<collection>/]…` layout); the older leaves stay
+# so a tree written before the rename keeps building.
+_ENGINE_LEAVES = ("byakugan", "byakugan-load", "exchange", "detections")
 
 
 def _subdirs(path: str) -> list[str]:
@@ -419,99 +428,165 @@ def _subdirs(path: str) -> list[str]:
                   if os.path.isdir(os.path.join(path, n)) and not _is_staging(n))
 
 
+def _walk(root: str):
+    """os.walk over `root`, staging directories pruned, entries sorted so the
+    discovery order (and the source names it yields) is deterministic."""
+    for cur, dirs, files in os.walk(root):
+        dirs[:] = sorted(d for d in dirs if not _is_staging(d))
+        yield cur, dirs, sorted(files)
+
+
+def _fold(rel: str) -> str:
+    """A path relative to a lane root, folded to one source-name segment: the
+    same `/`->`_` rule the tools use for their item folders, so a
+    collection-scoped tree (`<collection>/<host>/<item>`) names its source
+    `<collection>_<host>_<item>`."""
+    return rel.replace(os.sep, "_")
+
+
 # One directory holding any of these is one event-log source: an EvtxECmd
 # export (a host's channels, one file each) or a goevtx item (one log:
-# windows_logs/<item>/goevtx.jsonl).
+# <…>/goevtx.jsonl).
 _EVTX_SOURCE_FILES = ("_EvtxECmd_Output.json", "goevtx.jsonl")
+# per-item index files the plaso image writes beside its output — never a
+# raw json_line container
+_PLASO_INDEXES = ("timeline.jsonl", "psort.jsonl", "log2timeline.jsonl", "image_export.jsonl")
 
 
-def _evtx_sources(wl: str):
-    """(name, path, host) for every directory under windows_logs/ that holds
-    event-log output."""
-    for cur, dirs, files in os.walk(wl):
-        dirs[:] = sorted(d for d in dirs if not _is_staging(d))
+def _evtx_sources(wl: str, prefix: str):
+    """(name, path, host) for every directory under an event-log lane root
+    that holds event-log output, at any depth (`<collection>/<host>/<log>/`
+    or the flat `<item>/`)."""
+    for cur, _dirs, files in _walk(wl):
         if any(f.endswith(_EVTX_SOURCE_FILES) for f in files):
-            rel = os.path.relpath(cur, wl).replace(os.sep, "_")
-            yield f"windows_logs_{rel}", cur, None
+            yield f"{prefix}_{_fold(os.path.relpath(cur, wl))}", cur, None
 
 
-def _plaso_sources(jsonl_dir: str):
-    """(name, path, host) under a psort output root: <source>/timeline.jsonl
-    (the plaso lane's per-item folder) or a raw <image>.jsonl container beside
-    it — one source each, the l2t maps derive the host from the records."""
-    if not os.path.isdir(jsonl_dir):
+def _zeek_sources(zk: str):
+    """(name, path, host) for every capture directory under zeek/: a directory
+    holding Zeek's JSON logs (the `zeek.jsonl` index, or any `*.json`), at any
+    depth — `zeek/<capture>/` flat, `zeek/<collection>/<capture>/` scoped. The
+    capture directory's own name is the fallback host."""
+    for cur, _dirs, files in _walk(zk):
+        if cur == zk:
+            continue
+        if "zeek.jsonl" in files or any(f.endswith(".json") for f in files):
+            yield f"zeek_{_fold(os.path.relpath(cur, zk))}", cur, os.path.basename(cur)
+
+
+def _plaso_sources(root: str, strip_first: bool):
+    """(name, path, host) under a plaso lane root: every psort per-item folder
+    (`<…>/timeline.jsonl`, at any depth — `jsonl/<source>/` of the older
+    layout, `<host>/` or `<collection>/<host>/` of the current one where the
+    rendered timeline sits beside the storage file) and every raw
+    `<image>.jsonl` json_line container beside the folders — one source each;
+    the l2t maps derive the host from the records. `strip_first` drops the
+    older layout's `jsonl/` / `storage/` level from the name."""
+    if not os.path.isdir(root):
         return
-    for name in sorted(os.listdir(jsonl_dir)):
-        path = os.path.join(jsonl_dir, name)
-        if os.path.isdir(path):
-            timeline = os.path.join(path, "timeline.jsonl")
-            if os.path.isfile(timeline) and not _is_staging(name):
-                yield f"l2t_{name}", timeline, None
-        elif name.endswith(".jsonl"):
-            yield f"l2t_{name[:-6]}", path, None
+    for cur, _dirs, files in _walk(root):
+        rel = os.path.relpath(cur, root)
+        parts = [] if rel == "." else rel.split(os.sep)
+        if strip_first and parts and parts[0] in ("jsonl", "storage"):
+            parts = parts[1:]
+        if "timeline.jsonl" in files and parts:
+            yield f"l2t_{'_'.join(parts)}", os.path.join(cur, "timeline.jsonl"), None
+        for f in files:
+            if f.endswith(".jsonl") and f not in _PLASO_INDEXES:
+                yield f"l2t_{'_'.join(parts + [f[:-6]])}", os.path.join(cur, f), None
 
 
-def _godfir_toolz_sources(gt: str):
-    """(name, path, host) under godfir-toolz/. The framework layout is
-    godfir-toolz/<tool>/<item>/<tool>.jsonl: each item directory (one parsed
-    artefact — a hive, a .pf, a SRUM database) is one source, and no host is
-    claimed (the item is a path, not a host; the maps carry what the records
-    say). A tool directory (one of GODFIR_TOOLS, or any directory holding
-    such items) with no finished item yields nothing. Any other directory is
-    the older godfir-toolz/<host>/ tree: one source per host directory,
+def _framework_sources(gt: str, prefix: str, legacy_hosts: bool):
+    """(name, path, host) under a GoDFIR-toolz framework lane root. An ITEM is
+    a directory holding `<tool>.jsonl` where `<tool>` names one of its
+    ancestor directories beneath the root (the sub-tool level:
+    `<tool>/<item>/` flat, `<collection>/<tool>/<host>/<item>/` scoped) or one
+    of GODFIR_TOOLS — one source each, and no host is claimed (the item is a
+    path, not a host; the maps carry what the records say). An `<item>.part`
+    still being written is not an item. With `legacy_hosts`, an immediate
+    subdirectory that is neither a tool directory nor holds items is the
+    older `godfir-toolz/<host>/` tree: one source per host directory,
     upper-cased name as the fallback host."""
+    seen_item = set()
+    for cur, _dirs, files in _walk(gt):
+        rel = os.path.relpath(cur, gt)
+        if rel == ".":
+            continue
+        ancestors = set(rel.split(os.sep)[:-1])
+        if any(f.endswith(".jsonl") and (f[:-6] in ancestors or f[:-6] in GODFIR_TOOLS)
+               for f in files):
+            seen_item.add(rel.split(os.sep)[0])
+            yield f"{prefix}_{_fold(rel)}", cur, None
+    if not legacy_hosts:
+        return
     for name in _subdirs(gt):
         d = os.path.join(gt, name)
-        items = [it for it in _subdirs(d)
-                 if os.path.isfile(os.path.join(d, it, f"{name}.jsonl"))]
-        if items or name in GODFIR_TOOLS:
-            for it in items:
-                yield f"godfir_toolz_{name}_{it}", os.path.join(d, it), None
-        else:
-            yield f"godfir_toolz_{name}", d, name.upper()
+        if name in seen_item or name in GODFIR_TOOLS:
+            continue
+        # a tool directory by shape (`<item>/<name>.jsonl`, finished or not) is never a host
+        if any(os.path.exists(os.path.join(d, it, f"{name}.jsonl{sfx}"))
+               for it in _subdirs(d) for sfx in ("", ".part")):
+            continue
+        yield f"{prefix}_{name}", d, name.upper()
+
+
+def _memory_sources(mem: str, prefix: str):
+    """(name, path, host) for every finished anamnesis image under a memory
+    lane root: a directory holding `car.db`, at any depth."""
+    for cur, _dirs, files in _walk(mem):
+        if "car.db" in files and cur != mem:
+            yield f"{prefix}_{_fold(os.path.relpath(cur, mem))}", os.path.join(cur, "car.db"), None
 
 
 def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
     """The CAR sources under a processed tree, honouring the isolation rule
     (one source -> one working store). Returns (source_name, in_path, default_host).
-    The GoDFIR-toolz framework lanes write one folder per item; the older
-    per-host / per-image layouts are still recognised beside them:
 
-    - windows_logs/<item>/goevtx.jsonl (one event log) and windows_logs/<case>/
-      ... directories holding *_EvtxECmd_Output.json (a host's export): each
-      such DIRECTORY is one source;
-    - zeek/<capture>/: each capture directory (one source, all protocol logs);
-    - log2timeline/jsonl/<source>/timeline.jsonl (psort's per-item folder) and
-      log2timeline/jsonl/<image>.jsonl (a raw container): one source each —
-      likewise under a top-level jsonl/ (a psort output root mounted directly);
-    - godfir-toolz/<tool>/<item>/<tool>.jsonl: each Go-tool item (one parsed
-      artefact) is one source (a tool dir with no finished item: none);
-      godfir-toolz/<host>/ (not a tool dir): one source per host directory,
-      upper-cased dir name as the fallback host;
-    - memory/<image>/car.db: Anamnesis finished CAR (passthrough).
+    The tree is `processed/<tool>/[<collection>/]…` — one leaf per tool, a
+    collection-scoped run one level below it, the tool's own per-item
+    folders under that (DX_DFIR's `dxdfir process`). Discovery is by the
+    files each tool writes, at any depth, so the older flat leaves keep
+    building beside the current ones:
 
-    A lane's `_`-prefixed staging directory (the image exports the tools
-    parse) is never a source.
+    - windowlicker/ (and the older windows_logs/): every directory holding
+      goevtx.jsonl (one event log) or *_EvtxECmd_Output.json (a host's
+      export) is one source;
+    - zeek/: every capture directory (Zeek's JSON logs) is one source;
+    - log2timeline/: every psort per-item folder (timeline.jsonl beside the
+      storage file, or the older jsonl/<source>/) and every raw <image>.jsonl
+      container — one source each; likewise under a top-level jsonl/ (a
+      psort output root mounted directly);
+    - windowlicker/, daemonhunter/ (and the older godfir-toolz/): every
+      Go-tool item directory (`<tool>.jsonl` under its sub-tool level) is one
+      source; godfir-toolz/<host>/ (not a tool dir): one source per host
+      directory, upper-cased dir name as the fallback host;
+    - anamnesis/ (and the older memory/): every <image>/car.db, Anamnesis'
+      finished CAR (passthrough).
+
+    A `_`-prefixed staging directory (the image exports the tools parse) is
+    never a source, nor is anything under the engine's own leaves
+    (byakugan/, byakugan-load/, exchange/) or detections/.
     """
     out: list[tuple[str, str, str | None]] = []
-    wl = os.path.join(processed_dir, "windows_logs")
-    if os.path.isdir(wl):
-        out.extend(sorted(_evtx_sources(wl)))
-    zk = os.path.join(processed_dir, "zeek")
-    for name in _subdirs(zk):
-        out.append((f"zeek_{name}", os.path.join(zk, name), name))
-    out.extend(_plaso_sources(os.path.join(processed_dir, "log2timeline", "jsonl")))
-    out.extend(_plaso_sources(os.path.join(processed_dir, "jsonl")))
-    gt = os.path.join(processed_dir, "godfir-toolz")
-    if os.path.isdir(gt):
-        out.extend(_godfir_toolz_sources(gt))
-    mem = os.path.join(processed_dir, "memory")
-    if os.path.isdir(mem):
-        for name in sorted(os.listdir(mem)):
-            db = os.path.join(mem, name, "car.db")
-            if os.path.isfile(db):
-                out.append((f"memory_{name}", db, None))
-    return out
+    j = lambda *p: os.path.join(processed_dir, *p)  # noqa: E731
+    for leaf, prefix in (("windows_logs", "windows_logs"), ("windowlicker", "windowlicker")):
+        out.extend(sorted(_evtx_sources(j(leaf), prefix)))
+    out.extend(sorted(_zeek_sources(j("zeek"))))
+    out.extend(_plaso_sources(j("log2timeline"), strip_first=True))
+    out.extend(_plaso_sources(j("jsonl"), strip_first=False))
+    out.extend(_framework_sources(j("godfir-toolz"), "godfir_toolz", legacy_hosts=True))
+    out.extend(_framework_sources(j("windowlicker"), "windowlicker", legacy_hosts=False))
+    out.extend(_framework_sources(j("daemonhunter"), "daemonhunter", legacy_hosts=False))
+    for leaf in ("memory", "anamnesis"):
+        out.extend(sorted(_memory_sources(j(leaf), leaf)))
+    # one source, one name: the evtx and framework walks of windowlicker/ can
+    # both see a goevtx item (goevtx is a gowindowlicker sub-tool)
+    uniq, seen = [], set()
+    for src in out:
+        if src[0] not in seen:
+            seen.add(src[0])
+            uniq.append(src)
+    return uniq
 
 
 def run_batch(processed_dir: str, out_root: str, force: bool = False,
