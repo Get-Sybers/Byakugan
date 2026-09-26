@@ -301,3 +301,35 @@ def test_behaviour_extension_stays_inside_the_published_schema(car_and_detection
                 assert set(v) <= set(schema["properties"][k]["properties"]), (k, v)
     assert {"car_object", "technique", "signature", "matched", "car_guid"} <= seen
     assert schema["properties"]["matched"]["additionalProperties"] is False
+
+
+def test_detections_are_read_from_per_item_and_collection_folders(tmp_path):
+    """The signatures image writes one folder per item — a capture, a memory
+    image, a disk image, an event-log host — and a collection-scoped run one
+    level down (detections/<lane>/<collection>/<item>/<file>) — with the
+    lane's own file names (eve.json, timeline.jsonl, yara.jsonl, scan.jsonl);
+    every one is read, a staging directory never."""
+    root = tmp_path / "detections"
+    (root / "suricata" / "case-a" / "cap.pcap").mkdir(parents=True)
+    with open(root / "suricata" / "case-a" / "cap.pcap" / "eve.json", "w") as fh:
+        fh.write(json.dumps({"event_type": "alert", "timestamp": "2020-01-01T00:00:00.000000+0000",
+                             "src_ip": "10.0.0.1", "dest_ip": C2_IP,
+                             "alert": {"signature": "ET SCAN", "signature_id": 1,
+                                       "metadata": {"mitre_technique_id": [T_SCAN]}}}) + "\n")
+    (root / "hayabusa" / "HOST01").mkdir(parents=True)
+    with open(root / "hayabusa" / "HOST01" / "timeline.jsonl", "w") as fh:
+        fh.write(json.dumps({"Timestamp": "2020-01-01 00:00:00.000 +00:00", "Computer": HOST,
+                             "RuleTitle": "Obfuscated cmd", "MitreTags": T_EXEC,
+                             "Details": {"PGUID": PROC_GUID, "PID": 4242, "Proc": "cmd.exe"}}) + "\n")
+    (root / "yara" / "case-a" / "dump.raw").mkdir(parents=True)
+    with open(root / "yara" / "case-a" / "dump.raw" / "yara.jsonl", "w") as fh:
+        fh.write(json.dumps({"tool": "yara", "source": "memory", "rule": "SUSP_x", "pid": 4242}) + "\n")
+    (root / "yara" / "case-a" / "img.E01").mkdir(parents=True)
+    with open(root / "yara" / "case-a" / "img.E01" / "scan.jsonl", "w") as fh:
+        fh.write(json.dumps({"tool": "yara", "source": "disk", "rule": "SUSP_y", "target": "Windows/evil.exe"}) + "\n")
+    (root / "yara" / "_staging" / "x").mkdir(parents=True)
+    with open(root / "yara" / "_staging" / "x" / "yara.jsonl", "w") as fh:
+        fh.write(json.dumps({"tool": "yara", "rule": "NEVER"}) + "\n")
+    dets = behaviour.load_detections(str(root))
+    assert sorted((d.source, d.name) for d in dets) == [
+        ("hayabusa", "Obfuscated cmd"), ("suricata", "ET SCAN"), ("yara", "SUSP_x"), ("yara", "SUSP_y")]

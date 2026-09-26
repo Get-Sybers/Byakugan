@@ -292,25 +292,34 @@ def yara_detections(path: str) -> list[Detection]:
     return out
 
 
+# lane -> (parser, the file names its output lands as). The signatures image
+# writes one folder per item — detections/<lane>/[<collection>/]<item>/<file>
+# (suricata: eve.json, hayabusa: timeline.jsonl, yara: yara.jsonl for the
+# file/memory sources and scan.jsonl for the gomount->goyara disk scan); the
+# older flat names (<item>.eve.jsonl, memory.jsonl / disk.jsonl /
+# matches.jsonl) are still read.
 _DETECTION_FILES = {
-    "suricata": (suricata_detections, ("suricata",), (".eve.jsonl",)),
-    "hayabusa": (hayabusa_detections, ("hayabusa",), ("timeline.jsonl",)),
-    "yara": (yara_detections, ("yara",), ("memory.jsonl", "disk.jsonl", "matches.jsonl")),
+    "suricata": (suricata_detections, ("eve.json", ".eve.jsonl")),
+    "hayabusa": (hayabusa_detections, ("timeline.jsonl",)),
+    "yara": (yara_detections, ("yara.jsonl", "scan.jsonl", "memory.jsonl", "disk.jsonl", "matches.jsonl")),
 }
 
 
 def load_detections(detections_dir: str) -> list[Detection]:
-    """Every lane's output under ``<detections_dir>/<lane>/`` -> detections. A lane
-    with no output contributes nothing (never an error)."""
+    """Every lane's output under ``<detections_dir>/<lane>/`` -> detections, at
+    any depth (a collection-scoped run sits one level down, every item in its
+    own folder; a `_`-prefixed staging directory is skipped). A lane with no
+    output contributes nothing (never an error)."""
     dets: list[Detection] = []
-    for lane, (parser, subdirs, suffixes) in _DETECTION_FILES.items():
-        for sub in subdirs:
-            base = os.path.join(detections_dir, sub)
-            if not os.path.isdir(base):
-                continue
-            for name in sorted(os.listdir(base)):
+    for lane, (parser, suffixes) in _DETECTION_FILES.items():
+        base = os.path.join(detections_dir, lane)
+        if not os.path.isdir(base):
+            continue
+        for cur, dirs, files in os.walk(base):
+            dirs[:] = sorted(d for d in dirs if not d.startswith("_"))
+            for name in sorted(files):
                 if any(name.endswith(sfx) for sfx in suffixes):
-                    dets.extend(parser(os.path.join(base, name)))
+                    dets.extend(parser(os.path.join(cur, name)))
     return dets
 
 

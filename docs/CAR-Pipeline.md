@@ -41,10 +41,10 @@ evidence set:
 
 | source | what counts as "the source" |
 |---|---|
-| Windows event logs | one goevtx item (`windows_logs/<item>/goevtx.jsonl` — one log), OR a directory of `*_EvtxECmd_Output.json` (a host's channels), OR the host's Plaso `winevtx` output |
-| Zeek | one capture's per-protocol logs (`conn.json`, `http.json`, …) together |
-| log2timeline | one image's rendered timeline (`log2timeline/jsonl/<source>/timeline.jsonl`, or a raw `<image>.jsonl` — a container of many parsers, split internally) |
-| GoDFIR-toolz | one Go-tool item (`godfir-toolz/<tool>/<item>/<tool>.jsonl` — a hive, a `.pf`, a SRUM database), OR an older `godfir-toolz/<host>/` tree |
+| Windows event logs | one goevtx item (`windowlicker/[<collection>/]goevtx/<host>/<log>/goevtx.jsonl` — one log; the older `windows_logs/<item>/` too), OR a directory of `*_EvtxECmd_Output.json` (a host's channels), OR the host's Plaso `winevtx` output |
+| Zeek | one capture's per-protocol logs (`conn.json`, `http.json`, …) together (`zeek/[<collection>/]<capture>/`) |
+| log2timeline | one image's rendered timeline (`log2timeline/[<collection>/]<host>/timeline.jsonl` beside its storage file, the older `jsonl/<source>/` folder, or a raw `<image>.jsonl` — a container of many parsers, split internally) |
+| GoDFIR-toolz | one Go-tool item (`windowlicker/` or `daemonhunter/` `[<collection>/]<tool>/<host>/<item>/<tool>.jsonl` — a hive, a `.pf`, a SRUM database, a journal; the older `godfir-toolz/<tool>/<item>/` too), OR an older `godfir-toolz/<host>/` tree |
 | memory | Anamnesis's finished `car.db` (passed through 1:1) |
 
 `--batch` discovers these under a processed tree (`pipeline.discover_sources`);
