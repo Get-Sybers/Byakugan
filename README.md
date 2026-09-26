@@ -113,8 +113,8 @@ holds that source's finished CAR events and relationship edges **in memory**
 always written, even empty — the build's done-marker), plus
 `car_inferred.jsonl` with `--derive` — no SQLite anywhere. That JSONL tree is
 **the interchange every consumer reads**: downstream ingestion,
-`byakugan.timeline`, `byakugan.verify`, `byakugan.crosssource`, `byakugan.stix`
-and `byakugan.elastic.load` all read it, never the in-memory stores behind it
+`byakugan.timeline`, `byakugan.verify`, `byakugan.crosssource`, `byakugan.stix`,
+`byakugan.exchange` and `byakugan.elastic.load` all read it, never the in-memory stores behind it
 (the one exception: `byakugan/readers.py` reads an Anamnesis `car.db` — that
 file is Anamnesis's own output format, a component boundary, not Byakugan's
 store).
@@ -128,6 +128,13 @@ DX_DFIR's integrated stack, Byakugan's own standalone one
 same contract. `byakugan.timeline --elastic` reads that served tier back into
 the exact same `timeline.jsonl` shape a local JSONL-backed run produces.
 
+**The STIX/CTI exchange is the engine's too** (`byakugan.exchange`, sub-tools
+`stix-export` / `stix-behaviour` / `cti-pull` / `cti-sightings`): detections
+out as STIX 2.1 sightings + indicators with the projection's bundles merged
+through, the detection lanes joined to CAR entities as behaviour sightings
+over spindle-keyed observations, and OpenCTI as the wire in both directions —
+[docs/STIX-Exchange.md](docs/STIX-Exchange.md).
+
 ## Documentation
 
 | doc | what |
@@ -140,6 +147,7 @@ the exact same `timeline.jsonl` shape a local JSONL-backed run produces.
 | [docs/CAR-Extraction-Rules.md](docs/CAR-Extraction-Rules.md) | the four extraction principles every CAR object is built by |
 | [docs/CAR-CrossSource.md](docs/CAR-CrossSource.md) | the deferred cross-source aggregate stage (correlating across per-source stores) |
 | [docs/Elastic-Store-Plan.md](docs/Elastic-Store-Plan.md) | the served-store decision (SQLite → Elasticsearch, not a graph DB) and the cross-repo migration plan |
+| [docs/STIX-Exchange.md](docs/STIX-Exchange.md) | the STIX 2.1 / OpenCTI exchange: what a hit becomes, ids and versioning, the property extension, the CTI round-trip |
 | [elastic/README.md](elastic/README.md) | Byakugan's own standalone Elastic stack: bring-up, the one-command load, coexisting with DX_DFIR |
 | [docs/car-provenance/](docs/car-provenance/README.md) | the property-provenance catalogue: every CAR field → every artefact that can supply it |
 | [docs/research/cross-source-linkage/](docs/research/cross-source-linkage/README.md) | the research arc — resolving entities across sources and lining detections up against them |

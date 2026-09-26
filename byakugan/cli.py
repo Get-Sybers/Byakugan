@@ -1,6 +1,6 @@
 """The `byakugan` command — the engine's multi-tool entry point.
 
-One binary, five operations, selected by the first argument (the GoDFIR-toolz
+One binary, nine operations, selected by the first argument (the GoDFIR-toolz
 container framework's multi-tool dispatcher: name the sub-tool, pass the
 environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else):
 
@@ -39,6 +39,34 @@ environment — DX_DFIR drives the engine image with `-e`/`-v` and nothing else)
                          --es-password-file …] [--es-ca-file …]
                          [--setup [--kibana-url …]])
 
+    byakugan stix-export     the exchange (byakugan.exchange, docs/STIX-Exchange.md):
+                             detections -> STIX 2.1 sightings + indicators, the
+                             projection's stix_bundle.json files merged through.
+                             Every file under BYAKUGAN_STIX_EXPORT_INPUT_DIR is a
+                             hits input; _BUNDLES_DIR passes projections through;
+                             _RULES_DIR (default: /rules when mounted) resolves
+                             indicator patterns; _CASE, _TLP, _CONFIG, _PUSH ->
+                             <OUT_DIR>/bundle.json
+    byakugan stix-behaviour  the detection lanes joined to the CAR entities they
+                             touch: sightings of ATT&CK attack-patterns over the
+                             matched rows' spindle-keyed observed-data.
+                             INPUT_DIR = the materialised car tree;
+                             _DETECTIONS_DIR and _CASE required; _TLP, _PRODUCER,
+                             _ATTACK_INDEX -> <OUT_DIR>/behaviour-sightings.json
+    byakugan cti-pull        OpenCTI's STIX 2.1 indicators -> the cti-* copy
+                             Elastic's indicator-match rule reads, as _bulk
+                             NDJSON: _SINCE, _PAGE_SIZE, _MAX_PAGES, _INDEX,
+                             _FROM_BUNDLE (offline re-normalise), _BUNDLE_OUT ->
+                             <OUT_DIR>/cti-bulk.ndjson (needs no input mount)
+    byakugan cti-sightings   indicator-match alerts -> sightings of the
+                             platform's own indicators: every file under
+                             INPUT_DIR is an alerts input; _CASE, _TLP, _PUSH ->
+                             <OUT_DIR>/sightings.json
+
+The exchange sub-tools read the OpenCTI wire from the shared
+BYAKUGAN_OPENCTI_URL / BYAKUGAN_OPENCTI_TOKEN / BYAKUGAN_OPENCTI_CONNECTOR_ID
+variables (push/pull modes only; a token never rides argv).
+
 Each batch sub-tool reads its own env block — BYAKUGAN_<SUBTOOL>_INPUT_DIR
 (default /input, read-only), _OUT_DIR (default /output), _FORCE, _LOG_LEVEL
 (error|warn|info|debug, stderr only), _ARGS (extra engine argv) and the
@@ -53,14 +81,17 @@ Exit codes follow the framework's uniform table:
 
     0  ok            build: every source processed or already up to date;
                      timeline: written (or kept); verify: the gate PASSED;
-                     load: every stream bundled (push mode: pushed+verified)
+                     load: every stream bundled (push mode: pushed+verified);
+                     exchange: bundle valid, written (and pushed/pulled, if asked)
     1  nothing       build: no source produced events; timeline: no
                      materialised CAR under the input dir; verify: no
                      materialised CAR under the input dir — or the gate
                      FAILED (status `failed`, `failed` = the failed checks,
                      `failures` names them); load: no materialised CAR under
                      the input dir (status `nothing`) — or, push mode, every
-                     stream failed to push (status `failed`)
+                     stream failed to push (status `failed`); exchange: the
+                     bundle failed validation or a push/pull was refused
+                     (status `failed`)
     2  config_error  no sub-tool named, a bad variable, a missing or unreadable
                      input, an unwritable output, an engine argument error
     3  partial       build: at least one source processed, at least one failed;
@@ -84,8 +115,9 @@ import sys
 import time
 
 TOOL = "byakugan"
-SUBTOOLS = ("build", "timeline", "verify", "car-vocab", "load")
-BATCH_SUBTOOLS = ("build", "timeline", "verify", "load")
+EXCHANGE_SUBTOOLS = ("stix-export", "stix-behaviour", "cti-pull", "cti-sightings")
+SUBTOOLS = ("build", "timeline", "verify", "car-vocab", "load", *EXCHANGE_SUBTOOLS)
+BATCH_SUBTOOLS = ("build", "timeline", "verify", "load", *EXCHANGE_SUBTOOLS)
 DEFAULT_INPUT_DIR = "/input"
 DEFAULT_OUT_DIR = "/output"
 CONTRACT_ENV = "BYAKUGAN_CONTRACT"
@@ -140,7 +172,7 @@ class Config:
     absent or read-only default is not an error, and the default path is
     never created as a side effect."""
 
-    def __init__(self, subtool: str, env, out_optional: bool = False):
+    def __init__(self, subtool: str, env, out_optional: bool = False, in_optional: bool = False):
         self.subtool = subtool
         self.prefix = f"{TOOL.upper()}_{subtool.upper().replace('-', '_')}"
         self._env = env
@@ -150,7 +182,7 @@ class Config:
         if level not in LEVELS:
             raise ConfigError(f"{self.prefix}_LOG_LEVEL: {level!r} is not one of error|warn|info|debug")
         self.level = LEVELS[level]
-        if not os.path.isdir(self.input_dir):
+        if not in_optional and not os.path.isdir(self.input_dir):
             raise ConfigError(f"{self.prefix}_INPUT_DIR {self.input_dir}: not a readable directory")
         explicit = self._env.get(f"{self.prefix}_OUT_DIR") or ""
         self.out_dir: str | None = explicit or DEFAULT_OUT_DIR
@@ -456,7 +488,105 @@ def _load(cfg: Config, run: _Run) -> int:
     return run.finish("ok", EXIT_OK)
 
 
-_RUNNERS = {"build": _build, "timeline": _timeline, "verify": _verify, "load": _load}
+def _walk_files(root: str) -> list[str]:
+    found: list[str] = []
+    for cur, _dirs, files in os.walk(root):
+        found.extend(os.path.join(cur, name) for name in files)
+    return sorted(found)
+
+
+def _exchange_argv(cfg: Config, verb: str) -> tuple[list[str] | None, str | None]:
+    """The exchange CLI argv for one env block — or (None, why) on a config error."""
+    argv: list[str] = [verb]
+    if verb == "stix-export":
+        for p in _walk_files(cfg.input_dir):
+            argv += ["--hits", p]
+        bundles_dir = cfg.get("BUNDLES_DIR", "")
+        if bundles_dir:
+            if not os.path.isdir(bundles_dir):
+                return None, f"{cfg.prefix}_BUNDLES_DIR {bundles_dir}: not a readable directory"
+            for p in _walk_files(bundles_dir):
+                if os.path.basename(p) == "stix_bundle.json":
+                    argv += ["--bundle", p]
+        # like load's CA default: the /rules mount is used only when present;
+        # an operator-set path is passed through as given
+        rules_dir = cfg.explicit("RULES_DIR") or ("/rules" if os.path.isdir("/rules") else "")
+        if rules_dir:
+            argv += ["--rules-dir", rules_dir]
+        for flag in ("CASE", "TLP", "CONFIG"):
+            if value := cfg.get(flag, ""):
+                argv += [f"--{flag.lower()}", value]
+        if cfg.bool("PUSH", "0"):
+            argv.append("--push")
+        argv += ["--out", os.path.join(cfg.out_dir, "bundle.json")]
+    elif verb == "stix-behaviour":
+        detections_dir = cfg.get("DETECTIONS_DIR", "")
+        case = cfg.get("CASE", "")
+        if not detections_dir or not case:
+            return None, f"{cfg.prefix}_DETECTIONS_DIR and {cfg.prefix}_CASE are required"
+        argv += ["--car", cfg.input_dir, "--detections", detections_dir, "--case", case]
+        for flag in ("TLP", "PRODUCER", "ATTACK_INDEX"):
+            if value := cfg.get(flag, ""):
+                argv += [f"--{flag.lower().replace('_', '-')}", value]
+        argv += ["--out", os.path.join(cfg.out_dir, "behaviour-sightings.json")]
+    elif verb == "cti-pull":
+        for flag in ("SINCE", "INDEX", "FROM_BUNDLE", "BUNDLE_OUT", "CONFIG", "PAGE_SIZE", "MAX_PAGES"):
+            if value := cfg.get(flag, ""):
+                argv += [f"--{flag.lower().replace('_', '-')}", value]
+        argv += ["--out", os.path.join(cfg.out_dir, "cti-bulk.ndjson")]
+    else:                                                   # cti-sightings
+        for p in _walk_files(cfg.input_dir):
+            argv += ["--alerts", p]
+        for flag in ("CASE", "TLP", "CONFIG"):
+            if value := cfg.get(flag, ""):
+                argv += [f"--{flag.lower()}", value]
+        if cfg.bool("PUSH", "0"):
+            argv.append("--push")
+        argv += ["--out", os.path.join(cfg.out_dir, "sightings.json")]
+    argv.append("--compact")
+    argv += cfg.get("ARGS", "").split()
+    return argv, None
+
+
+def _exchange(cfg: Config, run: _Run) -> int:
+    """One exchange verb from its env block (byakugan.exchange.cli behind the
+    same run_engine plumbing as build/load); the OpenCTI wire rides the shared
+    BYAKUGAN_OPENCTI_URL / _TOKEN / _CONNECTOR_ID variables, never argv."""
+    from .exchange.cli import main as exchange_main
+    s = run.summary
+    argv, why = _exchange_argv(cfg, cfg.subtool)
+    if why is not None:
+        s["error"] = why
+        cfg.log(0, f"config error: {why}")
+        return run.finish("config_error", EXIT_CONFIG)
+    cfg.log(3, "engine argv: " + " ".join(argv))
+    rc, out, message = run_engine(exchange_main, argv)
+    if rc is None and message is None:
+        rc = 0                                  # the exchange returns None on success
+    engine = _engine_json(out, cfg, s, default={})
+    s["engine"] = engine
+    e = engine if isinstance(engine, dict) else {}
+    # exit 1 is the exchange's own verdict (validation / push / pull refused,
+    # summary already on stdout) — everything else unexpected is config-shaped
+    if rc not in (0, 1):
+        s["error"] = message or f"engine exited {rc}"
+        cfg.log(0, f"engine: {s['error']}")
+        return run.finish("config_error", EXIT_CONFIG)
+    shape = e.get("summary") if isinstance(e.get("summary"), dict) else {}
+    s["records"] = int(shape.get("objects", 0) or 0) or int((e.get("pull") or {}).get("indicators", 0) or 0)
+    s["inputs"] = len(e.get("inputs") or []) or 1
+    s["processed"] = 1 if rc == 0 else 0
+    s["failed"] = 0 if rc == 0 else 1
+    s["outputs"] = [cfg.out_dir]
+    problems = ((e.get("validation") or {}).get("errors") or [])[:8]
+    if rc != 0 and problems:
+        s["failures"] = [{"item": cfg.subtool, "error": str(p)} for p in problems]
+    cfg.log(2, f"{cfg.subtool}: {'ok' if rc == 0 else 'failed'} ({s['records']} objects)")
+    return run.finish("ok", EXIT_OK) if rc == 0 else run.finish("failed", EXIT_NOTHING)
+
+
+_RUNNERS = {"build": _build, "timeline": _timeline, "verify": _verify, "load": _load,
+            **{verb: _exchange for verb in EXCHANGE_SUBTOOLS}}
 
 
 def batch(subtool: str, env, stdout) -> int:
@@ -464,7 +594,8 @@ def batch(subtool: str, env, stdout) -> int:
     `stdout`, everything else to stderr."""
     run = _Run(subtool, stdout)
     try:
-        cfg = Config(subtool, env, out_optional=subtool == "verify")
+        cfg = Config(subtool, env, out_optional=subtool == "verify",
+                     in_optional=subtool == "cti-pull")
     except ConfigError as e:
         run.summary["error"] = str(e)
         sys.stderr.write(f"{TOOL} {subtool}: config error: {e}\n")
@@ -494,10 +625,12 @@ def print_contract() -> int:
 def usage() -> None:
     sys.stderr.write(
         "usage: byakugan build|timeline|verify|load   (env-driven batch: BYAKUGAN_<SUBTOOL>_*)\n"
+        "       byakugan stix-export|stix-behaviour|cti-pull|cti-sightings   (the exchange, same env contract)\n"
         "       byakugan car-vocab                   (the car_action vocabulary, one JSON line)\n"
         "       byakugan timeline <car_dir> [flags] | byakugan verify [car_dir] | "
         "byakugan load <car_dir> [flags] |\n"
-        "       byakugan [build] <pipeline flags...>   (pass-through)\n"
+        "       byakugan stix-export|stix-behaviour|cti-pull|cti-sightings <flags...> | "
+        "byakugan [build] <pipeline flags...>   (pass-through)\n"
         "       byakugan --version | --print-contract\n")
 
 
@@ -520,6 +653,10 @@ def main(argv: list[str] | None = None) -> int:
         run.summary["error"] = f"no sub-tool named ({'|'.join(SUBTOOLS)})"
         return run.finish("config_error", EXIT_CONFIG)
     # pass-through: the engine's own argv
+    if argv[0] in EXCHANGE_SUBTOOLS:
+        from .exchange.cli import main as exchange_main
+        exchange_main(argv)                     # raises SystemExit on any non-zero outcome
+        return 0
     if argv[0] == "timeline":
         from .timeline import main as timeline_main
         return timeline_main(argv[1:])

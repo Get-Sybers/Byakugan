@@ -299,3 +299,74 @@ def test_car_vocab_is_the_model_vocabulary(env, capsys):
     vocab, _err = _summary(capsys)
     assert set(vocab) >= set(verify._OBJECTS)
     assert "create" in vocab["process"]
+
+
+# --- the exchange sub-tools ---------------------------------------------------
+
+def _rule(rules_dir, rid):
+    rules_dir.mkdir(parents=True, exist_ok=True)
+    (rules_dir / f"{rid}.yml").write_text(
+        "query: process where true\nlanguage: eql\ncreated: 2026-09-01\n"
+        "updated: 2026-09-02\nseverity: high\nstatus: ported\n")
+
+
+def test_stix_export_batch_runs_from_its_env_block(tmp_path, env, capsys):
+    hits, rules, out = tmp_path / "hits", tmp_path / "rules", tmp_path / "out"
+    hits.mkdir()
+    (hits / "detections.jsonl").write_text(json.dumps(
+        {"RunId": "run-1", "DetectionId": "r1", "Title": "T", "Severity": "high",
+         "Source": "evtx", "Timestamp": "2026-09-02T10:00:00Z",
+         "DetectedAt": "2026-09-02T10:00:01Z"}) + "\n")
+    _rule(rules, "r1")
+    env.setenv("BYAKUGAN_STIX_EXPORT_INPUT_DIR", str(hits))
+    env.setenv("BYAKUGAN_STIX_EXPORT_OUT_DIR", str(out))
+    env.setenv("BYAKUGAN_STIX_EXPORT_RULES_DIR", str(rules))
+    env.setenv("BYAKUGAN_STIX_EXPORT_CASE", "CASE-7")
+    assert cli.main(["stix-export"]) == 0
+    s, _err = _summary(capsys)
+    assert (s["tool"], s["subtool"], s["status"], s["exit"]) == ("byakugan", "stix-export", "ok", 0)
+    assert s["records"] > 0 and s["failed"] == 0 and s["engine"]["ok"] is True
+    bundle = json.loads((out / "bundle.json").read_text())
+    types = {o["type"] for o in bundle["objects"]}
+    assert {"indicator", "sighting", "identity", "extension-definition"} <= types
+
+
+def test_stix_behaviour_batch_requires_detections_and_case(tmp_path, env, capsys):
+    car = tmp_path / "car"
+    car.mkdir()
+    env.setenv("BYAKUGAN_STIX_BEHAVIOUR_INPUT_DIR", str(car))
+    env.setenv("BYAKUGAN_STIX_BEHAVIOUR_OUT_DIR", str(tmp_path / "out"))
+    assert cli.main(["stix-behaviour"]) == 2
+    s, _err = _summary(capsys)
+    assert s["status"] == "config_error" and "DETECTIONS_DIR" in s["error"]
+
+
+def test_stix_behaviour_batch_over_a_quiet_tree(tmp_path, env, capsys):
+    car, det, out = tmp_path / "car" / "srcA", tmp_path / "det", tmp_path / "out"
+    car.mkdir(parents=True)
+    det.mkdir()
+    (car / "car_relationships.jsonl").write_text("")     # a finished (empty) source
+    env.setenv("BYAKUGAN_STIX_BEHAVIOUR_INPUT_DIR", str(tmp_path / "car"))
+    env.setenv("BYAKUGAN_STIX_BEHAVIOUR_OUT_DIR", str(out))
+    env.setenv("BYAKUGAN_STIX_BEHAVIOUR_DETECTIONS_DIR", str(det))
+    env.setenv("BYAKUGAN_STIX_BEHAVIOUR_CASE", "CASE-7")
+    assert cli.main(["stix-behaviour"]) == 0
+    s, _err = _summary(capsys)
+    assert s["status"] == "ok" and s["engine"]["report"]["sightings"] == 0
+    assert (out / "behaviour-sightings.json").is_file()
+
+
+def test_cti_pull_batch_needs_no_input_mount(env, tmp_path, capsys):
+    # no INPUT_DIR at all (the one input-less sub-tool) — the refusal must be
+    # the exchange's own (endpoint/token), never a missing-input config error
+    env.setenv("BYAKUGAN_CTI_PULL_OUT_DIR", str(tmp_path / "out"))
+    assert cli.main(["cti-pull"]) == 2
+    s, err = _summary(capsys)
+    assert s["status"] == "config_error"
+    assert "INPUT_DIR" not in (s.get("error") or "") and "OPENCTI" in err
+
+
+def test_exchange_passthrough_uses_the_exchange_cli(env):
+    with pytest.raises(SystemExit) as e:
+        cli.main(["cti-pull", "--since", "yesterday"])   # the exchange's own argv validation
+    assert e.value.code == 2
