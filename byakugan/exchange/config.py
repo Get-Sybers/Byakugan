@@ -13,7 +13,7 @@ Config file shape (every key optional)::
     tlp: amber                   # white | green | amber | red | none
     confidence: 80               # optional STIX confidence (0..100) on indicators and sightings
     out: exchange/bundle.json
-    rules_dir: /rules            # the deployment's rules-as-code (no default: the engine ships no rules)
+    rules_dir: /rules            # the rules-as-code (the image bakes this repo's rules/ at /rules)
     attack_index: attack-index.json                  # or an ATT&CK STIX bundle; default: the committed index
     stack_version: "9.4.3"       # the Elastic stack the rules run on -> indicator.pattern_version
     push: false

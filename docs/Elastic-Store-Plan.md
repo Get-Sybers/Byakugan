@@ -39,7 +39,7 @@ uSaid proved — not as a second database with a traversal engine.
 | Joins the stack DX_DFIR already runs | *Is* the stack — ES 9.4.3 + Kibana on Basic, compose project literally named `byakugan` (`DX_DFIR/docker/elastic/`) | A second server, second query language, second backup/auth surface; nothing in any repo consumes Cypher/Gremlin |
 | Timeline in Kibana | Native: Discover/Lens over `logs-car.*`, `date_histogram` buckets | No Kibana; needs its own viewer |
 | Query by CAR fields | Projection contract + generated field aliases (below) keeps every CAR field addressable | Would need its own CAR property model, built from scratch |
-| Detections | DX_DFIR's `detect/` rules are already authored against the ECS fields this projection produces, and the `car-detections` lookup-join contract is already written | No detection layer exists or is planned against a graph store |
+| Detections | The rules-as-code (this repo's `rules/`) are already authored against the ECS fields this projection produces, and the `car-detections` lookup-join contract is already written | No detection layer exists or is planned against a graph store |
 | The relationship queries we actually run | 1–2 hop pivots on **already-materialised** edges (owning process, parent, LUID auth↔session, injection) — term queries on `source_guid`/`target_guid`, `LOOKUP JOIN` for enrichment | Wins only on deep variable-length traversal, which no current consumer performs |
 | Ops posture (air-gap, Basic licence, hardened images) | Already proven by the DX_DFIR risk gate on 9.4.3/Basic | Licensing and hardening work from zero |
 
@@ -69,7 +69,7 @@ should say so plainly:
   (`.github/tests/elastic-riskgate/`, `docs/riskgate.md` — evidence time in
   `@timestamp`, never re-stamped; `logs-car@custom` + `lifecycle: {}` as the
   retention remedy), has written the `car-detections` lookup-index join
-  contract (`detect/rules/car-detections/join-keys.yml`, including the
+  contract (`rules/car-detections/join-keys.yml` here, including the
   `LOOKUP JOIN` field-shadowing hazards), and `docs/Get-Started.md` names the
   CAR→ECS load "the next phase".
 - GoDFIR-toolz already owns the Byakugan container (`byakugan/` — engine

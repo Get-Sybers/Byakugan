@@ -114,11 +114,12 @@ SPEC_RELATIONSHIPS: dict[str, dict[str, frozenset[str]]] = {
     src: {rt: frozenset(targets) for rt, targets in table.items()} for src, table in _TABLE.items()}
 
 UNCASED = "uncased"
-# The rules-as-code live with the DEPLOYMENT (DX_DFIR detect/rules), never the
-# engine: there is no default rules directory — the caller supplies one.
-# Released STIX references the stable released branch (main), not dev (WIP), so
-# exported artifacts don't point consumers at a moving target.
-RULE_URL = "https://github.com/Get-Sybers/DX_DFIR/blob/main/python/get_sybers_dxdfir/detect/rules/{id}.yml"
+# The canonical rules-as-code ship in THIS repository (rules/ — baked into
+# the get-sybers/byakugan image at /rules by the GoDFIR-toolz build); the
+# package still takes the directory explicitly — a deployment may hand it its
+# own set. Released STIX references the stable released branch (main), not
+# dev (WIP), so exported artifacts don't point consumers at a moving target.
+RULE_URL = "https://github.com/Get-Sybers/byakugan/blob/main/rules/{id}.yml"
 # STIX 2.1 pattern-type-ov (§10.19). The rules' own languages are trust-group
 # values beyond it (BP §8.1) — documented in docs/STIX-Exchange.md, versioned by
 # ``pattern_version`` (the Elastic stack the rule is known to run on).
@@ -200,7 +201,8 @@ class RulesDir:
 
 
 def rules_source(rules_dir: str) -> RulesDir:
-    """The rules of ``rules_dir`` — required: the engine ships no rules."""
+    """The rules of ``rules_dir`` — required: the caller names the directory
+    (the canonical set is this repo's ``rules/``, ``/rules`` in the image)."""
     if not rules_dir:
         raise ValueError("no rules directory configured (rules_dir / --rules-dir)")
     return RulesDir(str(rules_dir))
