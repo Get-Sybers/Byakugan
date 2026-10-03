@@ -25,7 +25,7 @@ pip install -e .                       # the package itself, no extras
 - `third_party/attack-datasources` — the ATT&CK data-sources model (the superset
   objects + the relationship catalogue).
 
-**Go >= 1.24 is a prerequisite.** The parse stage (raw file → pre-enrichment CAR
+**Go >= 1.27 is a prerequisite.** The parse stage (raw file → pre-enrichment CAR
 events) is the Go engine in `go/`; `python -m byakugan` shells out to
 `go/bin/byakugan-parse` for every file source and fails with a build hint if it
 is absent. Point `$BYAKUGAN_PARSE_BIN` at a binary to use one from elsewhere.
