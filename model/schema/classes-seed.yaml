@@ -1,0 +1,272 @@
+# Artefact Class SEED TABLE — the curated decisions the class generator
+# scaffolds from (byakugan/schema_gen.py). Family assignment is a human
+# decision (car-vocabulary-ruling / forensicartifacts-crosswalk); the
+# generator only scaffolds. Facets:
+#   platform  array over the closed enum (windows|linux|macos); [] = agnostic
+#   domain    filesystem | memory | network | cloud
+#   object    the STIX SCO the family's primary entity grounds to; null for
+#             event-log families whose rows carry per-record objects
+#   lanes     ir.json mapping lanes (or lane/spindle-sub-entry) whose closure
+#             seeds the evidences rows; [] = no parser lane yet (admission via
+#             collection surface)
+#   surface   the gomount materialise set (admission evidence; provenance)
+#   fa        ForensicArtifacts citations -> references (coverage per row)
+#   default   {evidence, time} for ir-closure scaffold rows a matched-overlay
+#             row does not refine (docs/research/dfir-context/matched-evidences.yaml)
+#   held      admission rule: no lane AND no surface -> no class emitted
+schema_version_from: constants.yaml
+
+families:
+  prefetch:
+    platform: [windows]
+    domain: filesystem
+    object: process
+    lanes: [plaso_exec_prefetch, prefetch_dump]
+    surface: prefetch
+    fa: [{id: WindowsPrefetchFiles, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  evtx:
+    platform: [windows]
+    domain: filesystem
+    object: null            # event-log family: rows carry per-record objects
+    lanes: [evtx_bits, evtx_more, evtx_process, evtx_rdp, evtx_security,
+            evtx_security_sessions, evtx_services, evtx_sysmon]
+    surface: winevt
+    fa: [{id: WindowsEventLogs, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  mft:
+    platform: [windows]
+    domain: filesystem
+    object: file
+    lanes: [l2t_mft]
+    surface: mft
+    fa: [{id: NTFSMFTFiles, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  usnjrnl:
+    platform: [windows]
+    domain: filesystem
+    object: file
+    lanes: [l2t_usnjrnl]
+    surface: null            # crosswalk-confirmed collection gap
+    fa: [{id: NTFSUSNJournal, coverage: leaf}, {id: NTFSLogFile, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  srum:
+    platform: [windows]
+    domain: filesystem
+    object: null             # flow + process rows
+    lanes: [esedump_srum, l2t_srum]
+    surface: srum
+    fa: [{id: WindowsSystemResourceUsageMonitorDatabaseFile, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  amcache:
+    platform: [windows]
+    domain: filesystem
+    object: process
+    lanes: ["plaso_exec_winreg/amcache", "plaso_exec_winreg/amcache_link_time"]
+    surface: amcache
+    fa: [{id: WindowsAMCacheHveFile, coverage: leaf}]
+    default: {evidence: heuristic, time: bounded}
+  shimcache:
+    platform: [windows]
+    domain: filesystem
+    object: process
+    lanes: ["plaso_exec_winreg/appcompatcache"]
+    surface: shimcache
+    fa: [{id: WindowsAppCompatCache, coverage: leaf}]
+    default: {evidence: heuristic, time: bounded}
+  userassist:
+    platform: [windows]
+    domain: filesystem
+    object: process
+    lanes: ["plaso_exec_winreg/userassist"]
+    surface: ntuser
+    fa: [{id: WindowsUserRegistryFiles, coverage: container}]
+    default: {evidence: heuristic, time: bounded}
+  registry-hives:
+    platform: [windows]
+    domain: filesystem
+    object: windows-registry-key
+    lanes: [recmd_batch, plaso_registry, "plaso_exec_winreg/bam"]
+    surface: registry-core
+    fa: [{id: WindowsSystemRegistryFilesAndTransactionLogs, coverage: leaf},
+         {id: WindowsUserRegistryFiles, coverage: leaf}]
+    default: {evidence: definitive, time: bounded}
+  run-keys:
+    platform: [windows]
+    domain: filesystem
+    object: windows-registry-key
+    lanes: []                # parsed via registry-hives lanes; class earns by surface
+    surface: registry-core
+    fa: [{id: WindowsRunKeys, coverage: leaf}, {id: WindowsPersistenceRegistryKeys, coverage: leaf}]
+    default: {evidence: definitive, time: bounded}
+  shellbags:
+    platform: [windows]
+    domain: filesystem
+    object: windows-registry-key
+    lanes: [plaso_shellitem]
+    surface: usrclass
+    fa: [{id: WindowsUserRegistryFiles, coverage: container}]
+    default: {evidence: heuristic, time: bounded}
+  lnk-jumplists:
+    platform: [windows]
+    domain: filesystem
+    object: file
+    lanes: [jlecmd_dest, l2t_lnk]
+    surface: recent
+    fa: [{id: WindowsUserRecentFiles, coverage: leaf}, {id: WindowsUserJumpLists, coverage: leaf}]
+    default: {evidence: heuristic, time: event-time}
+  recyclebin:
+    platform: [windows]
+    domain: filesystem
+    object: file
+    lanes: [l2t_recyclebin]
+    surface: recyclebin
+    fa: [{id: WindowsRecycleBinMetadata, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  ual:
+    platform: [windows]
+    domain: filesystem
+    object: null
+    lanes: []                # parser lane to add; admission via surface
+    surface: sum
+    fa: [{id: WindowsUserAccessLogging, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  activities-timeline:
+    platform: [windows]
+    domain: filesystem
+    object: null
+    lanes: []
+    surface: timeline
+    fa: [{id: WindowsActivitiesCacheDatabase, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  scheduled-tasks:
+    held: true               # admission rule: no lane, no surface (crosswalk)
+    platform: [windows]
+    domain: filesystem
+    object: null
+    lanes: []
+    surface: null
+    fa: [{id: WindowsScheduledTasks, coverage: leaf}]
+    default: {evidence: definitive, time: bounded}
+  browser-history:
+    platform: [windows, linux, macos]
+    domain: filesystem
+    object: null
+    lanes: [l2t_firefox_places, l2t_firefox_cache, l2t_msiecf, l2t_javaidx]
+    surface: null
+    fa: [{id: BrowserHistory, coverage: leaf}, {id: FirefoxHistory, coverage: leaf},
+         {id: InternetExplorerHistory, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  wtmp:
+    platform: [linux]
+    domain: filesystem
+    object: user-account
+    lanes: [l2t_utmp]
+    surface: linux-core
+    fa: [{id: LinuxWtmp, coverage: leaf}, {id: LinuxUtmpFiles, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  utmpx:
+    platform: [macos]
+    domain: filesystem
+    object: user-account
+    lanes: [l2t_utmpx]
+    surface: macos-core
+    fa: [{id: MacOSUtmpxFile, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  syslog-auth:
+    platform: [linux]
+    domain: filesystem
+    object: null
+    lanes: [l2t_text]
+    surface: linux-core
+    fa: [{id: LinuxAuthLogs, coverage: leaf}, {id: LinuxSysLogFiles, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  journal:
+    held: true               # admission rule: binary journal lane missing
+    platform: [linux]
+    domain: filesystem
+    object: null
+    lanes: []
+    surface: linux-core
+    fa: [{id: LinuxSystemdJournalLogs, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  shell-history:
+    platform: [linux, macos]
+    domain: filesystem
+    object: process
+    lanes: []                # l2t_text covers fragments; dedicated lane pending
+    surface: linux-core
+    fa: [{id: ShellHistoryFile, coverage: leaf}, {id: BashShellHistoryFile, coverage: leaf}]
+    default: {evidence: heuristic, time: none}
+  cron-persistence:
+    platform: [linux]
+    domain: filesystem
+    object: file
+    lanes: [plaso_exec_cron]
+    surface: linux-core
+    fa: [{id: LinuxCronTabs, coverage: leaf}, {id: AnacronFiles, coverage: leaf}]
+    default: {evidence: definitive, time: bounded}
+  accounts:
+    platform: [linux, macos]
+    domain: filesystem
+    object: user-account
+    lanes: []
+    surface: linux-core
+    fa: [{id: UnixPasswdFile, coverage: leaf}, {id: UnixShadowFile, coverage: leaf}]
+    default: {evidence: definitive, time: none}
+  ssh:
+    platform: [linux, macos]
+    domain: filesystem
+    object: file
+    lanes: []
+    surface: linux-core
+    fa: [{id: SSHAuthorizedKeysFiles, coverage: leaf}, {id: SSHKnownHostsFiles, coverage: leaf}]
+    default: {evidence: definitive, time: none}
+  launchd:
+    platform: [macos]
+    domain: filesystem
+    object: file
+    lanes: []
+    surface: macos-core
+    fa: [{id: MacOSLaunchAgentsPlistFile, coverage: leaf}, {id: MacOSLaunchDaemonsPlistFile, coverage: leaf}]
+    default: {evidence: definitive, time: bounded}
+  fseventsd:
+    platform: [macos]
+    domain: filesystem
+    object: file
+    lanes: [plaso_fseventsd]
+    surface: null            # crosswalk-confirmed collection gap
+    fa: [{id: MacOSFSEventsFile, coverage: leaf}]
+    default: {evidence: definitive, time: event-time}
+  filestat:
+    platform: [windows, linux, macos]
+    domain: filesystem
+    object: file
+    lanes: [l2t_filestat]
+    surface: null            # the timeline verb, not a set
+    fa: []                   # no FA equivalent — seeded without upstream authority
+    default: {evidence: definitive, time: event-time}
+  zeek-logs:
+    platform: []             # network evidence; sensor-platform agnostic
+    domain: network
+    object: null
+    lanes: [zeek_conn, zeek_dns, zeek_files, zeek_http, zeek_smtp, zeek_ssl, zeek_x509]
+    surface: null
+    fa: []
+    default: {evidence: definitive, time: event-time}
+  olecf:
+    platform: [windows]
+    domain: filesystem
+    object: file
+    lanes: [plaso_olecf]
+    surface: null
+    fa: []
+    default: {evidence: definitive, time: none}
+  pecoff:
+    platform: [windows]
+    domain: filesystem
+    object: file
+    lanes: [plaso_pecoff]
+    surface: null
+    fa: []
+    default: {evidence: definitive, time: none}

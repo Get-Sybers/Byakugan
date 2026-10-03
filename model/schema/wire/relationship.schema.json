@@ -1,0 +1,1642 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/wire/relationship.schema.json",
+ "title": "Wire relationship — GENERATED from model/superset/relationship-types.yml",
+ "description": "Never hand-edited: python -m byakugan.schema_gen regenerates it (conform class-regen gates drift). Composed over the verbatim vendored OASIS core; the closed relationship_type enum means an undeclared verb cannot pass vacuously (generics like related-to are excluded by construction — doubt is tallied, never modeled).",
+ "allOf": [
+  {
+   "$ref": "../vendor/oasis/sros/relationship.json"
+  },
+  {
+   "properties": {
+    "relationship_type": {
+     "enum": [
+      "accessed",
+      "added",
+      "attached",
+      "attempted-connection-from",
+      "attempted-connection-to",
+      "attempted-to-authenticate",
+      "attempted-to-authenticate-from",
+      "attempted-to-authenticate-to",
+      "attempted-to-bind-on",
+      "attempted-to-listen-on",
+      "attempted-to-use",
+      "blocked-connection-from",
+      "blocked-connection-to",
+      "blocked-listener-on",
+      "blocked-port-bind-on",
+      "bound-to",
+      "connected-from",
+      "connected-to",
+      "contained",
+      "created",
+      "created-logon-session-from",
+      "deleted",
+      "deployed-container-in",
+      "described",
+      "detached",
+      "disabled",
+      "enabled",
+      "executed",
+      "granted-access-to",
+      "identified",
+      "listed",
+      "listened-on",
+      "loaded",
+      "locked",
+      "logged-off-from",
+      "modified",
+      "originated-from",
+      "permitted-listener-on",
+      "powered-off",
+      "ran",
+      "redeployed",
+      "removed",
+      "removed-access-from",
+      "requested",
+      "requested-access-to",
+      "requested-modification-of",
+      "responded-from",
+      "retrieved-information-about",
+      "started",
+      "stopped",
+      "terminated",
+      "unloaded",
+      "unlocked",
+      "updated",
+      "viewed",
+      "indicates"
+     ]
+    },
+    "x_car_action": true,
+    "x_car_analytic": true,
+    "x_car_asserted": true,
+    "x_car_attachment_ref": true,
+    "x_car_base_address": true,
+    "x_car_car_action": true,
+    "x_car_car_object": true,
+    "x_car_class": true,
+    "x_car_clause": true,
+    "x_car_confidence": true,
+    "x_car_conflicts": true,
+    "x_car_content_ref": true,
+    "x_car_corroborated_by": true,
+    "x_car_corroborating_refs": true,
+    "x_car_entity_id": true,
+    "x_car_event_id": true,
+    "x_car_fields": true,
+    "x_car_first_seen": true,
+    "x_car_identity_key": true,
+    "x_car_identity_value": true,
+    "x_car_inferred": true,
+    "x_car_inferred_end": true,
+    "x_car_last_seen": true,
+    "x_car_link_confidence": true,
+    "x_car_link_refs": true,
+    "x_car_method": true,
+    "x_car_native": true,
+    "x_car_node_id": true,
+    "x_car_object": true,
+    "x_car_parent": true,
+    "x_car_path": true,
+    "x_car_ppid": true,
+    "x_car_process_entity_id": true,
+    "x_car_properties": true,
+    "x_car_reason": true,
+    "x_car_response_body_bytes": true,
+    "x_car_response_status_code": true,
+    "x_car_roles": true,
+    "x_car_signature_valid": true,
+    "x_car_signer": true,
+    "x_car_source_artefact": true,
+    "x_car_source_host": true,
+    "x_car_techniques": true,
+    "x_car_timestamp": true,
+    "x_car_title": true,
+    "x_car_url_ref": true,
+    "x_car_would_be": true,
+    "extensions": {
+     "type": "object",
+     "properties": {
+      "extension-definition--b8c68e7b-701a-5c99-897d-a1c674311493": {
+       "type": "object",
+       "properties": {
+        "extension_type": {
+         "enum": [
+          "toplevel-property-extension",
+          "new-sco",
+          "new-sdo"
+         ]
+        }
+       },
+       "required": [
+        "extension_type"
+       ]
+      }
+     }
+    }
+   },
+   "patternProperties": {
+    "^x_(?!car_(?:action|analytic|asserted|attachment_ref|base_address|car_action|car_object|class|clause|confidence|conflicts|content_ref|corroborated_by|corroborating_refs|entity_id|event_id|fields|first_seen|identity_key|identity_value|inferred|inferred_end|last_seen|link_confidence|link_refs|method|native|node_id|object|parent|path|ppid|process_entity_id|properties|reason|response_body_bytes|response_status_code|roles|signature_valid|signer|source_artefact|source_host|techniques|timestamp|title|url_ref|would_be)$)": false
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "accessed"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(file|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(windows-registry-key|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(x-car-inferred-node|x-car-thread)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "added"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "attached"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "attempted-connection-from"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "attempted-connection-to"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "attempted-to-authenticate"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(user-account|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(user-account|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "attempted-to-authenticate-from"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "attempted-to-authenticate-to"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "attempted-to-bind-on"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "attempted-to-listen-on"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "attempted-to-use"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "blocked-connection-from"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "blocked-connection-to"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "blocked-listener-on"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "blocked-port-bind-on"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "bound-to"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "connected-from"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "connected-to"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "contained"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(file|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "created"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(file|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(x-car-inferred-node|x-car-thread)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(windows-registry-key|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(email-message|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(observed-data|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(user-account|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(user-account|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(observed-data|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(observed-data|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(observed-data|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "created-logon-session-from"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "deleted"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(file|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(windows-registry-key|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(email-message|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "deployed-container-in"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "described"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "detached"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "disabled"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "enabled"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "executed"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(file|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "granted-access-to"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "identified"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "listed"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "listened-on"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "loaded"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(file|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "locked"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(email-message|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(observed-data|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "logged-off-from"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "modified"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(file|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(windows-registry-key|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(email-message|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "originated-from"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "permitted-listener-on"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "powered-off"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "ran"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "redeployed"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "removed"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "removed-access-from"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "requested"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(observed-data|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "requested-access-to"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(file|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(windows-registry-key|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "requested-modification-of"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "responded-from"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "retrieved-information-about"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(file|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(file|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(observed-data|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "started"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "stopped"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(email-message|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "terminated"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(network-traffic|x-car-inferred-node)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(x-car-inferred-node|x-car-thread)--"
+       }
+      }
+     },
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(observed-data|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "unloaded"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(file|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "unlocked"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "anyOf": [
+     {
+      "properties": {
+       "source_ref": {
+        "pattern": "^(process|x-car-inferred-node)--"
+       },
+       "target_ref": {
+        "pattern": "^(observed-data|x-car-inferred-node)--"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "updated"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "viewed"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": false
+  },
+  {
+   "if": {
+    "properties": {
+     "relationship_type": {
+      "const": "indicates"
+     }
+    },
+    "required": [
+     "relationship_type"
+    ]
+   },
+   "then": {
+    "properties": {
+     "source_ref": {
+      "pattern": "^indicator--"
+     },
+     "target_ref": {
+      "pattern": "^attack-pattern--"
+     }
+    }
+   }
+  }
+ ],
+ "unevaluatedProperties": false
+}

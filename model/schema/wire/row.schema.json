@@ -1,0 +1,518 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/wire/row.schema.json",
+ "title": "Engine-input rows — GENERATED load gate",
+ "description": "Never hand-edited: python -m byakugan.schema_gen regenerates it (conform class-regen gates drift). byakugan.elastic.load validates every consumed row against the matching $def — count-and-carry: a nonconforming row is TALLIED in the load summary, never a crash and never silently admitted. Rows stay open beyond the gated surface (per-object properties ride flat); the gate is the closed (object, action) vocabulary plus the header/edge grammar.",
+ "$defs": {
+  "event": {
+   "type": "object",
+   "required": [
+    "car_object"
+   ],
+   "properties": {
+    "car_object": {
+     "enum": [
+      "authentication",
+      "driver",
+      "email",
+      "file",
+      "flow",
+      "http",
+      "module",
+      "process",
+      "registry",
+      "service",
+      "socket",
+      "thread",
+      "user_session"
+     ]
+    },
+    "car_action": {
+     "type": [
+      "string",
+      "number",
+      "null"
+     ]
+    },
+    "timestamp": {
+     "type": [
+      "string",
+      "number",
+      "null"
+     ]
+    },
+    "guid": {
+     "type": [
+      "string",
+      "number",
+      "null"
+     ]
+    },
+    "owning_guid": {
+     "type": [
+      "string",
+      "number",
+      "null"
+     ]
+    },
+    "volume_guid": {
+     "type": [
+      "string",
+      "number",
+      "null"
+     ]
+    },
+    "mac_address": {
+     "type": [
+      "string",
+      "number",
+      "null"
+     ]
+    },
+    "device_serial": {
+     "type": [
+      "string",
+      "number",
+      "null"
+     ]
+    },
+    "link_confidence": {
+     "type": [
+      "string",
+      "number",
+      "null"
+     ]
+    },
+    "source_artefact": {
+     "type": [
+      "string",
+      "number",
+      "null"
+     ]
+    },
+    "source_host": {
+     "type": [
+      "string",
+      "number",
+      "null"
+     ]
+    },
+    "native": true
+   },
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "authentication"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "error",
+         "failure",
+         "success",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "driver"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "load",
+         "metadata",
+         "unload",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "email"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "block",
+         "delete",
+         "deliver",
+         "quarantine",
+         "redirect",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "file"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "access",
+         "acl_modify",
+         "content",
+         "create",
+         "delete",
+         "metadata",
+         "modify",
+         "read",
+         "timestomp",
+         "write",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "flow"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "content",
+         "create",
+         "end",
+         "flow",
+         "message",
+         "start",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "http"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "get",
+         "post",
+         "put",
+         "tunnel",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "module"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "content",
+         "load",
+         "metadata",
+         "unload",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "process"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "access",
+         "create",
+         "execute",
+         "metadata",
+         "modify",
+         "terminate",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "registry"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "access",
+         "add",
+         "create",
+         "delete",
+         "key_edit",
+         "modify",
+         "remove",
+         "value_edit",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "service"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "access",
+         "create",
+         "delete",
+         "enumerate",
+         "metadata",
+         "modify",
+         "pause",
+         "start",
+         "stop",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "socket"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "bind",
+         "close",
+         "listen",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "thread"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "create",
+         "remote_create",
+         "suspend",
+         "terminate",
+         null
+        ]
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "car_object": {
+        "const": "user_session"
+       }
+      },
+      "required": [
+       "car_object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "car_action": {
+        "enum": [
+         "create",
+         "lock",
+         "login",
+         "logout",
+         "metadata",
+         "reconnect",
+         "terminate",
+         "unlock",
+         null
+        ]
+       }
+      }
+     }
+    }
+   ]
+  },
+  "relationship": {
+   "type": "object",
+   "required": [
+    "class",
+    "source_object",
+    "source_guid",
+    "target_object",
+    "target_guid"
+   ],
+   "properties": {
+    "class": {
+     "enum": [
+      "declared",
+      "derived"
+     ]
+    },
+    "confidence": {
+     "enum": [
+      "definitive",
+      "heuristic",
+      "inferred",
+      null
+     ]
+    },
+    "relationship": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "timestamp": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   }
+  },
+  "inferred": {
+   "type": "object",
+   "required": [
+    "node_id"
+   ],
+   "properties": {
+    "node_id": {
+     "type": [
+      "string",
+      "number"
+     ]
+    }
+   }
+  },
+  "content": {
+   "type": "object",
+   "required": [
+    "node_id"
+   ],
+   "properties": {
+    "node_id": {
+     "type": [
+      "string",
+      "number"
+     ]
+    }
+   }
+  }
+ }
+}

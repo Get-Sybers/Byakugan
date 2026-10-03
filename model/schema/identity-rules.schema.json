@@ -1,0 +1,181 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/identity-rules.schema.json",
+ "title": "Identity Rules — the row-identity registry, validated in place",
+ "description": "Validates byakugan/spindle.yml — the SINGLE registry (wire format, its own version-bump change protocol) — rather than copying it: one recipe per identified thing, inputs + canonicalisation + namespace + recipe version, golden vectors as part of the declaration. Object-id scopes live in identity/object-ids.yaml (docs/design/schema-layers.md, Identity Rules).",
+ "type": "object",
+ "properties": {
+  "spindle": {
+   "type": "object",
+   "properties": {
+    "version": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "namespace": {
+     "type": "object",
+     "properties": {
+      "parent": {
+       "const": "CAR_NS"
+      },
+      "label": {
+       "const": "spindle"
+      }
+     },
+     "required": [
+      "parent",
+      "label"
+     ]
+    },
+    "object_key": {
+     "const": "_obj"
+    },
+    "version_key": {
+     "const": "_v"
+    },
+    "rendering": {
+     "type": "string"
+    },
+    "normalize": {
+     "type": "array"
+    },
+    "positional": {
+     "type": "object",
+     "properties": {
+      "fields": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "minItems": 1
+      },
+      "version": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "golden": {
+       "$ref": "#/$defs/golden"
+      }
+     },
+     "required": [
+      "fields",
+      "version",
+      "golden"
+     ]
+    },
+    "scopes": {
+     "type": "object",
+     "required": [
+      "intrinsic",
+      "positional"
+     ]
+    },
+    "kinds": {
+     "type": "object",
+     "required": [
+      "record",
+      "entity"
+     ]
+    }
+   },
+   "required": [
+    "version",
+    "namespace",
+    "object_key",
+    "version_key",
+    "positional",
+    "scopes",
+    "kinds"
+   ]
+  },
+  "identities": {
+   "type": "object",
+   "minProperties": 1,
+   "additionalProperties": {
+    "$ref": "#/$defs/entry"
+   }
+  }
+ },
+ "required": [
+  "spindle",
+  "identities"
+ ],
+ "$defs": {
+  "entry": {
+   "type": "object",
+   "properties": {
+    "object": {
+     "type": "string"
+    },
+    "kind": {
+     "enum": [
+      "record",
+      "entity"
+     ]
+    },
+    "scope": {
+     "enum": [
+      "intrinsic",
+      "positional"
+     ]
+    },
+    "version": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "validated_against": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     },
+     "minItems": 1
+    },
+    "stable_across": {
+     "type": "string"
+    },
+    "identity": {
+     "type": "object",
+     "minProperties": 1
+    },
+    "golden": {
+     "$ref": "#/$defs/golden"
+    },
+    "external": {
+     "type": "object"
+    }
+   },
+   "required": [
+    "object",
+    "kind",
+    "scope",
+    "version",
+    "validated_against",
+    "stable_across",
+    "identity",
+    "golden"
+   ]
+  },
+  "golden": {
+   "type": "object",
+   "properties": {
+    "source": {
+     "enum": [
+      "real",
+      "synthetic"
+     ]
+    },
+    "object": {
+     "type": "string"
+    },
+    "values": {
+     "type": "object",
+     "minProperties": 1
+    }
+   },
+   "required": [
+    "source",
+    "values"
+   ]
+  }
+ }
+}

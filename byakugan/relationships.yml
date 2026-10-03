@@ -1,0 +1,280 @@
+---
+# The relationship & inheritance rules the cascade applies — DATA, not code
+# (enrich.py implements the mechanics). The reasoning behind every rule is
+# docs/CAR-Relations.md: change the rule here; change the reasoning there.
+
+# ---------------------------------------------------------------------------
+# Inheritance: fills ONLY null fields, and only fields the receiving object
+# actually has in the CAR model. A natively extracted value is never
+# overwritten — it is evidence.
+inheritance:
+  # a spoke event (module/flow/file/registry/... row linked to its owning
+  # process) may inherit this process context:
+  from_owning_process:
+    - exe
+    - image_path
+    - command_line
+    - user
+    - sid
+    - fqdn
+    - hostname
+    - ppid            # a spoke's ppid means: the parent of the process it belongs to
+  # a process CREATE event may inherit these from its resolved parent:
+  from_parent_process:
+    exe: parent_exe
+    image_path: parent_image_path
+    command_line: parent_command_line
+  # a zeek spoke (http/file) linked to its connection by the shared capture
+  # uid may inherit this connection context (R3). Keys are the RECEIVING
+  # object's CAR field; values are the flow field they come from.
+  from_owning_flow:
+    requester_ip_address: src_ip
+    hostname: src_hostname
+
+# ---------------------------------------------------------------------------
+# Deduplication: two rows are the SAME event when `key` matches — and they
+# FOLD into one row (engine: enrich.fold). `fold: additive` (the default —
+# the D4 superset rule): the first row is the base, every later row fills the
+# properties it lacks, a disagreeing value is kept in native under
+# coalesced_conflicts (never overwritten, never nulled), the contributing
+# artefacts are listed in coalesced_sources, and the row counts its
+# contributors — native.contributions and native.contributed_by
+# [{source_artefact, spindle_ref}] (capped at 64) — so a consumer can weigh
+# corroboration. `fold: most_populated` keeps the single most-populated row
+# instead (the older behaviour: a loser's values are discarded).
+# target_guid/access_level distinguish a process's several ACCESS events (null
+# on everything else). A row with no guid has no identity and never folds.
+dedupe:
+  key:
+    - source_host
+    - car_object
+    - guid
+    - car_action
+    - target_guid
+    - access_level
+  fold: additive
+
+# ---------------------------------------------------------------------------
+# Identity canonicalisation: the well-known accounts must render as the SAME
+# string in every table. Canonicalisation fills blanks and unifies ALTERNATE
+# RENDERINGS of the same account only — any other native value (e.g. a machine
+# account DESKTOP-X$ on a 4624 Subject) is evidence and is never overwritten.
+identity:
+  # the canonical token MUST equal what normalize.user_canon emits at the map
+  # layer (normalize._WELLKNOWN_SIDS), so an enrich blank-fill from a SID and a
+  # map's own extraction render the account identically — one string per source.
+  well_known_sids:
+    S-1-5-18: SYSTEM
+    S-1-5-19: LOCAL SERVICE
+    S-1-5-20: NETWORK SERVICE
+  # renderings of those SAME accounts that may be unified (lowercased match):
+  canonical_aliases:
+    - system
+    - local system
+    - localsystem
+    - systemprofile
+    - nt authority
+    - local service
+    - localservice
+    - network service
+    - networkservice
+
+# ---------------------------------------------------------------------------
+# Joins. The two-tier owner join (tier 1: a natively-carried owning-process
+# guid — definitive; tier 2: the pid + create-time-window match — heuristic,
+# PID reuse) is engine mechanics; the LUID join's parameters are rules:
+joins:
+  auth_session_luid:
+    # LUIDs are unique per boot per host — a same-host match is definitive
+    # within the evidence window, EXCEPT these per-boot singletons, which
+    # recur every boot and are only heuristic across a multi-boot log:
+    well_known_luids: ["0x3e4", "0x3e5", "0x3e7"]
+    # a null session — never a join key:
+    null_luids: ["0x0"]
+
+# ---------------------------------------------------------------------------
+# DERIVED relationships (class=derived; engine: derive.py). Everything above
+# is the DECLARED cascade — validated rules whose edges are credible for
+# inference. A DERIVED link is data-driven: two parsed records that clearly list
+# the same properties tied to the same event/entity, joined 1:1 on a SHARED
+# STRONG identity. Only the identities declared here may join; every derived
+# row names its identity_key, its method label and the corroborating guids.
+# Verbs come from the same ATT&CK vocabulary the cascade uses (test-enforced).
+derived:
+  # The strong identities. `instance` identities name ONE observed thing (a
+  # sensor-minted guid, a memory object offset); `content` identities name the
+  # same content wherever it appears and become content_node rows (the
+  # attribution layer) with an entity_ref from every record carrying them.
+  # A must field (an identity-anchoring field) lists its authoritative
+  # `sources`, strongest first — always more than one (uSaid authority-control
+  # pattern; register §10.6). class: issuer = mints/owns the value,
+  # computed = derived from the content itself, recorded = written by an OS
+  # artefact at event time, observed = read live from memory, mapping = a
+  # cross-reference table. New maps grow the spindle by naming which declared
+  # source their artefact carries.
+  identities:
+    guid:
+      kind: instance          # Sysmon ProcessGuid / ParentProcessGuid / TargetProcessGuid, a Zeek uid/fuid
+    offset:
+      kind: instance          # a memory-image object offset (Anamnesis owning_offset = the owning _EPROCESS)
+      guid_form: "proc-{hex}" # the guid Anamnesis mints for that object (proc-<offset hex>)
+    file_offset:
+      kind: instance          # a memory-image FILE_OBJECT offset (Anamnesis mints file-<hex> from it)
+      guid_form: "file-{hex}"
+    luid:
+      kind: instance          # logon-session LUID, per boot per host (joins.auth_session_luid)
+      guid_form: "user_session-{value}"
+      normalize: lower        # hex case differs between artefacts
+      # 0x0 names no session; the per-boot singletons recur every boot — excluded
+      accept: ['(?i)^0x(?!0$|3e4$|3e5$|3e7$)[0-9a-f]+$']
+      sources:
+        - {authority: LSA logon-session table, class: observed, carries: the live LUIDs (memory windows.anamnesis.sessions)}
+        - {authority: Security event log, class: recorded, carries: TargetLogonId / SubjectLogonId (4624/4634/4647/4672)}
+    hash:
+      kind: content
+      node: file_content
+      fields: [sha256_hash, sha1_hash, md5_hash]     # strongest first
+      accept: ['^[0-9A-Fa-f]{64}$', '^[0-9A-Fa-f]{40}$', '^[0-9A-Fa-f]{32}$']
+      normalize: lower
+      properties: [file_path, image_path, module_path, file_name, signer]   # context unioned onto the node
+      sources:
+        - {authority: the bytes themselves, class: computed, carries: hashes computed from content (disk image / zeek files.log)}
+        - {authority: sensor at event time, class: recorded, carries: Sysmon-computed hashes (EID 1/6/7/11/15/23)}
+        - {authority: Amcache / PE metadata, class: recorded, carries: recorded SHA-1 / header hashes — may lag the bytes}
+    sid:
+      kind: content
+      node: user_account
+      fields: [sid, uid, owner_uid, target_uid]
+      # REAL accounts only: local/domain (S-1-5-21-…) and Azure AD (S-1-12-1-…)
+      # SIDs; the well-known singletons (S-1-5-18/19/20 …) identify no account.
+      accept: ['^S-1-5-21-\d+-\d+-\d+-\d+$', '^S-1-12-1-\d+-\d+-\d+-\d+$']
+      normalize: upper
+      properties: [user, hostname]
+      sources:                    # the D3 exemplar: where a SID can be sourced from
+        - {authority: Active Directory (ntds.dit), class: issuer, carries: domain account SIDs}
+        - {authority: SAM hive, class: issuer, carries: local account SIDs (machine SID + RID)}
+        - {authority: Security event log, class: recorded, carries: Subject/Target SIDs (4624/4688/4907/4720-family)}
+        - {authority: process token, class: observed, carries: the token's user and group SIDs (memory)}
+        - {authority: NTFS $Secure / owner, class: recorded, carries: owner SIDs (file owner_uid)}
+        - {authority: registry ProfileList, class: mapping, carries: SID -> profile path (SOFTWARE hive)}
+
+  # ACTOR edges (D3): the acting account, grounded in the SID through the
+  # identities.sid gate — user_account(sid:<SID>) --> the row, or account -->
+  # account for an auth's subject/target pair (the impersonation transaction).
+  # Reasoning + follow-ons: register §10.3.
+  actors:
+    - name: user_created_process
+      identity: sid
+      source: [sid, uid]            # the acting account, strongest field first
+      "on": process/create
+      relationship: created         # user --created--> process (exact ATT&CK)
+      method: actor_sid
+      confidence: definitive
+    - name: user_created_session
+      identity: sid
+      source: [uid]
+      "on": user_session/login
+      relationship: created         # user --created--> logon session (exact ATT&CK)
+      method: actor_sid
+      confidence: definitive
+    - name: auth_subject_target
+      identity: sid
+      source: [uid]                 # subject account
+      target_source: [target_uid]   # target account; subject==target never emits
+      "on": authentication
+      relationship: attempted to authenticate
+      method: actor_sid
+      confidence: definitive
+
+  # 1:1 links where BOTH ends are observed records. `join` names the field on
+  # each end (a plain CAR field, or native.<key> for a kept native value; a list
+  # value matches any element). A content identity joins on its own fields.
+  links:
+    - name: process_image_content
+      identity: hash
+      source: process
+      target: file
+      relationship: executed
+      method: shared_hash
+      confidence: definitive
+      # 1:1 disambiguation where several file records share the hash: the one
+      # whose file_path is the process image_path; else an unambiguous single
+      # record; else no edge (the content_node carries the many-to-many).
+      prefer: {source: image_path, target: file_path}
+    - name: http_file_transfer
+      identity: guid
+      source: http
+      target: file
+      relationship: contained
+      method: shared_fuid
+      confidence: definitive
+      join: {source: native.resp_fuids, target: guid}   # Zeek's file id on both records
+
+  # RECONSTRUCTION: an observed record natively references a node (by a strong
+  # identity) that NO source observed — the process a spoke names by ProcessGuid
+  # after the log was cleared, the owner a memory spoke names by offset when the
+  # process was unlinked or reaped. The missing end becomes an inferred_node
+  # (flagged, corroborated) and the derived edge points at it via inferred_end.
+  # It is never written as a car_<object> event row. `reference` is where the
+  # observed record carries the identity (an in-memory enrich input such as
+  # owning_guid_native / owning_offset, or native.<key>); `unless_linked` is the
+  # cascade link that, when resolved, proves the node WAS observed (possibly
+  # under another identity — a 4688 record beside a lost Sysmon 1) so nothing is
+  # reconstructed; `properties` is what the observed record says about the
+  # missing node (node field: the observed record's field). `on` scopes the
+  # rule: `spokes` = every non-process object, or <object>[/<action>].
+  reconstruct:
+    - name: owning_process
+      identity: guid
+      reference: owning_guid_native
+      unless_linked: owning_guid
+      "on": spokes
+      node: process
+      end: source                   # the missing node is the edge SOURCE (owner --verb--> spoke)
+      relationship: spoke_owner     # verb from cascade_relationships spoke_owner[(object, action)]
+      method: native_guid
+      properties: {pid: owning_pid, image_path: image_path}
+    - name: owning_process_memory
+      identity: offset
+      reference: owning_offset
+      unless_linked: owning_guid
+      "on": spokes
+      node: process
+      end: source
+      relationship: spoke_owner
+      method: memory_offset
+      properties: {pid: owning_pid}
+    - name: parent_process
+      identity: guid
+      reference: native.ParentProcessGuid
+      unless_linked: parent_guid
+      "on": process/create
+      node: process
+      end: source
+      relationship: created
+      method: native_guid
+      properties: {pid: ppid, image_path: parent_image_path, exe: parent_exe,
+                   command_line: parent_command_line}
+    - name: injection_target
+      identity: guid
+      reference: native.TargetProcessGuid
+      unless_linked: native.target_process_guid
+      "on": thread
+      node: process
+      end: target                   # owner --accessed--> (missing) target
+      observed: {field: owning_guid, object: process}   # the observed end is the spoke's OWNER
+      relationship: accessed
+      method: native_guid
+      properties: {pid: tgt_pid}
+    - name: auth_session_target
+      # a success names the session it opened; when no source carries a row for
+      # that LUID the session still existed — reconstruct it, flagged (§3.2.4)
+      identity: luid
+      reference: native.TargetLogonId
+      unless_linked: native.target_session_guid
+      "on": authentication/success
+      node: user_session
+      end: target                   # the observed auth --created--> the missing session
+      relationship: created         # same verb as the declared auth_session edge
+      method: luid
+      properties: {login_id: native.TargetLogonId, user: target_user, uid: target_uid}

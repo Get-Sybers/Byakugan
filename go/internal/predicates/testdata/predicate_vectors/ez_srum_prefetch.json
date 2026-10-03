@@ -1,0 +1,352 @@
+{
+ "cases": [
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {
+    "TableAlias": "NetworkDataUsage"
+   },
+   "result": true,
+   "rec_after": {
+    "TableAlias": "NetworkDataUsage"
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {
+    "TableAlias": "ApplicationResourceUsage"
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": "ApplicationResourceUsage"
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {
+    "TableAlias": "NetworkConnectivityUsage"
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": "NetworkConnectivityUsage"
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {
+    "TableAlias": "NetworkDataUsage "
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": "NetworkDataUsage "
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {
+    "TableAlias": "networkdatausage"
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": "networkdatausage"
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {
+    "TableAlias": null
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": null
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {
+    "TableAlias": ""
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": ""
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {
+    "TableAlias": 0
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": 0
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {
+    "TableAlias": 5
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": 5
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {
+    "TableAlias": false
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": false
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "esedump_srum_is_network_usage",
+   "rec": {
+    "TableAlias": "NetworkDataUsage",
+    "AppId": 102,
+    "UserId": 8,
+    "AppIdName": "System",
+    "UserIdName": "S-1-5-18",
+    "InterfaceLuid": 1689399632855040,
+    "TimeStamp": "2024-02-20T07:50:00Z",
+    "BytesSent": 2100,
+    "BytesRecvd": 1440
+   },
+   "result": true,
+   "rec_after": {
+    "TableAlias": "NetworkDataUsage",
+    "AppId": 102,
+    "UserId": 8,
+    "AppIdName": "System",
+    "UserIdName": "S-1-5-18",
+    "InterfaceLuid": 1689399632855040,
+    "TimeStamp": "2024-02-20T07:50:00Z",
+    "BytesSent": 2100,
+    "BytesRecvd": 1440
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_application_usage",
+   "rec": {
+    "TableAlias": "ApplicationResourceUsage"
+   },
+   "result": true,
+   "rec_after": {
+    "TableAlias": "ApplicationResourceUsage"
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_application_usage",
+   "rec": {
+    "TableAlias": "NetworkDataUsage"
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": "NetworkDataUsage"
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_application_usage",
+   "rec": {
+    "TableAlias": "NetworkConnectivityUsage"
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": "NetworkConnectivityUsage"
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_application_usage",
+   "rec": {
+    "TableAlias": "ApplicationResourceUsage "
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": "ApplicationResourceUsage "
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_application_usage",
+   "rec": {
+    "TableAlias": null
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": null
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_application_usage",
+   "rec": {
+    "TableAlias": ""
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": ""
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_application_usage",
+   "rec": {
+    "TableAlias": 0
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": 0
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_application_usage",
+   "rec": {
+    "TableAlias": true
+   },
+   "result": false,
+   "rec_after": {
+    "TableAlias": true
+   }
+  },
+  {
+   "predicate": "esedump_srum_is_application_usage",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "Executable": "ADDINUTIL.EXE"
+   },
+   "result": true,
+   "rec_after": {
+    "Executable": "ADDINUTIL.EXE"
+   }
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "Executable": "-"
+   },
+   "result": true,
+   "rec_after": {
+    "Executable": "-"
+   }
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "Executable": ""
+   },
+   "result": false,
+   "rec_after": {
+    "Executable": ""
+   }
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "Executable": null
+   },
+   "result": false,
+   "rec_after": {
+    "Executable": null
+   }
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "Executable": 0
+   },
+   "result": false,
+   "rec_after": {
+    "Executable": 0
+   }
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "Executable": 5
+   },
+   "result": true,
+   "rec_after": {
+    "Executable": 5
+   }
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "Executable": false
+   },
+   "result": false,
+   "rec_after": {
+    "Executable": false
+   }
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "Executable": true
+   },
+   "result": true,
+   "rec_after": {
+    "Executable": true
+   }
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "Executable": []
+   },
+   "result": false,
+   "rec_after": {
+    "Executable": []
+   }
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "Executable": [
+     "x"
+    ]
+   },
+   "result": true,
+   "rec_after": {
+    "Executable": [
+     "x"
+    ]
+   }
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "Executable": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Executable": {}
+   }
+  },
+  {
+   "predicate": "prefetch_dump_is_execution",
+   "rec": {
+    "executable": "lower-case key"
+   },
+   "result": false,
+   "rec_after": {
+    "executable": "lower-case key"
+   }
+  }
+ ]
+}

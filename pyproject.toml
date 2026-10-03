@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# Distribution and import package are both byakugan.
+# The STIX namespace/producer identity seed strings are frozen INSIDE
+# ids.py/stix.py — wire-format constants that never depend on packaging and
+# move only with a contract version bump (last: v4, re-seeded to the byakugan
+# name — every deterministic id re-minted).
+name = "byakugan"
+version = "0.1.0"
+description = "Byakugan — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, Anamnesis) into finished MITRE CAR: per-source databases, an inference cascade, per-object JSON."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+keywords = ["dfir", "mitre-car", "mitre-attack", "forensics", "timeline",
+            "car", "normalisation", "incident-response"]
+dependencies = ["pyyaml>=6", "jsonschema>=4.18"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "yamale>=4", "yamllint>=1.30"]
+
+[project.urls]
+Repository = "https://github.com/Get-Sybers/Byakugan"
+Issues = "https://github.com/Get-Sybers/Byakugan/-/issues"
+
+[project.scripts]
+# the multi-tool entry point: `byakugan build|timeline|verify|car-vocab` driven
+# by BYAKUGAN_<SUBTOOL>_* (the container contract), or the engine's own argv
+byakugan = "byakugan.cli:main"
+
+[tool.pytest.ini_options]
+# tests/ holds shared helpers (reference_plumbing.py) that the test modules
+# import as top-level modules (`from reference_plumbing import ...`). Put tests/
+# on sys.path explicitly so collection works regardless of pytest's import mode
+# or the directory pytest is invoked from.
+pythonpath = ["tests"]
+# Vendored source catalogues carry their own upstream test suites; collection
+# stops at the vendor boundary. norecursedirs REPLACES pytest's default list,
+# so the stock entries are restated here alongside the vendor dirs.
+norecursedirs = [".*", "build", "dist", "*.egg", "node_modules", "venv", "_darcs", "CVS", "{arch}",
+                 "third_party", "forensicartifacts"]
+
+[tool.setuptools]
+# byakugan.adapters is gone: the winevt/jlecmd/l2t-split plumbing it held now
+# lives in the Go parse engine (go/internal/{adapt,split}).
+# byakugan.elastic is the Elastic runtime (load/projection/inverse_projection/
+# _http); the projection CONTRACT it reads is not code and is not packaged
+# here — it lives at the repo root's elastic/projection/, read from the
+# checked-out source tree like the CAR model itself.
+packages = ["byakugan", "byakugan.mappings", "byakugan.elastic",
+            "byakugan.exchange", "byakugan.exchange.cti"]
+
+[tool.setuptools.package-data]
+# the CAR/superset models + ATT&CK relationships are reconstructed live from the
+# pinned submodules, so they are not shipped; only the owned data files are.
+byakugan = ["cascade_relationships.yml", "relationships.yml", "spindle.yml",
+            "car_source_schema.yaml",
+            # model/schema — the schema authority, shipped as package data
+            # (byakugan/_schema is a symlink into model/schema; the build
+            # copies the resolved files). byakugan.schemadata resolves the
+            # live dir: env override -> repo checkout -> this packaged copy.
+            "_schema/*.json", "_schema/*.yaml",
+            "_schema/classes/*.yaml", "_schema/enrichment/*.yaml",
+            "_schema/identity/*.yaml", "_schema/mappings/*.yaml",
+            "_schema/profiles/*.yaml", "_schema/vocab/*.json",
+            "_schema/wire/*.json", "_schema/vendor/oasis/*.md",
+            "_schema/vendor/oasis/common/*.json",
+            "_schema/vendor/oasis/observables/*.json",
+            "_schema/vendor/oasis/sdos/*.json",
+            "_schema/vendor/oasis/sros/*.json"]
+# the exchange's committed ATT&CK index, CTI field mapping/template and the
+# extension schema ride the package (attack_index/objects resolve them by file)
+"byakugan.exchange" = ["data/attack-index.json", "cti/pattern-mapping.yml",
+                       "cti/cti.index-template.json",
+                       "extension/dxdfir-extension.schema.json"]

@@ -1,0 +1,226 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "generated_by": "python elastic/projection/render_elastic.py",
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "elastic/projection/conventions.yml",
+      "elastic/projection/objects/process.yml",
+      "elastic/projection/ecs_types.yml"
+    ],
+    "version": 3
+  },
+  "template": {
+    "mappings": {
+      "properties": {
+        "car": {
+          "properties": {
+            "process": {
+              "properties": {
+                "access_level": {
+                  "type": "keyword"
+                },
+                "call_trace": {
+                  "type": "text"
+                },
+                "command_line": {
+                  "path": "process.command_line",
+                  "type": "alias"
+                },
+                "current_working_directory": {
+                  "path": "process.working_directory",
+                  "type": "alias"
+                },
+                "env_vars": {
+                  "path": "process.env_vars",
+                  "type": "alias"
+                },
+                "exe": {
+                  "path": "process.name",
+                  "type": "alias"
+                },
+                "fqdn": {
+                  "path": "host.hostname",
+                  "type": "alias"
+                },
+                "hostname": {
+                  "path": "host.hostname",
+                  "type": "alias"
+                },
+                "image_path": {
+                  "path": "process.executable",
+                  "type": "alias"
+                },
+                "integrity_level": {
+                  "type": "keyword"
+                },
+                "md5_hash": {
+                  "path": "process.hash.md5",
+                  "type": "alias"
+                },
+                "parent_command_line": {
+                  "path": "process.parent.command_line",
+                  "type": "alias"
+                },
+                "parent_exe": {
+                  "path": "process.parent.name",
+                  "type": "alias"
+                },
+                "parent_guid": {
+                  "path": "process.parent.entity_id",
+                  "type": "alias"
+                },
+                "parent_image_path": {
+                  "path": "process.parent.executable",
+                  "type": "alias"
+                },
+                "pid": {
+                  "path": "process.pid",
+                  "type": "alias"
+                },
+                "ppid": {
+                  "path": "process.parent.pid",
+                  "type": "alias"
+                },
+                "sha1_hash": {
+                  "path": "process.hash.sha1",
+                  "type": "alias"
+                },
+                "sha256_hash": {
+                  "path": "process.hash.sha256",
+                  "type": "alias"
+                },
+                "sid": {
+                  "path": "user.id",
+                  "type": "alias"
+                },
+                "signature_valid": {
+                  "path": "process.code_signature.valid",
+                  "type": "alias"
+                },
+                "signer": {
+                  "path": "process.code_signature.subject_name",
+                  "type": "alias"
+                },
+                "target_address": {
+                  "type": "keyword"
+                },
+                "target_guid": {
+                  "type": "keyword"
+                },
+                "target_name": {
+                  "type": "keyword"
+                },
+                "target_pid": {
+                  "type": "long"
+                },
+                "uid": {
+                  "path": "user.id",
+                  "type": "alias"
+                },
+                "user": {
+                  "path": "user.name",
+                  "type": "alias"
+                }
+              }
+            }
+          }
+        },
+        "host": {
+          "properties": {
+            "hostname": {
+              "type": "keyword"
+            }
+          }
+        },
+        "process": {
+          "properties": {
+            "code_signature": {
+              "properties": {
+                "subject_name": {
+                  "type": "keyword"
+                },
+                "valid": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "command_line": {
+              "type": "keyword"
+            },
+            "env_vars": {
+              "type": "keyword"
+            },
+            "executable": {
+              "type": "keyword"
+            },
+            "hash": {
+              "properties": {
+                "md5": {
+                  "type": "keyword"
+                },
+                "sha1": {
+                  "type": "keyword"
+                },
+                "sha256": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "parent": {
+              "properties": {
+                "command_line": {
+                  "type": "keyword"
+                },
+                "entity_id": {
+                  "type": "keyword"
+                },
+                "executable": {
+                  "type": "keyword"
+                },
+                "name": {
+                  "type": "keyword"
+                },
+                "pid": {
+                  "type": "long"
+                }
+              }
+            },
+            "pid": {
+              "type": "long"
+            },
+            "working_directory": {
+              "type": "keyword"
+            }
+          }
+        },
+        "related": {
+          "properties": {
+            "hash": {
+              "type": "keyword"
+            },
+            "hosts": {
+              "type": "keyword"
+            },
+            "user": {
+              "type": "keyword"
+            }
+          }
+        },
+        "user": {
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}

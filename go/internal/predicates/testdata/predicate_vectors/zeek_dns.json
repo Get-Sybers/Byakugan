@@ -1,0 +1,190 @@
+{
+ "cases": [
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": "scoring-c2.berylia.org"
+   },
+   "result": true,
+   "rec_after": {
+    "query": "scoring-c2.berylia.org"
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": "a.example",
+    "trans_id": 1
+   },
+   "result": true,
+   "rec_after": {
+    "query": "a.example",
+    "trans_id": 1
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": "-"
+   },
+   "result": true,
+   "rec_after": {
+    "query": "-"
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": " "
+   },
+   "result": true,
+   "rec_after": {
+    "query": " "
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": ""
+   },
+   "result": false,
+   "rec_after": {
+    "query": ""
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": null
+   },
+   "result": false,
+   "rec_after": {
+    "query": null
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": 0
+   },
+   "result": false,
+   "rec_after": {
+    "query": 0
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": 1
+   },
+   "result": true,
+   "rec_after": {
+    "query": 1
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": 0.0
+   },
+   "result": false,
+   "rec_after": {
+    "query": 0.0
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": 1.5
+   },
+   "result": true,
+   "rec_after": {
+    "query": 1.5
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": false
+   },
+   "result": false,
+   "rec_after": {
+    "query": false
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": true
+   },
+   "result": true,
+   "rec_after": {
+    "query": true
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": []
+   },
+   "result": false,
+   "rec_after": {
+    "query": []
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": [
+     "a.example"
+    ]
+   },
+   "result": true,
+   "rec_after": {
+    "query": [
+     "a.example"
+    ]
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": {}
+   },
+   "result": false,
+   "rec_after": {
+    "query": {}
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "query": {
+     "a": 1
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "query": {
+     "a": 1
+    }
+   }
+  },
+  {
+   "predicate": "zeek_dns_is_query",
+   "rec": {
+    "Query": "case-sensitive"
+   },
+   "result": false,
+   "rec_after": {
+    "Query": "case-sensitive"
+   }
+  }
+ ]
+}

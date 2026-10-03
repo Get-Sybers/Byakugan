@@ -1,0 +1,406 @@
+{
+ "cases": [
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "ts": 1341856306.0,
+    "uid": "Cs",
+    "trans_depth": 1,
+    "id.orig_h": "10.0.0.5",
+    "id.resp_h": "1.2.3.4",
+    "helo": "mail",
+    "tls": true,
+    "last_reply": "220 ready"
+   },
+   "result": false,
+   "rec_after": {
+    "ts": 1341856306.0,
+    "uid": "Cs",
+    "trans_depth": 1,
+    "id.orig_h": "10.0.0.5",
+    "id.resp_h": "1.2.3.4",
+    "helo": "mail",
+    "tls": true,
+    "last_reply": "220 ready"
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "ts": 1341856306.0,
+    "uid": "Cs",
+    "trans_depth": 1,
+    "id.orig_h": "10.0.0.5",
+    "id.resp_h": "1.2.3.4",
+    "helo": "mail",
+    "tls": true,
+    "last_reply": "220 ready",
+    "mailfrom": "a@evil.com",
+    "rcptto": "v@corp.com",
+    "subject": "hi",
+    "from": "A <a@evil.com>",
+    "to": "v@corp.com"
+   },
+   "result": true,
+   "rec_after": {
+    "ts": 1341856306.0,
+    "uid": "Cs",
+    "trans_depth": 1,
+    "id.orig_h": "10.0.0.5",
+    "id.resp_h": "1.2.3.4",
+    "helo": "mail",
+    "tls": true,
+    "last_reply": "220 ready",
+    "mailfrom": "a@evil.com",
+    "rcptto": "v@corp.com",
+    "subject": "hi",
+    "from": "A <a@evil.com>",
+    "to": "v@corp.com"
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "mailfrom": "a@evil.com"
+   },
+   "result": true,
+   "rec_after": {
+    "mailfrom": "a@evil.com"
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "rcptto": "v@corp.com"
+   },
+   "result": true,
+   "rec_after": {
+    "rcptto": "v@corp.com"
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "from": "A <a@evil.com>"
+   },
+   "result": true,
+   "rec_after": {
+    "from": "A <a@evil.com>"
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "to": "v@corp.com"
+   },
+   "result": true,
+   "rec_after": {
+    "to": "v@corp.com"
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "subject": "hi"
+   },
+   "result": true,
+   "rec_after": {
+    "subject": "hi"
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "mailfrom": "",
+    "rcptto": "",
+    "from": "",
+    "to": "",
+    "subject": ""
+   },
+   "result": false,
+   "rec_after": {
+    "mailfrom": "",
+    "rcptto": "",
+    "from": "",
+    "to": "",
+    "subject": ""
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "mailfrom": null,
+    "rcptto": null,
+    "from": null,
+    "to": null,
+    "subject": null
+   },
+   "result": false,
+   "rec_after": {
+    "mailfrom": null,
+    "rcptto": null,
+    "from": null,
+    "to": null,
+    "subject": null
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "mailfrom": [],
+    "rcptto": [],
+    "from": 0,
+    "to": false,
+    "subject": 0.0
+   },
+   "result": false,
+   "rec_after": {
+    "mailfrom": [],
+    "rcptto": [],
+    "from": 0,
+    "to": false,
+    "subject": 0.0
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "mailfrom": "-"
+   },
+   "result": true,
+   "rec_after": {
+    "mailfrom": "-"
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "subject": " "
+   },
+   "result": true,
+   "rec_after": {
+    "subject": " "
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "rcptto": [
+     "v@corp.com",
+     "w@corp.com"
+    ]
+   },
+   "result": true,
+   "rec_after": {
+    "rcptto": [
+     "v@corp.com",
+     "w@corp.com"
+    ]
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "rcptto": []
+   },
+   "result": false,
+   "rec_after": {
+    "rcptto": []
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "mailfrom": "",
+    "rcptto": "",
+    "to": "v@corp.com"
+   },
+   "result": true,
+   "rec_after": {
+    "mailfrom": "",
+    "rcptto": "",
+    "to": "v@corp.com"
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "subject": 0,
+    "to": 1
+   },
+   "result": true,
+   "rec_after": {
+    "subject": 0,
+    "to": 1
+   }
+  },
+  {
+   "predicate": "zeek_is_smtp_message",
+   "rec": {
+    "Subject": "wrong case"
+   },
+   "result": false,
+   "rec_after": {
+    "Subject": "wrong case"
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": "FdEQ",
+    "uid": "Cno6"
+   },
+   "result": true,
+   "rec_after": {
+    "fuid": "FdEQ",
+    "uid": "Cno6"
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": "-"
+   },
+   "result": true,
+   "rec_after": {
+    "fuid": "-"
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": ""
+   },
+   "result": false,
+   "rec_after": {
+    "fuid": ""
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": null
+   },
+   "result": false,
+   "rec_after": {
+    "fuid": null
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "uid": "Cno6"
+   },
+   "result": false,
+   "rec_after": {
+    "uid": "Cno6"
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": 0
+   },
+   "result": false,
+   "rec_after": {
+    "fuid": 0
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": 1
+   },
+   "result": true,
+   "rec_after": {
+    "fuid": 1
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": 0.0
+   },
+   "result": false,
+   "rec_after": {
+    "fuid": 0.0
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": false
+   },
+   "result": false,
+   "rec_after": {
+    "fuid": false
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": true
+   },
+   "result": true,
+   "rec_after": {
+    "fuid": true
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": []
+   },
+   "result": false,
+   "rec_after": {
+    "fuid": []
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": [
+     "FdEQ"
+    ]
+   },
+   "result": true,
+   "rec_after": {
+    "fuid": [
+     "FdEQ"
+    ]
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "fuid": {}
+   },
+   "result": false,
+   "rec_after": {
+    "fuid": {}
+   }
+  },
+  {
+   "predicate": "zeek_is_file",
+   "rec": {
+    "FUID": "FdEQ"
+   },
+   "result": false,
+   "rec_after": {
+    "FUID": "FdEQ"
+   }
+  }
+ ]
+}

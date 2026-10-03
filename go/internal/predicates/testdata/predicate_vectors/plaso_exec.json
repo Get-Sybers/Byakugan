@@ -1,0 +1,1182 @@
+{
+ "cases": [
+  {
+   "predicate": "plaso_is_prefetch_execution",
+   "rec": {
+    "Record": {
+     "data_type": "windows:prefetch:execution"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:prefetch:execution"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_prefetch_execution",
+   "rec": {
+    "Record": {
+     "data_type": "windows:volume:creation"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "windows:volume:creation"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_prefetch_execution",
+   "rec": {
+    "Record": {
+     "data_type": "WINDOWS:PREFETCH:EXECUTION"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "WINDOWS:PREFETCH:EXECUTION"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_prefetch_execution",
+   "rec": {
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "plaso_is_prefetch_execution",
+   "rec": {
+    "Record": {
+     "data_type": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": null
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_prefetch_execution",
+   "rec": {
+    "Record": {
+     "data_type": 7
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": 7
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_prefetch_execution",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "plaso_is_prefetch_execution",
+   "rec": {
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Record": null
+   }
+  },
+  {
+   "predicate": "plaso_is_prefetch_execution",
+   "rec": {
+    "Record": {},
+    "Parser": "prefetch"
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {},
+    "Parser": "prefetch"
+   }
+  },
+  {
+   "predicate": "plaso_is_cron_task_run",
+   "rec": {
+    "Record": {
+     "data_type": "syslog:cron:task_run"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Record": {
+     "data_type": "syslog:cron:task_run"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_cron_task_run",
+   "rec": {
+    "Record": {
+     "data_type": "syslog:line"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": "syslog:line"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_cron_task_run",
+   "rec": {
+    "Record": {
+     "data_type": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "data_type": ""
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_cron_task_run",
+   "rec": {
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Record": null
+   }
+  },
+  {
+   "predicate": "plaso_is_cron_task_run",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "winreg/amcache",
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/amcache",
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "AMCACHE",
+    "Record": {
+     "timestamp_desc": "LINK TIME"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "AMCACHE",
+    "Record": {
+     "timestamp_desc": "LINK TIME"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Compilation Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Compilation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Content Modification Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Content Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Installation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Installation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": null
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": ""
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": 0
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": 42
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": 42
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": true
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": true
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": null,
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": null,
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "",
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "",
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": 0,
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": 0,
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": false,
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": false,
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": 17,
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": 17,
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": true,
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": true,
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache",
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": null
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache_link_time",
+   "rec": {
+    "Parser": "amcache"
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache"
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Content Modification Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Content Modification Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Link Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Compilation Time"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {
+     "timestamp_desc": "Compilation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache",
+   "rec": {
+    "Parser": "amcache",
+    "Record": {}
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "amcache",
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache",
+   "rec": {
+    "Parser": "winreg/amcache",
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/amcache",
+    "Record": {
+     "timestamp_desc": "Creation Time"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache",
+   "rec": {
+    "Parser": "winreg/bam",
+    "Record": {
+     "timestamp_desc": "x"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/bam",
+    "Record": {
+     "timestamp_desc": "x"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_amcache",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_RUNPATH:E:\\R54402.EXE"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_RUNPATH:E:\\R54402.EXE"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_RUNPATH:"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_RUNPATH:"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_RUNPATH"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_RUNPATH"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_RUNPIDL:%csidl2%\\x.lnk"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_RUNPIDL:%csidl2%\\x.lnk"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_RUNCPL:timedate.cpl"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_RUNCPL:timedate.cpl"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_CTLSESSION"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_CTLSESSION"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_CTLCUACount:ctor"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_CTLCUACount:ctor"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_UISCUT"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "UEME_UISCUT"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "notepad.exe"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "notepad.exe"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "C:\\Program Files\\x\\y.exe"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "C:\\Program Files\\x\\y.exe"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "ueme_ctlsession"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": "ueme_ctlsession"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": ""
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": ""
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": null
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": null
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": 0
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": 0
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": 42
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": 42
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": true
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {
+     "value_name": true
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": {}
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": {}
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/userassist",
+    "Record": null
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist",
+    "Record": null
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "USERASSIST",
+    "Record": {
+     "value_name": "notepad.exe"
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "USERASSIST",
+    "Record": {
+     "value_name": "notepad.exe"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Parser": "winreg/appcompatcache",
+    "Record": {
+     "value_name": "notepad.exe"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/appcompatcache",
+    "Record": {
+     "value_name": "notepad.exe"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_userassist_run",
+   "rec": {
+    "Record": {
+     "value_name": "notepad.exe"
+    }
+   },
+   "result": false,
+   "rec_after": {
+    "Record": {
+     "value_name": "notepad.exe"
+    }
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": "winreg/bam"
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/bam"
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": "bam"
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "bam"
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": "bam/x"
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "bam/x"
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": "a/bam/b"
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "a/bam/b"
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": "WINREG/BAM"
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "WINREG/BAM"
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": "winreg/bamboo"
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/bamboo"
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": "bambam"
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "bambam"
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": "winreg/xbam"
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/xbam"
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": "winreg\\bam"
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg\\bam"
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": ""
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": ""
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": null
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": null
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": 0
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": 0
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": false
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": false
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": 17
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": 17
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": true
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": true
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {
+    "Parser": [
+     "winreg/BAM"
+    ]
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": [
+     "winreg/BAM"
+    ]
+   }
+  },
+  {
+   "predicate": "plaso_is_bam",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "plaso_is_appcompatcache",
+   "rec": {
+    "Parser": "winreg/appcompatcache"
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/appcompatcache"
+   }
+  },
+  {
+   "predicate": "plaso_is_appcompatcache",
+   "rec": {
+    "Parser": "appcompatcache"
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "appcompatcache"
+   }
+  },
+  {
+   "predicate": "plaso_is_appcompatcache",
+   "rec": {
+    "Parser": "WINREG/AppCompatCache"
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "WINREG/AppCompatCache"
+   }
+  },
+  {
+   "predicate": "plaso_is_appcompatcache",
+   "rec": {
+    "Parser": "winreg/appcompatcache_extra"
+   },
+   "result": true,
+   "rec_after": {
+    "Parser": "winreg/appcompatcache_extra"
+   }
+  },
+  {
+   "predicate": "plaso_is_appcompatcache",
+   "rec": {
+    "Parser": "winreg/userassist"
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": "winreg/userassist"
+   }
+  },
+  {
+   "predicate": "plaso_is_appcompatcache",
+   "rec": {
+    "Parser": null
+   },
+   "result": false,
+   "rec_after": {
+    "Parser": null
+   }
+  },
+  {
+   "predicate": "plaso_is_appcompatcache",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  }
+ ]
+}

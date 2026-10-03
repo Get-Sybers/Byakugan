@@ -1,0 +1,418 @@
+"""Tests for the plaso execution-evidence CAR maps (mappings/plaso_exec.py).
+
+Rows are shaped exactly like the wrapped l2t JSONL the plaso lane emits
+(ingest/prepare.split_l2t): {"SourceImage","Timestamp","Parser","Record"} —
+field values copied from the real evidence in
+data_store/processed/log2timeline/jsonl/ where it exists (prefetch,
+appcompatcache, userassist, cron); amcache and bam rows are synthetic, shaped
+per the plaso parsers, as no real evidence carries those parsers yet (amcache
+timestamp_desc values per plaso's timeliner.yaml: the entry's key write is
+'Content Modification Time', the program's PE compile stamp 'Link Time').
+"""
+from __future__ import annotations
+
+import json
+import os
+
+from byakugan import pipeline
+from go_engine import go_normalize
+
+from byakugan import carmodel as _cm
+
+
+# --- rows (wrapped shape) ---------------------------------------------------
+
+_PREFETCH_EXEC = {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "Timestamp": "2009-11-20T09:31:29.671875Z",
+    "Parser": "prefetch",
+    "Record": {
+        "data_type": "windows:prefetch:execution",
+        "display_name": "NTFS:\\WINDOWS\\Prefetch\\SVCHOST.EXE-3530F672.pf",
+        "executable": "SVCHOST.EXE",
+        "image_hostname": "M57-JO",
+        "parser": "prefetch",
+        "path_hints": [],
+        "prefetch_hash": 892401266,
+        "run_count": 3,
+        "sha256_hash": "12f31dcc" + "0" * 56,
+        "timestamp_desc": "Last Time Executed",
+        "username": "-",
+        "version": 17,
+    },
+}
+
+_PREFETCH_VOLUME = {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "Timestamp": "2009-11-20T09:38:03.625000Z",
+    "Parser": "prefetch",
+    "Record": {
+        "data_type": "windows:volume:creation",
+        "display_name": "NTFS:\\WINDOWS\\Prefetch\\SVCHOST.EXE-3530F672.pf",
+        "image_hostname": "M57-JO",
+        "origin": "SVCHOST.EXE-3530F672.pf",
+        "parser": "prefetch",
+    },
+}
+
+_APPCOMPAT = {
+    "SourceImage": "log2timeline/jsonl/M57-JO.jsonl",
+    "Timestamp": "2004-02-10T18:31:30.000000Z",
+    "Parser": "winreg/appcompatcache",
+    "Record": {
+        "control_set": 2,
+        "data_type": "windows:registry:appcompatcache",
+        "display_name": "NTFS:\\WINDOWS\\system32\\config\\system",
+        "entry_index": 49,
+        "image_hostname": "M57-JO",
+        "key_path": "HKEY_LOCAL_MACHINE\\System\\ControlSet002\\Control\\"
+                    "Session Manager\\AppCompatibility",
+        "parser": "winreg/appcompatcache",
+        "path": "\\??\\C:\\WINDOWS\\system32\\hkcmd.exe",
+        "timestamp_desc": "File Last Modification Time",
+        "username": "-",
+    },
+}
+
+_USERASSIST_RUNPATH = {
+    "SourceImage": "log2timeline/jsonl/DESKTOP-PM6C56D.jsonl",
+    "Timestamp": "2009-11-20T01:23:45.000000Z",
+    "Parser": "winreg/userassist",
+    "Record": {
+        "data_type": "windows:registry:userassist",
+        # real LoneWolf shape: the per-user NTUSER.DAT under \Users\<name>\
+        # (a VSS shadow copy of it here) — the owning account is in the path
+        "display_name": "VSS2:NTFS:\\Users\\jcloudy\\NTUSER.DAT",
+        "image_hostname": "DESKTOP-PM6C56D",
+        "key_path": "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\"
+                    "CurrentVersion\\Explorer\\UserAssist\\"
+                    "{75048700-EF1F-11D0-9888-006097DEACF9}\\Count",
+        "number_of_executions": 1,
+        "parser": "winreg/userassist",
+        "username": "-",
+        "value_name": "UEME_RUNPATH:E:\\R54402.EXE",
+    },
+}
+
+_AMCACHE = {  # synthetic (no real amcache evidence yet); plaso AMCacheFileEventData shape
+    "SourceImage": "log2timeline/jsonl/synth.jsonl",
+    "Timestamp": "2023-05-01T10:00:00.000000Z",
+    "Parser": "amcache",
+    "Record": {
+        "data_type": "windows:registry:amcache",
+        # the parsed HIVE, never the program:
+        "display_name": "NTFS:\\Windows\\appcompat\\Programs\\Amcache.hve",
+        "filename": "Amcache.hve",
+        "full_path": "c:\\users\\bob\\downloads\\evil.exe",
+        "image_hostname": "HOST1",
+        "parser": "amcache",
+        "program_identifier": "0006a1c48f048a1c",
+        # real plaso shape: the PROGRAM's SHA-1 lives in file_identifier as the
+        # hive's "0000" record-length prefix + the 40-hex hash (the bare `sha1`
+        # key does not exist in the shipping build)
+        "file_identifier": "0000a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
+        # the artefact (Amcache.hve) has its own sha256 — must never leak as the
+        # program hash
+        "sha256_hash": "f" * 64,
+        # amcache's CompanyName version-resource string -> file.company
+        "company_name": "Contoso Ltd",
+        # the entry's key write (plaso: last_written_time) — the row that
+        # evidences execution. NB plaso gives the file's own $SI mtime row
+        # (file_modification_time) the very same description.
+        "timestamp_desc": "Content Modification Time",
+        "username": "-",
+    },
+}
+
+# the SAME entry's PE "Link Time" row: the header TimeDateStamp — when the
+# binary was COMPILED, not when it ran (plaso emits one row per stamp)
+_AMCACHE_LINK = json.loads(json.dumps(_AMCACHE))
+_AMCACHE_LINK["Timestamp"] = "2021-11-11T11:11:11.000000Z"
+_AMCACHE_LINK["Record"]["timestamp_desc"] = "Link Time"
+
+_BAM = {  # synthetic (no real bam evidence yet); plaso BackgroundActivityModerator shape
+    "SourceImage": "log2timeline/jsonl/synth.jsonl",
+    "Timestamp": "2023-05-01T11:00:00.000000Z",
+    "Parser": "winreg/bam",
+    "Record": {
+        "data_type": "windows:registry:bam",
+        "display_name": "NTFS:\\Windows\\System32\\config\\SYSTEM",
+        "image_hostname": "HOST1",
+        "key_path": "HKEY_LOCAL_MACHINE\\System\\ControlSet001\\Services\\bam\\"
+                    "State\\UserSettings\\S-1-5-21-1-2-3-1001",
+        "parser": "winreg/bam",
+        "path": "\\Device\\HarddiskVolume2\\Windows\\System32\\notepad.exe",
+        "timestamp_desc": "Last Time Executed",
+        "user_identifier": "S-1-5-21-1-2-3-1001",
+        "username": "-",
+    },
+}
+
+_CRON = {
+    "SourceImage": "log2timeline/jsonl/dualserver_logs.jsonl",
+    "Timestamp": "2020-08-26T11:46:13.000000Z",
+    "Parser": "text/syslog_traditional",
+    "Record": {
+        "command": "test -x /etc/cron.daily/popularity-contest && "
+                   "/etc/cron.daily/popularity-contest --crond",
+        "data_type": "syslog:cron:task_run",
+        "display_name": "OS:/data/dualserver_logs/logserver-logs-day2/log/message",
+        "hostname": "pits-gatsby",
+        "image_hostname": "",
+        "parser": "text/syslog_traditional",
+        "pid": 2534,
+        "reporter": "CRON",
+        "username": "root",
+    },
+}
+
+
+# --- prefetch ---------------------------------------------------------------
+
+def test_prefetch_execution_maps_to_process_create():
+    ev = go_normalize("plaso_exec_prefetch", _PREFETCH_EXEC)
+    assert ev is not None
+    assert ev["car_object"] == "process" and ev["car_action"] == "create"
+    assert ev["timestamp"] == "2009-11-20T09:31:29.671875Z"
+    # exe is the bare NAME plaso proves; image_path is NOT faked from it
+    assert ev["exe"] == "SVCHOST.EXE"
+    assert ev.get("image_path") is None
+    # the .pf ARTEFACT file must never leak into exe/image_path
+    assert ".pf" not in str(ev["exe"])
+    assert ev["_native"]["artefact_file"].endswith(".pf")
+    assert ev["_native"]["run_count"] == 3
+    assert ev["hostname"] == "M57-JO" and ev["source_host"] == "M57-JO"
+    # "-" username is an honest null, never an identity
+    assert ev.get("user") is None
+
+
+def test_prefetch_volume_creation_stays_raw():
+    assert go_normalize("plaso_exec_prefetch", _PREFETCH_VOLUME) is None
+
+
+# --- winreg family ----------------------------------------------------------
+
+def test_appcompatcache_maps_path_verbatim():
+    ev = go_normalize("plaso_exec_winreg", _APPCOMPAT)
+    assert ev is not None
+    assert ev["car_action"] == "create"
+    assert ev["image_path"] == "\\??\\C:\\WINDOWS\\system32\\hkcmd.exe"
+    assert ev["exe"] == "hkcmd.exe"
+    assert ev["_native"]["control_set"] == 2
+    assert ev["_native"]["timestamp_desc"] == "File Last Modification Time"
+
+
+def test_appcompatcache_execution_is_labelled_inferred():
+    ev = go_normalize("plaso_exec_winreg", _APPCOMPAT)
+    # the row is KEPT (analysts expect it): process create at the cached
+    # file's $SI mtime — but never as a bare assertion of a run at that time
+    assert ev["car_object"] == "process" and ev["car_action"] == "create"
+    assert ev["timestamp"] == "2004-02-10T18:31:30.000000Z"
+    assert ev["_native"]["execution_inferred"] is True
+    assert ev["_native"]["time_meaning"] == "file mtime, not run time"
+    # plaso's other shimcache stamps — the SYSTEM key write, XP's cache
+    # last-update time, an unknown desc — each say what the time means; the
+    # execution stays inferred on every one
+    for desc, meaning in (
+            ("Registry Last Written Time", "registry key write time, not run time"),
+            ("Last Time Executed", "XP-era cache last-update time (plaso labels it last run)"),
+            ("", "cache entry timestamp (see timestamp_desc), not run time")):
+        rec = json.loads(json.dumps(_APPCOMPAT))
+        rec["Record"]["timestamp_desc"] = desc
+        ev = go_normalize("plaso_exec_winreg", rec)
+        assert ev["car_action"] == "create" and ev["timestamp"], desc
+        assert ev["_native"]["execution_inferred"] is True, desc
+        assert ev["_native"]["time_meaning"] == meaning, desc
+
+
+def test_userassist_runpath_maps_and_derives_user_from_hive_path():
+    ev = go_normalize("plaso_exec_winreg", _USERASSIST_RUNPATH)
+    assert ev is not None
+    assert ev["exe"] == "R54402.EXE"
+    assert ev["image_path"] == "E:\\R54402.EXE"
+    # A1 (the #1 disk win): the owning account, derived from the per-user
+    # NTUSER hive path (\Users\jcloudy\NTUSER.DAT). The "-" native username is
+    # an honest null, so the path fills it.
+    assert ev["user"] == "jcloudy"
+    # the dead hive_user_sid native extract is retired — it scanned display_name
+    # for an S-1-5-21… SID, a form Plaso never renders into the hive path, so it
+    # matched 0% of real rows. Owner attribution now rides the canonical `user`.
+    assert "hive_user_sid" not in ev["_native"]
+    assert ev.get("sid") is None
+
+
+def test_userassist_counters_and_pidl_stay_raw():
+    for vn in ("UEME_CTLCUACount:ctor", "UEME_CTLSESSION", "UEME_UISCUT",
+               "UEME_RUNPIDL:%csidl2%\\x.lnk", "UEME_RUNCPL:timedate.cpl",
+               "UEME_RUNPATH", ""):
+        rec = json.loads(json.dumps(_USERASSIST_RUNPATH))
+        rec["Record"]["value_name"] = vn
+        assert go_normalize("plaso_exec_winreg", rec) is None, vn
+
+
+def test_userassist_decoded_bare_name_gets_exe_but_no_image_path():
+    # Win7+ plaso decodes value names; one with no separator can never fake a
+    # full image_path
+    rec = json.loads(json.dumps(_USERASSIST_RUNPATH))
+    rec["Record"]["value_name"] = "notepad.exe"
+    ev = go_normalize("plaso_exec_winreg", rec)
+    assert ev["exe"] == "notepad.exe" and ev.get("image_path") is None
+
+
+def test_amcache_program_hash_not_hive_hash_and_no_filename_leak():
+    ev = go_normalize("plaso_exec_winreg", _AMCACHE)
+    assert ev is not None
+    assert ev["car_object"] == "process" and ev["car_action"] == "create"
+    assert ev["timestamp"] == "2023-05-01T10:00:00.000000Z"   # the key write
+    assert ev["image_path"] == "c:\\users\\bob\\downloads\\evil.exe"
+    assert ev["exe"] == "evil.exe"
+    # A3: the PROGRAM's SHA-1 out of file_identifier ("0000"+40hex, prefix
+    # stripped) — never the hive's own sha256_hash
+    assert ev["sha1_hash"] == "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"
+    assert ev["sha1_hash"] != "f" * 64
+    # Amcache.hve (Record.filename/display_name) must never leak into exe
+    assert "Amcache" not in str(ev["exe"]) + str(ev["image_path"])
+
+
+def test_amcache_link_time_is_a_compile_stamp_never_an_execution():
+    ev = go_normalize("plaso_exec_winreg", _AMCACHE_LINK)
+    assert ev is not None
+    # a Link Time is when the binary was COMPILED: never a process create,
+    # and never an event at that time — a timestamp-less file record instead
+    assert ev["car_object"] == "file" and ev["car_action"] == "create"
+    assert ev["timestamp"] is None
+    assert ev["_native"]["compile_time"] == "2021-11-11T11:11:11.000000Z"
+    assert ev["_native"]["timestamp_desc"] == "Link Time"
+    # A3: the file entity carries the program SHA-1 (from file_identifier) and
+    # amcache's CompanyName -> file.company
+    assert ev["sha1_hash"] == "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"  # program, not hive
+    assert ev["company"] == "Contoso Ltd"
+    assert ev["file_path"] == "c:\\users\\bob\\downloads\\evil.exe"
+    assert ev["file_name"] == "evil.exe" and ev["extension"] == "exe"
+    assert "Amcache" not in str(ev["file_path"]) + str(ev["file_name"])
+    assert ev["_native"]["program_identifier"] == "0006a1c48f048a1c"
+    assert ev["hostname"] == "HOST1" and ev["source_host"] == "HOST1"
+    assert "exe" not in ev and "image_path" not in ev                   # not a process row
+    # its identity: the program as an ENTITY (path + its own SHA-1), minted,
+    # time-free (spindle.yml plaso_exec_winreg/amcache_link_time)
+    assert ev["guid"] and ev["_native"]["spindle_scope"] == "intrinsic"
+    assert set(ev["_native"]["spindle_key"]) == {"_obj", "_v", "file_path", "sha1"}
+    # nothing on the whole L2tWinreg route turns the compile stamp into a run
+    for key in pipeline.route("host.L2tWinreg"):
+        out = go_normalize(key, _AMCACHE_LINK)
+        assert out is None or out["car_object"] != "process", key
+
+
+def test_amcache_sha1_ignores_a_malformed_file_identifier():
+    # honest null: file_identifier that is not the "0000"+40hex shape yields no
+    # SHA-1 (never a truncated/garbage hash)
+    rec = json.loads(json.dumps(_AMCACHE))
+    rec["Record"]["file_identifier"] = "deadbeef"           # wrong shape
+    ev = go_normalize("plaso_exec_winreg", rec)
+    assert ev.get("sha1_hash") is None
+    # an empty CompanyName is an honest null, not ""
+    rec2 = json.loads(json.dumps(_AMCACHE_LINK))
+    rec2["Record"]["company_name"] = ""
+    ev2 = go_normalize("plaso_exec_winreg", rec2)
+    assert ev2.get("company") is None
+
+
+def test_amcache_link_time_without_full_path_is_still_no_execution():
+    rec = json.loads(json.dumps(_AMCACHE_LINK))
+    del rec["Record"]["full_path"]
+    ev = go_normalize("plaso_exec_winreg", rec)
+    assert ev["car_object"] == "file" and ev["timestamp"] is None
+    assert ev.get("file_path") is None and ev.get("file_name") is None
+
+
+def test_amcache_without_full_path_leaves_paths_null():
+    rec = json.loads(json.dumps(_AMCACHE))
+    del rec["Record"]["full_path"]
+    ev = go_normalize("plaso_exec_winreg", rec)
+    # filename ("Amcache.hve") is the ARTEFACT — the KQL's fallback onto it is
+    # deliberately dropped; null over near-miss
+    assert ev is not None
+    assert ev.get("exe") is None and ev.get("image_path") is None
+
+
+def test_bam_maps_sid_natively():
+    ev = go_normalize("plaso_exec_winreg", _BAM)
+    assert ev is not None
+    assert ev["exe"] == "notepad.exe"
+    assert ev["image_path"] == \
+        "\\Device\\HarddiskVolume2\\Windows\\System32\\notepad.exe"
+    assert ev["sid"] == "S-1-5-21-1-2-3-1001"
+
+
+def test_programscache_and_plain_winreg_stay_raw():
+    for parser in ("winreg/explorer_programscache", "winreg/winreg_default",
+                   "winreg/windows_usbstor_devices"):
+        rec = {"SourceImage": "x.jsonl", "Parser": parser,
+               "Record": {"parser": parser, "key_path": "HKLM\\X",
+                          "image_hostname": "M57-JO"}}
+        assert go_normalize("plaso_exec_winreg", rec) is None, parser
+
+
+# --- cron -------------------------------------------------------------------
+
+def test_cron_task_run_maps_command_pid_user():
+    ev = go_normalize("plaso_exec_cron", _CRON)
+    assert ev is not None
+    assert ev["car_object"] == "process" and ev["car_action"] == "create"
+    assert ev["command_line"].startswith("test -x /etc/cron.daily/")
+    # first token: a shell builtin — exe carries it, image_path is not faked
+    assert ev["exe"] == "test" and ev.get("image_path") is None
+    assert ev["pid"] == 2534 and ev["user"] == "root"
+    # image_hostname is empty (log-only source) — the syslog-RECORDED hostname
+    # fills hostname/source_host (recorded, not trusted)
+    assert ev["hostname"] == "pits-gatsby"
+    assert ev["source_host"] == "pits-gatsby"
+
+
+def test_cron_rooted_first_token_fills_image_path():
+    rec = json.loads(json.dumps(_CRON))
+    rec["Record"]["command"] = "/usr/lib/php/sessionclean 2>/dev/null"
+    ev = go_normalize("plaso_exec_cron", rec)
+    assert ev["image_path"] == "/usr/lib/php/sessionclean"
+    assert ev["exe"] == "sessionclean"
+
+
+def test_cron_image_hostname_wins_when_present():
+    rec = json.loads(json.dumps(_CRON))
+    rec["Record"]["image_hostname"] = "webserver01"
+    ev = go_normalize("plaso_exec_cron", rec)
+    assert ev["hostname"] == "webserver01"
+
+
+def test_other_syslog_lines_stay_raw():
+    rec = json.loads(json.dumps(_CRON))
+    rec["Record"]["data_type"] = "syslog:line"
+    assert go_normalize("plaso_exec_cron", rec) is None
+
+
+# --- model conformance ------------------------------------------------------
+
+def test_all_mapped_props_exist_on_the_model_objects():
+    model = _cm.load()
+    # the map DATA is now Go-authored (decoded from ir.json into the aggregate
+    # registry); this module owns these three keys.
+    from byakugan.mappings import MAPPINGS
+    plaso_exec_keys = ("plaso_exec_prefetch", "plaso_exec_winreg", "plaso_exec_cron")
+
+    def maps(entry):
+        for _, sub in entry.get("variants", []):
+            if sub:
+                yield sub
+
+    objects = set()
+    for key in plaso_exec_keys:
+        entry = MAPPINGS[key]
+        for m in maps(entry):
+            spec = model[m["object"]]
+            objects.add(m["object"])
+            assert m["action"] in spec["actions"], key
+            for prop in m["props"]:
+                assert prop in spec["fields"], (key, prop)
+    # the execution artefacts are process rows; the ONE file record is the
+    # amcache Link Time (compile stamp) row
+    assert objects == {"process", "file"}

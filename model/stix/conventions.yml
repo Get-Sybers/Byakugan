@@ -1,0 +1,399 @@
+# HAND-AUTHORED contract — validated by `python model/stix/validate.py`.
+# The CAR -> STIX 2.1 projection: how the object events + relationship timeline + native are DERIVED
+# into STIX at export (byakugan/stix.py). Nothing here is generated; it
+# records boundary DECISIONS — which STIX object a CAR row becomes, how its id
+# is minted, how both relationship classes and the reconstructed nodes appear.
+# Per-object field decisions live in objects.yml. Change a decision here AND in
+# stix.py; the validator plus tests/test_stix.py hold the two in step.
+
+contract:
+  name: car-stix-projection
+  version: 6                       # bump on any change to an id recipe or a target property
+                                   # 2: the row identity's forms (the spindle uuid5 + native.spindle_*),
+                                   #    the fold's native keys (contributions / contributed_by)
+                                   # 3: the behaviour layer — attack-pattern / indicator / indicates
+                                   #    (GLOBAL) + sighting + host identity (CASE-SCOPED), from the
+                                   #    runnable CAR analytics over the object events (analytics.py; see `behaviour`)
+                                   # 4: CAR_NS re-seeded to the byakugan URL and the producer to
+                                   #    identity|byakugan / "Byakugan" — every deterministic id re-mints
+                                   # 5: SROs carry the edge's association properties verbatim
+                                   #    (x_car_properties <- car_relationships properties; the #108
+                                   #    handle facts and the cascade_relationships.yml
+                                   #    association_properties registry). Additive: no id moves.
+                                   # 6: the evidence extension (dxdfir-evidence) legalizes every
+                                   #    x_car_* property and x-car-* object; global content SCOs go
+                                   #    PURE (no x_car_*, no extensions entry); the catalogue
+                                   #    (indicator / indicates) re-mints under catalogue_ns and
+                                   #    versions from the content pins (CAR corpus + ATT&CK index); attack-patterns are
+                                   #    REFERENCED via the exchange attack index, never emitted;
+                                   #    observations reference their connecting SROs; the producer
+                                   #    identity gains contact_information. Ids move: indicator,
+                                   #    indicates. See model/stix/changelog/v6.md.
+  stix_version: '2.1'
+  engine: byakugan/stix.py
+  validated_by: model/stix/validate.py
+  car_model: model/car/objects     # the 13 CAR objects objects.yml must cover exactly
+  derives_from: [car_<object>.jsonl, car_relationships.jsonl, native]   # the ONLY inputs — no second extraction path
+  exchange: >-
+    OpenCTI (or any STIX consumer) is an EXCHANGE interface only: the bundle is the contract, the
+    stores are the truth. A re-export from the same stores reproduces the same bundle byte for byte.
+
+# ---------------------------------------------------------------------------
+# Output shape.
+output:
+  file: stix_bundle.json           # <car-dir>/stix_bundle.json (or --out)
+  shape: >-
+    one STIX 2.1 bundle. Objects are ordered (the producer identity, the evidence
+    extension-definition, SCOs by type/id, observed-data by time, inferred nodes, relationships
+    by time, then the behaviour layer: indicator, sighting) so a re-export is byte-identical.
+  # The producer identity and CAR_NS below are wire-format constants — changing
+  # either re-mints every deterministic id ever issued, so they only move with
+  # a major contract version (last: v4).
+  producer: identity--<uuid5(CAR_NS, "identity|byakugan")> (name Byakugan, identity_class system)
+  cli: 'python -m byakugan.stix export <car-dir> [--out FILE] [--case ID] [--as-of ISO]'
+  pipeline_flag: '--stix (python -m byakugan --in/--batch ... --stix): export after the stores are built'
+  as_of: >-
+    the `created`/`modified` stamp for objects that carry no evidence time (a relationship row
+    without a timestamp, an inferred node without first_seen): --as-of, else the LATEST evidence
+    time in the stores — never the wall clock, so a re-export is idempotent.
+
+# ---------------------------------------------------------------------------
+# Id derivation — the two scopes of the D4 rule.
+id_derivation:
+  namespaces:
+    STIX_NS: 00abedb4-aa42-466c-9c01-fed23315a9b7          # STIX 2.1 §2.9 — mints SCO ids ONLY
+    CAR_NS: uuid5(NAMESPACE_URL, "https://github.com/Get-Sybers/Byakugan/stix")
+    case_ns: uuid5(CAR_NS, "case|<case>")
+    catalogue_ns: uuid5(CAR_NS, "catalogue")               # the behaviour catalogue (indicator, indicates)
+    case: >-
+      --case, default the car directory's name (the batch source name, e.g. windows_logs_<case>_<host>).
+      Two exports of the same stores under the same case are identical; under another case every
+      instance id changes and every global id stays.
+
+  global:
+    # CONTENT-KEYED — the same content is the same object in every case, for every consumer.
+    rule: >-
+      STIX 2.1 §2.9 — UUIDv5 over STIX_NS and the canonical JSON (sorted keys, no whitespace,
+      UTF-8) of the ID-contributing properties. What contributes is exactly what the spec lists,
+      so an independent producer mints the same id for the same content.
+    entities:
+      file (content):
+        contributing: {hashes: {<algo>: <hex>}}
+        hash_choice: 'ONE hash: the first present in MD5, SHA-1, SHA-256, SHA-512 (§2.9)'
+        source: >-
+          superset content_node rows of kind file_content (derive.content_entities over the same
+          events); the nodes ONE record co-references (md5:x, sha256:y on the same row) are unioned
+          into one file carrying all its hashes — the id is then from the preferred hash of the
+          union.
+        pure: >-
+          the content file carries hashes and NOTHING else: `name` and `extensions` both contribute
+          to the §2.9 file id, so the object has no name, no x_car_* property and no extensions
+          entry. Every name/path/signer it was seen under stays on the case-scoped instance SCOs,
+          joined through x_car_content_ref; a hash conflict inside a union is tallied
+          (content_hash_conflicts), never carried.
+      user-account (real SID):
+        contributing: {user_id: <SID>}
+        accept: 'S-1-5-21-* (local/domain) and S-1-12-1-* (Azure AD) only — relationships.yml derived.identities.sid'
+        note: >-
+          account_login contributes to the id, so the login NAME is display_name; the id is the SID
+          alone. PURE like the content file: no x_car_* property, no extensions entry — login/host
+          aggregates stay on the case-scoped instances and observations. Well-known SIDs
+          (S-1-5-18/19/20) identify no account and become per-host instances.
+      ipv4-addr / ipv6-addr: {contributing: {value: <canonical address>}}
+      domain-name: {contributing: {value: <verbatim>}}
+      url: {contributing: {value: <verbatim>}}
+      email-addr: {contributing: {value: <verbatim>}}
+  catalogue:
+    # The behaviour catalogue — GLOBAL, catalogue-keyed, case-independent: the
+    # same detection is the same object in every case. §2.9 reserves STIX_NS
+    # to SCOs, so the catalogue mints under catalogue_ns (a CAR_NS child).
+    # created = EPOCH; modified = the LATER of the two content pins — the CAR
+    # corpus (behaviour.corpus_pin) and the ATT&CK index (kill_chain_phases
+    # and the indicates targets read it) — so regenerating EITHER pin moves
+    # `modified` (BP §3.1; stix.catalogue_modified).
+    rule: 'UUIDv5 under catalogue_ns over the name "<type>|<key parts joined by |>"'
+    entities:
+      indicator: [analytic_id]
+      relationship (indicates): [indicates, analytic_id, technique_id]
+    attack-pattern: >-
+      NEVER minted — techniques are referenced by MITRE's authoritative
+      attack-pattern ids, resolved through the pinned exchange attack index
+      (byakugan/exchange/attack_index.py; revoked ids follow revoked-by to
+      their successors). Sanctioned non-local refs into the common repository
+      (BP §2.2 / §3.3); a technique the index cannot resolve is counted
+      (behaviour_techniques_unresolved), never invented.
+
+  case_scoped:
+    # INSTANCE / OBSERVATION — a thing on a host in a case; an observation; an edge.
+    rule: 'UUIDv5 under case_ns over the name "<type>|<key parts joined by |>"'
+    entities:
+      process: [source_host, guid]              # guid = the process ENTITY; owning_guid on an access row
+      process (service): [source_host, service, name]
+      file (instance): '[source_host, path] | [source_host, name] | [source_host, row, object, guid]'
+      directory: [source_host, path]
+      windows-registry-key: '[source_host, key, key] | [source_host, row, registry, guid]'
+      network-traffic: [source_host, object, guid]          # object = flow | socket | http
+      user-account (no real SID): '[source_host, id, <sid|uid>] | [source_host, name, <user>]'
+      email-message: [source_host, guid]
+      x-car-thread: [source_host, guid]
+      x-car-record: [source_host, object, guid]             # the fallback when a row projects no entity (never for a guid-less row)
+      observed-data: [source_host, object, guid, car_action, timestamp, target_guid, access_level]
+      relationship: [class, verb, source_ref, target_ref, timestamp, method]
+      x-car-inferred-node: [source_host, node_id]
+      bundle: [case]
+      # the behaviour TIMELINE — case-scoped evidence, like the observed-data
+      sighting: [analytic_id, guid, timestamp, clause]      # one per analytics.BehaviourHit
+      identity (host): [source_host]                        # where_sighted_refs target (identity_class system)
+    observed_data_key_note: >-
+      the pipeline same-event key (relationships.yml dedupe.key) — the same recipe the CAR->ECS
+      contract recommends for the Elastic document _id, so an observation and its ECS document
+      correspond; the pipeline folds same-key rows into one before export (dedupe.fold), so there
+      is one observation per key.
+    deviation: >-
+      STIX 2.1 asks for UUIDv4 on process (no contributing properties) and spec-UUIDv5 on directory /
+      windows-registry-key / network-traffic / email-message. Case-scoped UUIDv5 is chosen
+      deliberately: a re-export of the same case is idempotent, and the same path / key / socket on
+      two hosts never collapses into one object. A consumer needing strict conformance re-mints
+      those ids; the global ids are already conformant.
+
+# ---------------------------------------------------------------------------
+# Identity conventions — mirror elastic/projection/conventions.yml (CAR -> ECS).
+identity_conventions:
+  guid: >-
+    observed-data.x_car_event_id (ECS event.id) — the row identity, in one of four forms, never
+    re-minted here: a sensor's own id (a Sysmon ProcessGuid; a Zeek uid / fuid), a record id the
+    map renders (<object>-<host>-<channel>-<record number> for an EVTX record; the JLECmd /
+    RECmd field forms), a memory-object offset (Anamnesis's proc-<hex>), or the spindle uuid5 a
+    disk-image row is MINTED with — uuid5(SPINDLE_NS, canonical_json(native.spindle_key)), the
+    registry byakugan/spindle.yml (snapshot model/spindle/): native.spindle_key is the
+    readable key (_obj, _v = the entry's identity-key version, the identity names),
+    native.spindle_scope is intrinsic | positional, native.spindle_ref is where the record came
+    from (outside the key). The forms are the registry's `external:` section and its entries.
+    On a process row it is also the process SCO key when owning_guid is absent (create /
+    terminate); on an access row guid is a record id.
+  owning_guid: >-
+    observed-data.x_car_process_entity_id (ECS process.entity_id) and the `owning_guid` role in
+    x_car_roles: the ACTING process SCO the observation references. On a process row it wins the
+    entity (Sysmon 10: SourceProcessGUID).
+  parent_guid: process.parent_ref (ECS process.parent.entity_id) — the resolved parent's process SCO
+  link_confidence: >-
+    observed-data.x_car_link_confidence, the verbatim word. On an SRO the STIX `confidence`
+    (definitive 100, heuristic 50, inferred 20) plus x_car_confidence verbatim.
+  source_artefact: observed-data.x_car_source_artefact (ECS event.provider)
+  source_host: observed-data.x_car_source_host (ECS host.name); x_car_source_host on every instance SCO except directory (a value SCO — host already in its case-scoped key)
+  timestamp: >-
+    observed-data.first_observed = last_observed (UTC, millisecond precision); the verbatim string in
+    x_car_timestamp. A process create row also stamps process.created_time.
+  native: >-
+    observed-data.x_car_native (ECS car.native) — the whole bag, keys verbatim. It is provenance,
+    never a source of SROs or embedded refs (see engine_declarations.inheritance_trace).
+  homeless_fields: >-
+    observed-data.x_car_fields — every populated CAR column no SCO property homed, verbatim (the
+    ECS car.<object>.<field> rule). A typed STIX property whose value does not parse (a pid that is
+    not an integer, an address that is not an IP, a timestamp that is not ISO) is left unset and
+    the value stays here.
+
+# ---------------------------------------------------------------------------
+# Observations and the additive fill.
+observation:
+  one_per_row: >-
+    one observed-data per object event row, number_observed 1, object_refs = the row's SCOs (entity,
+    acting process, accounts, addresses, files, directories) plus the content entities it
+    references (superset entity_ref); x_car_roles = {ref: [the CAR fields that named it]}.
+  connected: >-
+    after the relationship pass, every SRO both of whose ends an observation references is added
+    to that observation's object_refs — each observation references a connected graph
+    (BP §5.9 / spec §4.14), aligned with the exchange layer's practice.
+  labels: ['car:<object>']
+  no_timestamp: >-
+    a row whose timestamp does not parse keeps its SCOs but gets NO observed-data (counted as
+    observations_skipped_no_timestamp) — an observation time is never invented.
+  no_identity: >-
+    a row with no guid keys NOTHING off itself: its content- and path-keyed SCOs stand (a file at
+    a path, an account, an address), but no row-keyed SCO, no x-car-record and no observed-data
+    are minted (counted as observations_skipped_no_identity) — an id is never derived from a
+    row's position in the export (A9). No mapped row is guid-less by design
+    (spindle.verify_registry refuses a map leaf without a guid form): such a row is a malformed
+    record.
+  additive: >-
+    two rows on one entity (a process create then its terminate; a key set twice) fill the SAME
+    SCO: a property already set is never overwritten, lists are unioned, a disagreeing scalar goes
+    to x_car_conflicts on the object — the D4 superset rule at the STIX layer.
+  no_minting_from_spokes: >-
+    a spoke never mints its owner: the acting-process columns fill the owning process SCO only when
+    the cascade resolved owning_guid (that process row exists); an unresolved owner is derive's
+    inferred_node, projected as x-car-inferred-node, never as a process SCO.
+
+# ---------------------------------------------------------------------------
+# Relationships — both classes, from the relationship timeline only.
+relationships:
+  source: 'the relationship timeline (car_relationships.jsonl) — every row, both classes; nothing is re-derived from the object events or native'
+  relationship_type: the ATT&CK verb verbatim (lower-case, hyphenated) — the cascade vocabulary
+  labels: ['car:<class>', 'car:<method>']
+  confidence: {definitive: 100, heuristic: 50, inferred: 20}
+  start_time: the edge timestamp (absent when the row has none)
+  x_car: [class, method, confidence, identity_key, inferred_end, corroborated_by, properties, source_host]
+  properties: >-
+    x_car_properties = the edge row's association properties verbatim (the facts OF the
+    relationship — a handle's access mask, an injection's start address; the
+    cascade_relationships.yml association_properties registry) — the ECS car.rel.properties
+    peer. Absent on an edge with none; never a source of SCO properties or refs.
+  ends: >-
+    objects.yml <object>.sro_end — the row's entity SCO, or the row's observed-data for the event
+    objects (authentication, user_session) that are not things; an inferred_end resolves to the
+    x-car-inferred-node of that node_id on that host.
+  unresolved: an end no store row backs is counted (relationships_unresolved), never invented
+  unmapped: >-
+    an edge whose verb is empty/unmappable is counted (relationships_unmapped), never emitted —
+    the closed vocabulary excludes the generic verbs (related-to / duplicate-of / derived-from)
+    by construction; doubt is tallied, not modeled
+  classes:
+    declared: the validated cascade edges (relationships.yml / cascade_relationships.yml; superset.edges_from_events)
+    derived: the strong-identity 1:1 links and reconstructions (relationships.yml derived:; derive.py)
+
+# ---------------------------------------------------------------------------
+# Inferred nodes — reconstructed, flagged, never asserted.
+inferred_nodes:
+  type: x-car-inferred-node        # an opinion-style custom object, never an SCO of the would-be type
+  source: 'the inferred-node export (car_inferred.jsonl); an inferred_end an edge names without a row is flagged from the edge'
+  never:
+    - referenced by an observed-data (it was not observed)
+    - written as a car_<object> row or a <would-be> SCO
+  flags: {x_car_inferred: true, x_car_asserted: false, labels: ['car:inferred', 'car:reconstructed'], confidence: 20}
+  carries: >-
+    x_car_would_be (the SCO type it would have been), x_car_object, x_car_node_id, x_car_identity_key /
+    x_car_identity_value, x_car_method, x_car_reason, x_car_corroborated_by (guids),
+    x_car_corroborating_refs (those records' observed-data), x_car_properties (what the observed
+    records said about it — pid, image_path…, conflicts kept), x_car_first_seen / x_car_last_seen.
+
+# ---------------------------------------------------------------------------
+# The behaviour layer — the third pillar (README: normalise -> relate -> flag TTPs).
+# The finished object events are read back through the RUNNABLE MITRE CAR
+# analytics (analytics.py — the events only, so the "derived from the model"
+# contract holds) and each hit becomes a Sighting of the technique's Attack-Pattern.
+# Evidence-driven: only analytics that FIRED in the case appear; a row matching
+# nothing adds nothing. The catalogue content is computed from the full runnable
+# corpus (case-independent), so the GLOBAL ids carry identical content everywhere.
+behaviour:
+  source: 'the object events via analytics (the runnable single-search+filter CAR analytics)'
+  corpus_pin:                        # third_party/car — catalogue `modified` derives from it
+    commit: 1b922fe1527d956e222a99473472e594f10f610b
+    date: '2025-05-16T14:27:55.000Z'
+  catalogue:                         # GLOBAL, catalogue-keyed (id_derivation.catalogue)
+    indicator: >-
+      one per runnable CAR analytic (the detection). name = the analytic title; pattern_type = "car"
+      (a trust-group value: the CAR analytic IS the pattern); pattern = its pseudocode (or the id);
+      indicator_types = [malicious-activity]; kill_chain_phases = the pinned attack index's phases
+      over the analytic's coverage (techniques + tactics — generated, never a hand table);
+      external_references = [{mitre-car, CAR-xxxx, https://car.mitre.org/analytics/CAR-xxxx}];
+      created = EPOCH, modified = corpus_pin.date.
+    indicates: >-
+      indicator --indicates--> attack-pattern, one per technique/subtechnique the analytic covers;
+      target_ref = MITRE's authoritative attack-pattern id from the pinned index (revoked-by
+      substitution) — referenced, never a bundle member (id_derivation.catalogue.attack-pattern).
+    retirement: >-
+      a retired analytic emits a `revoked: true` indicator tombstone (same catalogue id,
+      modified = the retirement date) for one contract version before disappearing —
+      stix.RETIRED_ANALYTICS, empty when nothing is retired.
+  timeline:                          # CASE-SCOPED evidence — like the observed-data
+    sighting: >-
+      one per BehaviourHit. sighting_of_ref = the analytic's indicator; observed_data_refs =
+      [self.obs[(source_host, car_object, guid)]] when the matched row produced an observed-data
+      (omitted when it did not — the sighting still stands); where_sighted_refs = the host identity;
+      first_seen = last_seen = the row's instant (stix_ts(hit.timestamp), omitted when it does not
+      parse); count = 1. Keyed on [analytic_id, guid, timestamp, clause] so a re-export is identical.
+      Carries x_car_analytic / x_car_clause / x_car_object / x_car_action / x_car_event_id (the
+      spindle guid) / x_car_source_host / x_car_techniques.
+    host_identity: 'identity (identity_class system, name = source_host), keyed [source_host] — the where_sighted target'
+  never:
+    - fabricated: a technique/detection with no analytic that fired in the case is not emitted
+    - a native key or object-event re-derivation as a sighting source (the hits come from analytics.py over the events)
+
+# ---------------------------------------------------------------------------
+# The evidence extension (contract v6) — STIX 2.1 §7.3, the dxdfir-evidence
+# extension-definition every bundle carries.
+extensions:
+  dxdfir-evidence:
+    id: extension-definition--<uuid5(DX_NAMESPACE, "extension-definition|dxdfir-evidence")>
+    extension_types: [toplevel-property-extension, new-sco, new-sdo]
+    created_by_ref: the producer identity (output.producer)
+    schema: 'model/schema/extensions/dxdfir-evidence.schema.json (raw github.com/Get-Sybers path)'
+    properties: >-
+      the closed x_car_* top-level list — EVIDENCE_PROPERTIES in
+      byakugan/exchange/objects.py (47 names), harvested from the EMITTED
+      surface (stix.py + this contract + objects.yml); an emitted x_car_* name
+      outside the list is a conformance finding, never silently admitted.
+    entries: >-
+      every object carrying an x_car_* property declares
+      {extensions: {<id>: {extension_type: toplevel-property-extension}}};
+      x-car-thread and x-car-record declare new-sco; x-car-inferred-node
+      declares new-sdo. PURE global content SCOs (file-by-hash,
+      user-account-by-SID) and the value SCOs (ip / domain / url / email-addr /
+      directory) carry no entry.
+    in_bundle: 'the definition object rides every bundle, ordered after the producer identity'
+
+# ---------------------------------------------------------------------------
+# The three engine declarations the projection depends on.
+engine_declarations:
+  # 1. per-leaf hash_subject: what a row's md5/sha1/sha256 fields HASH — the
+  #    file instance those hashes land on (and bind to the global content file).
+  #    Each leaf object with hash fields names exactly one path column.
+  hash_subject:
+    process: image_path            # the process image (ECS process.hash.*)
+    file: file_path                # the file itself (ECS file.hash.*)
+    module: module_path            # the loaded module, not the loading image (ECS dll.hash.*)
+    driver: image_path             # the driver image (ECS file.hash.*)
+
+  # 2. the inheritance trace is kept in native.
+  inheritance_trace:
+    rule: >-
+      The cascade's null-only inheritance (relationships.yml inheritance.from_owning_process /
+      from_parent_process / from_owning_flow) writes inherited context INTO the spoke's CAR
+      columns with no per-field marker. The only trace of what the cascade and the derived pass
+      did is what they wrote into `native` — as is the row identity's own trace (the spindle key,
+      its scope, the record's provenance) and the fold's (which rows contributed). The projection
+      carries that trace VERBATIM (observed-data.x_car_native) and never re-derives an SRO or an
+      embedded _ref from it — every SRO comes from the relationship timeline. Inherited process context on a
+      spoke is not re-asserted as a second process SCO: the spoke's acting columns fill the
+      OWNING process SCO it already references (see objects.yml <object>.acting).
+    native_keys:                   # written by enrich.py / derive.py / normalize.py (named in
+                                   # spindle.py), read by nothing here
+      - executed_as_process_guid
+      - executed_as_process_link
+      - executed_as_process_count
+      - flow_guid
+      - flow_link
+      - target_session_guid
+      - target_session_link
+      - subject_session_guid
+      - subject_session_link
+      - session_login_guid
+      - session_logout_guid
+      - session_end
+      - target_process_guid
+      - target_process_link
+      - coalesced_sources
+      - coalesced_conflicts
+      - contributions            # the fold: how many rows this row is (relationships.yml dedupe.fold)
+      - contributed_by           # the fold: [{source_artefact, spindle_ref}] per contributor
+      - spindle_key              # the row identity: the readable key the guid was minted from
+      - spindle_scope            # intrinsic | positional
+      - spindle_ref              # the record's provenance, outside the key
+
+  # 3. the two native-only join keys: the strong identities the DERIVED engine
+  #    joins on that have NO CAR column on their object. They live in native
+  #    only, so the projection reads them from nowhere: the derived SRO they
+  #    yield comes from the relationship timeline, and the key itself rides in x_car_native.
+  native_only_join_keys:
+    - object: http
+      key: native.resp_fuids
+      joins: file.guid             # the Zeek fuid the file record IS
+      rule: http_file_transfer     # relationships.yml derived.links
+      class: derived
+      projection: none — the `contained` SRO comes from the relationship timeline
+    - object: thread
+      key: native.TargetProcessGuid
+      joins: process.guid          # the Sysmon 8 target process
+      rule: injection_target       # relationships.yml derived.reconstruct
+      class: derived
+      projection: none — the `accessed` SRO (or its inferred end) comes from the relationship timeline

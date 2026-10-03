@@ -1,0 +1,156 @@
+# Contributing
+
+## Setup
+
+The object model is reconstructed live from **pinned submodules**, so clone
+recursively (or init them after):
+
+```
+git clone --recursive https://github.com/Get-Sybers/Byakugan
+# or, in an existing checkout:
+git submodule update --init --recursive
+pip install -e '.[dev]'          # loose install, from pyproject's extras
+make -C go build                 # the Go parse engine — REQUIRED to run the pipeline
+```
+
+For the EXACT versions this repo is proven against (what CI and the benchmark
+ran on), install the pinned inventory instead:
+
+```
+pip install -r requirements-dev.txt    # pulls in requirements.txt too
+pip install -e .                       # the package itself, no extras
+```
+
+- `third_party/car` — the MITRE CAR data model (the 13 CAR objects).
+- `third_party/attack-datasources` — the ATT&CK data-sources model (the superset
+  objects + the relationship catalogue).
+
+**Go >= 1.24 is a prerequisite.** The parse stage (raw file → pre-enrichment CAR
+events) is the Go engine in `go/`; `python -m byakugan` shells out to
+`go/bin/byakugan-parse` for every file source and fails with a build hint if it
+is absent. Point `$BYAKUGAN_PARSE_BIN` at a binary to use one from elsewhere.
+After changing a mapping table, a marker or a route, re-export the engine's IR
+(`python -m byakugan.export_ir`) and rebuild — `export_ir --check` is the drift
+gate. See [go/README.md](go/README.md).
+
+A model refresh is a **submodule-pin bump**, never a hand-edit — nothing about the
+model or the ATT&CK vocabulary is committed as a copy (see
+[docs/DataModel.md](docs/DataModel.md)).
+
+## Dependencies
+
+Every module Byakugan depends on is declared in one of three traced files, so an
+upgrade is a diff in a known place rather than an archaeology exercise:
+
+| file | what | upgrade |
+|---|---|---|
+| [`requirements.txt`](requirements.txt) | runtime (currently just `pyyaml` — everything else is the stdlib) | edit the range here **and** in `pyproject.toml` `[project] dependencies`, then `pip install -r requirements.txt` |
+| [`requirements-dev.txt`](requirements-dev.txt) | the exact `pytest` / `yamale` / `yamllint` versions this repo is proven against (`pyproject`'s `dev` extra keeps the loose floors) | bump the pin, then `pip install -r requirements-dev.txt` |
+| [`go/go.mod`](go/go.mod) | the parse engine — **stdlib-only**, no `require` block and no `go.sum` | bump the `go` directive (+ the CI toolchain version), then `make -C go build test` |
+
+After ANY dependency change, re-prove the repo:
+
+```
+python -m pytest -q
+python elastic/projection/validate.py && python model/stix/validate.py
+python -m byakugan.gen_sources --check && python -m byakugan.spindle --check
+python -m byakugan.export_ir --check && make -C go build test
+```
+
+`tests/test_requirements_sync.py` keeps the files honest: it fails if
+`requirements.txt` and `pyproject.toml` disagree on a package or a range, if the
+dev pins drift from the `dev` extra or fall below its floors, or if the Go module
+ever gains a third-party dependency.
+
+## Everyday commands
+
+```
+python -m byakugan --in <file-or-dir> --out <dir>   # run one source
+python -m byakugan --batch <processed_dir>          # every source
+python -m byakugan.gen_sources                      # regenerate sources/ after a map change
+python -m byakugan.timeline <car-dir>               # unified CAR timeline (car.db + superset.db)
+python -m byakugan.verify <car-dir>                 # the CAR run-through over a materialised tree
+python -m byakugan build|timeline|verify|car-vocab  # the env-driven sub-tools (cli.py; BYAKUGAN_<SUBTOOL>_*)
+python -m byakugan.build_data_model --write out/    # export the models for inspection
+python -m byakugan.export_ir                        # re-export the Go engine's IR after a map change
+make -C go build test                               # build the parse engine + go vet/test
+python scripts/bench-parse.py --repeat 3            # Go engine vs the Python path it replaced
+pytest -q                                                 # tests (parity suite included)
+```
+
+The import package is `byakugan` — write all code against it.
+
+CI (`.github/workflows/lint.yml`) runs `gen_sources --check`, `spindle --check`
+(the identity registry, its snapshot and the golden vectors), `export_ir --check`,
+`make -C go build test`, `yamale`, `yamllint`, and `pytest` (whose parity suite
+builds the engine and byte-compares it against the frozen Python reference) —
+with submodules checked out and a Go toolchain installed.
+
+## Code style — [module-best-practices](https://github.com/mattdesl/module-best-practices)
+
+- **Small, focused, separate files** — one artefact family per file in
+  `mappings/` (auto-discovered). Prefer another small file over a big one; this
+  guide favours that over deep subpackage nesting, so the module layout stays flat.
+- **Don't duplicate** — shared map helpers live in `mappings/_common.py`
+  (`R`/`plaso_rec`/`PLASO_HOST`/`spindle`, `EVTX_HOST`/`EVTX_FQDN`/`EVTX_KEEP`/
+  `EVTX_RECORD_GUID`/`evtx_payload_field`), and the one id recipe (namespaces +
+  canonical JSON, shared by the STIX projection and the spindle row guid) in
+  `ids.py`. Import them rather than re-defining.
+- **Data, not code** — the cascade rules (`relationships.yml`), the
+  relationship-verb bridge (`cascade_relationships.yml`), the spindle
+  row-identity registry (`spindle.yml` — which fields a disk-image row's guid
+  is minted from; snapshot `model/spindle/`), and the source manifests
+  (`sources/`, generated) are data; the engine implements mechanics.
+- **Honest mapping** — map a record only when it fits a canonical CAR
+  object + action; nulls/duplicates are fine, near-misses are not (see
+  [docs/CAR-Relations.md](docs/CAR-Relations.md)). Unvalidated inferences go in
+  `to-be-validated/`.
+- Naming: `readers.py` = the memory-passthrough reader (the mapped-artefact
+  readers are the Go engine now); `sources_model.py` = the source-manifest
+  generator; `sources/` = its generated output. Keep those distinct.
+
+## Adding a map
+
+1. Add `mappings/<artefact>.py` exporting `MAPPINGS` (+ `PREDICATES` if needed),
+   using the `_common` helpers.
+2. Route it in `pipeline.py` (`ROUTES` / `EVTX_MAPS`) if it needs filename routing.
+3. `python -m byakugan.gen_sources` and commit the regenerated `sources/`.
+4. A disk-image (l2t/Plaso) map names its row identity: add the entry to
+   `spindle.yml` — `object`, `kind` (`record` | `entity`), `scope: intrinsic`,
+   `version: 1`, `validated_against: [plaso]`, `stable_across`, the `identity`
+   fields and a `golden` sample — reference it with
+   `_common.spindle("<entry>")`, then `python model/generate.py` and commit
+   the regenerated `model/spindle/` (identity, record and golden). Any other
+   map's raw guid form must be one of the registry's `external:` forms.
+   **The P7 rule:** a leaf that emits no timestamp (`ts: None` — a PE's
+   compile stamp, an amcache Link Time) MUST name a time-free `kind: entity`
+   entry; `spindle --check` refuses a Plaso leaf without an entry and a timed
+   identity on an untimed leaf.
+5. `python -m byakugan.export_ir` (the engine reads the tables through the IR)
+   and, for a new predicate, port it in
+   `go/internal/predicates/predicates_<family>.go` — `ir-check` and the Go
+   registry test fail on an unported name.
+6. Add a test and a parity fixture (`tests/parity/genf/<family>.py`); run
+   `pytest -q` and `make -C go build test`.
+
+## Changing a row identity (the change protocol)
+
+An entry's identity fields, names, rendering or golden sample change **only
+with a `version` bump** — the version is hashed into every guid as `_v`:
+
+1. edit the entry in `spindle.yml` and bump its `version`;
+2. `python model/generate.py` — regenerates `model/spindle/` (the golden vector
+   moves with the version; the generator refuses a guid that moved without it);
+3. commit the snapshot, `golden.yml` included, and the regenerated `sources/`
+   (each manifest states its identity entries and versions);
+4. rebuild the stores (`--batch --force`) — every guid of that entry re-mints
+   (a remint / audit tool is a follow-up). The id recipe itself (namespaces,
+   canonical JSON) never changes under a version bump: that would move every
+   guid at once and is a new spindle.
+
+## Branch / release flow
+
+- Land work on **`dev`**.
+- Promote to **`main` via a `dev → main` pull request** (never a ref
+  fast-forward); CI must be green. Maintainers merge — open the PR and leave it.
+- Follow **SemVer** for `version` in `pyproject.toml`.

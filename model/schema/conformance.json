@@ -1,0 +1,156 @@
+{
+ "title": "The named check-pass conformance table (epic &1 #136): both engines provably gated against one schema",
+ "generated_by": "python -m byakugan.conform --write-table",
+ "checks": [
+  {
+   "name": "class-regen",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "The generated classes + vocabulary regenerate byte-identically"
+  },
+  {
+   "name": "class-structure",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "Structural gate over every class declaration: facets present, closed"
+  },
+  {
+   "name": "conformance-table",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "model/schema/conformance.json byte-matches regeneration — the table"
+  },
+  {
+   "name": "elastic-contract",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "The ECS projection contract validates against the CAR model"
+  },
+  {
+   "name": "elastic-rendered",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "The rendered Elastic assets (component/index templates, Kibana bundle)"
+  },
+  {
+   "name": "enrichment-structure",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "enrichment/rules.yaml validates against the Enrichment Rules layer"
+  },
+  {
+   "name": "identity-object-ids",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "identity/object-ids.yaml (the R1-R5 scope table) names exactly the five"
+  },
+  {
+   "name": "identity-registry",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "byakugan/spindle.yml validates against the Identity Rules layer"
+  },
+  {
+   "name": "mapping-coverage",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "The declarations and ir.json hold each other BOTH ways: every ir lane"
+  },
+  {
+   "name": "mapping-structure",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "Every generated mappings/*.yaml validates against the Model Mapping"
+  },
+  {
+   "name": "profile-coverage",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "The design's gate: each profile's lanes exist in the mapping layer and"
+  },
+  {
+   "name": "profile-structure",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "Every generated profiles/*.yaml validates against the Parser Profile"
+  },
+  {
+   "name": "row-gate",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "The engine-input load gate is live: row.schema.json exists, compiles,"
+  },
+  {
+   "name": "schema-constants",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "constants.yaml regenerates byte-identically from the code constants"
+  },
+  {
+   "name": "schema-json",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "Every JSON file under model/schema/ parses"
+  },
+  {
+   "name": "schema-namespace-values",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "The literal uuids in constants.yaml equal the code-derived values"
+  },
+  {
+   "name": "schema-version-lockstep",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "ONE version: constants.yaml == extension-definition == its schema file"
+  },
+  {
+   "name": "wire-schemas",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "Every generated wire schema is a valid 2020-12 schema whose $refs all"
+  },
+  {
+   "name": "x-property-registry",
+   "engine": "python",
+   "command": "python -m byakugan.conform --strict",
+   "proves": "The R6 standing harvest gate: the emitted surface (harvested), the"
+  },
+  {
+   "name": "gen-ir-check",
+   "engine": "go",
+   "command": "make -C go gen-ir-check",
+   "proves": "ir.json byte-matches the Go authoring tables"
+  },
+  {
+   "name": "registry-against-ir",
+   "engine": "go",
+   "command": "go test github.com/Get-Sybers/Byakugan/go/internal/predicates",
+   "proves": "registered predicate funcs == ir.predicate_names, both ways"
+  },
+  {
+   "name": "finding-wire-parity",
+   "engine": "go",
+   "command": "go test github.com/Get-Sybers/Byakugan/go/internal/conform",
+   "proves": "the Go Finding record serialises byte-compatibly with Python's"
+  },
+  {
+   "name": "schema-gen-check",
+   "engine": "python",
+   "command": "python -m byakugan.schema_gen --check",
+   "proves": "every generated model/schema file byte-matches regeneration"
+  },
+  {
+   "name": "row-load-gate",
+   "engine": "python",
+   "command": "byakugan load (tallies `nonconforming` per source)",
+   "proves": "graph-engine input rows validate against wire/row.schema.json at load, count-and-carry"
+  },
+  {
+   "name": "wirecheck",
+   "engine": "python",
+   "command": "python -m byakugan.wirecheck <bundle.json>",
+   "proves": "produced bundles validate against the composed wire schemas, count-and-carry"
+  }
+ ]
+}

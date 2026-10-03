@@ -1,0 +1,992 @@
+# Matched evidences matrix — 99 source rows individually matched by mechanism
+# into canonical rows. sources = [repo#row] from the per-source extracts
+# (docs/research/dfir-context/); tier disagreements reconciled CONSERVATIVELY
+# (weaker tier wins, disagreement noted). Matching judgments at the end.
+# row ids refer to the consolidated validated-rows.json index (0-98).
+
+evtx:
+  # --- authentication ---
+  - object: authentication
+    action: success
+    evidence: definitive
+    time: event-time
+    when: Security 4624
+    basis: >-
+      Security 4624 "An account was successfully logged on" — subject/target
+      SID+name, LogonType, AuthenticationPackage, workstation/IP.
+    sources: [dfir-toolkit#3, evtx-etw-resources#20, mitre-alerts#90]
+  - object: authentication
+    action: success
+    evidence: heuristic
+    time: event-time
+    when: Security 4648
+    basis: >-
+      Security 4648 "A logon was attempted using explicit credentials" —
+      records the ATTEMPT, not the outcome.
+    sources: [evtx-etw-resources#22, dfir-toolkit#3]
+    note: dfir-toolkit folded 4648 into its 4624 row as definitive; split and
+      typed heuristic per the more careful evtx-etw reading.
+  - object: authentication
+    action: failure
+    evidence: definitive
+    time: event-time
+    when: Security 4625
+    basis: Security 4625 "An account failed to log on" — Status/SubStatus/FailureReason.
+    sources: [dfir-toolkit#4, evtx-etw-resources#21, m365d-queries#78, mitre-alerts#91, labwork-findings#63]
+    note: labwork's 4625→user_session.login row reclassified here — a failed
+      logon opens no session; its lockout-observation context kept in provenance.
+  - object: authentication
+    action: success
+    evidence: definitive
+    time: event-time
+    when: Security 4768 (Kerberos TGT)
+    basis: Kerberos TGT issuance — PreAuthType, CertIssuer fields.
+    sources: [labwork-findings#64]
+  - object: authentication
+    action: success
+    evidence: heuristic
+    time: event-time
+    when: Security 4769 (Kerberos TGS)
+    basis: TGS requests are high-volume/low-signal; Transited-Services adds context.
+    sources: [labwork-findings#65]
+  - object: authentication
+    action: success
+    evidence: definitive
+    time: event-time
+    when: Security 4776 (NTLM)
+    basis: NTLM credential validation — account, protocol, error code.
+    sources: [labwork-findings#66]
+  # --- user_session ---
+  - object: user_session
+    action: login
+    evidence: definitive
+    time: event-time
+    when: Security 4624, interactive-class LogonType (2/7/10/11)
+    basis: >-
+      The session-establishing read of 4624 — LogonType scopes it to
+      interactive/unlock/remote-interactive classes.
+    sources: [dfir-toolkit#0, evtx-etw-resources#23, labwork-findings#62, m365d-queries#77, mitre-alerts#89]
+  - object: user_session
+    action: login
+    evidence: definitive
+    time: event-time
+    when: System 7001 (Winlogon)
+    basis: Winlogon logon notification (7002 the logoff counterpart).
+    sources: [evtx-etw-resources#35]
+  - object: user_session
+    action: login
+    evidence: definitive
+    time: event-time
+    when: TerminalServices-LocalSessionManager 21 (RDP)
+    basis: Session logon succeeded — RDP source address in fields.
+    sources: [evtx-etw-resources#36, dfir-toolkit#0]
+  - object: user_session
+    action: logout
+    evidence: definitive
+    time: event-time
+    when: Security 4634 / 4647
+    basis: Logoff / user-initiated logoff.
+    sources: [dfir-toolkit#1, evtx-etw-resources#24]
+  - object: user_session
+    action: reconnect
+    evidence: definitive
+    time: event-time
+    when: Security 4778 (4779 = disconnect)
+    basis: Session reconnected to a Window Station.
+    sources: [dfir-toolkit#2, evtx-etw-resources#25]
+  - object: user_session
+    action: reconnect
+    evidence: definitive
+    time: event-time
+    when: TerminalServices-LocalSessionManager 25
+    basis: RDP session reconnection succeeded.
+    sources: [evtx-etw-resources#37, dfir-toolkit#2]
+  - object: user_session
+    action: metadata
+    evidence: definitive
+    time: event-time
+    when: Security 4672
+    basis: Special privileges assigned to new logon — types the session.
+    sources: [evtx-etw-resources#26]
+  # --- process ---
+  - object: process
+    action: create
+    evidence: definitive
+    time: event-time
+    when: Sysmon 1
+    basis: Image, command line, hashes, parent, ProcessGuid.
+    sources: [evtx-etw-resources#39, labwork-findings#55, mitre-alerts#83]
+  - object: process
+    action: create
+    evidence: definitive
+    time: event-time
+    when: Security 4688
+    basis: >-
+      NewProcessId/NewProcessName (+ command line when audited). m365d's
+      net.exe account-creation pattern rides this row; its 4720 half is the
+      account-object vocabulary gap.
+    sources: [dfir-toolkit#5, evtx-etw-resources#27, mitre-alerts#84, m365d-queries#79]
+  - object: process
+    action: terminate
+    evidence: definitive
+    time: event-time
+    when: Security 4689
+    basis: Process exited — closes the 4688 lifetime.
+    sources: [evtx-etw-resources#28]
+  - object: process
+    action: terminate
+    evidence: definitive
+    time: event-time
+    when: Sysmon 5
+    basis: Process terminated.
+    sources: [evtx-etw-resources#42]
+  - object: process
+    action: execute
+    evidence: heuristic
+    time: event-time
+    when: PowerShell 4103/4104
+    basis: >-
+      Module/pipeline logging and script-block capture at execution start;
+      captures code delivered for execution, not its completion.
+    sources: [dfir-toolkit#7, labwork-findings#56, mitre-alerts#92, mitre-alerts#93]
+    note: dfir-toolkit and mitre-alerts typed definitive; labwork's heuristic
+      reading kept (conservative).
+  - object: process
+    action: execute
+    evidence: definitive
+    time: event-time
+    when: AppLocker EXE-and-DLL channel, allow decisions (8002)
+    basis: >-
+      AppLocker execution ALLOW decisions only — a blocked execution
+      (8003/8004) did not execute (constraints: applocker-allow-only).
+    sources: [dfir-toolkit#6]
+  - object: process
+    action: access
+    evidence: definitive
+    time: event-time
+    when: Sysmon 10
+    basis: Granted access mask, call trace, source/target (lsass credential-theft shape).
+    sources: [evtx-etw-resources#46, labwork-findings#53]
+  - object: process
+    action: access
+    evidence: definitive
+    time: event-time
+    when: Security 4663 (PROCESS_VM_READ)
+    basis: Kernel-object audit read access on a process (requires SACL).
+    sources: [labwork-findings#54]
+  - object: process
+    action: modify
+    evidence: definitive
+    time: event-time
+    when: Sysmon 25
+    basis: Process tampering (image change / hollowing indicator).
+    sources: [evtx-etw-resources#52]
+    note: legal CAR pair with NO current lane — declared-but-unreached capability.
+  # --- service ---
+  - object: service
+    action: create
+    evidence: definitive
+    time: event-time
+    when: Security 4697
+    basis: Service installed (audit-policy gated).
+    sources: [dfir-toolkit#8, evtx-etw-resources#29]
+  - object: service
+    action: create
+    evidence: definitive
+    time: event-time
+    when: System 7045
+    basis: >-
+      Service installed — Service Control Manager provider (stores qualified
+      id 1073748869 in the SCM CSV; the join trap).
+    sources: [evtx-etw-resources#33]
+    note: dfir-toolkit's 7045 binding EXCLUDED — its script aims System-channel
+      ids at Security.evtx (recorded source defect).
+  - object: service
+    action: stop
+    evidence: definitive
+    time: event-time
+    when: System 7034/7036
+    basis: Unexpected termination / state-change cluster.
+    sources: [evtx-etw-resources#34]
+    note: dfir-toolkit's 7034/7036 bindings excluded (same channel defect).
+  # --- file / registry / module / driver / thread / flow / http ---
+  - object: file
+    action: create
+    evidence: definitive
+    time: event-time
+    when: Sysmon 11
+    basis: Target filename, creating process, CreationUtcTime — logged at drop time.
+    sources: [evtx-etw-resources#47, labwork-findings#57, mitre-alerts#87]
+  - object: file
+    action: delete
+    evidence: definitive
+    time: event-time
+    when: Sysmon 23/26
+    basis: File delete (archived / logged) with deleting process.
+    sources: [evtx-etw-resources#51]
+  - object: file
+    action: timestomp
+    evidence: definitive
+    time: event-time
+    when: Sysmon 2
+    basis: File creation time changed — previous and new timestamps recorded.
+    sources: [evtx-etw-resources#40]
+    note: legal CAR pair with NO current lane — declared-but-unreached capability.
+  - object: file
+    action: access
+    evidence: definitive
+    time: event-time
+    when: Security 5140
+    basis: Network share object accessed (C$ shape).
+    sources: [evtx-etw-resources#30, labwork-findings#59]
+  - object: file
+    action: read
+    evidence: definitive
+    time: event-time
+    when: Security 5145
+    basis: >-
+      Detailed file share — relative target name per access check; labwork
+      reads it as file.read, evtx-etw folds it under access; both kept, the
+      5145 row carries the finer read claim.
+    sources: [labwork-findings#58, evtx-etw-resources#30]
+  - object: file
+    action: acl_modify
+    evidence: definitive
+    time: event-time
+    when: Security 4907
+    basis: Auditing settings (SACL) on object changed.
+    sources: [evtx-etw-resources#31]
+  - object: file
+    action: modify
+    evidence: definitive
+    time: event-time
+    when: Security 1102
+    basis: >-
+      "The audit log was cleared" — self-report of destructive modification of
+      the security log file itself.
+    sources: [evtx-etw-resources#32]
+  - object: registry
+    action: add
+    evidence: definitive
+    time: event-time
+    when: Sysmon 12
+    basis: Registry key/value create (delete variant maps to registry.remove).
+    sources: [evtx-etw-resources#48]
+  - object: registry
+    action: value_edit
+    evidence: definitive
+    time: event-time
+    when: Sysmon 13
+    basis: Value set — key path, data, writing process (Run/Winlogon/Defender shapes).
+    sources: [evtx-etw-resources#49, labwork-findings#61, mitre-alerts#88]
+  - object: registry
+    action: key_edit
+    evidence: definitive
+    time: event-time
+    when: Sysmon 14
+    basis: Key/value rename.
+    sources: [evtx-etw-resources#50]
+  - object: module
+    action: load
+    evidence: definitive
+    time: event-time
+    when: Sysmon 7
+    basis: Module path, hashes, signer, loading process.
+    sources: [evtx-etw-resources#44, mitre-alerts#85]
+  - object: driver
+    action: load
+    evidence: definitive
+    time: event-time
+    when: Sysmon 6
+    basis: Driver image, hashes, signature status.
+    sources: [evtx-etw-resources#43]
+  - object: thread
+    action: remote_create
+    evidence: definitive
+    time: event-time
+    when: Sysmon 8
+    basis: CreateRemoteThread — source/target process, start address.
+    sources: [evtx-etw-resources#45, mitre-alerts#86]
+  - object: flow
+    action: start
+    evidence: definitive
+    time: event-time
+    when: Sysmon 3
+    basis: Network connection — src/dst ip:port, protocol, owning process.
+    sources: [evtx-etw-resources#41, labwork-findings#60]
+    note: labwork typed the action flow.create; canonicalised to flow.start,
+      matching the existing evtx_sysmon lane's pair.
+  - object: http
+    action: get
+    evidence: definitive
+    time: event-time
+    when: BITS-Client 59/60
+    basis: Transfer job started/completed — URL in fields.
+    sources: [evtx-etw-resources#38]
+
+  # --- promoted objects (docs/research/car-vocabulary-ruling.md) ---
+  - object: user_account
+    action: create
+    evidence: definitive
+    time: event-time
+    when: Security 4720
+    basis: >-
+      "A user account was created" — User Account Management success auditing
+      is default-on (ruling: backbone MUST when present).
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/user_account.yml:26-70", "extract-evtx-etw-resources.md:258-268"]
+  - object: user_account
+    action: delete
+    evidence: definitive
+    time: event-time
+    when: Security 4726
+    basis: '"A user account was deleted".'
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/user_account.yml:26-70"]
+  - object: user_account
+    action: modify
+    evidence: definitive
+    time: event-time
+    when: Security 4722/4723/4724/4725/4738/4740/4767/4781
+    basis: >-
+      Enable / password change / password reset / disable / changed / lockout /
+      unlock / rename — the component's own modification cluster.
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/user_account.yml:44-68"]
+  - object: group
+    action: create
+    evidence: definitive
+    time: event-time
+    when: Security 4727/4731
+    basis: Security-enabled global/local group created.
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/group.yml:17-50"]
+  - object: group
+    action: delete
+    evidence: definitive
+    time: event-time
+    when: Security 4730/4734
+    basis: Group deleted.
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/group.yml:17-50"]
+  - object: group
+    action: modify
+    evidence: definitive
+    time: event-time
+    when: Security 4728/4732/4756 (+ removals 4729/4733/4757)
+    basis: Group membership add/remove.
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/group.yml:17-50", "extract-labwork-findings.md (4728 noted-not-added)"]
+  - object: group
+    action: enumerate
+    evidence: heuristic
+    time: event-time
+    when: Security 4798/4799
+    basis: Local group membership enumerated — recon signal.
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/group.yml:17-50"]
+  - object: scheduled_job
+    action: create
+    evidence: definitive
+    time: event-time
+    when: Security 4698 (MAY — Other Object Access auditing off by default)
+    basis: Scheduled task created; audit-policy gated, absence proves nothing.
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/scheduled_job.yml:14-60", "extract-evtx-etw-resources.md:270-273"]
+  - object: scheduled_job
+    action: create
+    evidence: definitive
+    time: event-time
+    when: TaskScheduler-Operational 106
+    basis: 'Task registered — default-on channel (ruling: MUST when present).'
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/scheduled_job.yml:14-60"]
+  - object: scheduled_job
+    action: delete
+    evidence: definitive
+    time: event-time
+    when: Security 4699 (MAY — Other Object Access auditing off by default)
+    basis: Task deleted; audit-policy gated, absence proves nothing.
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/scheduled_job.yml:14-60"]
+  - object: scheduled_job
+    action: delete
+    evidence: definitive
+    time: event-time
+    when: TaskScheduler-Operational 141
+    basis: 'Task deleted — default-on channel (ruling: MUST when present).'
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/scheduled_job.yml:14-60"]
+  - object: scheduled_job
+    action: modify
+    evidence: definitive
+    time: event-time
+    when: Security 4700/4701/4702 (MAY — Other Object Access auditing off by default)
+    basis: Task enabled / disabled / updated; audit-policy gated, absence proves nothing.
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/scheduled_job.yml:14-60"]
+  - object: scheduled_job
+    action: modify
+    evidence: definitive
+    time: event-time
+    when: TaskScheduler-Operational 140
+    basis: 'Task updated — default-on channel (ruling: MUST when present).'
+    sources: [car-vocabulary-ruling, "attack-datasources:contribution/scheduled_job.yml:14-60"]
+
+shimcache:
+  - object: process
+    action: execute
+    evidence: heuristic
+    time: bounded
+    when: AppCompatCache entry
+    basis: >-
+      Presence implies execution at-or-before the SYSTEM hive write
+      (the toolkit's own "SoftwareExecutedHistory" label).
+    sources: [dfir-toolkit#9]
+
+registry-hives:
+  - object: service
+    action: metadata
+    evidence: definitive
+    time: none
+    when: SYSTEM hive services enumeration
+    basis: Installed service configuration as hive content — a state assertion, no event time.
+    sources: [dfir-toolkit#10]
+  - object: registry
+    action: value_edit
+    evidence: definitive
+    time: bounded
+    when: WDigest UseLogonCredential
+    basis: Value present re-enables cleartext creds; key last-write bounds the edit.
+    sources: [m365d-queries#70]
+  - object: registry
+    action: value_edit
+    evidence: definitive
+    time: bounded
+    when: Defender Exclusions values
+    basis: Exclusion Paths/Extensions/Processes values added pre-payload.
+    sources: [m365d-queries#71]
+  - object: service
+    action: modify
+    evidence: heuristic
+    time: bounded
+    when: service Start value change (sc config shape)
+    basis: Mass service-disable pattern; hive last-write bounds it.
+    sources: [m365d-queries#72]
+  - object: registry
+    action: value_edit
+    evidence: inferred
+    time: none
+    when: Terminal Server Client UsernameHint
+    basis: RDP client hint value — presence only; RetrievIR snapshots carry no timestamps.
+    sources: [retrievir#98]
+
+run-keys:
+  - object: registry
+    action: value_edit
+    evidence: definitive
+    time: bounded
+    when: Run/RunOnce(Ex)/RunServices values
+    basis: >-
+      A value under the Run* keys evidences configured autostart persistence;
+      the hive's key last-write bounds the edit (RetrievIR's live snapshot
+      lacks timestamps — a collection limit, not an artefact one).
+    sources: [m365d-queries#67, retrievir#94, dfir-toolkit#11]
+    note: dfir-toolkit's (process, execute, inferred) reading of the same keys
+      folded here as the weaker execution INFERENCE — kept as the separate
+      row below.
+  - object: process
+    action: create
+    evidence: inferred
+    time: none
+    when: Run* value names an executable
+    basis: Supports only the inference that the named binary runs at logon.
+    sources: [m365d-queries#68, dfir-toolkit#11]
+  - object: registry
+    action: value_edit
+    evidence: definitive
+    time: bounded
+    when: IFEO Debugger value
+    basis: Image File Execution Options debugger hijack (accessibility-binary shape).
+    sources: [m365d-queries#69, retrievir#95]
+    note: m365d filed under registry-hives, retrievir under run-keys —
+      canonicalised to run-keys (the persistence-keys cluster).
+  - object: registry
+    action: value_edit
+    evidence: inferred
+    time: none
+    when: ShellFolders startup-folder redirect
+    basis: Autorun-category redirect value; snapshot without timestamps.
+    sources: [retrievir#96]
+
+scheduled-tasks:
+  - object: file
+    action: create
+    evidence: definitive
+    time: bounded
+    when: task XML under System32\Tasks
+    basis: Registration leaves the task XML; NTFS timestamps bound it (4698 the live counterpart).
+    sources: [m365d-queries#73]
+  - object: file
+    action: modify
+    evidence: heuristic
+    time: event-time
+    when: task XML NTFS mtime vs RegistrationInfo.Date
+    basis: >-
+      The XML's NTFS mtime is the trustworthy edit instant relative to the
+      forgeable RegistrationInfo fields — but a single overwritable stamp
+      shows only the LAST edit (constraints: single-stamp-ceiling).
+    sources: [retrievir#97]
+    note: demoted definitive->heuristic by the normative review — same
+      mechanism as filestat's mtime row; conservative rule applied.
+  - object: registry
+    action: add
+    evidence: definitive
+    time: bounded
+    when: TaskCache Tree/Tasks GUID entries
+    basis: The registration's registry half.
+    sources: [m365d-queries#74]
+
+prefetch:
+  - object: process
+    action: execute
+    evidence: heuristic
+    time: event-time
+    when: schtasks.exe / recycler-path binaries in prefetch
+    basis: >-
+      Prefetch run-times evidence the execution instants; the task-manipulation
+      or staging INTENT stays an inference on top.
+    sources: [m365d-queries#75, m365d-queries#76, m365d-queries#82]
+    note: m365d filed the schtasks rows under scheduled-tasks; the ARTEFACT is
+      prefetch/4688, so they land here with the intent kept in basis.
+
+usnjrnl:
+  - object: file
+    action: create
+    evidence: definitive
+    time: event-time
+    when: USN reason flags, multi-drop burst shape
+    basis: PsExec-style lateral movement dropping executables on admin shares.
+    sources: [m365d-queries#80]
+  - object: file
+    action: modify
+    evidence: definitive
+    time: event-time
+    when: USN modify records (accessibility-binary overwrite shape)
+    basis: >-
+      The USN record is definitive for the modification; the overwrite-attack
+      reading is the detection layered on top (m365d typed the pattern
+      heuristic — the artefact row stays definitive).
+    sources: [m365d-queries#81]
+
+accounts:
+  - object: user_account
+    action: metadata
+    evidence: definitive
+    time: none
+    when: /etc/passwd, /etc/shadow, dslocal user plists
+    basis: >-
+      Account existence and attributes as file content — a state assertion,
+      no event time (ruling: the accounts family yields metadata rows).
+    sources: [car-vocabulary-ruling, "extract-dfir-toolkit.md (accounts collection glosses)"]
+
+wtmp:
+  - object: user_session
+    action: login
+    evidence: definitive
+    time: event-time
+    when: wtmp records
+    basis: '"wtmp: all valid past logins" (utmp = current).'
+    sources: [dfir-toolkit#13]
+  - object: authentication
+    action: failure
+    evidence: definitive
+    time: event-time
+    when: btmp records
+    basis: '"btmp: bad logins" / lastb.'
+    sources: [dfir-toolkit#14]
+
+shell-history:
+  - object: process
+    action: execute
+    evidence: heuristic
+    time: none
+    when: .bash_history lines
+    basis: Command lines without timestamps by default (HISTTIMEFORMAT absent).
+    sources: [dfir-toolkit#15]
+
+lnk-jumplists:
+  - object: file
+    action: access
+    evidence: heuristic
+    time: event-time
+    when: Automatic/CustomDestinations + Recent .lnk
+    basis: Shell-created access breadcrumbs; embedded target timestamps.
+    sources: [dfir-toolkit#12]
+
+filestat:
+  - object: file
+    action: metadata
+    evidence: definitive
+    time: event-time
+    when: MACB columns
+    basis: Live MACB timeline (find -printf Access/Modify/Change).
+    sources: [dfir-toolkit#16]
+  - object: file
+    action: modify
+    evidence: inferred
+    time: event-time
+    when: mtime column
+    basis: Time of the LAST content modification only — earlier edits invisible.
+    sources: [dfir-toolkit#17]
+  - object: file
+    action: access
+    evidence: inferred
+    time: event-time
+    when: atime column
+    basis: Last access only, degraded by NtfsDisableLastAccessUpdate/relatime.
+    sources: [dfir-toolkit#18]
+  - object: file
+    action: create
+    evidence: definitive
+    time: event-time
+    when: ext inode crtime (debugfs)
+    basis: crtime.sh reads the inode birth time directly.
+    sources: [dfir-toolkit#19]
+
+constraints:
+  # RFC-2119 normative layer over the matched rows above.
+  # Row refs: "<family>:<when>" cites a row of this file; extract refs are
+  # "<repo>#<row>" or "extract-<repo>.md:<line>". Tier numbers are the wire
+  # projection (model/stix/conventions.yml:207): definitive=100, heuristic=50,
+  # inferred=20. MUST = guaranteed by the artefact's nature under default
+  # configuration; MAY = gated by non-default policy, installed software,
+  # SACLs, or machine role — a conforming producer parses them when present
+  # but their ABSENCE carries no meaning (rule absence-not-evidence).
+  rules:
+    # ------------------------------------------------ 1. MUST yields (backbone)
+    - id: evtx-auth-backbone
+      level: MUST
+      scope: {family: evtx, object: authentication}
+      statement: >-
+        Parsing Security.evtx MUST yield authentication.success from 4624 and
+        authentication.failure from 4625 when those records are present
+        (Logon auditing is default-on); both definitive/event-time.
+      grounds: ["evtx:Security 4624", "evtx:Security 4625"]
+      enforcement: review    # Parser Profile conformance fixture (golden 4624/4625)
+    - id: evtx-session-backbone
+      level: MUST
+      scope: {family: evtx, object: user_session}
+      statement: >-
+        Parsing MUST yield user_session.login from 4624 interactive-class
+        LogonTypes (2/7/10/11), logout from 4634/4647, reconnect from 4778 and
+        TerminalServices-LocalSessionManager 21/25 — all default-on channels.
+      grounds: ["evtx:Security 4624, interactive-class LogonType (2/7/10/11)",
+                "evtx:Security 4634 / 4647", "evtx:Security 4778 (4779 = disconnect)",
+                "evtx:TerminalServices-LocalSessionManager 21 (RDP)",
+                "evtx:TerminalServices-LocalSessionManager 25"]
+      enforcement: review
+    - id: evtx-service-backbone
+      level: MUST
+      scope: {family: evtx, object: service}
+      statement: >-
+        Parsing System.evtx MUST yield service.create from 7045 and
+        service.stop from 7034/7036 (SCM provider, default-on), including the
+        qualified-id form 1073748869 for 7045.
+      grounds: ["evtx:System 7045", "evtx:System 7034/7036"]
+      enforcement: review
+    - id: evtx-logclear-backbone
+      level: MUST
+      scope: {family: evtx, object: file, action: modify, when: Security 1102}
+      statement: >-
+        1102 cannot be disabled by policy; when present it MUST be yielded
+        (definitive, event-time) — it is the self-report that survives the wipe.
+      grounds: ["evtx:Security 1102"]
+      enforcement: review
+    - id: mft-usn-filestat-backbone
+      level: MUST
+      scope: {family: [usnjrnl, filestat]}
+      statement: >-
+        usnjrnl parsing MUST be able to yield file create, modify AND delete
+        (USN reason flags are direct action records; delete is in the artefact's
+        nature even though no matched row covers it — overlay rule applies);
+        filestat MUST yield file.metadata from MACB columns.
+      grounds: ["usnjrnl:USN reason flags, multi-drop burst shape",
+                "usnjrnl:USN modify records (accessibility-binary overwrite shape)",
+                "filestat:MACB columns"]
+      enforcement: review
+    - id: wtmp-backbone
+      level: MUST
+      scope: {family: wtmp}
+      statement: >-
+        wtmp parsing MUST yield user_session.login (and logout — the record
+        pair is in the artefact; overlay rule applies) and btmp
+        authentication.failure; all definitive/event-time.
+      grounds: ["wtmp:wtmp records", "wtmp:btmp records", "dfir-toolkit#13", "dfir-toolkit#14"]
+      enforcement: review
+    - id: persistence-state-backbone
+      level: MUST
+      scope: {family: [run-keys, registry-hives, scheduled-tasks]}
+      statement: >-
+        When the values/files are present, parsing MUST yield the STATE rows:
+        registry.value_edit for Run*/IFEO/WDigest/Defender-exclusion values
+        (definitive, bounded by key last-write where hive timestamps exist),
+        service.metadata from SYSTEM-hive enumeration (definitive, none), file
+        create for task XML and registry.add for TaskCache (definitive, bounded).
+      grounds: ["run-keys:Run/RunOnce(Ex)/RunServices values", "run-keys:IFEO Debugger value",
+                "registry-hives:SYSTEM hive services enumeration",
+                "registry-hives:WDigest UseLogonCredential",
+                "scheduled-tasks:task XML under System32\\Tasks",
+                "scheduled-tasks:TaskCache Tree/Tasks GUID entries"]
+      enforcement: review
+    - id: residue-exec-backbone
+      level: MUST
+      scope: {family: [shimcache, prefetch, shell-history, lnk-jumplists]}
+      statement: >-
+        When the artefact is present, parsing MUST yield its execution/access
+        rows at DECLARED tier and time — shimcache (process.execute, heuristic,
+        bounded); prefetch (process execution rows, event-time run instants);
+        shell-history (process.execute, heuristic, none); lnk-jumplists
+        (file.access, heuristic, event-time).
+      grounds: ["shimcache:AppCompatCache entry",
+                "prefetch:schtasks.exe / recycler-path binaries in prefetch",
+                "shell-history:.bash_history lines",
+                "lnk-jumplists:Automatic/CustomDestinations + Recent .lnk"]
+      enforcement: review
+    - id: evtx-account-backbone
+      level: MUST
+      scope: {family: evtx, object: [user_account, group]}
+      statement: >-
+        Parsing Security.evtx MUST yield user_account.create from 4720,
+        user_account.delete from 4726, user_account.modify from the
+        modification cluster (4722/4723/4724/4725/4738/4740/4767/4781), and
+        the group create/delete/modify rows (4727/4731, 4730/4734,
+        4728/4732/4756 + removals) when those records are present — User
+        Account Management and Security Group Management success auditing are
+        default-on; all definitive/event-time.
+      grounds: ["evtx:Security 4720", "evtx:Security 4726",
+                "evtx:Security 4722/4723/4724/4725/4738/4740/4767/4781",
+                "evtx:Security 4727/4731", "evtx:Security 4730/4734",
+                "evtx:Security 4728/4732/4756 (+ removals 4729/4733/4757)"]
+      enforcement: review
+    - id: taskscheduler-operational-backbone
+      level: MUST
+      scope: {family: evtx, object: scheduled_job, when: TaskScheduler-Operational}
+      statement: >-
+        Parsing the Microsoft-Windows-TaskScheduler/Operational channel MUST
+        yield scheduled_job.create from 106, modify from 140 and delete from
+        141 when those records are present (default-on channel); all
+        definitive/event-time. The Security-channel counterparts (4698-4702)
+        stay MAY — see gated-records-may.
+      grounds: ["evtx:TaskScheduler-Operational 106",
+                "evtx:TaskScheduler-Operational 140",
+                "evtx:TaskScheduler-Operational 141"]
+      enforcement: review
+
+    # ------------------------------------------------ 2. MAY (config/role-gated)
+    - id: gated-records-may
+      level: MAY
+      scope: {family: evtx}
+      statement: >-
+        The following are yielded only when the gating configuration exists,
+        and are therefore MAY: all Sysmon rows (install + rule set — Sysmon
+        1/2/3/5/6/7/8/10/11/12/13/14/23/25/26); 4688/4689 (Process Tracking
+        audit, off by default; CommandLine further gated — the row's own
+        "when audited"); 4697 (its basis says audit-policy gated); 4663 and
+        4907 (SACL-dependent); 5140/5145 (File Share / Detailed File Share
+        auditing, off by default); PowerShell 4103/4104 (module/script-block
+        policy); AppLocker channel (policy deployed); 4768/4769/4776
+        (authority-role-dependent: DC for Kerberos, authenticating authority
+        for NTLM); 4698/4699/4700/4701/4702 (scheduled_job Security-channel
+        counterparts — Other Object Access auditing, off by default; the
+        default-on TaskScheduler-Operational channel is the MUST — see
+        taskscheduler-operational-backbone).
+      grounds: ["evtx:Security 4688", "evtx:Security 4697", "evtx:Security 4663 (PROCESS_VM_READ)",
+                "evtx:Security 4907", "evtx:Security 5140", "evtx:Security 5145",
+                "evtx:Security 4698 (scheduled_job — Other Object Access auditing)",
+                "evtx:PowerShell 4103/4104", "evtx:AppLocker EXE-and-DLL channel, allow decisions (8002)",
+                "evtx:Sysmon 1", "evtx:Security 4768 (Kerberos TGT)"]
+      enforcement: review
+    - id: absence-not-evidence
+      level: MUST NOT
+      scope: {family: all}
+      statement: >-
+        Absence of a MAY-class (config/role-gated) record MUST NOT be read as
+        absence of the activity; the producer marks the guaranteed field with
+        the absence vocabulary (not-applicable | unsupported | unknown), never
+        as a negative finding.
+      grounds: ["gated-records-may", "docs/design/schema-layers.md:62-68"]
+      enforcement: review
+    - id: shell-history-time-upgrade
+      level: MAY
+      scope: {family: shell-history, when: HISTTIMEFORMAT stamps present}
+      statement: >-
+        time MAY upgrade none -> event-time only when per-line stamps are
+        present in the record (data-driven), never by assumption.
+      grounds: ["shell-history:.bash_history lines"]
+      enforcement: count-and-carry:evidence-time
+
+    # ------------------------------------------------ 3. MUST NOT — tier upgrades
+    - id: bounded-never-event-time
+      level: MUST NOT
+      scope: {family: [shimcache, run-keys, registry-hives, scheduled-tasks], time: bounded|none}
+      statement: >-
+        Hive-write-bounded and snapshot artefacts MUST NOT claim event-time:
+        shimcache at-or-before the SYSTEM hive write; Run*/IFEO/WDigest/
+        exclusion values bounded by key last-write; RetrievIR live snapshots
+        carry NO timestamps and MUST NOT even claim bounded (collection limit).
+      grounds: ["shimcache:AppCompatCache entry", "run-keys:Run/RunOnce(Ex)/RunServices values",
+                "registry-hives:Terminal Server Client UsernameHint", "retrievir#98"]
+      enforcement: schema + count-and-carry:evidence-time
+    - id: residue-never-definitive-exec
+      level: MUST NOT
+      scope: {object: process, action: [execute, create]}
+      statement: >-
+        Presence/residue artefacts MUST NOT claim definitive for the execution
+        they imply: shimcache presence is heuristic-bounded; a Run* value
+        naming an executable is inferred-none for process.create (configured
+        persistence is definitive only for the registry.value_edit row).
+      grounds: ["shimcache:AppCompatCache entry", "run-keys:Run* value names an executable"]
+      enforcement: schema + count-and-carry:evidence-tier
+    - id: attempt-not-outcome
+      level: MUST NOT
+      scope: {family: evtx, object: authentication}
+      statement: >-
+        4648 records the ATTEMPT with explicit credentials and MUST NOT be
+        read as a completed logon (max tier heuristic; never user_session.login);
+        4769 TGS volume MUST NOT be read as definitive authentication (high-
+        volume/low-signal — heuristic ceiling).
+      grounds: ["evtx:Security 4648", "evtx:Security 4769 (Kerberos TGS)"]
+      enforcement: schema + count-and-carry:evidence-tier
+    - id: powershell-capture-not-completion
+      level: MUST NOT
+      scope: {family: evtx, when: PowerShell 4103/4104}
+      statement: >-
+        Script-block/module capture MUST NOT be upgraded past heuristic for
+        process.execute — it records code delivered for execution, not its
+        completion (the matrix's conservative reconciliation of the
+        definitive-typed sources is normative).
+      grounds: ["evtx:PowerShell 4103/4104"]
+      enforcement: schema
+    - id: single-stamp-ceiling
+      level: MUST NOT
+      scope: {family: [filestat, scheduled-tasks], when: mtime/atime columns}
+      statement: >-
+        A single overwritable POSIX/NTFS stamp MUST NOT ground more than one
+        action instance (the LAST modify/access only; earlier edits invisible)
+        and MUST NOT carry a tier above the filestat rows' typing; atime rows
+        additionally degraded by NtfsDisableLastAccessUpdate/relatime.
+      grounds: ["filestat:mtime column", "filestat:atime column",
+                "scheduled-tasks:task XML NTFS mtime vs RegistrationInfo.Date"]
+      enforcement: schema
+
+    # ------------------------------------------------ 4. MUST NOT — pair claims
+    - id: failed-logon-no-session
+      level: MUST NOT
+      scope: {family: evtx, when: Security 4625}
+      statement: 4625 MUST NOT yield user_session.login — a failed logon opens no session.
+      grounds: ["evtx:Security 4625 (note: labwork reclassification)", "labwork-findings#63"]
+      enforcement: count-and-carry:evidence-matrix
+    - id: channel-source-integrity
+      level: MUST NOT
+      scope: {family: evtx}
+      statement: >-
+        System/WLAN-channel ids (6005, 7001, 7034/7036, 7045, 8001/8002) MUST
+        NOT be sourced from Security.evtx; an evtx row's Channel MUST match the
+        declared `when` channel. Standing rule from the dfir-toolkit defect
+        (DFIR.cmd:981,:987 aim System/WLAN ids at Security.evtx — only 4697
+        can ever match there).
+      grounds: ["evtx:System 7045 (note)", "evtx:System 7034/7036 (note)",
+                "extract-dfir-toolkit.md:277-279"]
+      enforcement: count-and-carry:channel-source
+    - id: no-account-force-fit
+      level: MUST NOT
+      scope: {family: evtx}
+      statement: >-
+        Account-management ids (4720/4722-4726/4728/4732/4738/4740/4756) MUST
+        NOT be force-fit onto authentication, user_session or service. Under
+        the vocabulary ruling (docs/research/car-vocabulary-ruling.md) they
+        bind ONLY to the promoted user_account / group objects — the original
+        forbidden targets remain forbidden.
+      grounds: ["extract-evtx-etw-resources.md:258-268", "evtx:Security 4688 (m365d 4720 half)",
+                "docs/research/car-vocabulary-ruling.md"]
+      enforcement: count-and-carry:evidence-matrix
+    - id: no-task-force-fit
+      level: MUST NOT
+      scope: {family: [evtx, scheduled-tasks]}
+      statement: >-
+        Security 4698-4702 and TaskScheduler 106/140/141/200/201 MUST NOT be
+        force-fit onto service, and 200/201 MUST NOT be bound to
+        process.create (not asserted by any source). Under the vocabulary
+        ruling they bind ONLY to the promoted scheduled_job object — the
+        original forbidden targets remain forbidden.
+      grounds: ["extract-evtx-etw-resources.md:270-273", "extract-dfir-toolkit.md:242-244",
+                "docs/research/car-vocabulary-ruling.md"]
+      enforcement: count-and-carry:evidence-matrix
+    - id: no-sysmon-mis-object
+      level: MUST NOT
+      scope: {family: evtx}
+      statement: >-
+        Sysmon 17/18 (pipes) MUST NOT map to socket; 19/20/21 (WMI) and 22
+        (DNS) MUST NOT be force-fit onto flow or http — declared objectless
+        until the vocabulary grows.
+      grounds: ["extract-evtx-etw-resources.md:275-278"]
+      enforcement: count-and-carry:evidence-matrix
+    - id: share-not-file
+      level: MUST NOT
+      scope: {family: evtx, when: Security 5140}
+      statement: >-
+        5140 names the SHARE object (C$), not a file: it MUST NOT be read as
+        access to a specific file path; file-granular claims require 5145's
+        RelativeTargetName.
+      grounds: ["evtx:Security 5140", "evtx:Security 5145",
+                "labwork-findings#59 (extract-labwork-findings.md:106-107)",
+                "extract-dfir-toolkit.md:245-246"]
+      enforcement: review
+    - id: applocker-allow-only
+      level: MUST NOT
+      scope: {family: evtx, when: AppLocker EXE-and-DLL channel}
+      statement: >-
+        AppLocker BLOCK decisions (8003/8004) MUST NOT be read as
+        process.execute — a blocked execution did not execute; the definitive
+        execute claim is scoped to allow decisions (8002).
+      grounds: ["evtx:AppLocker EXE-and-DLL channel, allow decisions (8002)",
+                "extract-dfir-toolkit.md:103"]
+      enforcement: count-and-carry:evidence-matrix
+
+    # ------------------------------------------------ 5. Derivation MUSTs (SRO/wire)
+    - id: edge-confidence-min
+      level: MUST
+      scope: {wire: relationship}
+      statement: >-
+        An SRO derived from a row MUST carry confidence = min(method tier,
+        the evidencing row's declared tier) under {definitive:100,
+        heuristic:50, inferred:20}; an edge from a heuristic-evidence row MUST
+        NOT carry 100; from an inferred row MUST NOT exceed 20.
+      grounds: ["model/stix/conventions.yml:207", "shimcache:AppCompatCache entry",
+                "run-keys:Run* value names an executable"]
+      enforcement: count-and-carry:evidence-tier
+    - id: no-invented-instants
+      level: MUST NOT
+      scope: {wire: [relationship, observed-data]}
+      statement: >-
+        A bounded-time row MUST NOT populate SRO start_time or observed-data
+        first/last_observed as the action instant (its stamp is a bound,
+        carried in extension fields only); a time:none row MUST NOT mint an
+        observed-data at all — it fills SCO/state only (the existing "an
+        observation time is never invented" rule extended to bounds).
+      grounds: ["model/stix/conventions.yml:182-184",
+                "registry-hives:SYSTEM hive services enumeration",
+                "run-keys:Run* value names an executable", "retrievir#98"]
+      enforcement: count-and-carry:evidence-time
+    - id: matched-is-overlay
+      level: MUST NOT
+      scope: {family: all}
+      statement: >-
+        This matched file is a source-grounded OVERLAY, not the closed gate
+        set: the canonical evidences facet per family = the ir.json bootstrap
+        closure UNION these rows. Gating emissions against this file alone
+        MUST NOT be done (it would outlaw existing lanes — prefetch's
+        (process, create), usnjrnl's (file, delete), wtmp's
+        (user_session, logout) live in ir.json, not here).
+      grounds: ["prefetch:schtasks.exe / recycler-path binaries in prefetch",
+                "go/internal/ir/ir.json (plaso_exec_prefetch, l2t_usn_delete, l2t_utmp_logout)"]
+      enforcement: review
+    - id: row-grounding
+      level: MUST
+      scope: {family: all}
+      statement: >-
+        Every matrix row MUST cite at least one source, and tier
+        disagreements MUST reconcile conservatively (weaker tier wins) — the
+        file's own header rule, now normative and gated.
+      grounds: ["matched-evidences.yaml:1-4", "evtx:Security 4648 (note)",
+                "evtx:PowerShell 4103/4104 (note)"]
+      enforcement: schema

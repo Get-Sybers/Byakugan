@@ -1,0 +1,104 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/defs.schema.json",
+ "title": "Shared property library",
+ "$defs": {
+  "semver": {
+   "type": "string",
+   "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+  },
+  "stix-id": {
+   "type": "string",
+   "pattern": "^[a-z][a-z0-9-]+--[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+  },
+  "uuid": {
+   "type": "string",
+   "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+  },
+  "timestamp": {
+   "type": "string",
+   "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$"
+  },
+  "evidence-tier": {
+   "enum": [
+    "definitive",
+    "heuristic",
+    "inferred"
+   ],
+   "description": "wire projection 100/50/20 (model/stix/conventions.yml)"
+  },
+  "time-semantics": {
+   "enum": [
+    "event-time",
+    "bounded",
+    "none"
+   ],
+   "description": "the stamp IS the instant / bounds it / no time"
+  },
+  "absence": {
+   "enum": [
+    "not-applicable",
+    "collection-failed",
+    "unsupported",
+    "unknown"
+   ],
+   "description": "the producer absence vocabulary — declared once, selected per field"
+  },
+  "external-reference": {
+   "type": "object",
+   "description": "STIX s2.5 external-reference shape + byakugan's coverage qualifier",
+   "properties": {
+    "source_name": {
+     "type": "string"
+    },
+    "description": {
+     "type": "string"
+    },
+    "url": {
+     "type": "string"
+    },
+    "external_id": {
+     "type": "string"
+    },
+    "hashes": {
+     "type": "object"
+    },
+    "coverage": {
+     "enum": [
+      "leaf",
+      "container",
+      "none"
+     ]
+    }
+   },
+   "required": [
+    "source_name"
+   ],
+   "unevaluatedProperties": false
+  },
+  "finding": {
+   "type": "object",
+   "description": "the count-and-carry finding record — identical in both engines",
+   "properties": {
+    "object_id": {
+     "type": "string"
+    },
+    "rule": {
+     "type": "string"
+    },
+    "path": {
+     "type": "string"
+    },
+    "message": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "object_id",
+    "rule",
+    "message"
+   ],
+   "unevaluatedProperties": false
+  }
+ }
+}

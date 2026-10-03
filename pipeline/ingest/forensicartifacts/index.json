@@ -1,0 +1,8883 @@
+{
+ "artifact_count": 732,
+ "artifacts": [
+  {
+   "file": "linux.yaml",
+   "name": "APTSources",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "APT package sources list",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "APTTrustKeys",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "APT trusted keys",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "legacy.yaml",
+   "name": "AllUsersAppDataEnvironmentVariable",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %ProgramData% environment variable.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "legacy.yaml",
+   "name": "AllUsersProfileEnvironmentVariable",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "The %AllUsersProfile% environment variable.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "AnacronFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Anacron files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "webservers.yaml",
+   "name": "ApacheAccessLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Apache access logs are stored",
+   "supported_os": [
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webservers.yaml",
+   "name": "ApacheConfigurationFolder",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Apache keeps configuration files",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "webservers.yaml",
+   "name": "ApacheDefaultSiteConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Apache keeps the default site configuration file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "webservers.yaml",
+   "name": "ApacheErrorLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Apache error logs are stored",
+   "supported_os": [
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "linux_services.yaml",
+   "name": "ApacheKafkaLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Apache Kafka Log files",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "AptitudeLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux aptitude package manager log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "BashShellConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Bourne Again shell (bash) configuration files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSBashHistory"
+   ],
+   "file": "shell.yaml",
+   "name": "BashShellHistoryFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Bourne Again shell (bash) history files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSBashSessions"
+   ],
+   "file": "shell.yaml",
+   "name": "BashShellSessionFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Bourne Again shell (bash) session files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "Bit9LocalCache",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Bit9 local cache database.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "BourneShellHistoryFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Bourne shell (sh) history files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "members": [
+    "ChromiumBasedBrowsersCache",
+    "FirefoxCache",
+    "InternetExplorerCache",
+    "SafariCacheSQLiteDatabaseFile"
+   ],
+   "name": "BrowserCache",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Web browser cache of multiple web browsers.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "members": [
+    "ChromiumBasedBrowsersHistoryDatabaseFile",
+    "FirefoxDownloads",
+    "FirefoxHistory",
+    "InternetExplorerHistory",
+    "OperaHistoryFile",
+    "SafariDownloadsPlistFile",
+    "SafariHistoryPlistFile",
+    "SafariHistorySQLiteDatabaseFile"
+   ],
+   "name": "BrowserHistory",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Web browser history of multiple web browsers.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "CShellConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "C shell (csh) configuration files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "ChromeExtensionRegistryKeys",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Chrome extensions installed by writing windows registry keys.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "ChromeFileSystem",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Google Chrome, Beta, Canary and Chromium File System files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "ChromeIndexedDB",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Google Chrome, Beta, Canary and Chromium IndexedDB files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "ChromeLocalStorage",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Google Chrome, Beta, Canary and Chromium Local Storage files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "ChromeNotifications",
+    "ChromePlatformNotificationsDatabase"
+   ],
+   "file": "webbrowser.yaml",
+   "name": "ChromePlatformNotifications",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Google Chrome Platform Notifications LevelDB.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "ChromePreferences",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Chrome Preferences file.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "ChromeSessionStorage",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Google Chrome, Beta, Canary and Chromium Sessions and Session Storage files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "members": [
+    "ChromeFileSystem",
+    "ChromeIndexedDB",
+    "ChromeLocalStorage",
+    "ChromeSessionStorage"
+   ],
+   "name": "ChromeStorage",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Google Chrome, Canary and Chromium browser artifacts for Storage APIs.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "ChromeCache",
+    "ChromiumCache",
+    "EdgeCache"
+   ],
+   "file": "webbrowser.yaml",
+   "name": "ChromiumBasedBrowsersCache",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Caches of multiple Chromium-based browsers (Google Chrome, Brave, Chromium,",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "ChromeCookies"
+   ],
+   "file": "webbrowser.yaml",
+   "name": "ChromiumBasedBrowsersCookiesDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Cookies database file for multiple Chromium-based browsers, such as Google",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "ChromeExtensionActivity",
+    "ChromiumBasedBrowsersExtensionActivity"
+   ],
+   "file": "webbrowser.yaml",
+   "name": "ChromiumBasedBrowsersExtensionActivitySQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Browser Extension Activity SQLite database file for Chromium-based browsers,",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "ChromeExtensions"
+   ],
+   "file": "webbrowser.yaml",
+   "name": "ChromiumBasedBrowsersExtensions",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Browser extension files for multiple Chromium-based browsers, such as Google",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "ChromiumBasedBrowsersFaviconsDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Favicons database file for multiple Chromium-based browsers, such as Google",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "ChromeHistory",
+    "ChromiumBasedBrowsersHistory"
+   ],
+   "file": "webbrowser.yaml",
+   "name": "ChromiumBasedBrowsersHistoryDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Browsing history database file for multiple Chromium-based browsers, such as",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "ChromiumBasedBrowsersLoginDataDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Login Data database file for multiple Chromium-based browsers, such as Google",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "ChromiumBasedBrowsersWebDataDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Web Data database file for multiple Chromium-based browsers, such as Google",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "cloud_services.yaml",
+   "members": [
+    "DropboxClient",
+    "GoogleDriveClient",
+    "SkyDriveClient"
+   ],
+   "name": "CloudStorageClients",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Multiple cloud storage client artifacts.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "containerd.yaml",
+   "name": "ContainerdConfig",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "containerd configuration files",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "containerd.yaml",
+   "name": "ContainerdLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "containerd related events in the log files",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "containerd.yaml",
+   "name": "ContainerdRootDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "containerd default root directory.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "CronAtAllowDenyFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Files containing users authorized to run cron or at jobs.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "CrowdstrikeAgentID",
+   "source_types": [
+    "COMMAND",
+    "FILE",
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Identifier of a CrowdStrike agent.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "CrowdstrikeQuarantine",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Crowdstrike stores quarantined files encoded on disk.",
+   "supported_os": [
+    "Darwin",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSCupsJobCacheFile"
+   ],
+   "file": "unix_common.yaml",
+   "name": "CupsJobCacheFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Common UNIX Printing System (CUPS) job cache file.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "file": "windows_dll_hijacking.yaml",
+   "name": "DLLHijackLocations",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "DLL search order hijacking locations collected from base Windows 7.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "DNSResolvConfFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "DNS Resolver configuration file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "DebianPackagesLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux dpkg log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "DebianPackagesStatus",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux dpkg status file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "DebianVersion",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Debian version information.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "docker.yaml",
+   "name": "DockerContainerConfig",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Docker container configuration files",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "docker.yaml",
+   "name": "DockerRootDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Docker default root directory.",
+   "supported_os": []
+  },
+  {
+   "file": "cloud_services.yaml",
+   "name": "DropboxClient",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Dropbox cloud storage client artifacts.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXApiForwarder",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Records activities related to the vSphere Trust Authority API forwarder.",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXTokenService",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Records activities related to the vSphere Trust Authority ESX Token Service.",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiAttestationService",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Records activities related to the vSphere Trust Authority Attestation Service.",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiAuthenticationLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Contains all events related to authentication for the local system.",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiHostAgentLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Contains information about the agent that manages and configures the ESXi host and its virtual machines.",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiKeyProviderService",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Records activities related to the vSphere Trust Authority Key Provider Service.",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiQuickBootLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Contains all events related to restarting an ESXi host through Quick Boot.",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiShellLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Contains a record of all commands typed into the ESXi Shell and shell events (for example, when the shell was enabled)",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiSystemLogsDirectory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "ESXi System Logs Directory",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiSystemMessageslog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Contains all general log messages and can be used for troubleshooting. This information was formerly located in the messages log file.",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiTrustedInfrastructureAgentLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Records activities related to the Client Service on the ESXi Trusted Host.",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiVMKernelLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Records activities related to virtual machines and ESXi.",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiVMKernelSummaryLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Used to determine uptime and availability statistics for ESXi (comma separated).",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "ESXiVMKernelWarningsLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Records activities related to virtual machines.",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "ElasticsearchAccessLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Elasticsearch access logs are stored.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "ElasticsearchAuditLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Elasticsearch audit logs are stored.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "ElasticsearchGCLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Elasticsearch GC logs are stored.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "ElasticsearchLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Elasticsearch logs are stored.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "ElasticsearchServerLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Elasticsearch server logs are stored.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "EsetAVQuarantine",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Eset Anti-Virus Quarantine (Infected) files.",
+   "supported_os": [
+    "Darwin",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "FirefoxAddOns",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Firefox browser add-ons/extensions.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "FirefoxCache",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mozilla Firefox browser caches.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "FirefoxCookies",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Firefox browser cookies (cookies.sqlite).",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "FirefoxDownloads",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Firefox browser downloads (downloads.sqlite).",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "FirefoxHistory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Firefox browser history (places.sqlite).",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "FishShellConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "FishShell (fish) configuration files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "FishShellHistoryFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Fish shell (fish) history files.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "file": "installed_module_paths.yaml",
+   "name": "FlatpakAppPaths",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Get paths of installed Flatpak app.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "FreeDesktopTrashFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "FreeDesktop.org Trash Files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "FreeDesktopTrashInfoFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "FreeDesktop.org Trash Info Files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "docker.yaml",
+   "name": "GKEDockerContainerLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where stdout and stderr from containers is logged in a Google Kubernetes Engine (GKE) environment.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "GTKRecentlyUsedDatabase",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "GTK Recent Manager database.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "GnomeApplicationState",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Gnome application state for frequent application data.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "applications.yaml",
+   "name": "GnomeEvolution",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Gnome Evolution files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "GnomeTracker",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Gnome Tracker database and backup files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "cloud_services.yaml",
+   "name": "GoogleDriveClient",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Google Drive cloud storage client artifacts.",
+   "supported_os": [
+    "Darwin",
+    "Windows"
+   ]
+  },
+  {
+   "file": "linux_services.yaml",
+   "name": "HAProxyLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "HAProxy Log files",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "hadoop.yaml",
+   "name": "HadoopAppLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Hadoop application logs are stored",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "hadoop.yaml",
+   "name": "HadoopAppRoot",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Hadoop application files are stored",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "hadoop.yaml",
+   "name": "HadoopYarnLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where Hadoop Yarn LevelDB/Timeline files are stored",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "HostAccessPolicyConfiguration",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux files related to host access policy configuration.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "IPTablesRules",
+   "source_types": [
+    "COMMAND"
+   ],
+   "summary": "List IPTables rules.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "InternetExplorer6Settings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Registry keys affecting default behavior for Microsoft Internet Explorer 6.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "InternetExplorerBrowserHelperObjects",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Loaded on Internet Explorer startup",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "InternetExplorerCache",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft Internet Explorer (MSIE) browser cache.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "InternetExplorerCookies",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft Internet Explorer (MSIE) browser cookies.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "members": [
+    "InternetExplorerHistoryDatabaseFile",
+    "InternetExplorerIndexDatFiles"
+   ],
+   "name": "InternetExplorerHistory",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Microsoft Internet Explorer (MSIE) browser history.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "InternetExplorerHistoryDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft Internet Explorer (MSIE) 10 browser history database file (WebCacheV*.dat).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "InternetExplorerIndexDatFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft Internet Explorer (MSIE) 4 - 9 cache and history files (index.dat).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "InternetExplorerProtectedModeDisable",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Microsoft Internet Explorer (MSIE) Protected Mode Banner can be suppressed",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "InternetExplorerProtectedModeElevationPolicies",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Trust levels of apps launched from low rights IE sessions.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "InternetExplorerTypedURLsKeys",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Microsoft Internet Explorer TypedUrls keys.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "java.yaml",
+   "name": "JavaCacheFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Java Plug-in cache.",
+   "supported_os": [
+    "Windows",
+    "Linux",
+    "Darwin"
+   ]
+  },
+  {
+   "file": "linux_services.yaml",
+   "name": "JenkinsLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Jenkins log file",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "config_files.yaml",
+   "name": "JupyterConfigFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Jupyter notebook configuration file",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "KasperskyCaretoDarwinFiles"
+   ],
+   "file": "kaspersky_careto.yaml",
+   "name": "KasperskyCaretoDarwinFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Kaspersky Careto Darwin file system indicators of compromise (IOCs).",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "kaspersky_careto.yaml",
+   "members": [
+    "KasperskyCaretoDarwinFile",
+    "KasperskyCaretoWindowsFile",
+    "KasperskyCaretoWindowsRegistryValue"
+   ],
+   "name": "KasperskyCaretoIndicators",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Kaspersky Careto indicators of compromise (IOCs).",
+   "supported_os": [
+    "Windows",
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "KasperskyCaretoWindowsFiles"
+   ],
+   "file": "kaspersky_careto.yaml",
+   "name": "KasperskyCaretoWindowsFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Kaspersky Careto Windows file system indicators of compromise (IOCs).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "KasperskyCaretoWindowsRegKeys"
+   ],
+   "file": "kaspersky_careto.yaml",
+   "name": "KasperskyCaretoWindowsRegistryValue",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Kaspersky Careto Windows Registry indicators of compromise (IOCs).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "KernelModules",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Kernel modules to be loaded on boot.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "KornShellConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "KornShell (ksh) configuration files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "kubernetes.yaml",
+   "name": "KubernetesCertificates",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Certificate files that are used for a Kubernetes cluster.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "kubernetes.yaml",
+   "name": "KubernetesClusterDatabase",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Kubernetes cluster (etcd) database.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "kubernetes.yaml",
+   "name": "KubernetesKubelet",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Installation path of the (Kubernetes) Kubelet component.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "kubernetes.yaml",
+   "name": "KubernetesKubeletConfiguration",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Files that stores the configuration of the local (Kubernetes) Kubelet.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "kubernetes.yaml",
+   "name": "KubernetesKubeletNetworkPKI",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Certificates and other keyfiles used for Kubelet and Kubernetes general PKI.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "kubernetes.yaml",
+   "name": "KubernetesKubeletPod",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Path of (Kubernetes) Kubelet component information about Pods scheduled to run on a particular node.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "kubernetes.yaml",
+   "name": "KubernetesKubeletPodContainer",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Path where the container resources created within a (Kubernetes) Pod are located.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "kubernetes.yaml",
+   "name": "KubernetesKubeletPodLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where the log data of (Kubernetes) Pods can be found.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "kubernetes.yaml",
+   "name": "KubernetesKubeletPodManifest",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Manifest file that has been used to deploy a (Kubernetes) Pod.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "kubernetes.yaml",
+   "name": "KubernetesKubeletPodVolumes",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Volumes and other objects that are mounted into a (Kubernetes) Pod and respectively into the scheduled container(s).",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "kubernetes.yaml",
+   "name": "KubernetesLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Log files that contain information about the Kubernetes installation of a node.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LessHistoryFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "less history file which remembers search and shell commands",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxASLREnabled",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Kernel ASLR state.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxAtJobs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux at jobs.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxAtJobsTemporaryOutputs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux at jobs temporary outputs.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxAuditLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux audit log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxAuthLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux authentication log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxCACertificates",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux CA Certificates.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxCACertificatesConfiguration",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux CA Certificates configuration file.",
+   "supported_os": []
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxCronLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux cron log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxCronTabs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Crontab files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxDHCPConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux DHCP Configuration File",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxDSDTTable",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux file containing DSDT table.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxDaemonLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux daemon log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxDistributionRelease",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux distribution release information of non-LSB compliant systems.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxFstab",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux fstab file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxGrubConfiguration",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux grub configuration file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxHostnameFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux hostname file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxIfUpDownScripts",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "ifupdown scripts executed whenever a network interface goes up or down respectively.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxIgnoreICMPBroadcasts",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Whether the system ignores ICMP pings.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxInitrdFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Initrd (initramfs) files in /boot/ executed on startup.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxIssueFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux prelogin message and identification (issue) file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxKerberosConfiguration",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux Kerberos configuration information.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxKernelBootloader",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Bootloader state acquired from the kernel.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxKernelLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux kernel log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxKernelModuleRestrictions",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Module loading controls.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxKernelModuleTaintStatus",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Taint state of loaded modules (binary blobs, unsigned modules etc).",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxLSBInit",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux LSB-style init scripts.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxLSBRelease",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux Standard Base (LSB) release information",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxLastlogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux lastlog file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxLoaderSystemPreloadFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux dynamic linker/loader system-wide preload file (ld.so.preload).",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxLocalTime",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Local time zone configuration",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxMessagesLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux messages log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxMountCmd",
+   "source_types": [
+    "COMMAND"
+   ],
+   "summary": "Linux output of mount",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "members": [
+    "LinuxFstab",
+    "LinuxProcMounts"
+   ],
+   "name": "LinuxMountInfo",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Linux mount options.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxNetworkIpForwardingState",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "IP forwarding states.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxNetworkManager",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux NetworkManager files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxNetworkPathFilteringSettings",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "States that determine how the system responds to route manipulation.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxNetworkRedirectState",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Redirect send/receive states.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxNssCachePasswdFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Local NSS database for remote directory services.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxPamConfigs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Configuration files for PAM.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxPasswdFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux passwd file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxProcArp",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "ARP table via /proc/net/arp.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxProcMounts",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Current mounted filesystems.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "members": [
+    "LinuxASLREnabled",
+    "LinuxIgnoreICMPBroadcasts",
+    "LinuxKernelBootloader",
+    "LinuxKernelModuleRestrictions",
+    "LinuxKernelModuleTaintStatus",
+    "LinuxNetworkIpForwardingState",
+    "LinuxNetworkPathFilteringSettings",
+    "LinuxNetworkRedirectState",
+    "LinuxRestrictedDmesgReadPrivileges",
+    "LinuxRestrictedKernelPointerReadPrivileges",
+    "LinuxSecureFsLinks",
+    "LinuxSecureSuidCoreDumps",
+    "LinuxSyncookieState"
+   ],
+   "name": "LinuxProcSysHardeningSettings",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Linux sysctl settings obtained from /proc/sys.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "legacy.yaml",
+   "name": "LinuxRelease",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux specific distribution information.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "members": [
+    "LinuxDistributionRelease",
+    "LinuxLSBRelease",
+    "LinuxSystemdOSRelease"
+   ],
+   "name": "LinuxReleaseInfo",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Release information for Linux platforms.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxRestrictedDmesgReadPrivileges",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Restrict whether non-privileged users can read dmesg.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxRestrictedKernelPointerReadPrivileges",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Memory address obfuscation settings.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxRsyslogConfigs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux rsyslog configurations.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxSSDTTables",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux files containing SSDT table.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "members": [
+    "AnacronFiles",
+    "LinuxAtJobs",
+    "LinuxCronTabs"
+   ],
+   "name": "LinuxScheduleFiles",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "All Linux job scheduling files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxSecureFsLinks",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Security controls to restrict operations on links in world writable directories.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxSecureSuidCoreDumps",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Security controls for suid core dumps.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "members": [
+    "LinuxLSBInit",
+    "LinuxSysVInit",
+    "LinuxSystemdServices",
+    "LinuxXinetd"
+   ],
+   "name": "LinuxServices",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Services running on a Linux system.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxSudoReplayLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux sudoreplay log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxSyncookieState",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Whether the system uses syncookies.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxSysLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux syslog log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxSysVInit",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Services started by sysv-style init scripts.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux_proc.yaml",
+   "name": "LinuxSysctlCmd",
+   "source_types": [
+    "COMMAND"
+   ],
+   "summary": "Linux output of systctl -a.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxSysctlConfigurationFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux sysctl preload/configuration files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxSyslogNgConfigs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux syslog-ng configurations.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxSystemdJournalConfig",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux systemd journal config file",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxSystemdJournalLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux systemd journal log files",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxSystemdOSRelease",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux systemd /etc/os-release file",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxSystemdServices",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux systemd service unit files",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxSystemdTimers",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux systemd Timer files",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxTimezoneFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux timezone file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxUdevRules",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux udev rules for the events received by the udev's daemon from the Linux kernel.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxUtmpFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux btmp, utmp and wtmp login record files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxWtmp",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux wtmp login record file",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LinuxXinetd",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux xinetd configurations.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "ListProcessesPsCommand",
+   "source_types": [
+    "COMMAND"
+   ],
+   "summary": "Full process listing via the 'ps' command.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LoadedKernelModules",
+   "source_types": [
+    "COMMAND"
+   ],
+   "summary": "Linux output of lsmod.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LocateDatabase",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "locate/mlocate database and updatedb configuration.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "LoginPolicyConfiguration",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux files related to login policy configuration.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSAddressBookImagesSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Address book images SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSWirelessNetworks"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSAirportPreferencesPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Airport (wireless networking) preferences property list (plist) file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSApplePushServiceSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Apple push service SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSSystemInstallationTime"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSAppleSetupDoneFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mac OS .AppleSetupDone file that hints to the system installation date and time.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSAppleSystemLogFiles"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSAppleSystemLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Apple system log (ASL) files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSApplicationBundleCacheSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Application bundle cache SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSApplicationResourcesStringsPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Application resources strings plist file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSApplications"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSApplicationsDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Contents of the Applications directory.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSApplicationsRecentItems",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Recent Items application specific",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSAssetCacheInfoSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Asset cache information SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSAtJobs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "MacOS at jobs",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSAuditLogFiles"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSAuditLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Audit log files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSAuthorizationRulesSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Authorization rules SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSBluetoothPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Bluetooth preferences and paired device information property list (plist) file",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSCalendarCacheSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Calendar cache SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSCallHistoryCacheSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Call history cache SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSCodeSignatureCodeResourcesPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Code signature CodeResources plist file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSContentsInfoPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Contents Info.plist file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSContentsVersionPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Contents version.plist file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSCoreAnalyticsFiles"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSCoreAnalyticsFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "CoreAnalytics log files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSCronTabs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Cron tabs",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSDirectoryServicesLocalNodesSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Directory services local nodes database.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSDock"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSDockConfigurationPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Dock configuration property list (plist) file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSDuetActivitySchedulerSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Duet activity scheduler database.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSDuetKnowledgeBase"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSDuetKnowledgeCSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Duet knowledgeC User and Application usage database.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSDuetSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Duet database.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSDuetSystemEventsSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Duet system events database.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSDuetinteractionCSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Duet interactionC database.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSFSEvents"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSFSEventsFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "File system events disk log stream (fsevents) files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSGatekeeperOpaqueConfigurationSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Gatekeeper opaque configuration database.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSGlobalPreferencesPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Global preferences property list (plist) file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSIdentityServicesSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Identity services SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSInstallationHistory"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSInstallationHistoryPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Software installation history property list (plist) file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSInstallationLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Software installation log file",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSKextFiles"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSKernelExtensionFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Kernel extension (.kext) files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSKeyboardLayoutPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Keyboard layout property list (plist) file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSLastlogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Lastlog file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSLaunchAgentsPlistFiles"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSLaunchAgentsPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Launch Agents property list (plist) files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSLaunchDaemonsPlistFiles"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSLaunchDaemonsPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Launch Daemons property list (plist) files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSLoadedKexts",
+   "source_types": [
+    "COMMAND"
+   ],
+   "summary": "MacOS Loaded Kernel Extensions.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSMiscLogs"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Miscellaneous system log files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSLoginWindowPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Log-in window information property list (plist) file",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailAccounts",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail Accounts. Until now only V2, V3 and V5 have been observed.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailBackupTOC",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail Backup Table of Content. Until now only V2, V3 and V5 have been observed.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailDownloadAttachments",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail Downloads Directory",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailEnvelopIndex",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail Envelope Index. Until now only V2, V3 and V5 have been observed.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailIMAP",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail IMAP Synched Mailboxes. Until now only V2, V3 and V5 have been observed.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailMainDirectory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail Main Folder. Until now only V2, V3 and V5 have been observed.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailOpenedAttachments",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail Opened Attachments",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailPOP",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail POP Synched Mailboxes. Until now only V2, V3 and V5 have been observed.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailPreferences",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail Preferences",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailRecentContacts",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail Recent Contacts",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailSignatures",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail Signatures by Account. Until now only V2, V3 and V5 have been observed.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMailboxes",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mail Mailbox Directory. Until now only V2, V3 and V5 have been observed.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMessageChatSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "iMessage chat SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSMountedDMGs",
+   "source_types": [
+    "COMMAND"
+   ],
+   "summary": "MacOS Mounted DMG files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSNetworkUsageSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Network usage SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSNotesSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Notes SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSNotificationCenter"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSNotificationCenterSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "MacOS NotificationCenter SQLite database files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSPeriodicSystemFunctions"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSPeriodicSystemFunctionConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Configuration files of system function scripts that should run periodically.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSQuarantineEvents"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSQuarantineEventsSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Quarantine events SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSRecentItems"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSRecentItemsPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Recent items property list (plist) file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSRemoteDesktopAdministratorSystem",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Apple Remote Desktop (ARD) was first released in 2002 and is Apple’s desktop management system for software distribution, asset management, and remote assistance.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSRemoteDesktopClientSystem",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Apple Remote Desktop (ARD) was first released in 2002 and is Apple’s desktop management system for software distribution, asset management, and remote assistance.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSResourcesInfoStringsPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Resources InfoPlist.strings plist file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSResourcesLocalizableStringsPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Resources Localizable.strings plist file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSSidebarLists"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSSidebarListsPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Sidebar lists preferences property list (plist) file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSSiriAnalyticsSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Siri analytics SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSSiriSuggestionsEntitiesSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Siri suggestions entities SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSSiriSuggestionsPendingQueueSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Siri suggestions pending queue SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSSiriSuggestionsSnippetsSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Siri suggestions snippets SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSSleepimageFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Sleepimage file which contains the content of memory before going to sleep",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSUpdate"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSSoftwareUpdatePreferencesPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Software update preferences property list (plist) files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSSpotlightStoreVolumeConfigurationPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Spotlight store volume configuration plist file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSSpotlightVolumeConfigurationPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Spotlight volume configuration plist file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSStartupItemsPlistFiles"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSStartupItemsPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Startup Items property list (plist) files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSSwapFiles"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSSwapFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Swap file",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSSystemConfigurationPreferencesPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "System configuration preferences property list (plist) file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSSystemLogFiles"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSSystemLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "System log file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSSystemPolicySQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "System policy database.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSSystemPreferencesPlistFiles"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSSystemPreferencesPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "System Preferences property list (plist) files",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSSystemVersionPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Operating system name and version property list (plist) file",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSTCC"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSTCCSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Transparency, Consent, Control (TCC) framework SQLite database files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSTextReplacementsSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Text replacements SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSTimeMachinePlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Time Machine information property list (plist) file",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUnifiedLogging",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Apple Unified Logging and Activity Tracing",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSUserSocialAccounts"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSUserAccountsSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "User Accounts SQLite database files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSUserApplicationLogs"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSUserApplicationLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "User applications log files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSApplicationSupport"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSUserApplicationSupportDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Contents of the user Application Support directories.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUserDesktopDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Contents of the user Desktop directories.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUserDockDesktopPictureSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Dock user desktop picture SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUserDocumentsDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Contents of the user Documents directories.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSUserGlobalPreferences"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSUserGlobalPreferencesPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "User global preferences property list (plist) file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSKeychains"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSUserKeychainFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "User keychain files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUserKeychainOCSPCacheSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "User keychain CRL and OCSP cache SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUserLibraryDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Contents of the user Library directories.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUserLocalItemsKeychainKeybagSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "User (iCloud) local items keychain keybag SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUserLocalItemsKeychainRecordsSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "User (iCloud) local items keychain encrypted records SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSUserLoginItems"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSUserLoginItemsPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "User login items property list (plist) file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUserMoviesDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Contents of the user Movies directories.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUserMusicDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Contents of the user Music directories.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSUserPasswordHashesPlistFiles"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSUserPasswordHashesPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "User password hashes property list (plist) files.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUserPicturesDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Contents of the user Pictures directories.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSUserPreferences"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSUserPreferencesDirectory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Contents of the user Preferences directories.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUserPublicDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Contents of the user Public directories.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSUserTrash"
+   ],
+   "file": "macos.yaml",
+   "name": "MacOSUserTrashDirectory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Contents of the user Trash directories.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSUtmpxFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Utmpx login record file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSVolumeInformationDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Information of file ownership of (previously) attached volumes.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSWalletSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Apple Wallet SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSWirelessDiagnosticDataPersistentSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Apple Wireless Diagnostic Data (AWDD) persistent SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSXcodeiOSDeviceLogsSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Xcode iOS Device Logs SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSiCloudAccounts",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "iCloud Accounts",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSiCloudPreferences",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "iCloud user preferences",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSiDevices",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Attached iDevices",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSiOSBackupInfo",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "iOS device backup information",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSiOSBackupManifest",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "iOS device backup apps information",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSiOSBackupMbdb",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "iOS device backup files information",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSiOSBackupStatus",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "iOS device backup status information.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSiOSBackupsMainDirectory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "iOS device backups directory",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "macos.yaml",
+   "name": "MacOSiTunesInterfaceBuilderDocumentPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "iTunes Interface Builder document (*.itxib) plist file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "MicrosoftAVLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft Anti-Virus log files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "MicrosoftAVQuarantine",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft Anti-Virus Quarantine (Infected) files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webservers.yaml",
+   "name": "MicrosoftIISLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Internet Information Services (IIS) web server's log files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "WindowsMsOfficeAutosave"
+   ],
+   "file": "applications.yaml",
+   "name": "MicrosoftOfficeAutosave",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Automatically created Microsoft Office recovery files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "applications.yaml",
+   "name": "MicrosoftOfficeMRU",
+   "source_types": [
+    "FILE",
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Microsoft Office Most Recently Used",
+   "supported_os": [
+    "Darwin",
+    "Windows"
+   ]
+  },
+  {
+   "file": "applications.yaml",
+   "name": "MicrosoftOutlookOSTFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft Outlook OST Files",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "applications.yaml",
+   "name": "MicrosoftOutlookPABFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft Outlook PAB Files",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "applications.yaml",
+   "name": "MicrosoftOutlookPSTFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft Outlook PST Files",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "applications.yaml",
+   "name": "MicrosoftSqlServerErrorLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft SQL Server's error log files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "MongoDBConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "MongoDB configuration file.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "MongoDBDatabasePath",
+   "source_types": [
+    "FILE",
+    "PATH"
+   ],
+   "summary": "MongoDB database Path.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "MongoDBLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "MongoDB log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "applications.yaml",
+   "name": "MozillaThunderbird",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Mozilla Thunderbird files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "MySQLConfigurationFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "MySQL configuration files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "MySQLDataDictionary",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "MySQL data dictionary.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "MySQLDataDirectory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "MySQL data directory.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "MySQLHistoryFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "MySQL History file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "MySQLLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "MySQL log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "file_systems.yaml",
+   "name": "NTFSLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The NTFS $LogFile file system metadata file.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "file_systems.yaml",
+   "name": "NTFSMFTFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The NTFS $MFT and $MFTMirr file system metadata files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "file_systems.yaml",
+   "name": "NTFSUSNJournal",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The NTFS $UsnJnrl file system metadata file.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "NanoHistoryFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "nano history file that logs search and replace strings.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "NetgroupConfiguration",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Linux netgroup configuration.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "config_files.yaml",
+   "name": "NfsExportsFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "NFS Exports configuration",
+   "supported_os": [
+    "Linux",
+    "Darwin"
+   ]
+  },
+  {
+   "file": "webservers.yaml",
+   "name": "NginxAccessLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where nginx access logs are stored",
+   "supported_os": [
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webservers.yaml",
+   "name": "NginxErrorLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Location where nginx error logs are stored",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "applications.yaml",
+   "name": "NodeJSPackageManagerCacheFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Node JS package manager (NPM) cache files",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "installed_module_paths.yaml",
+   "name": "NpmPackagesPath",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Get path of NPM packages that are globally installed (currently linux only).",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "NtpConfFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The configuration file for ntpd. e.g. ntp.conf.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "OpenSearchLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "OpenSearch log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "aliases": [
+    "OperaHistory"
+   ],
+   "file": "webbrowser.yaml",
+   "name": "OperaHistoryFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Opera browser history (global_history.dat) file.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "linux_services.yaml",
+   "name": "OsqueryLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Osquery daemon log files",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "PCIDevicesInfoFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Info and config files for PCI devices located on the system.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "PostgreSQLConfigurationFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "PostgreSQL configuration files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "PostgreSQLDataDirectory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "PostgreSQL data directory.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "PostgreSQLHistoryFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "PostgreSQL History file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "PostgreSQLLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "PostgreSQL log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "installed_modules.yaml",
+   "name": "PythonDistInfo",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Python module files distributed in the dist-info format of PEP-0376",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "installed_module_paths.yaml",
+   "name": "PythonDistInfoPath",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Get the path of Python module files distributed in the dist-info format of",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "installed_modules.yaml",
+   "name": "PythonEggInfo",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Python module files distributed in .egg formats (currently linux only).",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "PythonHistoryFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Python REPL history file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "installed_modules.yaml",
+   "members": [
+    "PythonDistInfo",
+    "PythonEggInfo",
+    "PythonWheelInfo"
+   ],
+   "name": "PythonModuleInfo",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Python module installation information.",
+   "supported_os": []
+  },
+  {
+   "file": "installed_modules.yaml",
+   "name": "PythonWheelInfo",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Python module files distributed in the wheel format (currently linux only).",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "RHostsFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "RHosts file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "config_files.yaml",
+   "name": "RedisConfigFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Redis configuration file",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "RedisConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Redis configuration files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "RedisDataDirectory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Redis Data Directory.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "database_servers.yaml",
+   "name": "RedisLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Redis log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "RootUserShellConfigs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Common Unix root shell configuration files.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "RootUserShellHistory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Common Unix root shell history files.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "file": "installed_modules.yaml",
+   "name": "RubyGems",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Ruby Gems (currently linux only).",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "SQLiteHistoryFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "SQLite History file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "SSHAuthorizedKeysFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "SSH authorized keys files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "SSHHostPubKeys",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "SSH host public keys",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "SSHKnownHostsFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "SSH known_hosts files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "SafariAutoFillCorrectionsSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari browser auto-fill corrections SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "SafariCache"
+   ],
+   "file": "webbrowser.yaml",
+   "name": "SafariCacheSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari browser cache (cache.db) SQLite database file.",
+   "supported_os": [
+    "Darwin",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "SafariCloudAutoFillCorrectionsSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari browser cloud auto-fill corrections SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "SafariCookies",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari Cookies database.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "aliases": [
+    "SafariDownloads"
+   ],
+   "file": "webbrowser.yaml",
+   "name": "SafariDownloadsPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari downloads history (Downloads.plist) property list (plist) file.",
+   "supported_os": [
+    "Darwin",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "SafariExtensions",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari browser extensions.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "SafariFaviconsCacheSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari browser favicons cache SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "members": [
+    "SafariHistoryPlistFile",
+    "SafariHistorySQLiteDatabaseFile"
+   ],
+   "name": "SafariHistory",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Safari browser history.",
+   "supported_os": [
+    "Darwin",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "SafariHistoryPlistFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari browser history (History.plist) property list (plist) file.",
+   "supported_os": [
+    "Darwin",
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "SafariHistorySQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari browser history SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "SafariPerSitePreferencesSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari browser per site preferences SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "SafariTabSnapshotsMetadataSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari browser tab snapshots metadata SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "SafariTouchIconCacheSettingsSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Safari browser touch icon cache settings SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "config_files.yaml",
+   "name": "SambaConfigFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Samba configuration file",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "SambaLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Samba log files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "SantaLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Local Santa logs.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "SecretsServiceDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The System Security Services Daemon (SSSD) database file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "aliases": [
+    "AllShellConfigs",
+    "GlobalShellConfigs",
+    "UsersShellConfigs"
+   ],
+   "file": "shell.yaml",
+   "members": [
+    "BashShellConfigurationFile",
+    "CShellConfigurationFile",
+    "FishShellConfigurationFile",
+    "KornShellConfigurationFile",
+    "ShellLogoutFile",
+    "ShellProfileFile",
+    "TeeShellConfigurationFile",
+    "ZShellConfigurationFile"
+   ],
+   "name": "ShellConfigurationFile",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of shell configuration files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "AllUsersShellHistory",
+    "UserShellHistory"
+   ],
+   "file": "shell.yaml",
+   "members": [
+    "BashShellHistoryFile",
+    "BourneShellHistoryFile",
+    "FishShellHistoryFile",
+    "ZShellHistoryFile"
+   ],
+   "name": "ShellHistoryFile",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of shell history files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "ShellLogoutFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Shell logout file.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "ShellProfileFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Shell profile file.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "instant_messaging.yaml",
+   "name": "SignalApplicationContent",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Signal Application Content and Configuration",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "instant_messaging.yaml",
+   "name": "SignalDatabase",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Signal Database file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "cloud_services.yaml",
+   "name": "SkyDriveClient",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft Sky Drive cloud storage client artifacts.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "instant_messaging.yaml",
+   "name": "SkypeChatSync",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Chat Sync Directory",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "instant_messaging.yaml",
+   "name": "SkypeDb",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Main Skype database",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "instant_messaging.yaml",
+   "name": "SkypeMainDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Skype Directory",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "instant_messaging.yaml",
+   "name": "SkypePreferences",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Skype Preferences and Recent Searches",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "instant_messaging.yaml",
+   "name": "SkypeUserProfile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Skype User profile",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "SophosAVLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Sophos Anti-Virus log files.",
+   "supported_os": [
+    "Darwin",
+    "Windows"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "SophosAVQuarantine",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Sophos Anti-Virus Quarantine (Infected) files.",
+   "supported_os": [
+    "Darwin",
+    "Windows"
+   ]
+  },
+  {
+   "file": "config_files.yaml",
+   "name": "SshUserConfigFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "User ssh configuration file",
+   "supported_os": [
+    "Linux",
+    "Darwin"
+   ]
+  },
+  {
+   "file": "config_files.yaml",
+   "name": "SshdConfigFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Sshd configuration",
+   "supported_os": [
+    "Linux",
+    "Darwin"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "SymantecAVLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Symantec Anti-Virus Log Files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "SymantecAVQuarantine",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Symantec Anti-Virus quarantine (infected) and cloud submission files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "legacy.yaml",
+   "name": "SystemDriveEnvironmentVariable",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %SystemDrive% environment variable, usually \"C:\".",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "TeeShellConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Tee shell (tcsh) configuration files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "ThumbnailCacheFolder",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Thumbnail cache folder.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "tomcat.yaml",
+   "members": [
+    "TomcatLogFiles",
+    "TomcatPasswordFile"
+   ],
+   "name": "TomcatFiles",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Tomcat files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "tomcat.yaml",
+   "name": "TomcatLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Tomcat log files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "tomcat.yaml",
+   "name": "TomcatPasswordFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Tomcat password file.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "ApacheAccessLogs",
+    "ApacheConfigurationFolder",
+    "ApacheDefaultSiteConfigurationFile",
+    "ApacheErrorLogs",
+    "ApacheKafkaLogFiles",
+    "ElasticsearchAccessLog",
+    "ElasticsearchAuditLog",
+    "ElasticsearchGCLog",
+    "ElasticsearchLogs",
+    "ElasticsearchServerLog",
+    "HAProxyLogFiles",
+    "HadoopAppLogs",
+    "HadoopAppRoot",
+    "HadoopYarnLogs",
+    "JenkinsLogFile",
+    "MicrosoftIISLogs",
+    "MicrosoftSqlServerErrorLogs",
+    "NginxAccessLogs",
+    "NginxErrorLogs",
+    "OsqueryLogFiles",
+    "RedisConfigFile",
+    "TomcatFiles",
+    "TomcatLogFiles",
+    "TomcatPasswordFile",
+    "WordpressConfigFile"
+   ],
+   "name": "TriageApplicationConfigsAndLogs",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of configuration files and logs of installed applications.",
+   "supported_os": [
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "MongoDBConfigurationFile",
+    "MongoDBLogFiles",
+    "MySQLConfigurationFiles",
+    "MySQLLogFiles",
+    "OpenSearchLogFiles",
+    "PostgreSQLConfigurationFiles",
+    "PostgreSQLLogFiles",
+    "RedisConfigFile",
+    "RedisConfigurationFile",
+    "RedisLogFiles"
+   ],
+   "name": "TriageDatabaseConfigsAndLogs",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of configuration files and logs of installed databases.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "JavaCacheFiles",
+    "WMICCMRUA",
+    "WindowsAMCacheHveFile",
+    "WindowsCIMRepositoryFiles",
+    "WindowsCrashDumps",
+    "WindowsPrefetchFiles",
+    "WindowsRecentFileCacheBCF",
+    "WindowsStartupInfo",
+    "WindowsSuperFetchFiles",
+    "WindowsSystemResourceUsageMonitorDatabaseFile"
+   ],
+   "name": "TriageExecution",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of process/command execution related artifacts.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "WindowsSetupApiLogs"
+   ],
+   "name": "TriageExternalMedia",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of external media data or events related artifacts.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "NTFSLogFile",
+    "NTFSMFTFiles"
+   ],
+   "name": "TriageFileSystem",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of file system related artifacts.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "BashShellHistoryFile",
+    "BourneShellHistoryFile",
+    "FishShellHistoryFile",
+    "MySQLHistoryFile",
+    "PostgreSQLHistoryFile",
+    "PythonHistoryFile",
+    "RootUserShellHistory",
+    "SQLiteHistoryFile",
+    "ShellConfigurationFile",
+    "ShellHistoryFile",
+    "WindowsPowerShellHistory",
+    "ZShellHistoryFile"
+   ],
+   "name": "TriageHistoryFiles",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of history files related artifacts.",
+   "supported_os": [
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "DropboxClient",
+    "FreeDesktopTrashInfoFiles",
+    "GTKRecentlyUsedDatabase",
+    "GnomeApplicationState",
+    "GnomeTracker",
+    "MicrosoftOfficeAutosave",
+    "MicrosoftOfficeMRU",
+    "SignalDatabase",
+    "ThumbnailCacheFolder",
+    "Viminfo",
+    "WgetHSTSdatabase",
+    "WindowsActivitiesCacheDatabase",
+    "WindowsRDPClientBitmapCache",
+    "WindowsRecycleBinMetadata",
+    "WindowsSearchDatabaseFile",
+    "WindowsUserAutomaticDestinationsJumpLists",
+    "WindowsUserCustomDestinationsJumpLists",
+    "WindowsUserRecentFiles",
+    "XChatLogs",
+    "ZeitgeistDatabase"
+   ],
+   "name": "TriageInteractiveActivity",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of interactive user activity related artifacts.",
+   "supported_os": [
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "DNSResolvConfFile",
+    "HostAccessPolicyConfiguration",
+    "LinuxHostnameFile",
+    "LinuxIgnoreICMPBroadcasts",
+    "LinuxNetworkIpForwardingState",
+    "LinuxNetworkPathFilteringSettings",
+    "LinuxNetworkRedirectState",
+    "LinuxProcArp",
+    "LinuxSyncookieState",
+    "UFWConfigFiles",
+    "UnixHostsFile",
+    "WindowsFirewallLogFile",
+    "WindowsHostsFiles"
+   ],
+   "name": "TriageNetwork",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of network related artifacts.",
+   "supported_os": [
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "AnacronFiles",
+    "LinuxAtJobs",
+    "LinuxCronTabs",
+    "LinuxSysVInit",
+    "LinuxSystemdServices",
+    "LinuxSystemdTimers",
+    "WMIEnumerateASEC",
+    "WMIEnumerateCLEC",
+    "WindowsApplicationCompatibilityInstalledShimDatabases",
+    "WindowsAutoexecBat",
+    "WindowsAutorun",
+    "WindowsBITSQueueManagerDatabases",
+    "WindowsGroupPolicyScripts",
+    "WindowsPowerShellDefaultProfiles",
+    "WindowsScheduledTasks",
+    "WindowsStartupFolders",
+    "WindowsWinstart",
+    "XDGAutostartEntries"
+   ],
+   "name": "TriagePersistence",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of persistence mechanism related artifacts.",
+   "supported_os": [
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "EsetAVQuarantine",
+    "MicrosoftAVLogs",
+    "MicrosoftAVQuarantine",
+    "SophosAVLogs",
+    "SophosAVQuarantine",
+    "SymantecAVLogs",
+    "SymantecAVQuarantine"
+   ],
+   "name": "TriageSecurityAgents",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of endpoint detection and response related artifacts.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "APTSources",
+    "APTTrustKeys",
+    "CronAtAllowDenyFiles",
+    "DebianPackagesStatus",
+    "DebianVersion",
+    "KernelModules",
+    "LinuxASLREnabled",
+    "LinuxCACertificates",
+    "LinuxDHCPConfigurationFile",
+    "LinuxDSDTTable",
+    "LinuxFstab",
+    "LinuxGrubConfiguration",
+    "LinuxInitrdFiles",
+    "LinuxIssueFile",
+    "LinuxKernelBootloader",
+    "LinuxKernelModuleRestrictions",
+    "LinuxKernelModuleTaintStatus",
+    "LinuxLSBInit",
+    "LinuxLSBRelease",
+    "LinuxLoaderSystemPreloadFile",
+    "LinuxLocalTime",
+    "LinuxNetworkManager",
+    "LinuxPamConfigs",
+    "LinuxPasswdFile",
+    "LinuxProcMounts",
+    "LinuxRelease",
+    "LinuxRestrictedDmesgReadPrivileges",
+    "LinuxRestrictedKernelPointerReadPrivileges",
+    "LinuxRsyslogConfigs",
+    "LinuxSSDTTables",
+    "LinuxSecureFsLinks",
+    "LinuxSecureSuidCoreDumps",
+    "LinuxSysctlConfigurationFiles",
+    "LinuxSyslogNgConfigs",
+    "LinuxSystemdJournalConfig",
+    "LinuxSystemdOSRelease",
+    "LinuxTimezoneFile",
+    "LinuxXinetd",
+    "LocateDatabase",
+    "LoginPolicyConfiguration",
+    "NetgroupConfiguration",
+    "NfsExportsFile",
+    "NtpConfFile",
+    "PCIDevicesInfoFiles",
+    "SSHHostPubKeys",
+    "SambaConfigFile",
+    "SecretsServiceDatabaseFile",
+    "SshdConfigFile",
+    "UnixGroupsFile",
+    "UnixLocalTimeConfigurationFile",
+    "UnixPasswdFile",
+    "UnixShadowFile",
+    "UnixSudoersConfigurationFile",
+    "WindowsRegistryFilesAndTransactionLogs",
+    "WindowsSystemRegistryFilesAndTransactionLogsBackup",
+    "YumSources"
+   ],
+   "name": "TriageSystemConfiguration",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of configuration files related artifacts.",
+   "supported_os": [
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "DebianPackagesLogFiles",
+    "LinuxAuditLogs",
+    "LinuxAuthLogs",
+    "LinuxCronLogs",
+    "LinuxDaemonLogFiles",
+    "LinuxKernelLogFiles",
+    "LinuxLastlogFile",
+    "LinuxMessagesLogFiles",
+    "LinuxSudoReplayLogs",
+    "LinuxSysLogFiles",
+    "LinuxSystemdJournalLogs",
+    "LinuxUtmpFiles",
+    "LinuxWtmp",
+    "SambaLogFiles",
+    "UFWLogFile",
+    "UnixUtmpFile",
+    "WindowsEventLogs",
+    "WindowsUserAccessLogging"
+   ],
+   "name": "TriageSystemLogs",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of system logs related artifacts.",
+   "supported_os": [
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "BashShellConfigurationFile",
+    "CShellConfigurationFile",
+    "ChromePreferences",
+    "FishShellConfigurationFile",
+    "JupyterConfigFile",
+    "KornShellConfigurationFile",
+    "RHostsFile",
+    "RootUserShellConfigs",
+    "SSHAuthorizedKeysFiles",
+    "SSHKnownHostsFiles",
+    "ShellLogoutFile",
+    "ShellProfileFile",
+    "SignalApplicationContent",
+    "SshUserConfigFile",
+    "TeeShellConfigurationFile",
+    "ZShellConfigurationFile"
+   ],
+   "name": "TriageUserConfiguration",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of user configuration related artifacts.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "ChromePreferences",
+    "ChromiumBasedBrowsersExtensionActivitySQLiteDatabaseFile",
+    "ChromiumBasedBrowsersExtensions",
+    "FirefoxAddOns"
+   ],
+   "name": "TriageWebBrowserExtensions",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of web browser extensions related artifacts.",
+   "supported_os": [
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "triage.yaml",
+   "members": [
+    "BrowserHistory",
+    "WindowsCryptnetUrlCacheMetadata"
+   ],
+   "name": "TriageWebBrowserHistory",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Group of web browser history related artifacts.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "UFWConfigFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "UFW Configuration files.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "UFWLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "UFW Log file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "aliases": [
+    "UnixGroups"
+   ],
+   "file": "unix_common.yaml",
+   "name": "UnixGroupsFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Unix groups file.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSHostsFile"
+   ],
+   "file": "unix_common.yaml",
+   "name": "UnixHostsFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Unix hosts file",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSLocalTime"
+   ],
+   "file": "unix_common.yaml",
+   "name": "UnixLocalTimeConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Unix local time zone configuration file.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "aliases": [
+    "UnixPasswd"
+   ],
+   "file": "unix_common.yaml",
+   "name": "UnixPasswdFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Unix passwd file.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "file": "unix_common.yaml",
+   "name": "UnixShadowBackupFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Unix shadow backup file.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "file": "unix_common.yaml",
+   "name": "UnixShadowFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Unix shadow file.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "aliases": [
+    "UnixSudoersConfiguration"
+   ],
+   "file": "unix_common.yaml",
+   "name": "UnixSudoersConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Unix sudoers configuration file.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "file": "unix_common.yaml",
+   "members": [
+    "UnixGroupsFile",
+    "UnixPasswdFile",
+    "UnixShadowFile"
+   ],
+   "name": "UnixUsersGroups",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Unix users and groups files.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSUtmpFile"
+   ],
+   "file": "unix_common.yaml",
+   "name": "UnixUtmpFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Utmp login record files.",
+   "supported_os": [
+    "Darwin",
+    "Linux"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSUserDownloadsDirectory",
+    "UserDownloads",
+    "WindowsUserDownloadsDirectory"
+   ],
+   "file": "user.yaml",
+   "name": "UserDownloadsDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Contents of user Downloads directories.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "MacOSUsers",
+    "MacOSUsersDirectory",
+    "OSXUsers",
+    "UserHomeDirectory"
+   ],
+   "file": "user.yaml",
+   "name": "UsersDirectory",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Contents of the Users directory.",
+   "supported_os": [
+    "Darwin",
+    "Windows"
+   ]
+  },
+  {
+   "file": "installed_module_paths.yaml",
+   "name": "VSCodeExtensionsPath",
+   "source_types": [
+    "PATH"
+   ],
+   "summary": "Get paths of Visual Studio Code extensions",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "Viminfo",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Viminfo file.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIAccountUsersDomain",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Fill out user AD domain information based on username.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIAntivirusProduct",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Enumerate the registered antivirus.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMICCMRUA",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Enumerate instances of CCM_RecentlyUsedApps.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIComputerSystemProduct",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Computer System Product including identifying number queried from WMI.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIDNSClientCache",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "DNS client cache via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIDrivers",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Installed drivers via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIEnumerateASEC",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Enumerate instances of ActiveScriptEventConsumer.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIEnumerateCLEC",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Enumerate instances of CommandLineEventConsumer.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIHotFixes",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Installed hotfixes via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIInstalledSoftware",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Installed software via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMILastBootupTime",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Last system boot time (UTC) retrieved from WMI.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMILoggedOnSessions",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Logged on users queried from WMI.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMILoggedOnUsers",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Logged on users queried from WMI.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMILogicalDisks",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Disk information via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMILoginUsers",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Login Users via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMINetNeighbors",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "TCP/IP neighbors via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMINetTCPConnections",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "TCP connections via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMINetUDPEndpoints",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "UDP endpoints via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIOperatingSystem",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Operating system installed on the computer via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIPhysicalMemory",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Physical memory information via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIProcessList",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Process listing via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIProfileUsersHomeDir",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Get user homedir from Win32_UserProfile based on a known user's SID.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIScheduledTasks",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Scheduled tasks that are registered on the computer via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIServices",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Services queried from WMI.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIStartupCommands",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Commands that run automatically when a user logs onto the computer system via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIUsers",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "Users via Windows Management Instrumentation (WMI).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "wmi.yaml",
+   "name": "WMIVolumeShadowCopies",
+   "source_types": [
+    "WMI"
+   ],
+   "summary": "A List of Volume Shadow Copies from WMI.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webbrowser.yaml",
+   "name": "WebKitPubSubSQLiteDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "WebKit RSS feed (PubSub) SQLite database file.",
+   "supported_os": [
+    "Darwin"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "WgetHSTSdatabase",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Default wget HTTP Strict Transport Security (HSTS) database",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "legacy.yaml",
+   "name": "WinDomainName",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The Windows domain the system is connected to.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "applications.yaml",
+   "name": "WinRARAVScan",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Executable run to scan a file when it is opened by WinRAR.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "applications.yaml",
+   "name": "WinRARExternalViewer",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Executable run when a file is opened by WinRAR inside an archive.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WinSock2LayeredServiceProviders",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Used to filter TCP/IP traffic through WinSock2.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WinSock2NamespaceProviders",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Used to provide name-resolution services through WinSock2",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsAMCacheHveFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The AMCache file, stored in the Windows NT Registry file format.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsActionCenterSettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Action Center Settings",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsActiveDesktop",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Active Desktop settings and components.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "WindowsActiveDirectoryDatabase"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsActiveDirectoryDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Active Directory database file (ntds.dit).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsActiveSyncAutoStart",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows ActiveSync AutoStart entries",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsActivitiesCacheDatabase",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "SQLite database containing the Windows activities cache.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsAlternateShell",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Alternate Shell to be run via Userinit.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsAppCertDLLs",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows AppCertDLLs persistence.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsAppCompatCache",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Application Compatibility Cache",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsAppInitDLLs",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Application Initial (AppInit) DLLs persistence.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "WinAppXRT"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsAppXRT",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "WinAppXRT DLL loaded by .Net applications when the APPX_PROCESS environment variable is set.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsApplicationCompatibilityInstalledShimDatabases",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Application Compatibility Installed Shim Databases.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsApplicationCompatibilityShimDatabaseMappings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Application Compatibility Shim Database Mappings.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "members": [
+    "WindowsApplicationCompatibilityInstalledShimDatabases",
+    "WindowsApplicationCompatibilityShimDatabaseMappings"
+   ],
+   "name": "WindowsApplicationCompatibilityShims",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Windows Application Compatibility Shim Database Files and Application Mappings",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsApplicationRegistration",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Application Registration (AppPath) Registry keys.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsAutoexecBat",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows autoexec.bat file",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsAutomaticDebugging",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows automatic debugging (Aedebug)",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsAutomaticDebuggingExclusionList",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows automatic debugging (Aedebug) exclusion list",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsAutorun",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Filebased Tests.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsAvailableTimeZones",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Timezones available on a Windows system.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsBITSQueueManagerDatabases",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Databases that contain the Windows BITS jobs definition and state.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsBackgroundActivityModeratorKeys",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Background Activity Moderator (BAM) and Desktop Activity Moderator (DAM) registry keys.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsBootConfigurationDataRegistryFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Boot Configuration Data (BCD) Windows Registry files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsBootConfigurationSettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Boot Configuration Settings",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsBootVerificationProgram",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Path to custom startup verification program.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCIMRepositoryFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Common Information Model (CIM) repository.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCOMInprocHandlers",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows COM in-process handlers",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCOMInprocServers",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows COM in-process servers",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCOMLocalServers",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows COM local servers",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCOMProperties",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Various properties of Windows COM Objects.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCOMRegisteredTypeLibraries",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows COM registered type libraries",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "WinCodePage"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsCodePage",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The system code page.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCommandProcessorAutoRun",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Commands that are run each time the Command Processor (Cmd.exe) is started.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCommonFilePlacementAttacks",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Common files associated with search order hijacking and other file placement attacks.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsComputerName",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The name of the system.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsConfigSys",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows config.sys file",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsControlPanelFilePaths",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "DLLs listed here will be run when the user opens the Windows Control Panel.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCortanaDatabase",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Cortana database",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCrashDumps",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Error Reporting (WER) files and crash dumps.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCredentialProviderFilters",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Credential Provider Filters",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCredentialProviders",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "CLSIDs of applications to use as Credential Providers",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCryptnetUrlCacheContent",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Content of a Windows cache of files downloaded from the internet.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCryptnetUrlCacheMetadata",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Metadata of a Windows cache of files downloaded from the internet.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsCurrentVersion",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The Windows current version",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsDNSSettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Registry Keys that contain DNS and DHCP settings.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsDebugger",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Debugger persistence or AV disable.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "WindowsDefenderExclusions",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Directories, processes and extensions configured not to be scanned by Windows Defender.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "antivirus.yaml",
+   "name": "WindowsDefenderScanDetectionHistoryFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Microsoft Windows Defender scan detection history files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsDisallowedSystemCertificates",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Disallowed System Certificates",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsDomainCachedCredentials",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows domain cached credentials",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsDomainName",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The domain the system is connected to.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentUserLoginScripts",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "User login scripts configured via Windows environment variables.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "legacy.yaml",
+   "name": "WindowsEnvironmentVariableAllUsersAppData",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %ProgramData% environment variable.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableAllUsersProfile",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The system-wide %AllUsersProfile% environment variable contains the path of the of the \"All Users\" or \"Common\" profile directory.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableAppxProcess",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The user-specific %APPX_PROCESS% environment variable is used for .NET applications.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableComSpec",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %ComSpec% environment variable contains the path of the command processor, typically \"cmd.exe\".",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableCommonProgramFiles",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %COMMONPROGRAMFILES% environment variable contains the path of the common program files folder.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableCommonProgramFilesX86",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %COMMONPROGRAMFILES(X86)% environment variable contains the path of the 32-bit common program files folder on a 64-bit Windows installation.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableDriverData",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %DriverData% environment variable contains the path of the directory used for temporary state files of user-mode drivers.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "WinPathEnvironmentVariable"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariablePath",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %PATH% environment variable contains an ordered list of paths of directories that will be searched on execution request without a specific path.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableProfilesDirectory",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %ProfilesDirectory% environment variable contain a path of a directory that contains the users' profile directories, typically \"%SystemDrive%\\Users\".",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableProgramData",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %ProgramData% environment variable contains a path of the \"Program Data\" directory.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "ProgramFiles"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableProgramFiles",
+   "source_types": [
+    "PATH",
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %ProgramFiles% environment variable contains a path of the \"Program Files\" directory.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "ProgramFilesx86"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableProgramFilesX86",
+   "source_types": [
+    "PATH",
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %ProgramFiles(x86)% environment variable contains a path of the 32-bit \"Program Files\" directory on a 64-bit Windows installation.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "members": [
+    "WindowsEnvironmentVariableSystemRoot"
+   ],
+   "name": "WindowsEnvironmentVariableSystemDrive",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "The %SystemDrive% environment variable contains the letter of the drive in which the system directory is located, typically \"C:\".",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "SystemRoot"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableSystemRoot",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %SystemRoot%, environment variable contains the path of the system directory, typically \"C:\\Windows\".",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "TempEnvironmentVariable"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableTemp",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %TEMP% environment variable.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "WinDirEnvironmentVariable"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsEnvironmentVariableWinDir",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The %WinDir%, environment variable contains the path of the Windows directory, typically \"C:\\Windows\".",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEventLogApplication",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Application Windows Event Log.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEventLogPublishers",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows EventLog publishers (or providers) Registry keys.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEventLogSecurity",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Security Windows Event Log.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "WindowsEventLogProviders"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsEventLogSources",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows EventLog sources Registry keys.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEventLogSystem",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "System Windows Event Log.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEventLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Event logs.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsEventTracingLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Event Tracing for Windows (ETW) log files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsExcludeFromKnownDLLs",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "ExcludeFromKnownDLLs can be used to bypass search order hijacking protection.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsExplorerAppKey",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Handlers for special keys on some keyboards (file path or CLSID).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsExplorerAutoplayHandlers",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Handlers for autoplay events in Windows Explorer.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsExplorerContextMenuHandlers",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Handlers for subcommands on context menu",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsExplorerNamespaceCommonPlaces",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "CLSIDs listed here are used to populate the Common Places items.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsExplorerNamespaceControlPanel",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "CLSIDs listed here are used to populate the Control Panel items.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsExplorerNamespaceDesktop",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "CLSIDs listed here are used to populate the Desktop items.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsExplorerNamespaceMyComputer",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "CLSIDs listed here are used to populate the MyComputer items.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsExplorerNamespaceNetworkNeighborhood",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "CLSIDs listed here are used to populate the Network Neighborhood items.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsExplorerNamespacePrintersAndFaxes",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "CLSIDs listed here are used to populate the Printer and Fax items.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsExplorerSettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Explorer Settings",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsFileTypeAutorunAssociations",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Registry value for what application class identifier (CLSID) to launch for a file extension.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsFirewallAuthorizedApplications",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Firewall Authorized Applications",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsFirewallEnabledRules",
+   "source_types": [
+    "COMMAND"
+   ],
+   "summary": "Command to list the enabled Windows Firewall rules.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsFirewallGloballyOpenPorts",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Firewall Globally Open Ports",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsFirewallLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Firewall default logfile",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsFirewallPolicySettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Firewall Policy Settings",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsFirewallRules",
+   "source_types": [
+    "COMMAND"
+   ],
+   "summary": "Command to list the configured Windows Firewall rules.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsFontDrivers",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows font drivers from the Registry.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsGroupPolicyScripts",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows group policy scripts",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsHelpCenterDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Help Center database file (HCdata.edb).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsHostsFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The Windows hosts and lmhosts file.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsHotkeyReplacement",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Hotkey executable replacement.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsIconServiceLib",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Icon Service Library Name",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsInstallationDateTime",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows installation date and time",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsLSAAuthenticationPackages",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Authentication Packages can be injected into LSASS.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsLSANotificationPackages",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Notification Packages can be injected into LSASS.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsLSASecurityPackages",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Security Packages can be injected into LSASS.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsLanguage",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The system language.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsLogoffScript",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows policy logoff script",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsLogonScript",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows policy logon script",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsMSDTCDLLs",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows MSDTC attempts to load these DLLs on start",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsMapNetworkDriveMRU",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Recently mapped network shares.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsMetroApplicationCache",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Metro application cache.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsMetroApplicationCookies",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Metro application cookies.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsMetroApplicationHistory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Metro application history.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsMetroUserPinnedFavoriteTiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Metro user-pinned favorite tiles.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsMostRecentApplication",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Most Recent Application name key",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsMountedDevices",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows mounted devices",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsMultiMediaDrivers",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Configured drivers for different multimedia filetypes.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsNetworkShellHelpers",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Network Shell (netsh) helpers are loaded on boot",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsOpenSaveMRU",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Information about files opened or saved in a Windows shell dialog.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsOpenSavePidlMRU",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Information about files opened or saved in a Windows shell dialog.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPLAPProviders",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Pre-Logon Access Provider (PLAP) Providers",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPendingFileRenames",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Pending file renames on reboot",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPendingGPOs",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Pending GPOs registry settings.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "members": [
+    "WindowsPersistenceRegistryKeys",
+    "WindowsPowerShellDefaultProfiles",
+    "WindowsServices"
+   ],
+   "name": "WindowsPersistenceMechanisms",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Persistence mechanisms in Windows.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "members": [
+    "InternetExplorerBrowserHelperObjects",
+    "WinSock2LayeredServiceProviders",
+    "WinSock2NamespaceProviders",
+    "WindowsActiveDesktop",
+    "WindowsActiveSyncAutoStart",
+    "WindowsAlternateShell",
+    "WindowsAppCertDLLs",
+    "WindowsAppInitDLLs",
+    "WindowsBootVerificationProgram",
+    "WindowsCommandProcessorAutoRun",
+    "WindowsCredentialProviderFilters",
+    "WindowsCredentialProviders",
+    "WindowsDebugger",
+    "WindowsEnvironmentUserLoginScripts",
+    "WindowsExplorerAutoplayHandlers",
+    "WindowsFileTypeAutorunAssociations",
+    "WindowsFontDrivers",
+    "WindowsIconServiceLib",
+    "WindowsLSAAuthenticationPackages",
+    "WindowsLSANotificationPackages",
+    "WindowsLSASecurityPackages",
+    "WindowsMSDTCDLLs",
+    "WindowsMultiMediaDrivers",
+    "WindowsNetworkShellHelpers",
+    "WindowsPLAPProviders",
+    "WindowsPendingGPOs",
+    "WindowsPrintMonitors",
+    "WindowsRunGrpConv",
+    "WindowsRunKeys",
+    "WindowsRunServices",
+    "WindowsScreenSaverExecutable",
+    "WindowsSearchFilterHandlers",
+    "WindowsSecurityProviders",
+    "WindowsServiceControlManagerExtension",
+    "WindowsSessionManagerBootExecute",
+    "WindowsSessionManagerExecute",
+    "WindowsSessionManagerS0InitialCommand",
+    "WindowsSessionManagerSetupExecute",
+    "WindowsSessionManagerSubSystems",
+    "WindowsSessionManagerWOWCommandLine",
+    "WindowsSetupCommandLine",
+    "WindowsSharedTaskScheduler",
+    "WindowsShellExecuteHooks",
+    "WindowsShellExtensions",
+    "WindowsShellIconOverlayIdentifiers",
+    "WindowsShellLoadAndRun",
+    "WindowsShellOpenCommand",
+    "WindowsShellRunasCommand",
+    "WindowsShellServiceObjects",
+    "WindowsStubPaths",
+    "WindowsSystemPolicyShell",
+    "WindowsTerminalServerInitialProgram",
+    "WindowsTerminalServerRunKeys",
+    "WindowsTerminalServerStartupPrograms",
+    "WindowsToolPaths",
+    "WindowsWinlogonAppSetup",
+    "WindowsWinlogonAvailableShells",
+    "WindowsWinlogonGPExtensions",
+    "WindowsWinlogonGinaDLL",
+    "WindowsWinlogonNotify",
+    "WindowsWinlogonShell",
+    "WindowsWinlogonSystem",
+    "WindowsWinlogonTaskman",
+    "WindowsWinlogonUiHost",
+    "WindowsWinlogonUserinit",
+    "WindowsWinlogonVMApplet"
+   ],
+   "name": "WindowsPersistenceRegistryKeys",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Windows Registry keys used for persistence.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPolicyDisallowRun",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Restrict users from running specific applications, typically used by malware to block AV.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPortProxyConfiguration",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows PortProxy registry keys (set by netsh portproxy command or manually).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPowerShellDefaultProfiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Default PowerShell Profile files. These files are executed by default when PowerShell starts up.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPowerShellEnableScripts",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Registry keys that control whether PowerShell scripts can execute directly.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPowerShellExecutionPolicies",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "PowerShell Script Execution Policies for all users, and the system.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPowerShellHistory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "History of commands executed in an interactive PowerShell session.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPrefetchFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Prefetch files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPrintMonitors",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Print Monitor DLL config.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsProductName",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The Windows product name",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsProgramsCache",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Programs Cache",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsProgramsCacheJumpLists",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Programs Cache Jump Lists",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsProxyPACAutoConfigURL",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Proxy PAC AutoConfigURL.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsProxyServerSettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Proxy Server Settings.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsPushNotificationDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The Windows Push Notification (WPN) database file.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsRDPClientBitmapCache",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Artifacts of RDP connection contents",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsRecentFileCacheBCF",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The RecentFileCache.bcf file.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsRecycleBin",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Recycle Bin (Recyler, $Recycle.Bin) files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsRecycleBinMetadata",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Recycle Bin (Recyler, $Recycle.Bin) metadata files only.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "CurrentControlSet"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsRegistryCurrentControlSet",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The current control set of the Windows Registry.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "members": [
+    "WindowsSystemRegistryFiles",
+    "WindowsSystemRegistryTransactionLogFiles",
+    "WindowsUserRegistryFiles",
+    "WindowsUserRegistryTransactionLogFiles"
+   ],
+   "name": "WindowsRegistryFilesAndTransactionLogs",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Windows user and system Registry files and transaction logs.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsRegistryProfiles",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Get SIDs for all users on the system with profiles present in the Registry.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsReleaseIdentifier",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The Windows 10 release identifier (or version number).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsRoverAutostartDLL",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Rover autostart DLL.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsRoverAutostartKey",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Rover autostart Registry key.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsRunGrpConv",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The Windows RunGrpConv Registry value.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsRunKeys",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Run and RunOnce keys.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsRunServices",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Run Services.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsScheduledTasks",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Scheduled Tasks.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsScreenSaverExecutable",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "ScreenSaver Executable",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "WindowsSearchDatabase"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsSearchDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Search database (Windows.edb).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSearchFilterHandlers",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Search filter handlers configured for file types and applications.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSecurityCenterSettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Security Center Settings",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSecurityProviders",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Security Providers DLLs",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSecuritySettingsDatabases",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows security settings databases (secedit.sdb and spsecupd.sdb)",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsServiceControlManagerExtension",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows service control manager extension",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsServices",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows service and driver configurations.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSessionManagerBootExecute",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Session Manager BootExecute persistence.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSessionManagerExecute",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Session Manager Execute persistence",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSessionManagerS0InitialCommand",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Session Manager S0InitialCommand persistence",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSessionManagerSetupExecute",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Session Manager SetupExecute persistence",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSessionManagerSubSystems",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Session Manager SubSystems persistence",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSessionManagerWOWCommandLine",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Session Manager Windows-on-Windows (WOW) command line",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSetupApiLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows setup API logs.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSetupCommandLine",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Command line invocation used for custom setup and deployment tasks",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSharedTaskScheduler",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Runs on windows boot.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsShellExecuteHooks",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Shell execution hooks are called when ShellExecuteEx() is called.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsShellExtensions",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Approved extensions to the Windows Shell (explorer.exe).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsShellHandlersRegistryKeys",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows registry values for shell handler artifacts.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsShellIconOverlayIdentifiers",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Called to display custom icons.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsShellLoadAndRun",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Shell Load and Run values",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsShellOpenCommand",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Executed every time this file type is opened. For most file types, the value should be '\"%1\" %*'.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsShellRunasCommand",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Executed every time an executable or script file type is run as administrator.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsShellServiceObjects",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Shell (explorer.exe) service objects delayed load.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsShutdownScript",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows policy shutdown script",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "ics.yaml",
+   "name": "WindowsSiemensWinCCLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Siemens WinCC software logs.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSmsRouterInterceptStoreDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows SmsRouter intercept store database file (SmsInterceptStore.db)",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsStartupFolderModification",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows startup folder Registry values.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsStartupFolders",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows startup folder persistence.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsStartupInfo",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "StartupInfo XML files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsStartupScript",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows policy startup script",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsStateRepositoryDeploymentDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The State Reposistory deployment database file (StateRepository-Deployment.srd).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsStateRepositoryMachineDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The State Reposistory machine database file (StateRepository-Machine.srd).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsStubPaths",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows StubPath persistence.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSuperFetchFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows SuperFetch files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSystemIniFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows system ini files",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSystemPolicyShell",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows System policy replacement shell (custom user interface).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSystemRegistryFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows system Registry files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "members": [
+    "WindowsSystemRegistryFiles",
+    "WindowsSystemRegistryTransactionLogFiles"
+   ],
+   "name": "WindowsSystemRegistryFilesAndTransactionLogs",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Windows system Registry files and transaction logs.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "members": [
+    "WindowsSystemRegistryFilesBackup",
+    "WindowsSystemRegistryTransactionLogFilesBackup"
+   ],
+   "name": "WindowsSystemRegistryFilesAndTransactionLogsBackup",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Backup of Windows system Registry files and transaction logs.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSystemRegistryFilesBackup",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Backup of Windows system Registry files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSystemRegistryTransactionLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows system Registry transaction log files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSystemRegistryTransactionLogFilesBackup",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Backup of Windows system Registry transaction log files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSystemResourceUsageMonitorDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows System Resource Usage Monitor (SRUM) database file.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSystemRestoreSettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows System Restore Settings",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsSystemSettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows System Settings",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsTempDirectories",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Contents of the Windows temporary directories",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsTerminalServerInitialProgram",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Terminal Server Initial Program",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsTerminalServerRunKeys",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Terminal Server Run keys",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsTerminalServerStartupPrograms",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Terminal Server Startup Programs",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsThumbcacheDatabaseFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows thumbcache_*.db files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsTileDataLayerDatabase",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows tile data layer database (vedatamodel.edb)",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "aliases": [
+    "WinTimeZone"
+   ],
+   "file": "windows.yaml",
+   "name": "WindowsTimezone",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "The time zone of the system as a Windows time zone name or in MUI form.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsToolPaths",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Paths to windows tools such as defrag, chkdsk.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUninstallKeys",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Uninstall Registry keys",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUpdateBuildRevision",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows kernel update build revision (UBR).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUpdateCatalogDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Update catalog package signatures database file (catdb).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUpdateDataStoreDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Update data store database file (DataStore.edb).",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUpdateLogFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows Update log files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUpdateSettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Update Settings",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUpdateStatus",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows auto update status.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUpdateStoreDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "The Update Service Orchestrator (USO) private update store database file.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUpgradeSettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Upgrade Settings",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUserAccessLogging",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "User Access Logging (UAL) databases.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUserAccountControlSettings",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows User Account Control Settings",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUserAutomaticDestinationsJumpLists",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows user AutomaticDestinations Jump Lists.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUserCustomDestinationsJumpLists",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows user CustomDestinations Jump Lists.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "members": [
+    "WindowsProgramsCacheJumpLists",
+    "WindowsUserAutomaticDestinationsJumpLists",
+    "WindowsUserCustomDestinationsJumpLists"
+   ],
+   "name": "WindowsUserJumpLists",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Windows user Jump Lists.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUserRecentFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows user specific recent files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUserRegistryFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows user specific Registry files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "members": [
+    "WindowsUserRegistryFiles",
+    "WindowsUserRegistryTransactionLogFiles"
+   ],
+   "name": "WindowsUserRegistryFilesAndTransactionLogs",
+   "source_types": [
+    "ARTIFACT_GROUP"
+   ],
+   "summary": "Windows user Registry files and transaction logs.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUserRegistryTransactionLogFiles",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows user Registry transaction log files.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsUserShellFolders",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "The Shell Folders information for Windows users.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWebCacheStorageQuotaDatabaseFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows WebCache storage quota database file (CacheStorage.edb)",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinlogonAppSetup",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Winlogon Appsetup",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinlogonAvailableShells",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Windows Server Winlogon Available Shells",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinlogonGPExtensions",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Winlogon Group Policy Extensions",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinlogonGinaDLL",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Gina DLL replacement.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinlogonNotify",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Winlogon Notify DLL names.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinlogonShell",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows shell replacement.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinlogonSystem",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Applications launched by Winlogon in the system context during the system initialization.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinlogonTaskman",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Winlogon Taskman replacement.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinlogonUiHost",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Winlogon UI screen application",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinlogonUserinit",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows Winlogon Userinit replacement.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinlogonVMApplet",
+   "source_types": [
+    "REGISTRY_VALUE"
+   ],
+   "summary": "Windows VMApplet replacement.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWinstart",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Windows winstart.bat file",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsWordWheelQueryRegistryKey",
+   "source_types": [
+    "REGISTRY_KEY"
+   ],
+   "summary": "Keywords searched in from the Windows start menu, potentially resulting in files or folders access or program executions.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsXMLEventLogApplication",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Application Windows XML Event Log.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsXMLEventLogPowerShell",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "PowerShell Windows XML Event Logs.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsXMLEventLogSecurity",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Security Windows XML Event Log.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsXMLEventLogSysmon",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Sysmon Windows XML Event Log.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsXMLEventLogSystem",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "System Windows XML Event Log.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "windows.yaml",
+   "name": "WindowsXMLEventLogTerminalServices",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "TerminalServices Windows XML Event Log.",
+   "supported_os": [
+    "Windows"
+   ]
+  },
+  {
+   "file": "webservers.yaml",
+   "name": "WordpressConfigFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "WordPress configuration file",
+   "supported_os": [
+    "Linux",
+    "Darwin"
+   ]
+  },
+  {
+   "file": "instant_messaging.yaml",
+   "name": "XChatLogs",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "XChat Log Files",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "XDGAutostartEntries",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "XDG Autostart Entries",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "YumSources",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Yum package sources list",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "ZShellConfigurationFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Z shell (zsh) configuration files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "shell.yaml",
+   "name": "ZShellHistoryFile",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Z shell (zsh) history files.",
+   "supported_os": [
+    "Darwin",
+    "Linux",
+    "Windows"
+   ]
+  },
+  {
+   "file": "linux.yaml",
+   "name": "ZeitgeistDatabase",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Zeitgeist user activity database.",
+   "supported_os": [
+    "Linux"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "vCenterServerAgentLog",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "Contains information about the agent that communicates with vCenter Server (if the host is managed by vCenter Server).",
+   "supported_os": [
+    "ESXi"
+   ]
+  },
+  {
+   "file": "esxi.yaml",
+   "name": "vSphereClientLogsDirectory",
+   "source_types": [
+    "FILE"
+   ],
+   "summary": "vSphere Client Logs Directory",
+   "supported_os": [
+    "ESXi"
+   ]
+  }
+ ],
+ "generated_from": {
+  "commit": "72726309f0cf8232d633c27e26dc1c0348709351",
+  "repo": "https://github.com/ForensicArtifacts/artifacts.git",
+  "tool": "pipeline/ingest/forensicartifacts/ingest.py"
+ }
+}

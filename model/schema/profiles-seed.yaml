@@ -1,0 +1,288 @@
+# Parser Profile SEED TABLE — the curated decisions the profile generator
+# scaffolds from (byakugan/schema_gen.render_profiles). One profile per
+# (parser, artefact class); the generator joins this table with the lane
+# surfaces already reviewed into sources/*.yaml (field_provenance sources +
+# native/join keys) and emits model/schema/profiles/<tool>--<class>.yaml.
+#
+# tools.<name>:
+#   tool          the extractor tool string exactly as sources/*.yaml carries it
+#   version_range the proven range (in-house: the pinned tag; external: the
+#                 range the sources were reviewed against)
+#   url           the tool's home
+#   in_house      whether the record struct is OURS to mine (grounding below)
+#   transport     jsonl | json | csv | tsv — csv/tsv surfaces are all-string
+#   fields        IN-HOUSE ONLY: the full mined record struct
+#                 [{name, type, at}] — `at` cites repo file:line (read-only
+#                 grounding; the miners' reports, 2026-10-01)
+#   types         EXTERNAL ONLY: per-field type overrides where the emitted
+#                 JSON type is authoritatively known; everything else takes
+#                 the transport default (string)
+#   no_class      declared parser with NO artefact class yet (held family or
+#                 memory domain) — the profile carries artefact_class: null,
+#                 lanes: []: coverage debt, deliberately representable.
+tools:
+  log2timeline / Plaso:
+    slug: plaso
+    version_range: ">=20230717"
+    url: https://github.com/log2timeline/plaso
+    in_house: false
+    transport: jsonl
+    types:
+      Timestamp: timestamp
+      timestamp: timestamp
+      port: int
+      size: int
+      offset: int
+  EvtxECmd:
+    slug: evtxecmd
+    version_range: ">=1.5"
+    url: https://github.com/EricZimmerman/evtx
+    in_house: false
+    transport: jsonl
+    types:
+      EventId: int
+      RecordNumber: int
+      ProcessId: int
+      ThreadId: int
+      TimeCreated: timestamp
+  Zeek:
+    slug: zeek
+    version_range: ">=5.0"
+    url: https://zeek.org
+    in_house: false
+    transport: jsonl
+    types:
+      ts: timestamp
+      id.orig_p: int
+      id.resp_p: int
+      orig_bytes: int
+      resp_bytes: int
+      orig_pkts: int
+      resp_pkts: int
+      duration: float
+      seen_bytes: int
+      total_bytes: int
+      missing_bytes: int
+      overflow_bytes: int
+      depth: int
+      trans_depth: int
+      request_body_len: int
+      response_body_len: int
+      status_code: int
+      info_code: int
+      qtype: int
+      qclass: int
+      rcode: int
+      Z: int
+      local_orig: bool
+      local_resp: bool
+      is_orig: bool
+      timedout: bool
+      rejected: bool
+      AA: bool
+      TC: bool
+      RD: bool
+      RA: bool
+      resumed: bool
+      established: bool
+      certificate.exponent: int
+      certificate.key_length: int
+      certificate.not_valid_after: timestamp
+      certificate.not_valid_before: timestamp
+  RECmd:
+    slug: recmd
+    version_range: ">=2.0"
+    url: https://github.com/EricZimmerman/RECmd
+    in_house: false
+    transport: csv
+    types: {}
+  JLECmd:
+    slug: jlecmd
+    version_range: ">=1.5"
+    url: https://github.com/EricZimmerman/JLECmd
+    in_house: false
+    transport: csv
+    types: {}
+  prefetch_dump:
+    slug: prefetch-dump
+    version_range: "==0.2.0"
+    url: https://github.com/Get-Sybers/gowindowlicker
+    in_house: true
+    transport: jsonl
+    # gowindowlicker goprefetch `record` struct — one flat object per .pf
+    # (checkout at v0.2.0-7-gdbc6abd; the image pins v0.2.0)
+    fields:
+    - {name: SourceFilename, type: string, at: "gowindowlicker prefetch/tool.go:52"}
+    - {name: SourceModified, type: timestamp, at: "gowindowlicker prefetch/tool.go:53"}
+    - {name: Executable, type: string, at: "gowindowlicker prefetch/tool.go:54"}
+    - {name: Path, type: string, at: "gowindowlicker prefetch/tool.go:55"}
+    - {name: Hash, type: string, at: "gowindowlicker prefetch/tool.go:56"}
+    - {name: Version, type: string, at: "gowindowlicker prefetch/tool.go:57"}
+    - {name: FileSize, type: int, at: "gowindowlicker prefetch/tool.go:58"}
+    - {name: RunCount, type: int, at: "gowindowlicker prefetch/tool.go:59"}
+    - {name: LastRun, type: timestamp, at: "gowindowlicker prefetch/tool.go:60"}
+    - {name: PreviousRuns, type: array, at: "gowindowlicker prefetch/tool.go:61"}
+    - {name: FilesAccessed, type: array, at: "gowindowlicker prefetch/tool.go:62"}
+  ese_dump:
+    slug: ese-dump
+    version_range: "==0.2.0"
+    url: https://github.com/Get-Sybers/gowindowlicker
+    in_house: true
+    transport: jsonl
+    # gowindowlicker goese: the per-table data row is deliberately
+    # schema-DYNAMIC (raw ESE columns merged verbatim, ese/tool.go:311) —
+    # only the injected keys are statically declared; the goese.jsonl index
+    # struct is fixed (tableIndexEntry, ese/tool.go:508).
+    fields:
+    - {name: SourceDb, type: string, at: "gowindowlicker ese/tool.go:304"}
+    - {name: Table, type: string, at: "gowindowlicker ese/tool.go:307"}
+    - {name: TableAlias, type: string, at: "gowindowlicker ese/tool.go:308"}
+    - {name: AppIdName, type: string, at: "gowindowlicker ese/tool.go:230"}
+    - {name: UserIdName, type: string, at: "gowindowlicker ese/tool.go:230"}
+    dynamic: raw ESE table columns merged verbatim (go-ese decoded types) —
+      per-table, per-provider; declared per live catalog, not per struct tag
+  anamnesis (MemProcFS):
+    slug: anamnesis
+    version_range: "==2.0.0"
+    url: https://github.com/Get-Sybers/Anamnesis
+    in_house: true
+    transport: json
+    no_class: memory domain — no artefact class in the seed yet; byakugan
+      reads the car.db interchange (readers.load_anamnesis_car), not a lane
+    # the CAR-event interchange record byakugan actually reads (anamnesis
+    # internal/normalize/normalize.go:288 + internal/store/store.go:81;
+    # byakugan/readers.py:47-52 _ANAMNESIS_HEADER)
+    fields:
+    - {name: car_object, type: string, at: "anamnesis internal/normalize/normalize.go:296"}
+    - {name: car_action, type: string, at: "anamnesis internal/normalize/normalize.go:297"}
+    - {name: timestamp, type: timestamp, at: "anamnesis internal/normalize/normalize.go:298"}
+    - {name: guid, type: string, at: "anamnesis internal/normalize/normalize.go:299"}
+    - {name: owning_pid, type: int, at: "anamnesis internal/normalize/normalize.go:300"}
+    - {name: owning_offset, type: int, at: "anamnesis internal/normalize/normalize.go:301"}
+    - {name: parent_pid, type: int, at: "anamnesis internal/normalize/normalize.go:302"}
+    - {name: owning_guid, type: string, at: "anamnesis internal/normalize/normalize.go:303"}
+    - {name: parent_guid, type: string, at: "anamnesis internal/normalize/normalize.go:304"}
+    - {name: link_confidence, type: string, at: "anamnesis internal/normalize/normalize.go:305"}
+    - {name: source_plugin, type: string, at: "anamnesis internal/normalize/normalize.go:306"}
+    - {name: source_image, type: string, at: "anamnesis internal/pipeline/pipeline.go:78"}
+    - {name: native, type: object, at: "anamnesis internal/store/store.go:134"}
+  godaemonhunter:
+    slug: godaemonhunter
+    version_range: "==0.2.0"
+    url: https://github.com/Get-Sybers/godaemonhunter
+    in_house: true
+    transport: jsonl
+    no_class: journal family is HELD (binary journal lane missing) — the
+      in-house parser exists; declaring it is the admission groundwork
+    # gojournal journal_entry struct (worktree v0.2.0-8-gfb475aa); every
+    # record additionally embeds the gopinfo record.Envelope (see gopinfo)
+    fields:
+    - {name: MachineID, type: string, at: "godaemonhunter journal/tool.go:45"}
+    - {name: BootID, type: string, at: "godaemonhunter journal/tool.go:46"}
+    - {name: Seqnum, type: int, at: "godaemonhunter journal/tool.go:47"}
+    - {name: MonotonicUS, type: int, at: "godaemonhunter journal/tool.go:48"}
+    - {name: Message, type: string, at: "godaemonhunter journal/tool.go:49"}
+    - {name: Priority, type: string, at: "godaemonhunter journal/tool.go:50"}
+    - {name: Facility, type: string, at: "godaemonhunter journal/tool.go:51"}
+    - {name: Identifier, type: string, at: "godaemonhunter journal/tool.go:52"}
+    - {name: PID, type: string, at: "godaemonhunter journal/tool.go:53"}
+    - {name: UID, type: string, at: "godaemonhunter journal/tool.go:54"}
+    - {name: UIDName, type: string, at: "godaemonhunter journal/tool.go:55"}
+    - {name: GID, type: string, at: "godaemonhunter journal/tool.go:56"}
+    - {name: GIDName, type: string, at: "godaemonhunter journal/tool.go:57"}
+    - {name: Comm, type: string, at: "godaemonhunter journal/tool.go:58"}
+    - {name: Exe, type: string, at: "godaemonhunter journal/tool.go:59"}
+    - {name: Cmdline, type: string, at: "godaemonhunter journal/tool.go:60"}
+    - {name: SystemdUnit, type: string, at: "godaemonhunter journal/tool.go:61"}
+    - {name: UserUnit, type: string, at: "godaemonhunter journal/tool.go:62"}
+    - {name: Hostname, type: string, at: "godaemonhunter journal/tool.go:63"}
+    - {name: Transport, type: string, at: "godaemonhunter journal/tool.go:64"}
+    - {name: AuditSession, type: string, at: "godaemonhunter journal/tool.go:65"}
+    - {name: Fields, type: object, at: "godaemonhunter journal/tool.go:72"}
+    - {name: Truncated, type: bool, at: "godaemonhunter journal/tool.go:73"}
+  gopinfo:
+    slug: gopinfo
+    version_range: "==0.2.0"
+    url: https://github.com/Get-Sybers/gopinfo
+    in_house: true
+    transport: jsonl
+    no_class: the shared record ENVELOPE library, not a parser — the common
+      head every godaemonhunter record embeds (#129 shared Go components)
+    fields:
+    - {name: Tool, type: string, at: "gopinfo record/record.go:75"}
+    - {name: ToolVersion, type: string, at: "gopinfo record/record.go:76"}
+    - {name: RecordType, type: string, at: "gopinfo record/record.go:77"}
+    - {name: SourceFilename, type: string, at: "gopinfo record/record.go:78"}
+    - {name: SourceModified, type: timestamp, at: "gopinfo record/record.go:79"}
+    - {name: EventTime, type: timestamp, at: "gopinfo record/record.go:80"}
+    - {name: TimeKind, type: string, at: "gopinfo record/record.go:81"}
+    - {name: Origin.Image, type: string, at: "gopinfo record/record.go:32"}
+    - {name: Origin.Volume, type: string, at: "gopinfo record/record.go:33"}
+    - {name: Origin.FSUUID, type: string, at: "gopinfo record/record.go:36"}
+    - {name: Origin.Label, type: string, at: "gopinfo record/record.go:37"}
+    - {name: Origin.Path, type: string, at: "gopinfo record/record.go:38"}
+    - {name: Origin.Inode, type: int, at: "gopinfo record/record.go:39"}
+    - {name: Snapshot.Backend, type: string, at: "gopinfo record/record.go:45"}
+    - {name: Snapshot.ID, type: string, at: "gopinfo record/record.go:46"}
+    - {name: Snapshot.Name, type: string, at: "gopinfo record/record.go:47"}
+    - {name: Snapshot.Time, type: timestamp, at: "gopinfo record/record.go:48"}
+    - {name: Residue.Kind, type: string, at: "gopinfo record/record.go:54"}
+    - {name: Residue.Detail, type: string, at: "gopinfo record/record.go:55"}
+    - {name: Host.Hostname, type: string, at: "gopinfo record/record.go:63"}
+    - {name: Host.MachineID, type: string, at: "gopinfo record/record.go:64"}
+    - {name: Host.OS, type: string, at: "gopinfo record/record.go:65"}
+    - {name: Host.Timezone, type: string, at: "gopinfo record/record.go:66"}
+  gowindowlicker_evtx:
+    slug: goevtx
+    version_range: "==0.2.0"
+    url: https://github.com/Get-Sybers/gowindowlicker
+    in_house: true
+    transport: jsonl
+    artefact_class: evtx
+    alternate_for: EvtxECmd     # same record shape; no ir lane routes it yet
+    fields:
+    - {name: EventId, type: int, at: "gowindowlicker evtx/tool.go:58"}
+    - {name: Level, type: int, at: "gowindowlicker evtx/tool.go:59"}
+    - {name: Provider, type: string, at: "gowindowlicker evtx/tool.go:60"}
+    - {name: Channel, type: string, at: "gowindowlicker evtx/tool.go:61"}
+    - {name: Computer, type: string, at: "gowindowlicker evtx/tool.go:62"}
+    - {name: EventRecordId, type: int, at: "gowindowlicker evtx/tool.go:63"}
+    - {name: TimeCreated, type: timestamp, at: "gowindowlicker evtx/tool.go:64"}
+    - {name: UserId, type: string, at: "gowindowlicker evtx/tool.go:65"}
+    - {name: MapDescription, type: string, at: "gowindowlicker evtx/tool.go:66"}
+    - {name: SourceFile, type: string, at: "gowindowlicker evtx/tool.go:67"}
+    - {name: Payload, type: string, at: "gowindowlicker evtx/tool.go:68"}
+  gowindowlicker_mft:
+    slug: gomft
+    version_range: "==0.2.0"
+    url: https://github.com/Get-Sybers/gowindowlicker
+    in_house: true
+    transport: jsonl
+    artefact_class: mft
+    alternate_for: log2timeline / Plaso    # no ir lane routes it yet
+    fields:
+    - {name: EntryNumber, type: int, at: "gowindowlicker mft/tool.go:62"}
+    - {name: SequenceNumber, type: int, at: "gowindowlicker mft/tool.go:63"}
+    - {name: InUse, type: bool, at: "gowindowlicker mft/tool.go:64"}
+    - {name: ParentEntryNumber, type: int, at: "gowindowlicker mft/tool.go:65"}
+    - {name: ParentSequenceNumber, type: int, at: "gowindowlicker mft/tool.go:66"}
+    - {name: ParentPath, type: string, at: "gowindowlicker mft/tool.go:67"}
+    - {name: FileName, type: string, at: "gowindowlicker mft/tool.go:68"}
+    - {name: Extension, type: string, at: "gowindowlicker mft/tool.go:69"}
+    - {name: FileSize, type: int, at: "gowindowlicker mft/tool.go:70"}
+    - {name: ReferenceCount, type: int, at: "gowindowlicker mft/tool.go:71"}
+    - {name: IsDirectory, type: bool, at: "gowindowlicker mft/tool.go:72"}
+    - {name: HasAds, type: bool, at: "gowindowlicker mft/tool.go:73"}
+    - {name: NameType, type: string, at: "gowindowlicker mft/tool.go:74"}
+    - {name: SiFlags, type: string, at: "gowindowlicker mft/tool.go:75"}
+    - {name: 'SI<FN', type: bool, at: "gowindowlicker mft/tool.go:76"}
+    - {name: uSecZeros, type: bool, at: "gowindowlicker mft/tool.go:77"}
+    - {name: LogfileSequenceNumber, type: int, at: "gowindowlicker mft/tool.go:78"}
+    - {name: Created0x10, type: timestamp, at: "gowindowlicker mft/tool.go:79"}
+    - {name: Created0x30, type: timestamp, at: "gowindowlicker mft/tool.go:80"}
+    - {name: LastModified0x10, type: timestamp, at: "gowindowlicker mft/tool.go:81"}
+    - {name: LastModified0x30, type: timestamp, at: "gowindowlicker mft/tool.go:82"}
+    - {name: LastRecordChange0x10, type: timestamp, at: "gowindowlicker mft/tool.go:83"}
+    - {name: LastRecordChange0x30, type: timestamp, at: "gowindowlicker mft/tool.go:84"}
+    - {name: LastAccess0x10, type: timestamp, at: "gowindowlicker mft/tool.go:85"}
+    - {name: LastAccess0x30, type: timestamp, at: "gowindowlicker mft/tool.go:86"}

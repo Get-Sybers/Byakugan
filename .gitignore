@@ -1,0 +1,31 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+# generated per-source output
+car.db
+car_*.jsonl
+.car_l2t_*/
+.claude/
+*.egg-info/
+# Python packaging build output (`pip wheel .`, `python -m build`, sdist)
+build/
+dist/
+# Go build output
+go/bin/
+# CI-localized GOPATH, if a job ever sets GOPATH=$CI_PROJECT_DIR/.go (the
+# current jobs keep the image default /go, outside the tree)
+/.go/
+# Go test, coverage, and profiling artifacts
+*.test
+*.prof
+coverage.out
+*.cover
+# Go build/test cache when localized into the tree (the default GOCACHE lives
+# under ~/.cache/go-build, outside the repo). Matches only directories named
+# ".cache".
+.cache/
+# Local-only Go workspace. The module resolves its deps through go.mod; a
+# go.work is a per-developer convenience for editing sibling repos together and
+# is never committed.
+go.work
+go.work.sum

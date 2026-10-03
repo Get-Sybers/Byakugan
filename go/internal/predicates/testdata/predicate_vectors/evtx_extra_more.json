@@ -1,0 +1,1062 @@
+{
+ "cases": [
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": 59,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 59,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": 60,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 60,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": 58,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 58,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": 59.0,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 59.0,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": "59",
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": "59",
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": true,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": true,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": null,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": null,
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   },
+   "result": false,
+   "rec_after": {
+    "Channel": "Microsoft-Windows-Bits-Client/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": 59
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 59
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": 59,
+    "Channel": null
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 59,
+    "Channel": null
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": 59,
+    "Channel": 59
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 59,
+    "Channel": 59
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": 59,
+    "Channel": "BITS-Client"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 59,
+    "Channel": "BITS-Client"
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {
+    "EventId": 59,
+    "Channel": "Bits-Client"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 59,
+    "Channel": "Bits-Client"
+   }
+  },
+  {
+   "predicate": "evtxx_is_bits_transfer",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "evtxx_is_ts_session",
+   "rec": {
+    "EventId": 21,
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 21,
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_ts_session",
+   "rec": {
+    "EventId": 24,
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 24,
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_ts_session",
+   "rec": {
+    "EventId": 25,
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 25,
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_ts_session",
+   "rec": {
+    "EventId": 22,
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 22,
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_ts_session",
+   "rec": {
+    "EventId": 21.0,
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 21.0,
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_ts_session",
+   "rec": {
+    "EventId": "21",
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": "21",
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational"
+   }
+  },
+  {
+   "predicate": "evtxx_is_ts_session",
+   "rec": {
+    "EventId": 21,
+    "Channel": "TerminalServices-LocalSessionManager"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 21,
+    "Channel": "TerminalServices-LocalSessionManager"
+   }
+  },
+  {
+   "predicate": "evtxx_is_ts_session",
+   "rec": {
+    "EventId": 21,
+    "Channel": "Microsoft-Windows-TerminalServices-RDPClient"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 21,
+    "Channel": "Microsoft-Windows-TerminalServices-RDPClient"
+   }
+  },
+  {
+   "predicate": "evtxx_is_ts_session",
+   "rec": {
+    "EventId": 21,
+    "Channel": null
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 21,
+    "Channel": null
+   }
+  },
+  {
+   "predicate": "evtxx_is_ts_session",
+   "rec": {
+    "EventId": 21
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 21
+   }
+  },
+  {
+   "predicate": "evtxx_is_ts_session",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"Key\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"Key\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File \"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File \"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \" File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \" File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"file\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"file\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": null}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": null}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": 0}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": 0}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": ""
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": ""
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{not json"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{not json"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": 123
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": 123
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "\"a string\""
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "\"a string\""
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": \"not-a-dict\"}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": \"not-a-dict\"}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": []}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": []}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": {\"@Name\": \"ObjectType\"}}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": {\"@Name\": \"ObjectType\"}}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"UserData\": {\"X\": {\"ObjectType\": \"File\"}}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"UserData\": {\"X\": {\"ObjectType\": \"File\"}}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "ObjectType",
+        "#text": "File"
+       }
+      ]
+     }
+    }
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "ObjectType",
+        "#text": "File"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"Key\"}, {\"@Name\": \"ObjectType\", \"#text\": \"File\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"Key\"}, {\"@Name\": \"ObjectType\", \"#text\": \"File\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": "4907",
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": "4907",
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907.9,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4907.9,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": null,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": null,
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": "",
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": "",
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": "0x132B",
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": "0x132B",
+    "Channel": "Security",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "System",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "System",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Channel": "Microsoft-Windows-Security-Auditing",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 4907,
+    "Channel": "Microsoft-Windows-Security-Auditing",
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_4907_file",
+   "rec": {
+    "EventId": 4907,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 4907,
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"ObjectType\", \"#text\": \"File\"}, {\"@Name\": \"ObjectName\", \"#text\": \"C:\\\\secrets\\\\payroll.xlsx\"}]}}"
+   }
+  },
+  {
+   "predicate": "em_is_wmi_5857",
+   "rec": {
+    "EventId": 5857,
+    "Channel": "Microsoft-Windows-WMI-Activity/Operational"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 5857,
+    "Channel": "Microsoft-Windows-WMI-Activity/Operational"
+   }
+  },
+  {
+   "predicate": "em_is_wmi_5857",
+   "rec": {
+    "EventId": "5857",
+    "Channel": "WMI-Activity"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": "5857",
+    "Channel": "WMI-Activity"
+   }
+  },
+  {
+   "predicate": "em_is_wmi_5857",
+   "rec": {
+    "EventId": " 5857 ",
+    "Channel": "WMI-Activity"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": " 5857 ",
+    "Channel": "WMI-Activity"
+   }
+  },
+  {
+   "predicate": "em_is_wmi_5857",
+   "rec": {
+    "EventId": "5_857",
+    "Channel": "WMI-Activity"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": "5_857",
+    "Channel": "WMI-Activity"
+   }
+  },
+  {
+   "predicate": "em_is_wmi_5857",
+   "rec": {
+    "EventId": true,
+    "Channel": "WMI-Activity"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": true,
+    "Channel": "WMI-Activity"
+   }
+  },
+  {
+   "predicate": "em_is_wmi_5857",
+   "rec": {
+    "EventId": 5857,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 5857,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_wmi_5857",
+   "rec": {
+    "EventId": 5858,
+    "Channel": "WMI-Activity"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 5858,
+    "Channel": "WMI-Activity"
+   }
+  },
+  {
+   "predicate": "em_is_wmi_5857",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  },
+  {
+   "predicate": "em_is_pnp_20003",
+   "rec": {
+    "EventId": 20003,
+    "Channel": "System"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 20003,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_pnp_20003",
+   "rec": {
+    "EventId": "20003",
+    "Channel": "System"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": "20003",
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_pnp_20003",
+   "rec": {
+    "EventId": 20003,
+    "Channel": "Microsoft-Windows-UserPnp/DeviceInstall"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 20003,
+    "Channel": "Microsoft-Windows-UserPnp/DeviceInstall"
+   }
+  },
+  {
+   "predicate": "em_is_pnp_20003",
+   "rec": {
+    "EventId": 20001,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 20001,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_pnp_20003",
+   "rec": {
+    "EventId": 20003,
+    "Channel": null
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 20003,
+    "Channel": null
+   }
+  },
+  {
+   "predicate": "em_is_smb_30803",
+   "rec": {
+    "EventId": 30803,
+    "Channel": "Microsoft-Windows-SmbClient/Connectivity"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 30803,
+    "Channel": "Microsoft-Windows-SmbClient/Connectivity"
+   }
+  },
+  {
+   "predicate": "em_is_smb_30803",
+   "rec": {
+    "EventId": 30803.0,
+    "Channel": "SmbClient"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 30803.0,
+    "Channel": "SmbClient"
+   }
+  },
+  {
+   "predicate": "em_is_smb_30803",
+   "rec": {
+    "EventId": 30803,
+    "Channel": "Microsoft-Windows-SMBClient/Connectivity"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 30803,
+    "Channel": "Microsoft-Windows-SMBClient/Connectivity"
+   }
+  },
+  {
+   "predicate": "em_is_smb_30803",
+   "rec": {
+    "EventId": 30804,
+    "Channel": "SmbClient"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 30804,
+    "Channel": "SmbClient"
+   }
+  },
+  {
+   "predicate": "em_is_winlogon_7001",
+   "rec": {
+    "EventId": 7001,
+    "Channel": "System"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 7001,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_winlogon_7001",
+   "rec": {
+    "EventId": 7002,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 7002,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_winlogon_7001",
+   "rec": {
+    "EventId": 7001,
+    "Channel": "Application"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 7001,
+    "Channel": "Application"
+   }
+  },
+  {
+   "predicate": "em_is_winlogon_7001",
+   "rec": {
+    "EventId": "7001",
+    "Channel": "System"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": "7001",
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_winlogon_7002",
+   "rec": {
+    "EventId": 7002,
+    "Channel": "System"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 7002,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_winlogon_7002",
+   "rec": {
+    "EventId": 7001,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 7001,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_winlogon_7002",
+   "rec": {
+    "EventId": 7002.0,
+    "Channel": "System"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 7002.0,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_scm_7034",
+   "rec": {
+    "EventId": 7034,
+    "Channel": "System"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 7034,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_scm_7034",
+   "rec": {
+    "EventId": 7034.9,
+    "Channel": "System"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 7034.9,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_scm_7034",
+   "rec": {
+    "EventId": "7_034",
+    "Channel": "System"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": "7_034",
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_scm_7034",
+   "rec": {
+    "EventId": -7034,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": -7034,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_scm_7034",
+   "rec": {
+    "EventId": 7040,
+    "Channel": "System"
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 7040,
+    "Channel": "System"
+   }
+  },
+  {
+   "predicate": "em_is_scm_7034",
+   "rec": {
+    "EventId": 7034,
+    "Channel": "SystemD"
+   },
+   "result": true,
+   "rec_after": {
+    "EventId": 7034,
+    "Channel": "SystemD"
+   }
+  },
+  {
+   "predicate": "em_is_scm_7034",
+   "rec": {
+    "EventId": 7034
+   },
+   "result": false,
+   "rec_after": {
+    "EventId": 7034
+   }
+  },
+  {
+   "predicate": "em_is_scm_7034",
+   "rec": {},
+   "result": false,
+   "rec_after": {}
+  }
+ ]
+}

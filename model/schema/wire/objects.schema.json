@@ -1,0 +1,674 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/wire/objects.schema.json",
+ "title": "Wire bundle members — GENERATED type-dispatched composition",
+ "description": "Never hand-edited: python -m byakugan.schema_gen regenerates it (conform class-regen gates drift). The closed type inventory is harvested from the projection source; attack-pattern and marking-definition are excluded by design (the airway / spec singletons — wirecheck tallies them, the schema never admits them).",
+ "type": "object",
+ "required": [
+  "type"
+ ],
+ "properties": {
+  "type": {
+   "enum": [
+    "directory",
+    "domain-name",
+    "email-addr",
+    "email-message",
+    "extension-definition",
+    "file",
+    "identity",
+    "indicator",
+    "ipv4-addr",
+    "ipv6-addr",
+    "network-traffic",
+    "observed-data",
+    "process",
+    "relationship",
+    "sighting",
+    "url",
+    "user-account",
+    "windows-registry-key",
+    "x-car-inferred-node",
+    "x-car-record",
+    "x-car-thread"
+   ]
+  }
+ },
+ "allOf": [
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "directory"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/directory"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "domain-name"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/domain-name"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "email-addr"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/email-addr"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "email-message"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/email-message"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "extension-definition"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/extension-definition"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "file"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/file"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "identity"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/identity"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "indicator"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/indicator"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "ipv4-addr"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/ipv4-addr"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "ipv6-addr"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/ipv6-addr"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "network-traffic"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/network-traffic"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "observed-data"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/observed-data"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "process"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/process"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "relationship"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/relationship"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "sighting"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/sighting"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "url"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/url"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "user-account"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/user-account"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "windows-registry-key"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/windows-registry-key"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "x-car-inferred-node"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/x-car-inferred-node"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "x-car-record"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/x-car-record"
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "type": {
+      "const": "x-car-thread"
+     }
+    },
+    "required": [
+     "type"
+    ]
+   },
+   "then": {
+    "$ref": "#/$defs/x-car-thread"
+   }
+  }
+ ],
+ "$defs": {
+  "overlay": {
+   "properties": {
+    "x_car_action": true,
+    "x_car_analytic": true,
+    "x_car_asserted": true,
+    "x_car_attachment_ref": true,
+    "x_car_base_address": true,
+    "x_car_car_action": true,
+    "x_car_car_object": true,
+    "x_car_class": true,
+    "x_car_clause": true,
+    "x_car_confidence": true,
+    "x_car_conflicts": true,
+    "x_car_content_ref": true,
+    "x_car_corroborated_by": true,
+    "x_car_corroborating_refs": true,
+    "x_car_entity_id": true,
+    "x_car_event_id": true,
+    "x_car_fields": true,
+    "x_car_first_seen": true,
+    "x_car_identity_key": true,
+    "x_car_identity_value": true,
+    "x_car_inferred": true,
+    "x_car_inferred_end": true,
+    "x_car_last_seen": true,
+    "x_car_link_confidence": true,
+    "x_car_link_refs": true,
+    "x_car_method": true,
+    "x_car_native": true,
+    "x_car_node_id": true,
+    "x_car_object": true,
+    "x_car_parent": true,
+    "x_car_path": true,
+    "x_car_ppid": true,
+    "x_car_process_entity_id": true,
+    "x_car_properties": true,
+    "x_car_reason": true,
+    "x_car_response_body_bytes": true,
+    "x_car_response_status_code": true,
+    "x_car_roles": true,
+    "x_car_signature_valid": true,
+    "x_car_signer": true,
+    "x_car_source_artefact": true,
+    "x_car_source_host": true,
+    "x_car_techniques": true,
+    "x_car_timestamp": true,
+    "x_car_title": true,
+    "x_car_url_ref": true,
+    "x_car_would_be": true,
+    "extensions": {
+     "type": "object",
+     "properties": {
+      "extension-definition--b8c68e7b-701a-5c99-897d-a1c674311493": {
+       "type": "object",
+       "properties": {
+        "extension_type": {
+         "enum": [
+          "toplevel-property-extension",
+          "new-sco",
+          "new-sdo"
+         ]
+        }
+       },
+       "required": [
+        "extension_type"
+       ]
+      }
+     }
+    }
+   },
+   "patternProperties": {
+    "^x_(?!car_(?:action|analytic|asserted|attachment_ref|base_address|car_action|car_object|class|clause|confidence|conflicts|content_ref|corroborated_by|corroborating_refs|entity_id|event_id|fields|first_seen|identity_key|identity_value|inferred|inferred_end|last_seen|link_confidence|link_refs|method|native|node_id|object|parent|path|ppid|process_entity_id|properties|reason|response_body_bytes|response_status_code|roles|signature_valid|signer|source_artefact|source_host|techniques|timestamp|title|url_ref|would_be)$)": false
+   }
+  },
+  "directory": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/directory.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "domain-name": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/domain-name.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "email-addr": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/email-addr.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "email-message": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/email-message.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "extension-definition": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/common/extension-definition.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "file": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/file.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "identity": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/sdos/identity.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "indicator": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/sdos/indicator.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "ipv4-addr": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/ipv4-addr.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "ipv6-addr": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/ipv6-addr.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "network-traffic": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/network-traffic.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "observed-data": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/sdos/observed-data.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "process": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/process.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "relationship": {
+   "$ref": "relationship.schema.json"
+  },
+  "sighting": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/sros/sighting.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "url": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/url.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "user-account": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/user-account.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "windows-registry-key": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/observables/windows-registry-key.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "x-car-inferred-node": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/common/core.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    },
+    {
+     "properties": {
+      "type": {
+       "const": "x-car-inferred-node"
+      }
+     }
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "x-car-record": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/common/cyber-observable-core.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    },
+    {
+     "properties": {
+      "type": {
+       "const": "x-car-record"
+      }
+     }
+    }
+   ],
+   "unevaluatedProperties": false
+  },
+  "x-car-thread": {
+   "allOf": [
+    {
+     "$ref": "../vendor/oasis/common/cyber-observable-core.json"
+    },
+    {
+     "$ref": "#/$defs/overlay"
+    },
+    {
+     "properties": {
+      "type": {
+       "const": "x-car-thread"
+      }
+     }
+    }
+   ],
+   "unevaluatedProperties": false
+  }
+ }
+}

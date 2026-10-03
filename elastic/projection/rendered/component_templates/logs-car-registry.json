@@ -1,0 +1,127 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "generated_by": "python elastic/projection/render_elastic.py",
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "elastic/projection/conventions.yml",
+      "elastic/projection/objects/registry.yml",
+      "elastic/projection/ecs_types.yml"
+    ],
+    "version": 3
+  },
+  "template": {
+    "mappings": {
+      "properties": {
+        "car": {
+          "properties": {
+            "registry": {
+              "properties": {
+                "data": {
+                  "path": "registry.data.strings",
+                  "type": "alias"
+                },
+                "fqdn": {
+                  "path": "host.hostname",
+                  "type": "alias"
+                },
+                "hive": {
+                  "path": "registry.hive",
+                  "type": "alias"
+                },
+                "hostname": {
+                  "path": "host.hostname",
+                  "type": "alias"
+                },
+                "image_path": {
+                  "path": "process.executable",
+                  "type": "alias"
+                },
+                "key": {
+                  "path": "registry.key",
+                  "type": "alias"
+                },
+                "new_content": {
+                  "type": "keyword"
+                },
+                "pid": {
+                  "path": "process.pid",
+                  "type": "alias"
+                },
+                "type": {
+                  "path": "registry.data.type",
+                  "type": "alias"
+                },
+                "user": {
+                  "path": "user.name",
+                  "type": "alias"
+                },
+                "value": {
+                  "path": "registry.value",
+                  "type": "alias"
+                }
+              }
+            }
+          }
+        },
+        "host": {
+          "properties": {
+            "hostname": {
+              "type": "keyword"
+            }
+          }
+        },
+        "process": {
+          "properties": {
+            "executable": {
+              "type": "keyword"
+            },
+            "pid": {
+              "type": "long"
+            }
+          }
+        },
+        "registry": {
+          "properties": {
+            "data": {
+              "properties": {
+                "strings": {
+                  "type": "keyword"
+                },
+                "type": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "hive": {
+              "type": "keyword"
+            },
+            "key": {
+              "type": "keyword"
+            },
+            "value": {
+              "type": "keyword"
+            }
+          }
+        },
+        "related": {
+          "properties": {
+            "hosts": {
+              "type": "keyword"
+            },
+            "user": {
+              "type": "keyword"
+            }
+          }
+        },
+        "user": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}

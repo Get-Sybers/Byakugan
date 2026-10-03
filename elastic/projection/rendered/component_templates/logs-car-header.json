@@ -1,0 +1,135 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "generated_by": "python elastic/projection/render_elastic.py",
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "elastic/projection/conventions.yml"
+    ],
+    "version": 3
+  },
+  "template": {
+    "mappings": {
+      "_meta": {
+        "note": "evidence is never rejected for shape; drift is caught by the verify counts and the contract tests, not by mapping strictness."
+      },
+      "dynamic": false,
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "car": {
+          "properties": {
+            "car_action": {
+              "path": "event.action",
+              "type": "alias"
+            },
+            "device_serial": {
+              "type": "keyword"
+            },
+            "guid": {
+              "path": "event.id",
+              "type": "alias"
+            },
+            "link_confidence": {
+              "type": "float"
+            },
+            "mac_address": {
+              "type": "keyword"
+            },
+            "native": {
+              "type": "flattened"
+            },
+            "object": {
+              "type": "keyword"
+            },
+            "owning_guid": {
+              "path": "process.entity_id",
+              "type": "alias"
+            },
+            "source_artefact": {
+              "path": "event.provider",
+              "type": "alias"
+            },
+            "source_host": {
+              "path": "host.name",
+              "type": "alias"
+            },
+            "timestamp": {
+              "type": "keyword"
+            },
+            "volume_guid": {
+              "type": "keyword"
+            }
+          }
+        },
+        "data_stream": {
+          "properties": {
+            "dataset": {
+              "type": "constant_keyword"
+            },
+            "namespace": {
+              "type": "constant_keyword"
+            },
+            "type": {
+              "type": "constant_keyword"
+            }
+          }
+        },
+        "ecs": {
+          "properties": {
+            "version": {
+              "type": "keyword"
+            }
+          }
+        },
+        "event": {
+          "properties": {
+            "action": {
+              "type": "keyword"
+            },
+            "dataset": {
+              "type": "keyword"
+            },
+            "id": {
+              "type": "keyword"
+            },
+            "ingested": {
+              "type": "date"
+            },
+            "kind": {
+              "type": "keyword"
+            },
+            "module": {
+              "type": "keyword"
+            },
+            "provider": {
+              "type": "keyword"
+            }
+          }
+        },
+        "host": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            }
+          }
+        },
+        "labels": {
+          "properties": {
+            "link_confidence": {
+              "type": "keyword"
+            }
+          }
+        },
+        "process": {
+          "properties": {
+            "entity_id": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+# Object-id scopes — the R1-R5 rule set (model/stix/changelog/v6.md, ratified),
+# stated as data. Namespaces are the constants.yaml values; this file names the
+# recipe per scope. Hand-authored: a new scope is an explicit decision.
+schema_version: "6.0.0"
+source: hand-authored
+generated_from:
+  changelog: model/stix/changelog/v6.md
+
+scopes:
+  global-content:            # R1 — spec-native §2.9
+    namespace: STIX_NS
+    recipe: uuid5(STIX_NS, canonical_json(id-contributing properties))
+    mints: content SCOs only (file-by-hash, user-account-by-SID, ip, domain, url, email-addr)
+    note: STIX_NS mints SCO ids ONLY; content SCOs are PURE (no extensions entry)
+  case:                      # R2 — per-case instance scope
+    namespace: case_ns
+    recipe: uuid5(uuid5(CAR_NS, "case|<case>"), "<type>|<key parts>")
+    mints: instance SCOs, observed-data, sighting, evidence relationships,
+      x-car-* objects, host identities, the bundle
+  catalogue:                 # R3 — global detection content
+    namespace: CATALOGUE_NS
+    recipe: uuid5(uuid5(CAR_NS, "catalogue"), "<type>|<key parts>")
+    mints: indicator, the indicates relationship
+    note: attack-pattern is NEVER minted — referenced via the pinned attack index
+  smo:                       # R4 — the extension definitions
+    namespace: DX_NAMESPACE
+    recipe: uuid5(DX_NAMESPACE, "extension-definition|<name>")
+    mints: extension-definition objects
+  row:                       # R5 — row identity, never an object id
+    namespace: SPINDLE_NS
+    recipe: byakugan/spindle.yml (the registry this layer validates in place)
+    mints: nothing — rides only in x_car_event_id / native.spindle_key

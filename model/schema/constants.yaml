@@ -1,0 +1,19 @@
+# model/schema/constants.yaml — the wire-format constants, stated once.
+# GENERATED VALUES: every uuid below is computed from the seeds recorded next
+# to it; regenerating from byakugan.ids / byakugan.exchange.objects must
+# reproduce this file byte-identically (tests/test_schema_foundations.py).
+# These are wire format: they never change (schema-layers.md, Identity Rules).
+
+schema_version: "6.0.0"   # THE one version; renders into extension-definition.version
+
+namespaces:
+  STIX_NS: 00abedb4-aa42-466c-9c01-fed23315a9b7    # STIX 2.1 s2.9 SCO namespace — mints SCO ids ONLY
+  CAR_NS: 1fba557d-9fd4-5bcc-9546-d3ea3e787f02      # uuid5(NAMESPACE_URL, "https://github.com/Get-Sybers/Byakugan/stix") — seed URL is wire, not a link
+  SPINDLE_NS: afab0259-176f-58d2-9e88-8f508fb46232   # uuid5(CAR_NS, "spindle") — row identity; NEVER an object id
+  CATALOGUE_NS: 8832849d-b348-5a22-a5a3-d3105be4680f   # uuid5(CAR_NS, "catalogue") — indicator / indicates
+  DX_NAMESPACE: 518ade0c-8157-5d44-a810-9563a8af74ef   # the exchange's deterministic-id root
+  case_ns: uuid5(CAR_NS, "case|<case>")          # recipe — per-case instance scope
+
+extensions:
+  dxdfir: extension-definition--0a37fc5b-cf2b-5ae9-84aa-933110a32190
+  dxdfir-evidence: extension-definition--b8c68e7b-701a-5c99-897d-a1c674311493

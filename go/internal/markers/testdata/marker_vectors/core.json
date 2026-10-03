@@ -1,0 +1,2445 @@
+{
+ "resolve": [
+  {
+   "spec": "a",
+   "rec": {
+    "a": 1
+   },
+   "out": 1
+  },
+  {
+   "spec": "missing",
+   "rec": {
+    "a": 1
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     "a",
+     "b",
+     "c"
+    ]
+   },
+   "rec": {
+    "a": "-",
+    "b": "",
+    "c": "x"
+   },
+   "out": "x"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     "a",
+     "b"
+    ]
+   },
+   "rec": {
+    "a": null,
+    "b": null
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     {
+      "!": [
+       "basename",
+       "p"
+      ]
+     },
+     {
+      "!": [
+       "const",
+       "fallback"
+      ]
+     }
+    ]
+   },
+   "rec": {
+    "p": ""
+   },
+   "out": "fallback"
+  },
+  {
+   "spec": {
+    "!": [
+     "first",
+     "n",
+     "m"
+    ]
+   },
+   "rec": {
+    "n": 0,
+    "m": 2
+   },
+   "out": 0
+  },
+  {
+   "spec": {
+    "!": [
+     "const",
+     "administrator"
+    ]
+   },
+   "rec": {},
+   "out": "administrator"
+  },
+  {
+   "spec": {
+    "!": [
+     "const",
+     5
+    ]
+   },
+   "rec": {},
+   "out": 5
+  },
+  {
+   "spec": {
+    "!": [
+     "const",
+     null
+    ]
+   },
+   "rec": {},
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "const",
+     true
+    ]
+   },
+   "rec": {},
+   "out": true
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "C:\\Users\\jcloudy\\x.exe"
+   },
+   "out": "x.exe"
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "/usr/bin/python3"
+   },
+   "out": "python3"
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "a/b\\c"
+   },
+   "out": "c"
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "C:\\dir\\"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "C:"
+   },
+   "out": "C:"
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "\\\\srv\\share\\f.txt"
+   },
+   "out": "f.txt"
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "\\\\srv\\share"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "trailing/"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "plain"
+   },
+   "out": "plain"
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": 42
+   },
+   "out": "42"
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "-"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "basename",
+     "p"
+    ]
+   },
+   "rec": {},
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "a.TXT"
+   },
+   "out": "txt"
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": ".bashrc"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "C:\\d\\a.tar.GZ"
+   },
+   "out": "gz"
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "noext"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "a."
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "a..gz"
+   },
+   "out": "gz"
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "/p/.hidden"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "ext",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "-"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "lower",
+     "s"
+    ]
+   },
+   "rec": {
+    "s": "MiXeD"
+   },
+   "out": "mixed"
+  },
+  {
+   "spec": {
+    "!": [
+     "lower",
+     "s"
+    ]
+   },
+   "rec": {
+    "s": 17
+   },
+   "out": "17"
+  },
+  {
+   "spec": {
+    "!": [
+     "lower",
+     "s"
+    ]
+   },
+   "rec": {
+    "s": [
+     1,
+     "A"
+    ]
+   },
+   "out": "[1, 'a']"
+  },
+  {
+   "spec": {
+    "!": [
+     "lower",
+     "s"
+    ]
+   },
+   "rec": {
+    "s": ""
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     "p",
+     "(?i)[/\\\\]Users[/\\\\]([^/\\\\]+)[/\\\\]"
+    ]
+   },
+   "rec": {
+    "p": "C:\\USERS\\jcloudy\\NTUSER.DAT"
+   },
+   "out": "jcloudy"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     "c",
+     "^([^.]+\\..+)$"
+    ]
+   },
+   "rec": {
+    "c": "HOST1.example.com"
+   },
+   "out": "HOST1.example.com"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     "c",
+     "^([^.]+\\..+)$"
+    ]
+   },
+   "rec": {
+    "c": "HOST1"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     "s",
+     "(a)|b"
+    ]
+   },
+   "rec": {
+    "s": "b"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     "s",
+     "x(\\d+)"
+    ]
+   },
+   "rec": {
+    "s": "x123y"
+   },
+   "out": "123"
+  },
+  {
+   "spec": {
+    "!": [
+     "regex1",
+     "s",
+     "x(\\d+)"
+    ]
+   },
+   "rec": {
+    "s": "nope"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "domain_of",
+     "h"
+    ]
+   },
+   "rec": {
+    "h": "user@EXAMPLE.com"
+   },
+   "out": "example.com"
+  },
+  {
+   "spec": {
+    "!": [
+     "domain_of",
+     "h"
+    ]
+   },
+   "rec": {
+    "h": "Host.Example.COM"
+   },
+   "out": "host.example.com"
+  },
+  {
+   "spec": {
+    "!": [
+     "domain_of",
+     "h"
+    ]
+   },
+   "rec": {
+    "h": "host.com/path/x"
+   },
+   "out": "host.com"
+  },
+  {
+   "spec": {
+    "!": [
+     "domain_of",
+     "h"
+    ]
+   },
+   "rec": {
+    "h": "http://host.com/x"
+   },
+   "out": "http:"
+  },
+  {
+   "spec": {
+    "!": [
+     "domain_of",
+     "h"
+    ]
+   },
+   "rec": {
+    "h": "@"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "domain_of",
+     "h"
+    ]
+   },
+   "rec": {
+    "h": "-"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": 1341856306
+   },
+   "out": "2012-07-09T17:51:46+00:00"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": 1341856306.5
+   },
+   "out": "2012-07-09T17:51:46.500000+00:00"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": "1341856306.5"
+   },
+   "out": "2012-07-09T17:51:46.500000+00:00"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": 1341856211.834184
+   },
+   "out": "2012-07-09T17:50:11.834184+00:00"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": 5e-07
+   },
+   "out": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": 1.5e-06
+   },
+   "out": "1970-01-01T00:00:00.000002+00:00"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": -1.25
+   },
+   "out": "1969-12-31T23:59:58.750000+00:00"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": true
+   },
+   "out": "1970-01-01T00:00:01+00:00"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": "2012-07-09T17:51:46.593202Z"
+   },
+   "out": "2012-07-09T17:51:46.593202Z"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": "2012-07-09 17:51:46+02:00"
+   },
+   "out": "2012-07-09 17:51:46+02:00"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": "not a date"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": 253402300799.0
+   },
+   "out": "9999-12-31T23:59:59+00:00"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": 253402300800.0
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": "1e15"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": 1000000000000000.0
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": -62135596800.0
+   },
+   "out": "0001-01-01T00:00:00+00:00"
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": -62135596801.0
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": NaN
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": "12-3"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "epoch_ts",
+     "t"
+    ]
+   },
+   "rec": {
+    "t": "-"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "map_value",
+     "m",
+     {
+      "GET": "get",
+      "POST": "post"
+     },
+     true
+    ]
+   },
+   "rec": {
+    "m": "get"
+   },
+   "out": "get"
+  },
+  {
+   "spec": {
+    "!": [
+     "map_value",
+     "m",
+     {
+      "GET": "get"
+     },
+     true
+    ]
+   },
+   "rec": {
+    "m": "HEAD"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "map_value",
+     "m",
+     {
+      "S0": "start",
+      "SF": "end"
+     },
+     false
+    ]
+   },
+   "rec": {
+    "m": "SF"
+   },
+   "out": "end"
+  },
+  {
+   "spec": {
+    "!": [
+     "map_value",
+     "m",
+     {
+      "SF": "end"
+     },
+     false
+    ]
+   },
+   "rec": {
+    "m": "sf"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "map_value",
+     "m",
+     {
+      "4624": "x"
+     },
+     false
+    ]
+   },
+   "rec": {
+    "m": 4624
+   },
+   "out": "x"
+  },
+  {
+   "spec": {
+    "!": [
+     "concat",
+     {
+      "!": [
+       "const",
+       "http://"
+      ]
+     },
+     "host",
+     "uri"
+    ]
+   },
+   "rec": {
+    "host": "h.com",
+    "uri": "/p"
+   },
+   "out": "http://h.com/p"
+  },
+  {
+   "spec": {
+    "!": [
+     "concat",
+     {
+      "!": [
+       "const",
+       "http://"
+      ]
+     },
+     "host",
+     "uri"
+    ]
+   },
+   "rec": {
+    "host": "h.com"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "concat",
+     "a",
+     "b"
+    ]
+   },
+   "rec": {
+    "a": 1,
+    "b": 2.5
+   },
+   "out": "12.5"
+  },
+  {
+   "spec": {
+    "!": [
+     "concat",
+     "a"
+    ]
+   },
+   "rec": {
+    "a": "-"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "TargetUserName"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "out": "Steve"
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "Padded"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "out": "Advapi"
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "Dash"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "Empty"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "IntVal"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "out": 7
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "NoText"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "Missing"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "k"
+    ]
+   },
+   "rec": {
+    "Payload": "not json"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "k"
+    ]
+   },
+   "rec": {
+    "Payload": 42
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "k"
+    ]
+   },
+   "rec": {},
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "k"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"k\": \"  v  \", \"z\": 1}"
+   },
+   "out": "v"
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "z"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"k\": \"v\", \"z\": 1}"
+   },
+   "out": 1
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Payload",
+     "k"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"EventData\": \"odd\"}"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "file_path"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "file_path": "/tmp/x",
+     "pad": "  y  ",
+     "n": 5,
+     "dash": "-"
+    }
+   },
+   "out": "/tmp/x"
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "pad"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "file_path": "/tmp/x",
+     "pad": "  y  ",
+     "n": 5,
+     "dash": "-"
+    }
+   },
+   "out": "y"
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "n"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "file_path": "/tmp/x",
+     "pad": "  y  ",
+     "n": 5,
+     "dash": "-"
+    }
+   },
+   "out": 5
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "dash"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "file_path": "/tmp/x",
+     "pad": "  y  ",
+     "n": 5,
+     "dash": "-"
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "payload",
+     "Record",
+     "absent"
+    ]
+   },
+   "rec": {
+    "Record": {
+     "file_path": "/tmp/x",
+     "pad": "  y  ",
+     "n": 5,
+     "dash": "-"
+    }
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "userdata",
+     "Payload",
+     "User"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"UserData\": {\"EventXML\": {\"User\": \"DESKTOP-8\\\\jcloudy\", \"SessionID\": 2, \"Pad\": \"  x  \", \"Blank\": \"-\"}}}"
+   },
+   "out": "DESKTOP-8\\jcloudy"
+  },
+  {
+   "spec": {
+    "!": [
+     "userdata",
+     "Payload",
+     "SessionID"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"UserData\": {\"EventXML\": {\"User\": \"DESKTOP-8\\\\jcloudy\", \"SessionID\": 2, \"Pad\": \"  x  \", \"Blank\": \"-\"}}}"
+   },
+   "out": 2
+  },
+  {
+   "spec": {
+    "!": [
+     "userdata",
+     "Payload",
+     "Pad"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"UserData\": {\"EventXML\": {\"User\": \"DESKTOP-8\\\\jcloudy\", \"SessionID\": 2, \"Pad\": \"  x  \", \"Blank\": \"-\"}}}"
+   },
+   "out": "x"
+  },
+  {
+   "spec": {
+    "!": [
+     "userdata",
+     "Payload",
+     "Blank"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"UserData\": {\"EventXML\": {\"User\": \"DESKTOP-8\\\\jcloudy\", \"SessionID\": 2, \"Pad\": \"  x  \", \"Blank\": \"-\"}}}"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "userdata",
+     "Payload",
+     "Missing"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"UserData\": {\"EventXML\": {\"User\": \"DESKTOP-8\\\\jcloudy\", \"SessionID\": 2, \"Pad\": \"  x  \", \"Blank\": \"-\"}}}"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "userdata",
+     "Payload",
+     "User"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "userdata",
+     "Payload",
+     "User"
+    ]
+   },
+   "rec": {
+    "Payload": "{\"UserData\": \"odd\"}"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "host_label",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": "HOST1.example.com"
+   },
+   "out": "HOST1"
+  },
+  {
+   "spec": {
+    "!": [
+     "host_label",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": "HOST1"
+   },
+   "out": "HOST1"
+  },
+  {
+   "spec": {
+    "!": [
+     "host_label",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": ".leading"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "host_label",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": ""
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": 508
+   },
+   "out": 508
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "0x1FC"
+   },
+   "out": 508
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "1FC"
+   },
+   "out": 508
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "12"
+   },
+   "out": 12
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": " 12 "
+   },
+   "out": 12
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "12.5"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": 3.9
+   },
+   "out": 3
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": -3.9
+   },
+   "out": -3
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": true
+   },
+   "out": 1
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "0x"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "abc"
+   },
+   "out": 2748
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "xyz"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "1_0"
+   },
+   "out": 10
+  },
+  {
+   "spec": {
+    "!": [
+     "hex_int",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "-"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "unescape_backslashes",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "C:\\\\x\\\\y"
+   },
+   "out": "C:\\x\\y"
+  },
+  {
+   "spec": {
+    "!": [
+     "unescape_backslashes",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "C:\\x"
+   },
+   "out": "C:\\x"
+  },
+  {
+   "spec": {
+    "!": [
+     "unescape_backslashes",
+     "p"
+    ]
+   },
+   "rec": {
+    "p": "a\\\\\\\\b"
+   },
+   "out": "a\\\\b"
+  },
+  {
+   "spec": {
+    "!": [
+     "replace",
+     "t",
+     " ",
+     "T"
+    ]
+   },
+   "rec": {
+    "t": "2018-04-02 01:15"
+   },
+   "out": "2018-04-02T01:15"
+  },
+  {
+   "spec": {
+    "!": [
+     "replace",
+     "t",
+     "aa",
+     "b"
+    ]
+   },
+   "rec": {
+    "t": "aaaa"
+   },
+   "out": "bb"
+  },
+  {
+   "spec": {
+    "!": [
+     "at",
+     "strings",
+     0
+    ]
+   },
+   "rec": {
+    "strings": [
+     "a",
+     " b ",
+     "-",
+     "",
+     42
+    ]
+   },
+   "out": "a"
+  },
+  {
+   "spec": {
+    "!": [
+     "at",
+     "strings",
+     1
+    ]
+   },
+   "rec": {
+    "strings": [
+     "a",
+     " b ",
+     "-",
+     "",
+     42
+    ]
+   },
+   "out": "b"
+  },
+  {
+   "spec": {
+    "!": [
+     "at",
+     "strings",
+     2
+    ]
+   },
+   "rec": {
+    "strings": [
+     "a",
+     " b ",
+     "-",
+     "",
+     42
+    ]
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "at",
+     "strings",
+     3
+    ]
+   },
+   "rec": {
+    "strings": [
+     "a",
+     " b ",
+     "-",
+     "",
+     42
+    ]
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "at",
+     "strings",
+     4
+    ]
+   },
+   "rec": {
+    "strings": [
+     "a",
+     " b ",
+     "-",
+     "",
+     42
+    ]
+   },
+   "out": 42
+  },
+  {
+   "spec": {
+    "!": [
+     "at",
+     "strings",
+     -1
+    ]
+   },
+   "rec": {
+    "strings": [
+     "a",
+     " b ",
+     "-",
+     "",
+     42
+    ]
+   },
+   "out": 42
+  },
+  {
+   "spec": {
+    "!": [
+     "at",
+     "strings",
+     -5
+    ]
+   },
+   "rec": {
+    "strings": [
+     "a",
+     " b ",
+     "-",
+     "",
+     42
+    ]
+   },
+   "out": "a"
+  },
+  {
+   "spec": {
+    "!": [
+     "at",
+     "strings",
+     -6
+    ]
+   },
+   "rec": {
+    "strings": [
+     "a",
+     " b ",
+     "-",
+     "",
+     42
+    ]
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "at",
+     "strings",
+     5
+    ]
+   },
+   "rec": {
+    "strings": [
+     "a",
+     " b ",
+     "-",
+     "",
+     42
+    ]
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "at",
+     "strings",
+     0
+    ]
+   },
+   "rec": {
+    "strings": "not a list"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "at",
+     "strings",
+     0
+    ]
+   },
+   "rec": {},
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "ts_before",
+     "a",
+     "b"
+    ]
+   },
+   "rec": {
+    "a": "2020-02-10 08:20:00.000",
+    "b": "2020-02-10T08:28:12.876Z"
+   },
+   "out": true
+  },
+  {
+   "spec": {
+    "!": [
+     "ts_before",
+     "b",
+     "a"
+    ]
+   },
+   "rec": {
+    "a": "2020-02-10 08:20:00.000",
+    "b": "2020-02-10T08:28:12.876Z"
+   },
+   "out": false
+  },
+  {
+   "spec": {
+    "!": [
+     "ts_before",
+     "b",
+     "c"
+    ]
+   },
+   "rec": {
+    "b": "2020-02-10T08:28:12.876Z",
+    "c": "2020-02-10T09:28:12.876+01:00"
+   },
+   "out": false
+  },
+  {
+   "spec": {
+    "!": [
+     "ts_before",
+     "c",
+     "b"
+    ]
+   },
+   "rec": {
+    "b": "2020-02-10T08:28:12.876Z",
+    "c": "2020-02-10T09:28:12.876+01:00"
+   },
+   "out": false
+  },
+  {
+   "spec": {
+    "!": [
+     "ts_before",
+     "a",
+     "junk"
+    ]
+   },
+   "rec": {
+    "a": "2020-02-10 08:20:00",
+    "junk": "not a time"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "ts_before",
+     "blank",
+     "a"
+    ]
+   },
+   "rec": {
+    "a": "2020-02-10 08:20:00",
+    "blank": "-"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "ts_before",
+     "a",
+     "absent"
+    ]
+   },
+   "rec": {
+    "a": "2020-02-10 08:20:00"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "ts_before",
+     "a",
+     "b"
+    ]
+   },
+   "rec": {
+    "a": "2020-02-10 08:20:00.1234567",
+    "b": "2020-02-10T08:20:00.123457"
+   },
+   "out": true
+  },
+  {
+   "spec": {
+    "!": [
+     "win_program_path",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "C:\\Program Files\\x\\y.exe"
+   },
+   "out": "C:\\Program Files\\x\\y.exe"
+  },
+  {
+   "spec": {
+    "!": [
+     "win_program_path",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "0\tabcd\tef01\tx64\tPkg.Name\tpublisher8"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "win_program_name",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "C:\\Program Files\\x\\y.exe"
+   },
+   "out": "y.exe"
+  },
+  {
+   "spec": {
+    "!": [
+     "win_program_name",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "0\tabcd\tef01\tx64\tPkg.Name\tpublisher8"
+   },
+   "out": "Pkg.Name_publisher8"
+  },
+  {
+   "spec": {
+    "!": [
+     "win_program_name",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "0\tabcd\tef01\tx64\tPkg.Name\tpublisher8\tneutral"
+   },
+   "out": "Pkg.Name_publisher8"
+  },
+  {
+   "spec": {
+    "!": [
+     "win_program_name",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "0\tabcd\tef01\tx64\tNoDotName\tpublisher8"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "win_program_name",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "a\tb"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "win_program_path",
+     "v"
+    ]
+   },
+   "rec": {
+    "v": "-"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "S-1-5-18"
+   },
+   "out": "SYSTEM"
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "s-1-5-32-544"
+   },
+   "out": "ADMINISTRATORS"
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "NT AUTHORITY\\SYSTEM"
+   },
+   "out": "SYSTEM"
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "nt authority\\NetworkService"
+   },
+   "out": "NETWORK SERVICE"
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "BUILTIN\\Administrators"
+   },
+   "out": "ADMINISTRATORS"
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "DESKTOP-1\\jdoe"
+   },
+   "out": "DESKTOP-1\\jdoe"
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "Local System"
+   },
+   "out": "SYSTEM"
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "systemprofile"
+   },
+   "out": "SYSTEM"
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "S-1-5-21-1-2-3-1001"
+   },
+   "out": "S-1-5-21-1-2-3-1001"
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "  jcloudy  "
+   },
+   "out": "jcloudy"
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "DESKTOP-X$"
+   },
+   "out": "DESKTOP-X$"
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "-"
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "user_canon",
+     "u"
+    ]
+   },
+   "rec": {
+    "u": "   "
+   },
+   "out": null
+  },
+  {
+   "spec": {
+    "!": [
+     "exe_path",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": "\"C:\\p q\\x.exe\" -k net"
+   },
+   "out": "C:\\p q\\x.exe"
+  },
+  {
+   "spec": {
+    "!": [
+     "exe_path",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": "C:\\Windows\\system32\\svchost.exe -k netsvcs"
+   },
+   "out": "C:\\Windows\\system32\\svchost.exe"
+  },
+  {
+   "spec": {
+    "!": [
+     "exe_path",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": "C:\\X.EXE stuff"
+   },
+   "out": "C:\\X.EXE"
+  },
+  {
+   "spec": {
+    "!": [
+     "exe_path",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": "foo bar baz"
+   },
+   "out": "foo"
+  },
+  {
+   "spec": {
+    "!": [
+     "exe_path",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": "\"unterminated"
+   },
+   "out": "unterminated"
+  },
+  {
+   "spec": {
+    "!": [
+     "exe_path",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": "\"\""
+   },
+   "out": ""
+  },
+  {
+   "spec": {
+    "!": [
+     "exe_path",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": "  word  "
+   },
+   "out": "word"
+  },
+  {
+   "spec": {
+    "!": [
+     "exe_path",
+     "c"
+    ]
+   },
+   "rec": {
+    "c": " leading tok"
+   },
+   "out": "leading"
+  }
+ ],
+ "clean_ts": [
+  [
+   "2020-01-01T00:00:00Z",
+   "2020-01-01T00:00:00Z"
+  ],
+  [
+   "1601-01-01T00:00:00",
+   null
+  ],
+  [
+   "1970-01-01",
+   null
+  ],
+  [
+   "0001-01-01x",
+   null
+  ],
+  [
+   "1600-12-31T23:59:59",
+   null
+  ],
+  [
+   "2019-01-28T19:40:32+00:00",
+   "2019-01-28T19:40:32+00:00"
+  ],
+  [
+   5,
+   "5"
+  ],
+  [
+   "-",
+   null
+  ],
+  [
+   "",
+   null
+  ],
+  [
+   null,
+   null
+  ],
+  [
+   1.5,
+   "1.5"
+  ]
+ ],
+ "parse_ts": [
+  [
+   "2020-02-10 08:20:00.000",
+   "2020-02-10T08:20:00+00:00"
+  ],
+  [
+   "2020-02-10T08:28:12.876Z",
+   "2020-02-10T08:28:12.876000+00:00"
+  ],
+  [
+   "2020-02-10T09:28:12.876+01:00",
+   "2020-02-10T08:28:12.876000+00:00"
+  ],
+  [
+   "2020-02-10T08:20:00+02:00",
+   "2020-02-10T06:20:00+00:00"
+  ],
+  [
+   "2020-02-10 08:20:00.1234567",
+   "2020-02-10T08:20:00.123456+00:00"
+  ],
+  [
+   "2020-02-10T08:20:00-05:30",
+   "2020-02-10T13:50:00+00:00"
+  ],
+  [
+   "2020-02-10T08:20:00.5",
+   "2020-02-10T08:20:00.500000+00:00"
+  ],
+  [
+   "2020-13-01T00:00:00",
+   null
+  ],
+  [
+   "2020-02-30T00:00:00",
+   null
+  ],
+  [
+   "2020-02-29T00:00:00",
+   "2020-02-29T00:00:00+00:00"
+  ],
+  [
+   "2100-02-29T00:00:00",
+   null
+  ],
+  [
+   "2000-02-29T00:00:00",
+   "2000-02-29T00:00:00+00:00"
+  ],
+  [
+   "not a time",
+   null
+  ],
+  [
+   "",
+   null
+  ],
+  [
+   null,
+   null
+  ],
+  [
+   0,
+   null
+  ],
+  [
+   "2020-02-10",
+   null
+  ],
+  [
+   "  2020-02-10T08:20:00Z  ",
+   "2020-02-10T08:20:00+00:00"
+  ],
+  [
+   "2020-02-10T08:20:00.876543219Z",
+   "2020-02-10T08:20:00.876543+00:00"
+  ],
+  [
+   "2020-02-10T08:20:00Zx",
+   null
+  ]
+ ],
+ "payload_field": [
+  {
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "name": "TargetUserName",
+   "out": "Steve"
+  },
+  {
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "name": "Padded",
+   "out": "  Advapi  "
+  },
+  {
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "name": "Dash",
+   "out": "-"
+  },
+  {
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "name": "Empty",
+   "out": ""
+  },
+  {
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "name": "IntVal",
+   "out": "7"
+  },
+  {
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "name": "NoText",
+   "out": ""
+  },
+  {
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": [{\"@Name\": \"TargetUserName\", \"#text\": \"Steve\"}, {\"@Name\": \"Padded\", \"#text\": \"  Advapi  \"}, {\"@Name\": \"Dash\", \"#text\": \"-\"}, {\"@Name\": \"Empty\", \"#text\": \"\"}, {\"@Name\": \"IntVal\", \"#text\": 7}, {\"@Name\": \"NoText\"}, {\"@Name\": \"ProcessName\", \"#text\": \"C:\\\\Windows\\\\System32\\\\svchost.exe\"}]}}"
+   },
+   "name": "Missing",
+   "out": ""
+  },
+  {
+   "rec": {
+    "Payload": "not json"
+   },
+   "name": "X",
+   "out": ""
+  },
+  {
+   "rec": {
+    "Payload": ""
+   },
+   "name": "X",
+   "out": ""
+  },
+  {
+   "rec": {},
+   "name": "X",
+   "out": ""
+  },
+  {
+   "rec": {
+    "Payload": "{\"EventData\": \"odd\"}"
+   },
+   "name": "X",
+   "out": ""
+  },
+  {
+   "rec": {
+    "Payload": "{\"EventData\": {\"Data\": \"odd\"}}"
+   },
+   "name": "X",
+   "out": ""
+  }
+ ]
+}

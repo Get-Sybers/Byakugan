@@ -1,0 +1,334 @@
+{
+ "dotnet_date": [
+  [
+   "/Date(1522187139502)/",
+   "2018-03-27T21:45:39.502000+00:00"
+  ],
+  [
+   "/Date(1522917168677)/",
+   "2018-04-05T08:32:48.677000+00:00"
+  ],
+  [
+   "/Date(0)/",
+   "1970-01-01T00:00:00+00:00"
+  ],
+  [
+   "/Date(-11644473600000)/",
+   "1601-01-01T00:00:00+00:00"
+  ],
+  [
+   "/Date(-1)/",
+   "1969-12-31T23:59:59.999000+00:00"
+  ],
+  [
+   "/Date(1)/",
+   "1970-01-01T00:00:00.001000+00:00"
+  ],
+  [
+   "/Date(999)/",
+   "1970-01-01T00:00:00.999000+00:00"
+  ],
+  [
+   "/Date(1522187139502)/ trailing",
+   "2018-03-27T21:45:39.502000+00:00"
+  ],
+  [
+   "prefix /Date(1522187139502)/",
+   "2018-03-27T21:45:39.502000+00:00"
+  ],
+  [
+   "2018-04-05T09:52:48.677000+00:00",
+   "2018-04-05T09:52:48.677000+00:00"
+  ],
+  [
+   "not a date",
+   "not a date"
+  ],
+  [
+   "-",
+   "-"
+  ],
+  [
+   "",
+   null
+  ],
+  [
+   null,
+   null
+  ],
+  [
+   0,
+   null
+  ],
+  [
+   false,
+   null
+  ],
+  [
+   true,
+   "True"
+  ],
+  [
+   1522187139502,
+   "1522187139502"
+  ],
+  [
+   1.5,
+   "1.5"
+  ],
+  [
+   [],
+   null
+  ],
+  [
+   {},
+   null
+  ],
+  [
+   "/Date(253402300799999)/",
+   "9999-12-31T23:59:59.998993+00:00"
+  ],
+  [
+   "/Date(253402300800000)/",
+   null
+  ],
+  [
+   "/Date(-62135596800000)/",
+   "0001-01-01T00:00:00+00:00"
+  ],
+  [
+   "/Date(-62135596800001)/",
+   null
+  ],
+  [
+   "/Date(99999999999999999999999)/",
+   null
+  ]
+ ],
+ "flatten": [
+  {
+   "rec": {
+    "AppId": {
+     "AppId": "fb3b0dbfee58fac8",
+     "Description": "Microsoft Word 2016 64-bit"
+    },
+    "SourceFile": "/in/AutomaticDestinations/fb3b0dbfee58fac8.automaticDestinations-ms",
+    "DestListEntries": [
+     {
+      "Path": "C:\\Users\\jcloudy\\Desktop\\Planning.docx",
+      "EntryNumber": 1,
+      "CreatedOn": "/Date(1522187139502)/",
+      "LastModified": "/Date(1522917168677)/",
+      "Hostname": "desktop-pm6c56d",
+      "InteractionCount": 13,
+      "MRUPosition": 0,
+      "Pinned": false,
+      "MacAddress": "28:e3:47:01:77:77",
+      "VolumeDroid": "bc75"
+     }
+    ]
+   },
+   "out": [
+    {
+     "Path": "C:\\Users\\jcloudy\\Desktop\\Planning.docx",
+     "LastModified": "2018-04-05T08:32:48.677000+00:00",
+     "CreatedOn": "2018-03-27T21:45:39.502000+00:00",
+     "Hostname": "desktop-pm6c56d",
+     "InteractionCount": 13,
+     "EntryNumber": 1,
+     "MRUPosition": 0,
+     "Pinned": false,
+     "MacAddress": "28:e3:47:01:77:77",
+     "VolumeDroid": "bc75",
+     "AppId": "fb3b0dbfee58fac8",
+     "AppDescription": "Microsoft Word 2016 64-bit",
+     "SourceFile": "/in/AutomaticDestinations/fb3b0dbfee58fac8.automaticDestinations-ms"
+    }
+   ]
+  },
+  {
+   "rec": {
+    "AppId": {},
+    "DestListEntries": []
+   },
+   "out": []
+  },
+  {
+   "rec": {
+    "AppId": {
+     "AppId": "9b9cdc69c1c24e2b",
+     "Description": "Notepad"
+    },
+    "SourceFile": "/in/AutomaticDestinations/9b9cdc69c1c24e2b.automaticDestinations-ms",
+    "DestListEntries": [
+     {
+      "Path": "C:\\Users\\jcloudy\\Documents\\notes.txt",
+      "EntryNumber": 2,
+      "CreatedOn": "/Date(1522187139000)/",
+      "LastModified": "/Date(1522917168000)/",
+      "Hostname": "desktop-pm6c56d",
+      "InteractionCount": 3,
+      "MRUPosition": 1,
+      "Pinned": true,
+      "MacAddress": "28:e3:47:01:77:77",
+      "VolumeDroid": "bc75"
+     },
+     {
+      "Path": "\\\\srv\\share\\report.pdf",
+      "EntryNumber": 3,
+      "CreatedOn": "2018-03-27T20:25:39.502000+00:00",
+      "LastModified": "2018-04-05T09:52:48.677000+00:00",
+      "Hostname": "DESKTOP-PM6C56D",
+      "InteractionCount": 1.0,
+      "MRUPosition": 2,
+      "Pinned": false,
+      "MacAddress": null,
+      "VolumeDroid": null
+     },
+     {
+      "Path": null,
+      "EntryNumber": 4,
+      "CreatedOn": "/Date(-11644473600000)/",
+      "LastModified": "/Date(-2208988800000)/",
+      "Hostname": "desktop-pm6c56d"
+     },
+     "not a dict",
+     {
+      "Path": "/tmp/plain.log",
+      "EntryNumber": 5
+     },
+     {
+      "Path": "C:\\a\\b.docx",
+      "EntryNumber": 6,
+      "CreatedOn": "",
+      "LastModified": 0,
+      "Hostname": "",
+      "InteractionCount": 0,
+      "MRUPosition": null,
+      "Pinned": null
+     }
+    ]
+   },
+   "out": [
+    {
+     "Path": "C:\\Users\\jcloudy\\Documents\\notes.txt",
+     "LastModified": "2018-04-05T08:32:48+00:00",
+     "CreatedOn": "2018-03-27T21:45:39+00:00",
+     "Hostname": "desktop-pm6c56d",
+     "InteractionCount": 3,
+     "EntryNumber": 2,
+     "MRUPosition": 1,
+     "Pinned": true,
+     "MacAddress": "28:e3:47:01:77:77",
+     "VolumeDroid": "bc75",
+     "AppId": "9b9cdc69c1c24e2b",
+     "AppDescription": "Notepad",
+     "SourceFile": "/in/AutomaticDestinations/9b9cdc69c1c24e2b.automaticDestinations-ms"
+    },
+    {
+     "Path": "\\\\srv\\share\\report.pdf",
+     "LastModified": "2018-04-05T09:52:48.677000+00:00",
+     "CreatedOn": "2018-03-27T20:25:39.502000+00:00",
+     "Hostname": "DESKTOP-PM6C56D",
+     "InteractionCount": 1.0,
+     "EntryNumber": 3,
+     "MRUPosition": 2,
+     "Pinned": false,
+     "MacAddress": null,
+     "VolumeDroid": null,
+     "AppId": "9b9cdc69c1c24e2b",
+     "AppDescription": "Notepad",
+     "SourceFile": "/in/AutomaticDestinations/9b9cdc69c1c24e2b.automaticDestinations-ms"
+    },
+    {
+     "Path": null,
+     "LastModified": "1900-01-01T00:00:00+00:00",
+     "CreatedOn": "1601-01-01T00:00:00+00:00",
+     "Hostname": "desktop-pm6c56d",
+     "InteractionCount": null,
+     "EntryNumber": 4,
+     "MRUPosition": null,
+     "Pinned": null,
+     "MacAddress": null,
+     "VolumeDroid": null,
+     "AppId": "9b9cdc69c1c24e2b",
+     "AppDescription": "Notepad",
+     "SourceFile": "/in/AutomaticDestinations/9b9cdc69c1c24e2b.automaticDestinations-ms"
+    },
+    {
+     "Path": "/tmp/plain.log",
+     "LastModified": null,
+     "CreatedOn": null,
+     "Hostname": null,
+     "InteractionCount": null,
+     "EntryNumber": 5,
+     "MRUPosition": null,
+     "Pinned": null,
+     "MacAddress": null,
+     "VolumeDroid": null,
+     "AppId": "9b9cdc69c1c24e2b",
+     "AppDescription": "Notepad",
+     "SourceFile": "/in/AutomaticDestinations/9b9cdc69c1c24e2b.automaticDestinations-ms"
+    },
+    {
+     "Path": "C:\\a\\b.docx",
+     "LastModified": null,
+     "CreatedOn": null,
+     "Hostname": "",
+     "InteractionCount": 0,
+     "EntryNumber": 6,
+     "MRUPosition": null,
+     "Pinned": null,
+     "MacAddress": null,
+     "VolumeDroid": null,
+     "AppId": "9b9cdc69c1c24e2b",
+     "AppDescription": "Notepad",
+     "SourceFile": "/in/AutomaticDestinations/9b9cdc69c1c24e2b.automaticDestinations-ms"
+    }
+   ]
+  },
+  {
+   "rec": {
+    "SourceFile": "/in/AutomaticDestinations/none.automaticDestinations-ms"
+   },
+   "out": []
+  },
+  {
+   "rec": {
+    "AppId": null,
+    "DestListEntries": null
+   },
+   "out": []
+  },
+  {
+   "rec": {
+    "SourceFile": "/in/x.automaticDestinations-ms",
+    "DestListEntries": [
+     {
+      "Path": "D:\\evidence\\case.eml",
+      "EntryNumber": 9,
+      "LastModified": "/Date(1522917168677)/",
+      "Hostname": "desktop-pm6c56d"
+     }
+    ]
+   },
+   "out": [
+    {
+     "Path": "D:\\evidence\\case.eml",
+     "LastModified": "2018-04-05T08:32:48.677000+00:00",
+     "CreatedOn": null,
+     "Hostname": "desktop-pm6c56d",
+     "InteractionCount": null,
+     "EntryNumber": 9,
+     "MRUPosition": null,
+     "Pinned": null,
+     "MacAddress": null,
+     "VolumeDroid": null,
+     "AppId": null,
+     "AppDescription": null,
+     "SourceFile": "/in/x.automaticDestinations-ms"
+    }
+   ]
+  }
+ ]
+}

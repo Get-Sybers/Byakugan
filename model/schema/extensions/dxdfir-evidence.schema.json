@@ -1,0 +1,447 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/extensions/dxdfir-evidence.schema.json",
+ "title": "Byakugan CAR evidence extension (dxdfir-evidence)",
+ "description": "The CAR evidence surface of the Byakugan projection (car-stix-projection contract v6, model/stix/changelog/v6.md): the closed x_car_* top-level property set carried under a toplevel-property-extension entry, and the extension-defined objects x-car-thread, x-car-record (new-SCO) and x-car-inferred-node (new-SDO). Extension id: extension-definition--b8c68e7b-701a-5c99-897d-a1c674311493.",
+ "version": "6.0.0",
+ "$defs": {
+  "extension-entry": {
+   "type": "object",
+   "properties": {
+    "extension_type": {
+     "enum": [
+      "toplevel-property-extension",
+      "new-sco",
+      "new-sdo"
+     ]
+    }
+   },
+   "required": [
+    "extension_type"
+   ],
+   "unevaluatedProperties": false
+  },
+  "top-level-properties": {
+   "type": "object",
+   "properties": {
+    "x_car_action": {
+     "type": "string"
+    },
+    "x_car_analytic": {
+     "type": "string"
+    },
+    "x_car_asserted": {
+     "type": "boolean"
+    },
+    "x_car_attachment_ref": {
+     "type": "string"
+    },
+    "x_car_base_address": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "x_car_car_action": {
+     "type": "string"
+    },
+    "x_car_car_object": {
+     "type": "string"
+    },
+    "x_car_class": {
+     "type": "string"
+    },
+    "x_car_clause": {
+     "type": "string"
+    },
+    "x_car_confidence": {
+     "type": "string"
+    },
+    "x_car_conflicts": {
+     "type": [
+      "object",
+      "string"
+     ]
+    },
+    "x_car_content_ref": {
+     "type": "string"
+    },
+    "x_car_corroborated_by": {
+     "type": [
+      "array",
+      "string"
+     ]
+    },
+    "x_car_corroborating_refs": {
+     "type": [
+      "array",
+      "string"
+     ]
+    },
+    "x_car_entity_id": {
+     "type": "string"
+    },
+    "x_car_event_id": {
+     "type": "string"
+    },
+    "x_car_fields": {
+     "type": [
+      "object",
+      "string"
+     ]
+    },
+    "x_car_first_seen": {
+     "type": "string"
+    },
+    "x_car_identity_key": {
+     "type": "string"
+    },
+    "x_car_identity_value": {
+     "type": "string"
+    },
+    "x_car_inferred": {
+     "type": "boolean"
+    },
+    "x_car_inferred_end": {
+     "type": "string"
+    },
+    "x_car_last_seen": {
+     "type": "string"
+    },
+    "x_car_link_confidence": {
+     "type": "string"
+    },
+    "x_car_link_refs": {
+     "type": [
+      "array",
+      "string"
+     ]
+    },
+    "x_car_method": {
+     "type": "string"
+    },
+    "x_car_native": {
+     "type": [
+      "object",
+      "string"
+     ]
+    },
+    "x_car_node_id": {
+     "type": "string"
+    },
+    "x_car_object": {
+     "type": "string"
+    },
+    "x_car_parent": {
+     "type": [
+      "object",
+      "string"
+     ]
+    },
+    "x_car_path": {
+     "type": "string"
+    },
+    "x_car_ppid": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "x_car_process_entity_id": {
+     "type": "string"
+    },
+    "x_car_properties": {
+     "type": [
+      "object",
+      "string"
+     ]
+    },
+    "x_car_reason": {
+     "type": "string"
+    },
+    "x_car_response_body_bytes": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "x_car_response_status_code": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "x_car_roles": {
+     "type": [
+      "array",
+      "object",
+      "string"
+     ]
+    },
+    "x_car_signature_valid": {
+     "type": [
+      "boolean",
+      "string"
+     ]
+    },
+    "x_car_signer": {
+     "type": "string"
+    },
+    "x_car_source_artefact": {
+     "type": "string"
+    },
+    "x_car_source_host": {
+     "type": "string"
+    },
+    "x_car_techniques": {
+     "type": [
+      "array",
+      "string"
+     ]
+    },
+    "x_car_timestamp": {
+     "type": "string"
+    },
+    "x_car_title": {
+     "type": "string"
+    },
+    "x_car_url_ref": {
+     "type": "string"
+    },
+    "x_car_would_be": {
+     "type": "string"
+    }
+   }
+  },
+  "x-car-thread": {
+   "type": "object",
+   "allOf": [
+    {
+     "$ref": "#/$defs/top-level-properties"
+    }
+   ],
+   "properties": {
+    "type": {
+     "const": "x-car-thread"
+    },
+    "spec_version": {
+     "const": "2.1"
+    },
+    "id": {
+     "type": "string"
+    },
+    "created": {
+     "type": "string"
+    },
+    "modified": {
+     "type": "string"
+    },
+    "created_by_ref": {
+     "type": "string"
+    },
+    "labels": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "confidence": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 100
+    },
+    "revoked": {
+     "type": "boolean"
+    },
+    "extensions": {
+     "type": "object"
+    },
+    "src_pid": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "src_tid": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "tgt_pid": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "tgt_tid": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "start_address": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "start_function": {
+     "type": "string"
+    },
+    "start_module_name": {
+     "type": "string"
+    },
+    "start_module_ref": {
+     "type": "string"
+    },
+    "creator_user_ref": {
+     "type": "string"
+    },
+    "stack_base": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "stack_limit": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "user_stack_base": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    },
+    "user_stack_limit": {
+     "type": [
+      "integer",
+      "string"
+     ]
+    }
+   },
+   "required": [
+    "type",
+    "id"
+   ]
+  },
+  "x-car-record": {
+   "type": "object",
+   "allOf": [
+    {
+     "$ref": "#/$defs/top-level-properties"
+    }
+   ],
+   "properties": {
+    "type": {
+     "const": "x-car-record"
+    },
+    "spec_version": {
+     "const": "2.1"
+    },
+    "id": {
+     "type": "string"
+    },
+    "created": {
+     "type": "string"
+    },
+    "modified": {
+     "type": "string"
+    },
+    "created_by_ref": {
+     "type": "string"
+    },
+    "labels": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "confidence": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 100
+    },
+    "revoked": {
+     "type": "boolean"
+    },
+    "extensions": {
+     "type": "object"
+    }
+   },
+   "required": [
+    "type",
+    "id"
+   ]
+  },
+  "x-car-inferred-node": {
+   "type": "object",
+   "allOf": [
+    {
+     "$ref": "#/$defs/top-level-properties"
+    }
+   ],
+   "properties": {
+    "type": {
+     "const": "x-car-inferred-node"
+    },
+    "spec_version": {
+     "const": "2.1"
+    },
+    "id": {
+     "type": "string"
+    },
+    "created": {
+     "type": "string"
+    },
+    "modified": {
+     "type": "string"
+    },
+    "created_by_ref": {
+     "type": "string"
+    },
+    "labels": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "confidence": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 100
+    },
+    "revoked": {
+     "type": "boolean"
+    },
+    "extensions": {
+     "type": "object"
+    }
+   },
+   "required": [
+    "type",
+    "id",
+    "created",
+    "modified",
+    "created_by_ref"
+   ]
+  }
+ },
+ "anyOf": [
+  {
+   "$ref": "#/$defs/x-car-thread"
+  },
+  {
+   "$ref": "#/$defs/x-car-record"
+  },
+  {
+   "$ref": "#/$defs/x-car-inferred-node"
+  },
+  {
+   "$ref": "#/$defs/top-level-properties"
+  }
+ ]
+}

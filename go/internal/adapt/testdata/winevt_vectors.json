@@ -1,0 +1,2993 @@
+{
+ "cases": [
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4688,
+     "strings": [
+      "S-1-5-18",
+      "-",
+      "-",
+      "0x00000000000003e7",
+      "0x0000000000000174",
+      "C:\\Windows\\System32\\smss.exe",
+      "%%1936",
+      "0x0000000000000004",
+      null,
+      "S-1-0-0",
+      "-",
+      "-",
+      "0x0000000000000000",
+      null,
+      "S-1-16-16384"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4688,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": "S-1-5-18"
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": "-"
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": "-"
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": "0x00000000000003e7"
+       },
+       {
+        "@Name": "NewProcessId",
+        "#text": "0x0000000000000174"
+       },
+       {
+        "@Name": "NewProcessName",
+        "#text": "C:\\Windows\\System32\\smss.exe"
+       },
+       {
+        "@Name": "TokenElevationType",
+        "#text": "%%1936"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "0x0000000000000004"
+       },
+       {
+        "@Name": "CommandLine",
+        "#text": null
+       },
+       {
+        "@Name": "TargetUserSid",
+        "#text": "S-1-0-0"
+       },
+       {
+        "@Name": "TargetUserName",
+        "#text": "-"
+       },
+       {
+        "@Name": "TargetDomainName",
+        "#text": "-"
+       },
+       {
+        "@Name": "TargetLogonId",
+        "#text": "0x0000000000000000"
+       },
+       {
+        "@Name": "ParentProcessName",
+        "#text": null
+       },
+       {
+        "@Name": "MandatoryLabel",
+        "#text": "S-1-16-16384"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4624,
+     "strings": [
+      "S-1-5-18",
+      "WIN$",
+      "WORKGROUP",
+      "0x3e7",
+      "S-1-5-21-1-1-1-1001",
+      "jcloudy",
+      "DESKTOP-8",
+      "0x16bebd",
+      "2",
+      "User32",
+      "Negotiate",
+      "DESKTOP-8",
+      "{0}",
+      "-",
+      "-",
+      "0",
+      "0x238",
+      "C:\\Windows\\System32\\lsass.exe",
+      "10.0.0.9",
+      "445"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4624,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": "S-1-5-18"
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": "WIN$"
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": "WORKGROUP"
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": "0x3e7"
+       },
+       {
+        "@Name": "TargetUserSid",
+        "#text": "S-1-5-21-1-1-1-1001"
+       },
+       {
+        "@Name": "TargetUserName",
+        "#text": "jcloudy"
+       },
+       {
+        "@Name": "TargetDomainName",
+        "#text": "DESKTOP-8"
+       },
+       {
+        "@Name": "TargetLogonId",
+        "#text": "0x16bebd"
+       },
+       {
+        "@Name": "LogonType",
+        "#text": "2"
+       },
+       {
+        "@Name": "LogonProcessName",
+        "#text": "User32"
+       },
+       {
+        "@Name": "AuthenticationPackageName",
+        "#text": "Negotiate"
+       },
+       {
+        "@Name": "WorkstationName",
+        "#text": "DESKTOP-8"
+       },
+       {
+        "@Name": "LogonGuid",
+        "#text": "{0}"
+       },
+       {
+        "@Name": "TransmittedServices",
+        "#text": "-"
+       },
+       {
+        "@Name": "LmPackageName",
+        "#text": "-"
+       },
+       {
+        "@Name": "KeyLength",
+        "#text": "0"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "0x238"
+       },
+       {
+        "@Name": "ProcessName",
+        "#text": "C:\\Windows\\System32\\lsass.exe"
+       },
+       {
+        "@Name": "IpAddress",
+        "#text": "10.0.0.9"
+       },
+       {
+        "@Name": "IpPort",
+        "#text": "445"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4672,
+     "strings": [
+      "S-1-5-18",
+      "SYSTEM",
+      "NT AUTHORITY",
+      "0x3e7",
+      "SeDebugPrivilege"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4672,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": "S-1-5-18"
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": "SYSTEM"
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": "NT AUTHORITY"
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": "0x3e7"
+       },
+       {
+        "@Name": "PrivilegeList",
+        "#text": "SeDebugPrivilege"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4907,
+     "strings": [
+      "x"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": null
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 7045,
+     "strings": [
+      "Airplane Mode Switch",
+      "\\SystemRoot\\System32\\drivers\\DellRbtn.sys",
+      "kernel mode driver",
+      "demand start",
+      null
+     ],
+     "xml_string": "<Event><System><Channel>System</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Service Control Manager",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 7045,
+    "Provider": "Service Control Manager",
+    "Channel": "System",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "ServiceName",
+        "#text": "Airplane Mode Switch"
+       },
+       {
+        "@Name": "ImagePath",
+        "#text": "\\SystemRoot\\System32\\drivers\\DellRbtn.sys"
+       },
+       {
+        "@Name": "ServiceType",
+        "#text": "kernel mode driver"
+       },
+       {
+        "@Name": "StartType",
+        "#text": "demand start"
+       },
+       {
+        "@Name": "AccountName",
+        "#text": null
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 60,
+     "strings": [
+      "{C411}",
+      "Font Download",
+      "{43D8}",
+      "https://fs.microsoft.com/fs/x.json",
+      null,
+      "0",
+      "2017-04-20T16:10:39Z",
+      "55",
+      "55",
+      "55"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Bits-Client/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Bits-Client",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 60,
+    "Provider": "Microsoft-Windows-Bits-Client",
+    "Channel": "Microsoft-Windows-Bits-Client/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "transferId",
+        "#text": "{C411}"
+       },
+       {
+        "@Name": "name",
+        "#text": "Font Download"
+       },
+       {
+        "@Name": "Id",
+        "#text": "{43D8}"
+       },
+       {
+        "@Name": "url",
+        "#text": "https://fs.microsoft.com/fs/x.json"
+       },
+       {
+        "@Name": "peer",
+        "#text": null
+       },
+       {
+        "@Name": "fileTime",
+        "#text": "2017-04-20T16:10:39Z"
+       },
+       {
+        "@Name": "fileLength",
+        "#text": "55"
+       },
+       {
+        "@Name": "bytesTotal",
+        "#text": "55"
+       },
+       {
+        "@Name": "bytesTransferred",
+        "#text": "55"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 59,
+     "strings": [
+      "x"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-TerminalServices-LocalSessionManager/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "prov",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": null
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 24,
+     "strings": [
+      "DESKTOP-PM6C56D\\defaultuser0",
+      "1",
+      "LOCAL"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-TerminalServices-LocalSessionManager/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "prov",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 24,
+    "Provider": "prov",
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "UserData": {
+      "EventXML": {
+       "User": "DESKTOP-PM6C56D\\defaultuser0",
+       "SessionID": "1",
+       "Address": "LOCAL"
+      }
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 1,
+     "strings": [
+      "technique_id=T1112",
+      "2019-05-16 14:17:15.753",
+      "{DFAE8213-70EB-5CDD-0000-0010F66D0A00}",
+      "3788",
+      "C:\\Windows\\System32\\reg.exe",
+      "6.3",
+      "Registry Console Tool",
+      "MS Windows",
+      "Microsoft Corporation",
+      "reg add hklm\\...\\EnableLUA ...",
+      "C:\\",
+      "insecurebank\\Administrator",
+      "{DFAE8213-7002}",
+      "0x585e6",
+      "2",
+      "High",
+      "SHA1=0873...",
+      "{DFAE8213-702C}",
+      "3748",
+      "C:\\Windows\\System32\\cmd.exe",
+      "\"C:\\Windows\\system32\\cmd.exe\" "
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 1,
+    "Provider": "Microsoft-Windows-Sysmon",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "RuleName",
+        "#text": "technique_id=T1112"
+       },
+       {
+        "@Name": "UtcTime",
+        "#text": "2019-05-16 14:17:15.753"
+       },
+       {
+        "@Name": "ProcessGuid",
+        "#text": "{DFAE8213-70EB-5CDD-0000-0010F66D0A00}"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "3788"
+       },
+       {
+        "@Name": "Image",
+        "#text": "C:\\Windows\\System32\\reg.exe"
+       },
+       {
+        "@Name": "FileVersion",
+        "#text": "6.3"
+       },
+       {
+        "@Name": "Description",
+        "#text": "Registry Console Tool"
+       },
+       {
+        "@Name": "Product",
+        "#text": "MS Windows"
+       },
+       {
+        "@Name": "Company",
+        "#text": "Microsoft Corporation"
+       },
+       {
+        "@Name": "CommandLine",
+        "#text": "reg add hklm\\...\\EnableLUA ..."
+       },
+       {
+        "@Name": "CurrentDirectory",
+        "#text": "C:\\"
+       },
+       {
+        "@Name": "User",
+        "#text": "insecurebank\\Administrator"
+       },
+       {
+        "@Name": "LogonGuid",
+        "#text": "{DFAE8213-7002}"
+       },
+       {
+        "@Name": "LogonId",
+        "#text": "0x585e6"
+       },
+       {
+        "@Name": "TerminalSessionId",
+        "#text": "2"
+       },
+       {
+        "@Name": "IntegrityLevel",
+        "#text": "High"
+       },
+       {
+        "@Name": "Hashes",
+        "#text": "SHA1=0873..."
+       },
+       {
+        "@Name": "ParentProcessGuid",
+        "#text": "{DFAE8213-702C}"
+       },
+       {
+        "@Name": "ParentProcessId",
+        "#text": "3748"
+       },
+       {
+        "@Name": "ParentImage",
+        "#text": "C:\\Windows\\System32\\cmd.exe"
+       },
+       {
+        "@Name": "ParentCommandLine",
+        "#text": "\"C:\\Windows\\system32\\cmd.exe\" "
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 8,
+     "strings": [
+      "-",
+      "2019-05-26",
+      "{365ABB72-0FA6}",
+      "3884",
+      "C:\\jjs.exe",
+      "{365ABB72-0FA7}",
+      "3908",
+      "C:\\svchost.exe",
+      "3916",
+      "0x60000",
+      null,
+      null
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 8,
+    "Provider": "Microsoft-Windows-Sysmon",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "RuleName",
+        "#text": "-"
+       },
+       {
+        "@Name": "UtcTime",
+        "#text": "2019-05-26"
+       },
+       {
+        "@Name": "SourceProcessGuid",
+        "#text": "{365ABB72-0FA6}"
+       },
+       {
+        "@Name": "SourceProcessId",
+        "#text": "3884"
+       },
+       {
+        "@Name": "SourceImage",
+        "#text": "C:\\jjs.exe"
+       },
+       {
+        "@Name": "TargetProcessGuid",
+        "#text": "{365ABB72-0FA7}"
+       },
+       {
+        "@Name": "TargetProcessId",
+        "#text": "3908"
+       },
+       {
+        "@Name": "TargetImage",
+        "#text": "C:\\svchost.exe"
+       },
+       {
+        "@Name": "NewThreadId",
+        "#text": "3916"
+       },
+       {
+        "@Name": "StartAddress",
+        "#text": "0x60000"
+       },
+       {
+        "@Name": "StartModule",
+        "#text": null
+       },
+       {
+        "@Name": "StartFunction",
+        "#text": null
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4625,
+     "strings": [
+      "S-1-0-0",
+      "-",
+      "-",
+      "0x0",
+      "S-1-0-0",
+      "admin",
+      "DESKTOP-8",
+      "0xC000006D",
+      "%%2313",
+      "0xC0000064",
+      "3",
+      "NtLmSsp",
+      "NTLM",
+      "WS1",
+      "-",
+      "-",
+      "0",
+      "0x0",
+      "-",
+      "10.0.0.9",
+      "49213"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4625,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": "S-1-0-0"
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": "-"
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": "-"
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": "0x0"
+       },
+       {
+        "@Name": "TargetUserSid",
+        "#text": "S-1-0-0"
+       },
+       {
+        "@Name": "TargetUserName",
+        "#text": "admin"
+       },
+       {
+        "@Name": "TargetDomainName",
+        "#text": "DESKTOP-8"
+       },
+       {
+        "@Name": "Status",
+        "#text": "0xC000006D"
+       },
+       {
+        "@Name": "FailureReason",
+        "#text": "%%2313"
+       },
+       {
+        "@Name": "SubStatus",
+        "#text": "0xC0000064"
+       },
+       {
+        "@Name": "LogonType",
+        "#text": "3"
+       },
+       {
+        "@Name": "LogonProcessName",
+        "#text": "NtLmSsp"
+       },
+       {
+        "@Name": "AuthenticationPackageName",
+        "#text": "NTLM"
+       },
+       {
+        "@Name": "WorkstationName",
+        "#text": "WS1"
+       },
+       {
+        "@Name": "TransmittedServices",
+        "#text": "-"
+       },
+       {
+        "@Name": "LmPackageName",
+        "#text": "-"
+       },
+       {
+        "@Name": "KeyLength",
+        "#text": "0"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "0x0"
+       },
+       {
+        "@Name": "ProcessName",
+        "#text": "-"
+       },
+       {
+        "@Name": "IpAddress",
+        "#text": "10.0.0.9"
+       },
+       {
+        "@Name": "IpPort",
+        "#text": "49213"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4634,
+     "strings": [
+      "S-1-5-21-1-1-1-1001",
+      "jcloudy",
+      "DESKTOP-8",
+      "0x16bebd",
+      "2"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4634,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "TargetUserSid",
+        "#text": "S-1-5-21-1-1-1-1001"
+       },
+       {
+        "@Name": "TargetUserName",
+        "#text": "jcloudy"
+       },
+       {
+        "@Name": "TargetDomainName",
+        "#text": "DESKTOP-8"
+       },
+       {
+        "@Name": "TargetLogonId",
+        "#text": "0x16bebd"
+       },
+       {
+        "@Name": "LogonType",
+        "#text": "2"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4647,
+     "strings": [
+      "S-1-5-21-1-1-1-1001",
+      "jcloudy",
+      "DESKTOP-8",
+      "0x16bebd"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4647,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "TargetUserSid",
+        "#text": "S-1-5-21-1-1-1-1001"
+       },
+       {
+        "@Name": "TargetUserName",
+        "#text": "jcloudy"
+       },
+       {
+        "@Name": "TargetDomainName",
+        "#text": "DESKTOP-8"
+       },
+       {
+        "@Name": "TargetLogonId",
+        "#text": "0x16bebd"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4697,
+     "strings": [
+      "S-1-5-18",
+      "WIN$",
+      "WORKGROUP",
+      "0x3e7",
+      "MaliciousSvc",
+      "C:\\Windows\\Temp\\evil.exe",
+      "0x10",
+      "2",
+      "LocalSystem"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4697,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": "S-1-5-18"
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": "WIN$"
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": "WORKGROUP"
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": "0x3e7"
+       },
+       {
+        "@Name": "ServiceName",
+        "#text": "MaliciousSvc"
+       },
+       {
+        "@Name": "ServiceFileName",
+        "#text": "C:\\Windows\\Temp\\evil.exe"
+       },
+       {
+        "@Name": "ServiceType",
+        "#text": "0x10"
+       },
+       {
+        "@Name": "ServiceStartType",
+        "#text": "2"
+       },
+       {
+        "@Name": "ServiceAccount",
+        "#text": "LocalSystem"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4778,
+     "strings": [
+      "jcloudy",
+      "DESKTOP-8",
+      "0x16bebd",
+      "RDP-Tcp#0",
+      "CLIENT-1",
+      "10.0.0.9"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4778,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "AccountName",
+        "#text": "jcloudy"
+       },
+       {
+        "@Name": "AccountDomain",
+        "#text": "DESKTOP-8"
+       },
+       {
+        "@Name": "LogonID",
+        "#text": "0x16bebd"
+       },
+       {
+        "@Name": "SessionName",
+        "#text": "RDP-Tcp#0"
+       },
+       {
+        "@Name": "ClientName",
+        "#text": "CLIENT-1"
+       },
+       {
+        "@Name": "ClientAddress",
+        "#text": "10.0.0.9"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4779,
+     "strings": [
+      "jcloudy",
+      "DESKTOP-8",
+      "0x16bebd",
+      "RDP-Tcp#0",
+      "CLIENT-1",
+      "10.0.0.9"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4779,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "AccountName",
+        "#text": "jcloudy"
+       },
+       {
+        "@Name": "AccountDomain",
+        "#text": "DESKTOP-8"
+       },
+       {
+        "@Name": "LogonID",
+        "#text": "0x16bebd"
+       },
+       {
+        "@Name": "SessionName",
+        "#text": "RDP-Tcp#0"
+       },
+       {
+        "@Name": "ClientName",
+        "#text": "CLIENT-1"
+       },
+       {
+        "@Name": "ClientAddress",
+        "#text": "10.0.0.9"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 59,
+     "strings": [
+      "{C412}",
+      "Update Download",
+      "{43D9}",
+      "http://dl.example.com/pkg.cab",
+      "10.0.0.9",
+      "0",
+      "2017-04-20T16:11:39Z",
+      "128",
+      "128",
+      "64"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Bits-Client/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Bits-Client",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 59,
+    "Provider": "Microsoft-Windows-Bits-Client",
+    "Channel": "Microsoft-Windows-Bits-Client/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "transferId",
+        "#text": "{C412}"
+       },
+       {
+        "@Name": "name",
+        "#text": "Update Download"
+       },
+       {
+        "@Name": "Id",
+        "#text": "{43D9}"
+       },
+       {
+        "@Name": "url",
+        "#text": "http://dl.example.com/pkg.cab"
+       },
+       {
+        "@Name": "peer",
+        "#text": "10.0.0.9"
+       },
+       {
+        "@Name": "fileTime",
+        "#text": "2017-04-20T16:11:39Z"
+       },
+       {
+        "@Name": "fileLength",
+        "#text": "128"
+       },
+       {
+        "@Name": "bytesTotal",
+        "#text": "128"
+       },
+       {
+        "@Name": "bytesTransferred",
+        "#text": "64"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 21,
+     "strings": [
+      "DESKTOP-PM6C56D\\jcloudy",
+      "2",
+      "10.0.0.9"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-TerminalServices-LocalSessionManager/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "prov",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 21,
+    "Provider": "prov",
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "UserData": {
+      "EventXML": {
+       "User": "DESKTOP-PM6C56D\\jcloudy",
+       "SessionID": "2",
+       "Address": "10.0.0.9"
+      }
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 25,
+     "strings": [
+      "DESKTOP-PM6C56D\\jcloudy",
+      "2",
+      "10.0.0.9"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-TerminalServices-LocalSessionManager/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "prov",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 25,
+    "Provider": "prov",
+    "Channel": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "UserData": {
+      "EventXML": {
+       "User": "DESKTOP-PM6C56D\\jcloudy",
+       "SessionID": "2",
+       "Address": "10.0.0.9"
+      }
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 3,
+     "strings": [
+      "-",
+      "2019-05-16 14:17:16.000",
+      "{DFAE8213-70EB}",
+      "3788",
+      "C:\\Windows\\System32\\reg.exe",
+      "insecurebank\\Administrator",
+      "tcp",
+      "true",
+      "false",
+      "10.0.0.5",
+      "WS1",
+      "49155",
+      "-",
+      "false",
+      "1.2.3.4",
+      "evil.example.com",
+      "443",
+      "https"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 3,
+    "Provider": "Microsoft-Windows-Sysmon",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "RuleName",
+        "#text": "-"
+       },
+       {
+        "@Name": "UtcTime",
+        "#text": "2019-05-16 14:17:16.000"
+       },
+       {
+        "@Name": "ProcessGuid",
+        "#text": "{DFAE8213-70EB}"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "3788"
+       },
+       {
+        "@Name": "Image",
+        "#text": "C:\\Windows\\System32\\reg.exe"
+       },
+       {
+        "@Name": "User",
+        "#text": "insecurebank\\Administrator"
+       },
+       {
+        "@Name": "Protocol",
+        "#text": "tcp"
+       },
+       {
+        "@Name": "Initiated",
+        "#text": "true"
+       },
+       {
+        "@Name": "SourceIsIpv6",
+        "#text": "false"
+       },
+       {
+        "@Name": "SourceIp",
+        "#text": "10.0.0.5"
+       },
+       {
+        "@Name": "SourceHostname",
+        "#text": "WS1"
+       },
+       {
+        "@Name": "SourcePort",
+        "#text": "49155"
+       },
+       {
+        "@Name": "SourcePortName",
+        "#text": "-"
+       },
+       {
+        "@Name": "DestinationIsIpv6",
+        "#text": "false"
+       },
+       {
+        "@Name": "DestinationIp",
+        "#text": "1.2.3.4"
+       },
+       {
+        "@Name": "DestinationHostname",
+        "#text": "evil.example.com"
+       },
+       {
+        "@Name": "DestinationPort",
+        "#text": "443"
+       },
+       {
+        "@Name": "DestinationPortName",
+        "#text": "https"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 5,
+     "strings": [
+      "-",
+      "2019-05-16 14:18:00.000",
+      "{DFAE8213-70EB}",
+      "3788",
+      "C:\\Windows\\System32\\reg.exe"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 5,
+    "Provider": "Microsoft-Windows-Sysmon",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "RuleName",
+        "#text": "-"
+       },
+       {
+        "@Name": "UtcTime",
+        "#text": "2019-05-16 14:18:00.000"
+       },
+       {
+        "@Name": "ProcessGuid",
+        "#text": "{DFAE8213-70EB}"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "3788"
+       },
+       {
+        "@Name": "Image",
+        "#text": "C:\\Windows\\System32\\reg.exe"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 6,
+     "strings": [
+      "-",
+      "2019-05-16 14:10:00.000",
+      "C:\\Windows\\System32\\drv.sys",
+      "SHA1=AAAA",
+      "true",
+      "Microsoft Windows",
+      "Valid"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 6,
+    "Provider": "Microsoft-Windows-Sysmon",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "RuleName",
+        "#text": "-"
+       },
+       {
+        "@Name": "UtcTime",
+        "#text": "2019-05-16 14:10:00.000"
+       },
+       {
+        "@Name": "ImageLoaded",
+        "#text": "C:\\Windows\\System32\\drv.sys"
+       },
+       {
+        "@Name": "Hashes",
+        "#text": "SHA1=AAAA"
+       },
+       {
+        "@Name": "Signed",
+        "#text": "true"
+       },
+       {
+        "@Name": "Signature",
+        "#text": "Microsoft Windows"
+       },
+       {
+        "@Name": "SignatureStatus",
+        "#text": "Valid"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 7,
+     "strings": [
+      "-",
+      "2019-05-16 14:11:00.000",
+      "{DFAE8213-70EB}",
+      "3788",
+      "C:\\Windows\\System32\\reg.exe",
+      "C:\\Windows\\System32\\ntdll.dll",
+      "10.0",
+      "NT Layer DLL",
+      "MS Windows",
+      "Microsoft Corporation",
+      "SHA1=BBBB",
+      "true",
+      "Microsoft Windows",
+      "Valid"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 7,
+    "Provider": "Microsoft-Windows-Sysmon",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "RuleName",
+        "#text": "-"
+       },
+       {
+        "@Name": "UtcTime",
+        "#text": "2019-05-16 14:11:00.000"
+       },
+       {
+        "@Name": "ProcessGuid",
+        "#text": "{DFAE8213-70EB}"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "3788"
+       },
+       {
+        "@Name": "Image",
+        "#text": "C:\\Windows\\System32\\reg.exe"
+       },
+       {
+        "@Name": "ImageLoaded",
+        "#text": "C:\\Windows\\System32\\ntdll.dll"
+       },
+       {
+        "@Name": "FileVersion",
+        "#text": "10.0"
+       },
+       {
+        "@Name": "Description",
+        "#text": "NT Layer DLL"
+       },
+       {
+        "@Name": "Product",
+        "#text": "MS Windows"
+       },
+       {
+        "@Name": "Company",
+        "#text": "Microsoft Corporation"
+       },
+       {
+        "@Name": "Hashes",
+        "#text": "SHA1=BBBB"
+       },
+       {
+        "@Name": "Signed",
+        "#text": "true"
+       },
+       {
+        "@Name": "Signature",
+        "#text": "Microsoft Windows"
+       },
+       {
+        "@Name": "SignatureStatus",
+        "#text": "Valid"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 11,
+     "strings": [
+      "-",
+      "2019-05-16 14:12:00.000",
+      "{DFAE8213-70EB}",
+      "3788",
+      "C:\\Windows\\System32\\reg.exe",
+      "C:\\Users\\jcloudy\\drop.exe",
+      "2019-05-16 14:11:59.000"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 11,
+    "Provider": "Microsoft-Windows-Sysmon",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "RuleName",
+        "#text": "-"
+       },
+       {
+        "@Name": "UtcTime",
+        "#text": "2019-05-16 14:12:00.000"
+       },
+       {
+        "@Name": "ProcessGuid",
+        "#text": "{DFAE8213-70EB}"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "3788"
+       },
+       {
+        "@Name": "Image",
+        "#text": "C:\\Windows\\System32\\reg.exe"
+       },
+       {
+        "@Name": "TargetFilename",
+        "#text": "C:\\Users\\jcloudy\\drop.exe"
+       },
+       {
+        "@Name": "CreationUtcTime",
+        "#text": "2019-05-16 14:11:59.000"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 12,
+     "strings": [
+      "-",
+      "CreateKey",
+      "2019-05-16 14:13:00.000",
+      "{DFAE8213-70EB}",
+      "3788",
+      "C:\\Windows\\System32\\reg.exe",
+      "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 12,
+    "Provider": "Microsoft-Windows-Sysmon",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "RuleName",
+        "#text": "-"
+       },
+       {
+        "@Name": "EventType",
+        "#text": "CreateKey"
+       },
+       {
+        "@Name": "UtcTime",
+        "#text": "2019-05-16 14:13:00.000"
+       },
+       {
+        "@Name": "ProcessGuid",
+        "#text": "{DFAE8213-70EB}"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "3788"
+       },
+       {
+        "@Name": "Image",
+        "#text": "C:\\Windows\\System32\\reg.exe"
+       },
+       {
+        "@Name": "TargetObject",
+        "#text": "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 13,
+     "strings": [
+      "-",
+      "SetValue",
+      "2019-05-16 14:14:00.000",
+      "{DFAE8213-70EB}",
+      "3788",
+      "C:\\Windows\\System32\\reg.exe",
+      "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\evil",
+      "C:\\Users\\jcloudy\\drop.exe"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 13,
+    "Provider": "Microsoft-Windows-Sysmon",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "RuleName",
+        "#text": "-"
+       },
+       {
+        "@Name": "EventType",
+        "#text": "SetValue"
+       },
+       {
+        "@Name": "UtcTime",
+        "#text": "2019-05-16 14:14:00.000"
+       },
+       {
+        "@Name": "ProcessGuid",
+        "#text": "{DFAE8213-70EB}"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "3788"
+       },
+       {
+        "@Name": "Image",
+        "#text": "C:\\Windows\\System32\\reg.exe"
+       },
+       {
+        "@Name": "TargetObject",
+        "#text": "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\evil"
+       },
+       {
+        "@Name": "Details",
+        "#text": "C:\\Users\\jcloudy\\drop.exe"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 23,
+     "strings": [
+      "-",
+      "2019-05-16 14:15:00.000",
+      "{DFAE8213-70EB}",
+      "3788",
+      "insecurebank\\Administrator",
+      "C:\\Windows\\System32\\reg.exe",
+      "C:\\Users\\jcloudy\\drop.exe",
+      "SHA1=CCCC",
+      "true",
+      "true"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 23,
+    "Provider": "Microsoft-Windows-Sysmon",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "RuleName",
+        "#text": "-"
+       },
+       {
+        "@Name": "UtcTime",
+        "#text": "2019-05-16 14:15:00.000"
+       },
+       {
+        "@Name": "ProcessGuid",
+        "#text": "{DFAE8213-70EB}"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "3788"
+       },
+       {
+        "@Name": "User",
+        "#text": "insecurebank\\Administrator"
+       },
+       {
+        "@Name": "Image",
+        "#text": "C:\\Windows\\System32\\reg.exe"
+       },
+       {
+        "@Name": "TargetFilename",
+        "#text": "C:\\Users\\jcloudy\\drop.exe"
+       },
+       {
+        "@Name": "Hashes",
+        "#text": "SHA1=CCCC"
+       },
+       {
+        "@Name": "IsExecutable",
+        "#text": "true"
+       },
+       {
+        "@Name": "Archived",
+        "#text": "true"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4624.0,
+     "strings": [
+      "S-1-5-18",
+      "WIN$",
+      "WORKGROUP",
+      "0x3e7",
+      "S-1-5-21-1-1-1-1001",
+      "jcloudy",
+      "DESKTOP-8",
+      "0x16bebd",
+      "2",
+      "User32",
+      "Negotiate",
+      "DESKTOP-8",
+      "{0}",
+      "-",
+      "-",
+      "0",
+      "0x238",
+      "C:\\Windows\\System32\\lsass.exe",
+      "10.0.0.9",
+      "445"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4624.0,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": "S-1-5-18"
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": "WIN$"
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": "WORKGROUP"
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": "0x3e7"
+       },
+       {
+        "@Name": "TargetUserSid",
+        "#text": "S-1-5-21-1-1-1-1001"
+       },
+       {
+        "@Name": "TargetUserName",
+        "#text": "jcloudy"
+       },
+       {
+        "@Name": "TargetDomainName",
+        "#text": "DESKTOP-8"
+       },
+       {
+        "@Name": "TargetLogonId",
+        "#text": "0x16bebd"
+       },
+       {
+        "@Name": "LogonType",
+        "#text": "2"
+       },
+       {
+        "@Name": "LogonProcessName",
+        "#text": "User32"
+       },
+       {
+        "@Name": "AuthenticationPackageName",
+        "#text": "Negotiate"
+       },
+       {
+        "@Name": "WorkstationName",
+        "#text": "DESKTOP-8"
+       },
+       {
+        "@Name": "LogonGuid",
+        "#text": "{0}"
+       },
+       {
+        "@Name": "TransmittedServices",
+        "#text": "-"
+       },
+       {
+        "@Name": "LmPackageName",
+        "#text": "-"
+       },
+       {
+        "@Name": "KeyLength",
+        "#text": "0"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "0x238"
+       },
+       {
+        "@Name": "ProcessName",
+        "#text": "C:\\Windows\\System32\\lsass.exe"
+       },
+       {
+        "@Name": "IpAddress",
+        "#text": "10.0.0.9"
+       },
+       {
+        "@Name": "IpPort",
+        "#text": "445"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": "4624",
+     "strings": [
+      "S-1-5-18",
+      "WIN$",
+      "WORKGROUP",
+      "0x3e7",
+      "S-1-5-21-1-1-1-1001",
+      "jcloudy",
+      "DESKTOP-8",
+      "0x16bebd",
+      "2",
+      "User32",
+      "Negotiate",
+      "DESKTOP-8",
+      "{0}",
+      "-",
+      "-",
+      "0",
+      "0x238",
+      "C:\\Windows\\System32\\lsass.exe",
+      "10.0.0.9",
+      "445"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": null
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": null,
+     "strings": [
+      "S-1-5-18",
+      "WIN$",
+      "WORKGROUP",
+      "0x3e7",
+      "S-1-5-21-1-1-1-1001",
+      "jcloudy",
+      "DESKTOP-8",
+      "0x16bebd",
+      "2",
+      "User32",
+      "Negotiate",
+      "DESKTOP-8",
+      "{0}",
+      "-",
+      "-",
+      "0",
+      "0x238",
+      "C:\\Windows\\System32\\lsass.exe",
+      "10.0.0.9",
+      "445"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": null
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4624,
+     "strings": "not a list",
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4624,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": null
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": null
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": null
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": null
+       },
+       {
+        "@Name": "TargetUserSid",
+        "#text": null
+       },
+       {
+        "@Name": "TargetUserName",
+        "#text": null
+       },
+       {
+        "@Name": "TargetDomainName",
+        "#text": null
+       },
+       {
+        "@Name": "TargetLogonId",
+        "#text": null
+       },
+       {
+        "@Name": "LogonType",
+        "#text": null
+       },
+       {
+        "@Name": "LogonProcessName",
+        "#text": null
+       },
+       {
+        "@Name": "AuthenticationPackageName",
+        "#text": null
+       },
+       {
+        "@Name": "WorkstationName",
+        "#text": null
+       },
+       {
+        "@Name": "LogonGuid",
+        "#text": null
+       },
+       {
+        "@Name": "TransmittedServices",
+        "#text": null
+       },
+       {
+        "@Name": "LmPackageName",
+        "#text": null
+       },
+       {
+        "@Name": "KeyLength",
+        "#text": null
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": null
+       },
+       {
+        "@Name": "ProcessName",
+        "#text": null
+       },
+       {
+        "@Name": "IpAddress",
+        "#text": null
+       },
+       {
+        "@Name": "IpPort",
+        "#text": null
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4624,
+     "strings": [],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4624,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": null
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": null
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": null
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": null
+       },
+       {
+        "@Name": "TargetUserSid",
+        "#text": null
+       },
+       {
+        "@Name": "TargetUserName",
+        "#text": null
+       },
+       {
+        "@Name": "TargetDomainName",
+        "#text": null
+       },
+       {
+        "@Name": "TargetLogonId",
+        "#text": null
+       },
+       {
+        "@Name": "LogonType",
+        "#text": null
+       },
+       {
+        "@Name": "LogonProcessName",
+        "#text": null
+       },
+       {
+        "@Name": "AuthenticationPackageName",
+        "#text": null
+       },
+       {
+        "@Name": "WorkstationName",
+        "#text": null
+       },
+       {
+        "@Name": "LogonGuid",
+        "#text": null
+       },
+       {
+        "@Name": "TransmittedServices",
+        "#text": null
+       },
+       {
+        "@Name": "LmPackageName",
+        "#text": null
+       },
+       {
+        "@Name": "KeyLength",
+        "#text": null
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": null
+       },
+       {
+        "@Name": "ProcessName",
+        "#text": null
+       },
+       {
+        "@Name": "IpAddress",
+        "#text": null
+       },
+       {
+        "@Name": "IpPort",
+        "#text": null
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4624,
+     "strings": [
+      "S-1-5-18",
+      "WIN$",
+      "WORKGROUP",
+      "0x3e7",
+      "S-1-5-21-1-1-1-1001",
+      "jcloudy"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4624,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": "S-1-5-18"
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": "WIN$"
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": "WORKGROUP"
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": "0x3e7"
+       },
+       {
+        "@Name": "TargetUserSid",
+        "#text": "S-1-5-21-1-1-1-1001"
+       },
+       {
+        "@Name": "TargetUserName",
+        "#text": "jcloudy"
+       },
+       {
+        "@Name": "TargetDomainName",
+        "#text": null
+       },
+       {
+        "@Name": "TargetLogonId",
+        "#text": null
+       },
+       {
+        "@Name": "LogonType",
+        "#text": null
+       },
+       {
+        "@Name": "LogonProcessName",
+        "#text": null
+       },
+       {
+        "@Name": "AuthenticationPackageName",
+        "#text": null
+       },
+       {
+        "@Name": "WorkstationName",
+        "#text": null
+       },
+       {
+        "@Name": "LogonGuid",
+        "#text": null
+       },
+       {
+        "@Name": "TransmittedServices",
+        "#text": null
+       },
+       {
+        "@Name": "LmPackageName",
+        "#text": null
+       },
+       {
+        "@Name": "KeyLength",
+        "#text": null
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": null
+       },
+       {
+        "@Name": "ProcessName",
+        "#text": null
+       },
+       {
+        "@Name": "IpAddress",
+        "#text": null
+       },
+       {
+        "@Name": "IpPort",
+        "#text": null
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4672,
+     "strings": [
+      "S-1-5-18",
+      "SYSTEM",
+      "NT AUTHORITY",
+      "0x3e7",
+      "SeDebugPrivilege"
+     ],
+     "xml_string": "",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": 4672,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Microsoft-Windows-Security-Auditing",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": "S-1-5-18"
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": "SYSTEM"
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": "NT AUTHORITY"
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": "0x3e7"
+       },
+       {
+        "@Name": "PrivilegeList",
+        "#text": "SeDebugPrivilege"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4672,
+     "strings": [
+      "S-1-5-18",
+      "SYSTEM",
+      "NT AUTHORITY",
+      "0x3e7",
+      "SeDebugPrivilege"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": "WIN-1M3263ACE5D",
+     "computer_name": "COMPUTER-NAME-WINS"
+    }
+   },
+   "out": {
+    "EventId": 4672,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "COMPUTER-NAME-WINS",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": "S-1-5-18"
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": "SYSTEM"
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": "NT AUTHORITY"
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": "0x3e7"
+       },
+       {
+        "@Name": "PrivilegeList",
+        "#text": "SeDebugPrivilege"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4672,
+     "strings": [
+      "S-1-5-18",
+      "SYSTEM",
+      "NT AUTHORITY",
+      "0x3e7",
+      "SeDebugPrivilege"
+     ],
+     "xml_string": "<Event><System><Channel>Security</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": null
+    }
+   },
+   "out": {
+    "EventId": 4672,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Security",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": "S-1-5-18"
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": "SYSTEM"
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": "NT AUTHORITY"
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": "0x3e7"
+       },
+       {
+        "@Name": "PrivilegeList",
+        "#text": "SeDebugPrivilege"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:11:42.0Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 4672,
+     "strings": [
+      "S-1-5-18",
+      "SYSTEM",
+      "NT AUTHORITY",
+      "0x3e7",
+      "SeDebugPrivilege"
+     ],
+     "xml_string": "",
+     "source_name": "Microsoft-Windows-Security-Auditing",
+     "record_number": 2623,
+     "hostname": null
+    }
+   },
+   "out": {
+    "EventId": 4672,
+    "Provider": "Microsoft-Windows-Security-Auditing",
+    "Channel": "Microsoft-Windows-Security-Auditing",
+    "Computer": null,
+    "EventRecordId": 2623,
+    "TimeCreated": "2018-03-27T12:11:42.0Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "SubjectUserSid",
+        "#text": "S-1-5-18"
+       },
+       {
+        "@Name": "SubjectUserName",
+        "#text": "SYSTEM"
+       },
+       {
+        "@Name": "SubjectDomainName",
+        "#text": "NT AUTHORITY"
+       },
+       {
+        "@Name": "SubjectLogonId",
+        "#text": "0x3e7"
+       },
+       {
+        "@Name": "PrivilegeList",
+        "#text": "SeDebugPrivilege"
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": 25,
+     "strings": [
+      "a",
+      "b",
+      "c"
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": null
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": true,
+     "strings": [
+      "technique_id=T1112",
+      "2019-05-16 14:17:15.753",
+      "{DFAE8213-70EB-5CDD-0000-0010F66D0A00}",
+      "3788",
+      "C:\\Windows\\System32\\reg.exe",
+      "6.3",
+      "Registry Console Tool",
+      "MS Windows",
+      "Microsoft Corporation",
+      "reg add hklm\\...\\EnableLUA ...",
+      "C:\\",
+      "insecurebank\\Administrator",
+      "{DFAE8213-7002}",
+      "0x585e6",
+      "2",
+      "High",
+      "SHA1=0873...",
+      "{DFAE8213-702C}",
+      "3748",
+      "C:\\Windows\\System32\\cmd.exe",
+      "\"C:\\Windows\\system32\\cmd.exe\" "
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": {
+    "EventId": true,
+    "Provider": "Microsoft-Windows-Sysmon",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "Computer": "WIN-1M3263ACE5D",
+    "EventRecordId": 5,
+    "TimeCreated": "2018-03-27T12:00:00Z",
+    "Payload": {
+     "EventData": {
+      "Data": [
+       {
+        "@Name": "RuleName",
+        "#text": "technique_id=T1112"
+       },
+       {
+        "@Name": "UtcTime",
+        "#text": "2019-05-16 14:17:15.753"
+       },
+       {
+        "@Name": "ProcessGuid",
+        "#text": "{DFAE8213-70EB-5CDD-0000-0010F66D0A00}"
+       },
+       {
+        "@Name": "ProcessId",
+        "#text": "3788"
+       },
+       {
+        "@Name": "Image",
+        "#text": "C:\\Windows\\System32\\reg.exe"
+       },
+       {
+        "@Name": "FileVersion",
+        "#text": "6.3"
+       },
+       {
+        "@Name": "Description",
+        "#text": "Registry Console Tool"
+       },
+       {
+        "@Name": "Product",
+        "#text": "MS Windows"
+       },
+       {
+        "@Name": "Company",
+        "#text": "Microsoft Corporation"
+       },
+       {
+        "@Name": "CommandLine",
+        "#text": "reg add hklm\\...\\EnableLUA ..."
+       },
+       {
+        "@Name": "CurrentDirectory",
+        "#text": "C:\\"
+       },
+       {
+        "@Name": "User",
+        "#text": "insecurebank\\Administrator"
+       },
+       {
+        "@Name": "LogonGuid",
+        "#text": "{DFAE8213-7002}"
+       },
+       {
+        "@Name": "LogonId",
+        "#text": "0x585e6"
+       },
+       {
+        "@Name": "TerminalSessionId",
+        "#text": "2"
+       },
+       {
+        "@Name": "IntegrityLevel",
+        "#text": "High"
+       },
+       {
+        "@Name": "Hashes",
+        "#text": "SHA1=0873..."
+       },
+       {
+        "@Name": "ParentProcessGuid",
+        "#text": "{DFAE8213-702C}"
+       },
+       {
+        "@Name": "ParentProcessId",
+        "#text": "3748"
+       },
+       {
+        "@Name": "ParentImage",
+        "#text": "C:\\Windows\\System32\\cmd.exe"
+       },
+       {
+        "@Name": "ParentCommandLine",
+        "#text": "\"C:\\Windows\\system32\\cmd.exe\" "
+       }
+      ]
+     }
+    },
+    "SourceFile": null,
+    "MapDescription": null
+   }
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx",
+    "Record": {
+     "data_type": "windows:evtx:record",
+     "event_identifier": false,
+     "strings": [
+      "technique_id=T1112",
+      "2019-05-16 14:17:15.753",
+      "{DFAE8213-70EB-5CDD-0000-0010F66D0A00}",
+      "3788",
+      "C:\\Windows\\System32\\reg.exe",
+      "6.3",
+      "Registry Console Tool",
+      "MS Windows",
+      "Microsoft Corporation",
+      "reg add hklm\\...\\EnableLUA ...",
+      "C:\\",
+      "insecurebank\\Administrator",
+      "{DFAE8213-7002}",
+      "0x585e6",
+      "2",
+      "High",
+      "SHA1=0873...",
+      "{DFAE8213-702C}",
+      "3748",
+      "C:\\Windows\\System32\\cmd.exe",
+      "\"C:\\Windows\\system32\\cmd.exe\" "
+     ],
+     "xml_string": "<Event><System><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>WIN-1M3263ACE5D</Computer></System></Event>",
+     "source_name": "Microsoft-Windows-Sysmon",
+     "record_number": 5,
+     "hostname": "WIN-1M3263ACE5D"
+    }
+   },
+   "out": null
+  },
+  {
+   "wrapped": {
+    "SourceImage": "LoneWolf.E01",
+    "Timestamp": "2018-03-27T12:00:00Z",
+    "Parser": "winevtx"
+   },
+   "out": null
+  }
+ ]
+}

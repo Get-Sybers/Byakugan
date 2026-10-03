@@ -1,0 +1,6 @@
+[submodule "third_party/car"]
+	path = third_party/car
+	url = https://github.com/Get-Sybers/car.git
+[submodule "model/sources/forensicartifacts"]
+	path = model/sources/forensicartifacts
+	url = https://github.com/ForensicArtifacts/artifacts.git

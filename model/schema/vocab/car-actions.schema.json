@@ -1,0 +1,492 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/vocab/car-actions.schema.json",
+ "title": "CAR object/action vocabulary — GENERATED from model/car/objects",
+ "description": "Never hand-edited: python -m byakugan.schema_gen regenerates it; the conform rule class-regen gates drift.",
+ "$defs": {
+  "object": {
+   "enum": [
+    "authentication",
+    "driver",
+    "email",
+    "file",
+    "flow",
+    "group",
+    "http",
+    "module",
+    "process",
+    "registry",
+    "scheduled_job",
+    "service",
+    "socket",
+    "thread",
+    "user_account",
+    "user_session"
+   ]
+  },
+  "authentication-actions": {
+   "enum": [
+    "error",
+    "failure",
+    "success"
+   ]
+  },
+  "driver-actions": {
+   "enum": [
+    "load",
+    "metadata",
+    "unload"
+   ]
+  },
+  "email-actions": {
+   "enum": [
+    "block",
+    "delete",
+    "deliver",
+    "quarantine",
+    "redirect"
+   ]
+  },
+  "file-actions": {
+   "enum": [
+    "access",
+    "acl_modify",
+    "content",
+    "create",
+    "delete",
+    "metadata",
+    "modify",
+    "read",
+    "timestomp",
+    "write"
+   ]
+  },
+  "flow-actions": {
+   "enum": [
+    "content",
+    "create",
+    "end",
+    "flow",
+    "message",
+    "start"
+   ]
+  },
+  "group-actions": {
+   "enum": [
+    "create",
+    "delete",
+    "enumerate",
+    "metadata",
+    "modify"
+   ]
+  },
+  "http-actions": {
+   "enum": [
+    "get",
+    "post",
+    "put",
+    "tunnel"
+   ]
+  },
+  "module-actions": {
+   "enum": [
+    "content",
+    "load",
+    "metadata",
+    "unload"
+   ]
+  },
+  "process-actions": {
+   "enum": [
+    "access",
+    "create",
+    "execute",
+    "metadata",
+    "modify",
+    "terminate"
+   ]
+  },
+  "registry-actions": {
+   "enum": [
+    "access",
+    "add",
+    "create",
+    "delete",
+    "key_edit",
+    "modify",
+    "remove",
+    "value_edit"
+   ]
+  },
+  "scheduled_job-actions": {
+   "enum": [
+    "create",
+    "delete",
+    "metadata",
+    "modify"
+   ]
+  },
+  "service-actions": {
+   "enum": [
+    "access",
+    "create",
+    "delete",
+    "enumerate",
+    "metadata",
+    "modify",
+    "pause",
+    "start",
+    "stop"
+   ]
+  },
+  "socket-actions": {
+   "enum": [
+    "bind",
+    "close",
+    "listen"
+   ]
+  },
+  "thread-actions": {
+   "enum": [
+    "create",
+    "remote_create",
+    "suspend",
+    "terminate"
+   ]
+  },
+  "user_account-actions": {
+   "enum": [
+    "create",
+    "delete",
+    "metadata",
+    "modify"
+   ]
+  },
+  "user_session-actions": {
+   "enum": [
+    "create",
+    "lock",
+    "login",
+    "logout",
+    "metadata",
+    "reconnect",
+    "terminate",
+    "unlock"
+   ]
+  },
+  "pair": {
+   "type": "object",
+   "properties": {
+    "object": {
+     "$ref": "#/$defs/object"
+    }
+   },
+   "allOf": [
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "authentication"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/authentication-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "driver"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/driver-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "email"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/email-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "file"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/file-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "flow"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/flow-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "group"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/group-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "http"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/http-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "module"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/module-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "process"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/process-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "registry"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/registry-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "scheduled_job"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/scheduled_job-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "service"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/service-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "socket"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/socket-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "thread"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/thread-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "user_account"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/user_account-actions"
+       }
+      }
+     }
+    },
+    {
+     "if": {
+      "properties": {
+       "object": {
+        "const": "user_session"
+       }
+      },
+      "required": [
+       "object"
+      ]
+     },
+     "then": {
+      "properties": {
+       "action": {
+        "$ref": "#/$defs/user_session-actions"
+       }
+      }
+     }
+    }
+   ]
+  }
+ }
+}

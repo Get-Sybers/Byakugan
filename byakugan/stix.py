@@ -1,0 +1,1308 @@
+"""STIX 2.1 projection — DERIVED from the materialised tree at export (the D4
+exchange layer).
+
+car_<object>.jsonl holds the OBJECT events (one CAR entry per event, every
+source's properties superset-filled, the homeless values in `native`);
+car_relationships.jsonl holds the RELATIONSHIP instances in both classes
+(declared cascade edges, derived strong-identity links), and car_inferred.jsonl
+the reconstructed `inferred_node` rows (the content-keyed attribution layer is
+recomputed from the events themselves — derive.content_entities). This module
+reads those — and nothing else, no SQLite anywhere — and projects them as STIX
+2.1 at export time: there is no second extraction path, no parser-side STIX,
+nothing a re-export could disagree with.
+
+    SCO             one per ENTITY a CAR row observes (its process, the file at
+                    a path, the registry key, the connection, the account …)
+                    plus the CONTENT entities (the same bytes, the same account)
+    observed-data   one per CAR row that carries an identity and a time: the
+                    observation, timestamped, referencing the row's SCOs,
+                    carrying the CAR header (guid = event.id, owning_guid =
+                    process.entity_id) and `native` verbatim. A row with no
+                    guid keys NOTHING off itself — its content- and path-keyed
+                    SCOs stand, no row-keyed SCO, no record, no observation
+                    (A9; no mapped row is guid-less by design —
+                    spindle.verify_registry refuses a leaf without a guid form)
+    relationship    one SRO per relationship-timeline row, labelled with its
+                    class (declared | derived) and its method
+    x-car-inferred-node
+                    a reconstructed-but-unobserved end (antiforensics / partial
+                    recovery): flagged, corroborated, referenced by derived SROs
+                    only — never an SCO, never inside an observed-data
+
+The BEHAVIOUR layer (analytics.py, the third pillar — flag TTPs) is projected
+into the same id space: the finished events are read back through the runnable
+MITRE CAR analytics, and each hit becomes STIX:
+
+    attack-pattern  one per distinct ATT&CK id (technique or subtechnique) the
+                    runnable analytics cover — a CONTENT-KEYED global object
+                    (same technique = same object in every case)
+    indicator       one per runnable CAR analytic (the detection; pattern_type
+                    "car") — content-keyed global, keyed by the analytic id
+    relationship    indicator --indicates--> attack-pattern, one per technique an
+                    analytic covers (content-keyed global)
+    sighting        one per BehaviourHit — a Sighting of the analytic's indicator
+                    over the matched row's observed-data (observed_data_refs),
+                    where_sighted the host, first/last_seen the row's instant;
+                    CASE-SCOPED (keyed on analytic id + guid + timestamp + clause)
+
+So the technique/detection catalogue is GLOBAL content (like the SCOs) and the
+behaviour timeline is CASE-SCOPED evidence (like the observed-data) — identity
+and behaviour share the one STIX-minted id space.
+
+Ids come in two scopes, the D4 rule:
+
+- CONTENT-KEYED entities (a file by hash, an account by real SID, an IP, a
+  domain, a URL, an e-mail address) get the STIX 2.1 §2.9 spec-deterministic
+  GLOBAL id — UUIDv5 over the STIX namespace and the canonical JSON of the
+  ID-contributing properties — so the same content is the same object in every
+  case and for every consumer.
+- INSTANCE / OBSERVATION entities (a process, a file at a path, a key, a
+  connection, every observed-data, every SRO) get a CASE-SCOPED id — UUIDv5
+  under a per-case namespace — so a re-export of the same case is byte-identical
+  and two cases never collide.
+
+The recipe itself (the namespaces, canonical JSON) lives in ids.py: it is the
+same one the CAR row identity — the spindle guid every disk-image row carries —
+is minted with, so an observation keys off a guid built like its own ids are.
+
+The identity conventions mirror the CAR->ECS projection: guid <-> event.id,
+owning_guid -> process.entity_id (the acting process; on a process row the guid
+itself unless owning_guid is set), parent_guid -> the parent, native ->
+car.native (here x_car_native). The contract is model/stix/.
+
+    python -m byakugan.stix export <car-dir> [--out FILE] [--case ID]
+"""
+from __future__ import annotations
+
+import argparse
+import glob
+import ipaddress
+import json
+import os
+import re
+import sys
+import uuid
+from collections import Counter, defaultdict
+
+from . import derive, enrich, store, superset
+# the ATT&CK airway: techniques are REFERENCED by MITRE's authoritative
+# attack-pattern ids (revoked-by substitution included), never minted here
+from .exchange.attack_index import load_attack_index
+# the CAR evidence extension (contract v6): the definition object every bundle
+# carries, its id for the per-object `extensions` entries, and the closed
+# top-level property list
+from .exchange.objects import (EVIDENCE_EXTENSION_ID, EVIDENCE_EXTENSION_OBJECTS,
+                               EVIDENCE_PROPERTIES, evidence_extension_definition)
+# the id recipe — the §2.9 namespace, the project namespace, canonical JSON — is
+# SHARED with the CAR row identity (ids.py); re-exported here so stix.STIX_NS /
+# stix.CAR_NS / stix.canonical_json keep their meaning for every consumer
+from .ids import CAR_NS, STIX_NS, canonical_json  # noqa: F401
+from .normalize import parse_ts as _parse_ts  # the one tolerant ISO-8601 parser
+
+SPEC = "2.1"
+EPOCH = "1970-01-01T00:00:00.000Z"
+# The producer identity is a wire-format constant: seed and name only move
+# with a major version, because a re-export must stay byte-identical.
+PRODUCER = {"type": "identity", "spec_version": SPEC,
+            "id": f"identity--{uuid.uuid5(CAR_NS, 'identity|byakugan')}",
+            "created": EPOCH, "modified": "2026-09-30T00:00:00.000Z", "name": "Byakugan",
+            "identity_class": "system",
+            "contact_information": "https://github.com/Get-Sybers/Byakugan",
+            "description": "the materialised MITRE CAR tree, projected to STIX 2.1 at export"}
+
+# The pinned CAR corpus (third_party/car): the catalogue objects' `modified`
+# derives from the pin so a corpus update always moves `modified` (BP §3.1 —
+# never two contents under one id+modified). Bump both with the submodule pin.
+CAR_CORPUS = {"commit": "1b922fe1527d956e222a99473472e594f10f610b",
+              "modified": "2025-05-16T14:27:55.000Z"}
+
+
+def catalogue_modified(index) -> str:
+    """Catalogue content derives from TWO pins — the CAR corpus and the
+    ATT&CK index (kill_chain_phases and the indicates targets read the index)
+    — so `modified` is the LATER of the two: regenerating either pin always
+    moves it, closing the BP §3.1 same-id/same-modified hazard for both
+    (Ratification F8; conformance follow-up R3)."""
+    return max(CAR_CORPUS["modified"], getattr(index, "modified", None) or "")
+# Retired analytics emit a `revoked: true` tombstone for one contract version
+# before disappearing: analytic id -> {"date": ISO, "name": ..., "pattern": ...}.
+RETIRED_ANALYTICS: dict[str, dict] = {}
+
+# STIX 2.1 §2.9: when `hashes` contributes to an id ONE hash is used, chosen in this order
+HASH_PREFERENCE = ("MD5", "SHA-1", "SHA-256", "SHA-512")
+HASH_FIELDS = {"md5_hash": "MD5", "sha1_hash": "SHA-1", "sha256_hash": "SHA-256"}
+_ALGO_BY_NODE_PREFIX = {"md5": "MD5", "sha1": "SHA-1", "sha256": "SHA-256"}   # derive's node_id prefixes
+_NODE_PREFIX_BY_ALGO = {a: p for p, a in _ALGO_BY_NODE_PREFIX.items()}
+# the pipeline confidence vocabulary -> STIX `confidence` (0-100) on an SRO
+CONFIDENCE = {"definitive": 100, "heuristic": 50, "inferred": 20}
+
+# The projection contract per CAR object — model/stix/objects.yml mirrors this
+# table and tests/test_stix.py holds the two in step.
+#   sco           the SCO type the row's ENTITY projects to
+#   sro_end       what a relationship end on this object resolves to: the entity
+#                 `sco`, or the row's `observed-data` when the object is an event
+#                 (an authentication, a session) rather than a thing
+#   hash_subject  which path the row's md5/sha1/sha256 fields hash (per leaf);
+#                 None where the object carries no hash fields
+#   acting        the row's columns that describe the ACTING process (ECS
+#                 process.*): filled onto the owning process SCO when the cascade
+#                 resolved owning_guid, left under x_car_fields when it did not
+#                 (an unresolved owner is derive's inferred node, never a minted SCO)
+OBJECTS = {
+    "authentication": {"sco": "user-account", "sro_end": "observed-data",
+                       "hash_subject": None, "acting": []},
+    "driver": {"sco": "file", "sro_end": "sco", "hash_subject": "image_path", "acting": ["pid"]},
+    "email": {"sco": "email-message", "sro_end": "sco", "hash_subject": None, "acting": []},
+    "file": {"sco": "file", "sro_end": "sco", "hash_subject": "file_path",
+             "acting": ["pid", "ppid", "image_path"]},
+    "flow": {"sco": "network-traffic", "sro_end": "sco", "hash_subject": None,
+             "acting": ["pid", "ppid", "exe", "image_path"]},
+    "http": {"sco": "network-traffic", "sro_end": "sco", "hash_subject": None, "acting": []},
+    "module": {"sco": "file", "sro_end": "sco", "hash_subject": "module_path",
+               "acting": ["pid", "image_path"]},
+    "process": {"sco": "process", "sro_end": "sco", "hash_subject": "image_path", "acting": []},
+    "registry": {"sco": "windows-registry-key", "sro_end": "sco", "hash_subject": None,
+                 "acting": ["pid", "image_path"]},
+    "service": {"sco": "process", "sro_end": "sco", "hash_subject": None, "acting": []},
+    "socket": {"sco": "network-traffic", "sro_end": "sco", "hash_subject": None,
+               "acting": ["pid", "image_path"]},
+    "thread": {"sco": "x-car-thread", "sro_end": "sco", "hash_subject": None, "acting": ["src_pid"]},
+    "user_session": {"sco": "user-account", "sro_end": "observed-data",
+                     "hash_subject": None, "acting": []},
+}
+
+_MISSING = (None, "")
+_HEADER = set(store.HEADER) | {"car_object", "native", "event_id"}
+# bundle ordering: identity, the extension definition, SCOs (default 1),
+# observations, inferred nodes, SROs, then the BEHAVIOUR layer — the detection
+# catalogue (indicator) and the behaviour timeline (sighting). ATT&CK
+# attack-patterns are referenced (the airway), never bundle members.
+_ORDER = {"identity": 0, "observed-data": 2,
+          "x-car-inferred-node": 3, "relationship": 4, "indicator": 6, "sighting": 7}  # SCOs: 1
+# (the extension-definition is prepended in bundle() beside the producer, never sorted)
+_INTEGRITY = {"low", "medium", "high", "system"}
+
+
+# --------------------------------------------------------------------------- #
+# Ids (the namespaces and canonical_json come from ids.py)
+# --------------------------------------------------------------------------- #
+def global_id(sco_type: str, contributing: dict) -> str:
+    """A spec-deterministic GLOBAL SCO id (STIX 2.1 §2.9)."""
+    return f"{sco_type}--{uuid.uuid5(STIX_NS, canonical_json(contributing))}"
+
+
+def case_namespace(case: str) -> uuid.UUID:
+    return uuid.uuid5(CAR_NS, f"case|{case}")
+
+
+# The catalogue namespace (contract v6, id rule R3): global SDO/SRO catalogue
+# content — the indicator per analytic and its `indicates` SROs — mints under a
+# producer-owned uuid5 tree, never under the §2.9 SCO namespace.
+CATALOGUE_NS = uuid.uuid5(CAR_NS, "catalogue")
+
+
+def catalogue_id(obj_type: str, *parts) -> str:
+    key = "|".join(str(p) for p in parts)
+    return f"{obj_type}--{uuid.uuid5(CATALOGUE_NS, f'{obj_type}|{key}')}"
+
+
+# --------------------------------------------------------------------------- #
+# The behaviour layer catalogue — GLOBAL, catalogue-keyed, case-independent.
+# One indicator per runnable CAR analytic and the `indicates` SROs to the
+# MITRE-authoritative attack-patterns each covers (the airway: referenced,
+# never minted); the same detection is the same object in every case
+# (created EPOCH, modified from the CAR corpus pin).
+# --------------------------------------------------------------------------- #
+def _indicator_obj(an, index) -> dict:
+    ind_id = catalogue_id("indicator", an.id)
+    pattern = an.pseudocode if getattr(an, "pseudocode", None) else an.id
+    tactic_ids = [ta for cov in (an.coverage or []) for ta in (cov.tactics or [])]
+    return {"type": "indicator", "spec_version": SPEC, "id": ind_id,
+            "created": EPOCH, "modified": catalogue_modified(index),
+            "created_by_ref": PRODUCER["id"],
+            "name": an.title, "pattern_type": "car",         # the CAR analytic IS the pattern
+            "pattern": pattern.strip() if isinstance(pattern, str) else pattern,
+            "valid_from": EPOCH,
+            "indicator_types": ["malicious-activity"],
+            "kill_chain_phases": index.phases(_coverage_ids(an.coverage), tactic_ids),
+            "external_references": [{"source_name": "mitre-car", "external_id": an.id,
+                                     "url": "https://car.mitre.org/analytics/" + an.id}],
+            "x_car_analytic": an.id, "x_car_car_object": getattr(an, "car_object", None),
+            "x_car_car_action": getattr(an, "car_action", None)}
+
+
+def _tombstone_obj(an_id: str, meta: dict) -> dict:
+    """A retired analytic's revoked indicator (BP §3.1): same catalogue id,
+    `modified` the retirement date, emitted for one contract version."""
+    return {"type": "indicator", "spec_version": SPEC, "id": catalogue_id("indicator", an_id),
+            "created": EPOCH, "modified": meta["date"], "created_by_ref": PRODUCER["id"],
+            "revoked": True, "name": meta.get("name") or an_id, "pattern_type": "car",
+            "pattern": meta.get("pattern") or an_id, "valid_from": EPOCH,
+            "x_car_analytic": an_id}
+
+
+def _coverage_ids(coverage) -> list:
+    """The ATT&CK ids of a coverage list — each technique and each subtechnique,
+    de-duplicated, order-stable."""
+    out = []
+    for cov in coverage or []:
+        for tid in [cov.technique] + list(cov.subtechniques or []):
+            if tid and tid not in out:
+                out.append(tid)
+    return out
+
+
+def behaviour_catalogue(analytics_list) -> dict:
+    """The GLOBAL behaviour catalogue built from every RUNNABLE CAR analytic —
+    case-independent so a detection is the same object everywhere:
+      indicators: {analytic id -> indicator SDO}
+      covers:     {analytic id -> [(att&ck id, MITRE attack-pattern id | None)]}
+    Techniques resolve through the pinned ATT&CK index (the airway) to MITRE's
+    authoritative attack-pattern ids, revoked-by substitution included; an id
+    the index cannot resolve carries None (tallied at projection time)."""
+    index = load_attack_index()
+    covers: dict[str, list] = {}
+    indicators: dict[str, dict] = {}
+    for an in analytics_list or []:
+        if not getattr(an, "runnable", False) or not an.coverage:
+            continue
+        resolved = []
+        for tid in _coverage_ids(an.coverage):
+            r = index.resolve(tid)
+            resolved.append((tid, r.technique.id if r is not None else None))
+        covers[an.id] = resolved
+        indicators[an.id] = _indicator_obj(an, index)
+    return {"indicators": indicators, "covers": covers,
+            "modified": catalogue_modified(index)}
+
+
+def _load_runnable_analytics() -> list:
+    """The pinned CAR analytics, or [] when the submodule / pyyaml is unavailable
+    (the behaviour layer is additive — a missing corpus must not break export)."""
+    try:
+        from . import analytics as _an
+        return _an.load_analytics()
+    except (ImportError, SystemExit):
+        return []
+
+
+class _NoKey:
+    """The row key of a guid-less row: nothing may be keyed off it."""
+
+
+_NO_KEY = _NoKey()
+
+
+def case_id(ns: uuid.UUID, obj_type: str, *parts) -> str | None:
+    """A CASE-SCOPED id: UUIDv5 under the case namespace over the typed key —
+    None when a part is the no-key of a guid-less row (an id is never derived
+    from a row's position in the export; such an object is not minted)."""
+    if any(p is _NO_KEY for p in parts):
+        return None
+    key = "|".join("" if p is None else str(p) for p in parts)
+    return f"{obj_type}--{uuid.uuid5(ns, f'{obj_type}|{key}')}"
+
+
+def content_hash(hashes: dict) -> tuple[str, str] | None:
+    """The ONE hash §2.9 contributes to a file id: the first present in
+    HASH_PREFERENCE, else the lexicographically first algorithm."""
+    for algo in HASH_PREFERENCE:
+        if algo in hashes:
+            return algo, hashes[algo]
+    if hashes:
+        algo = sorted(hashes)[0]
+        return algo, hashes[algo]
+    return None
+
+
+def content_file_id(hashes: dict) -> str | None:
+    k = content_hash(hashes)
+    return global_id("file", {"hashes": {k[0]: k[1]}}) if k else None
+
+
+def stix_ts(value) -> str | None:
+    """A CAR timestamp as a STIX timestamp (UTC, millisecond precision), or None."""
+    dt = _parse_ts(value)
+    if dt is None:
+        return None
+    return dt.strftime("%Y-%m-%dT%H:%M:%S.") + f"{dt.microsecond // 1000:03d}Z"
+
+
+def _basename(path) -> str | None:
+    s = str(path).rstrip("/\\")
+    return re.split(r"[\\/]", s)[-1] or None if s else None
+
+
+def _dirname(path) -> str | None:
+    s = str(path).rstrip("/\\")
+    m = re.match(r"^(.*)[\\/][^\\/]+$", s)
+    if not m:
+        return None
+    return m.group(1) or ("/" if s.startswith("/") else None)
+
+
+def _clean(o: dict) -> dict:
+    return {k: v for k, v in o.items() if v not in (None, "", [], {})}
+
+
+def _fill(cur: dict, new: dict, root: dict, prefix: str = "") -> None:
+    """The additive superset fill at the STIX layer: every property `cur` lacks
+    is filled, a list is unioned, a disagreeing scalar is kept under
+    x_car_conflicts on the object — never overwritten, never nulled."""
+    for k, v in new.items():
+        if k in ("id", "type", "spec_version") or v in (None, "", [], {}):
+            continue
+        have = cur.get(k)
+        if have in (None, "", [], {}):
+            cur[k] = v
+        elif isinstance(have, list) and isinstance(v, list):
+            for x in v:
+                if x not in have:
+                    have.append(x)
+        elif isinstance(have, dict) and isinstance(v, dict) and k != "x_car_conflicts":
+            _fill(have, v, root, prefix + k + ".")
+        elif have != v:
+            alts = root.setdefault("x_car_conflicts", {}).setdefault(prefix + k, [])
+            if v not in alts:
+                alts.append(v)
+
+
+class _Row:
+    """A CAR row with CONSUMPTION tracking: every column a builder homes is
+    marked; what no SCO property could home lands verbatim under x_car_fields
+    on the observation (the D4 rule: nothing homeless is dropped)."""
+
+    def __init__(self, ev: dict):
+        self.ev, self.used = ev, set()
+
+    def peek(self, f: str):
+        v = self.ev.get(f)
+        return None if v in _MISSING else v
+
+    def get(self, f: str):
+        v = self.peek(f)
+        if v is not None:
+            self.used.add(f)
+        return v
+
+    def int(self, f: str):
+        i = enrich._to_int(self.ev.get(f))  # noqa: SLF001 — hex-tolerant, as the cascade reads pids
+        if i is not None:
+            self.used.add(f)
+        return i                                 # unparseable: stays verbatim under x_car_fields
+
+    def ts(self, f: str):
+        t = stix_ts(self.ev.get(f))
+        if t is not None:
+            self.used.add(f)
+        return t
+
+    def leftovers(self) -> dict:
+        return {k: v for k, v in self.ev.items()
+                if k not in self.used and k not in _HEADER and not k.startswith("_")
+                and v not in _MISSING}
+
+
+class _Ctx:
+    def __init__(self, ev: dict):
+        self.host = ev.get("source_host")
+        self.obj = ev["car_object"]
+        self.action = ev.get("car_action")
+        self.guid = ev.get("guid")
+        # what a row-keyed SCO is keyed by: the guid itself — never the row's
+        # position in the export (that would change with every re-export and
+        # name nothing in the stores); a guid-less row keys nothing off itself
+        self.key = self.guid if self.guid is not None else _NO_KEY
+        self.owning_guid = ev.get("owning_guid")
+        self.ts = stix_ts(ev.get("timestamp"))
+
+
+def _hashes(r: _Row) -> dict:
+    """The row's accepted hash fields as STIX `hashes` (lower-case hex), by the
+    same identity rule derive.py keys content nodes with."""
+    rule = derive.rules()["identities"]["hash"]
+    out = {}
+    for f, algo in HASH_FIELDS.items():
+        v = r.peek(f)
+        if v is not None and derive._accepts(rule, v):  # noqa: SLF001
+            out[algo] = derive._normalize(rule, v)      # noqa: SLF001
+            r.used.add(f)
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# The projection
+# --------------------------------------------------------------------------- #
+class Projection:
+    # catalogue versioning default; behaviour() refines it from the catalogue
+    # it is handed (catalogue_modified — both pins folded in, R3/F8)
+    _catalogue_modified = CAR_CORPUS["modified"]
+
+    def __init__(self, case: str, as_of: str):
+        self.case, self.ns, self.as_of = case, case_namespace(case), as_of
+        self.objs: dict[str, dict] = {}
+        self.primary: dict[tuple, str] = {}         # (host, object, guid) -> the row's entity SCO
+        self.obs: dict[tuple, str] = {}             # (host, object, guid) -> the row's observed-data
+        self.obs_by_guid: dict[tuple, list] = defaultdict(list)
+        self.node_content: dict[str, str] = {}      # superset content node_id -> the global SCO id
+        self.pure_ids: set[str] = set()             # §2.9 global SCOs: no x_car_*, no extension entry
+        self.record_refs: dict[tuple, list] = defaultdict(list)
+        self.stats: Counter = Counter()
+        self._refs: list[str] = []
+        self._roles: dict[str, list] = {}
+
+    # -- registry ------------------------------------------------------------
+    def _put(self, o: dict) -> str | None:
+        if o.get("id") is None:
+            return None                              # keyed off a guid-less row: not minted
+        o = _clean(o)
+        # the evidence extension (contract v6): an x-car-* object declares its
+        # new-sco/new-sdo entry; any object carrying x_car_* properties declares
+        # the toplevel-property-extension entry. Global content SCOs carry
+        # neither (pure — `extensions` contributes to the §2.9 file id).
+        ext_type = EVIDENCE_EXTENSION_OBJECTS.get(o["type"]) \
+            or ("toplevel-property-extension"
+                if any(k.startswith("x_car_") for k in o) else None)
+        if ext_type is not None:
+            o.setdefault("extensions", {}) \
+             .setdefault(EVIDENCE_EXTENSION_ID, {"extension_type": ext_type})
+        cur = self.objs.get(o["id"])
+        if cur is None:
+            self.objs[o["id"]] = o
+        else:
+            _fill(cur, o, cur)
+        return o["id"]
+
+    def ref(self, sco_id: str | None, role: str | None) -> None:
+        if not sco_id:
+            return
+        if sco_id not in self._refs:
+            self._refs.append(sco_id)
+        if role:
+            roles = self._roles.setdefault(sco_id, [])
+            if role not in roles:
+                roles.append(role)
+
+    # -- content-keyed SCOs (global ids) --------------------------------------
+    def _value_sco(self, sco_type: str, value, role: str | None) -> str | None:
+        if value in _MISSING:
+            return None
+        v = str(value).strip()
+        if not v:
+            return None
+        sid = global_id(sco_type, {"value": v})
+        self._put({"type": sco_type, "spec_version": SPEC, "id": sid, "value": v})
+        self.ref(sid, role)
+        return sid
+
+    def ip(self, r: _Row, field: str, role: str) -> str | None:
+        v = r.peek(field)
+        if v is None:
+            return None
+        try:
+            a = ipaddress.ip_address(str(v).strip())
+        except ValueError:
+            return None                          # not an address: stays verbatim under x_car_fields
+        r.used.add(field)
+        return self._value_sco("ipv4-addr" if a.version == 4 else "ipv6-addr", str(a), role)
+
+    def domain(self, r: _Row, field: str, role: str) -> str | None:
+        return self._value_sco("domain-name", r.get(field), role)
+
+    def url(self, r: _Row, field: str, role: str) -> str | None:
+        return self._value_sco("url", r.get(field), role)
+
+    def email_addr(self, value, role: str) -> str | None:
+        return self._value_sco("email-addr", value, role)
+
+    def user(self, host, ident, name, role: str) -> str | None:
+        """A user-account: GLOBAL (keyed by the SID alone — account_login would
+        contribute, so the login name goes to display_name) when `ident` is a
+        REAL account SID by derive's identity rule; else a per-host instance."""
+        if ident is None and name is None:
+            return None
+        rule = derive.rules()["identities"]["sid"]
+        if ident is not None and derive._accepts(rule, ident):  # noqa: SLF001
+            sid = derive._normalize(rule, ident)                 # noqa: SLF001
+            uid = global_id("user-account", {"user_id": sid})
+            # PURE (contract v6): the global SID-keyed account carries core
+            # properties only; login aggregates stay case-scoped.
+            o = {"type": "user-account", "spec_version": SPEC, "id": uid, "user_id": sid}
+            self.pure_ids.add(uid)
+            if name is not None:
+                o["display_name"] = str(name)
+        else:
+            key = ("id", ident) if ident is not None else ("name", name)
+            uid = case_id(self.ns, "user-account", host, *key)
+            o = {"type": "user-account", "spec_version": SPEC, "id": uid, "x_car_source_host": host}
+            if ident is not None:
+                o["user_id"] = str(ident)
+            if name is not None:
+                o["account_login"] = str(name)
+        self._put(o)
+        self.ref(uid, role)
+        return uid
+
+    def content_ref(self, hashes: dict) -> str | None:
+        """The global content file the row's hashes belong to — the superset
+        node group when the content pass saw them, else the spec id of the row's own."""
+        for algo, v in hashes.items():
+            nid = f"{_NODE_PREFIX_BY_ALGO.get(algo, algo.lower())}:{v}"
+            if nid in self.node_content:
+                return self.node_content[nid]
+        return content_file_id(hashes)
+
+    # -- instance SCOs (case-scoped ids) -------------------------------------
+    def directory(self, host, path) -> str:
+        # a value SCO: core-only (the host is already in its case-scoped key),
+        # so no evidence-extension entry attaches (conventions extensions.entries)
+        did = case_id(self.ns, "directory", host, path)
+        self._put({"type": "directory", "spec_version": SPEC, "id": did, "path": str(path)})
+        self.ref(did, None)
+        return did
+
+    def file_instance(self, host, path, name, hashes: dict, role, fallback: tuple,
+                      **props) -> str | None:
+        """The file AT A PATH on a host (an instance): keyed by path, else by
+        name, else by the row; its hashes also bind it to the global content file."""
+        props = {k: v for k, v in props.items() if v not in _MISSING}
+        if path is None and name is None and not hashes and not props:
+            return None
+        key = ("path", path) if path is not None else ("name", name) if name is not None \
+            else ("row",) + tuple(fallback)
+        fid = case_id(self.ns, "file", host, *key)
+        o = {"type": "file", "spec_version": SPEC, "id": fid, "x_car_source_host": host}
+        nm = name if name is not None else (_basename(path) if path is not None else None)
+        if nm is not None:
+            o["name"] = str(nm)
+        if path is not None:
+            o["x_car_path"] = str(path)
+            d = _dirname(path)
+            if d:
+                o["parent_directory_ref"] = self.directory(host, d)
+        if hashes:
+            o["hashes"] = dict(hashes)
+            o["x_car_content_ref"] = self.content_ref(hashes)
+        o.update(props)
+        self._put(o)
+        self.ref(fid, role)
+        return fid
+
+    def process(self, host, guid, props: dict | None = None, image_path=None, image_name=None,
+                hashes: dict | None = None, role: str | None = None, **image_props) -> str:
+        """The process ENTITY (host, guid) — every row naming it fills the same SCO."""
+        pid_ = case_id(self.ns, "process", host, guid)
+        o = {"type": "process", "spec_version": SPEC, "id": pid_, "x_car_entity_id": str(guid),
+             "x_car_source_host": host}
+        o.update({k: v for k, v in (props or {}).items() if v not in _MISSING})
+        if image_path is not None or image_name is not None or hashes:
+            o["image_ref"] = self.file_instance(host, image_path, image_name, hashes or {}, None,
+                                                ("process", guid), **image_props)
+        self._put(o)
+        if pid_ is not None:
+            self.primary.setdefault((host, "process", str(guid)), pid_)
+        self.ref(pid_, role)
+        return pid_
+
+    def record(self, c: _Ctx) -> str | None:
+        """The fallback when a row projects no entity at all: the record itself,
+        so its observation still has an object to reference (never for a
+        guid-less row: it has no observation, and nothing is keyed off it)."""
+        rid = case_id(self.ns, "x-car-record", c.host, c.obj, c.key)
+        self._put({"type": "x-car-record", "spec_version": SPEC, "id": rid, "x_car_object": c.obj,
+                   "x_car_event_id": c.guid, "x_car_source_host": c.host})
+        self.ref(rid, c.obj)
+        return rid
+
+    # -- the content layer (superset content_node / entity_ref, from the events)
+    def content(self, events: list[dict]) -> None:
+        """The content-keyed entities: derive's content pass over the same
+        events (one node per algorithm/value), the hash nodes one record
+        co-references UNIONED into one file carrying all its hashes, whose id is
+        the §2.9 one; real-SID nodes become the global user-accounts."""
+        nodes, refs = derive.content_entities(events)
+        by_id = {n["node_id"]: n for n in nodes}
+        parent: dict[str, str] = {}
+
+        def find(x):
+            while parent.get(x, x) != x:
+                x = parent[x]
+            return x
+
+        per_record: dict[tuple, list] = defaultdict(list)
+        for ref in refs:
+            per_record[(ref.get("source_host"), ref["object"], str(ref["guid"]))].append(ref)
+        for lst in per_record.values():
+            hs = [x["node_id"] for x in lst if by_id[x["node_id"]]["kind"] == "file_content"]
+            for a in hs[1:]:
+                ra, rb = find(hs[0]), find(a)
+                if ra != rb:
+                    parent[max(ra, rb)] = min(ra, rb)
+        groups: dict[str, list] = defaultdict(list)
+        for n in nodes:
+            if n["kind"] == "file_content":
+                groups[find(n["node_id"])].append(n)
+            elif n["kind"] == "user_account":
+                self._content_user(n)
+        for members in groups.values():
+            self._content_file(members)
+        for ref in refs:
+            sco = self.node_content.get(ref["node_id"])
+            if sco:
+                self.record_refs[(ref.get("source_host"), ref["object"], str(ref["guid"]))] \
+                    .append((sco, ref.get("identity_key")))
+
+    def _content_file(self, members: list[dict]) -> None:
+        hashes, conflicts = {}, {}
+        for m in sorted(members, key=lambda n: n["node_id"]):
+            algo = _ALGO_BY_NODE_PREFIX.get(m["node_id"].split(":", 1)[0])
+            if algo is None:
+                continue
+            if algo in hashes and hashes[algo] != m["identity_value"]:
+                conflicts.setdefault("hashes." + algo, []).append(m["identity_value"])
+            else:
+                hashes[algo] = m["identity_value"]
+        fid = content_file_id(hashes)
+        if fid is None:
+            return
+        # The content file is PURE (contract v6): hashes only. `name` and
+        # `extensions` both contribute to the §2.9 file id, so the object
+        # carries neither — every name/path/signer it was seen under stays on
+        # the case-scoped instance SCOs, joined through x_car_content_ref.
+        if conflicts:
+            self.stats["content_hash_conflicts"] += len(conflicts)
+        self._put({"type": "file", "spec_version": SPEC, "id": fid, "hashes": hashes})
+        self.pure_ids.add(fid)
+        for m in members:
+            self.node_content[m["node_id"]] = fid
+
+    def _content_user(self, n: dict) -> None:
+        sid = n["identity_value"]
+        uid = global_id("user-account", {"user_id": sid})
+        props = n.get("properties") or {}
+        users = [str(u) for u in props.get("user", [])]
+        # PURE (contract v6): user_id + display_name are core; the login/host
+        # aggregates stay on the case-scoped instance SCOs and observations.
+        self._put({"type": "user-account", "spec_version": SPEC, "id": uid, "user_id": sid,
+                   "display_name": users[0] if users else None})
+        self.pure_ids.add(uid)
+        self.node_content[n["node_id"]] = uid
+
+    # -- one CAR row -> its SCOs + its observed-data ------------------------
+    def row(self, ev: dict) -> None:
+        obj = ev["car_object"]
+        if obj not in OBJECTS:
+            self.stats["rows_unknown_object"] += 1
+            return
+        r, c = _Row(ev), _Ctx(ev)
+        self._refs, self._roles = [], {}
+        prim = _BUILDERS[obj](self, r, c) or self.record(c)
+        if c.owning_guid and obj != "process":
+            self._acting(r, c)
+        self.stats["rows"] += 1
+        if c.guid is None:
+            # A9: a row with no identity keys nothing off itself — its content-
+            # and path-keyed SCOs stand (a file at a path, an account, an
+            # address); no row-keyed SCO, no record and no observation were
+            # minted. No mapped row is guid-less by design (spindle.verify_registry
+            # refuses a leaf without a guid form): this is a malformed record.
+            self.stats["observations_skipped_no_identity"] += 1
+            return
+        self.primary.setdefault((c.host, obj, str(c.guid)), prim)
+        for sco, role in self.record_refs.get((c.host, obj, str(c.guid)), []):
+            self.ref(sco, role)
+        if c.ts is None:
+            # an observation time is never invented: the SCOs stand, no observed-data
+            self.stats["observations_skipped_no_timestamp"] += 1
+            return
+        oid = case_id(self.ns, "observed-data", c.host, obj, c.key, c.action, ev.get("timestamp"),
+                      ev.get("target_guid"), ev.get("access_level"))
+        entity = c.owning_guid or (c.guid if obj == "process" else None)
+        self._put({"type": "observed-data", "spec_version": SPEC, "id": oid,
+                   "created": c.ts, "modified": c.ts, "created_by_ref": PRODUCER["id"],
+                   "first_observed": c.ts, "last_observed": c.ts, "number_observed": 1,
+                   "object_refs": list(self._refs), "labels": [f"car:{obj}"],
+                   "x_car_object": obj, "x_car_action": c.action, "x_car_event_id": c.guid,
+                   "x_car_process_entity_id": entity, "x_car_source_host": c.host,
+                   "x_car_source_artefact": ev.get("source_artefact"),
+                   "x_car_link_confidence": ev.get("link_confidence"),
+                   "x_car_timestamp": ev.get("timestamp"), "x_car_roles": dict(self._roles),
+                   "x_car_fields": r.leftovers(), "x_car_native": ev.get("_native") or {}})
+        if c.guid is not None:
+            self.obs[(c.host, obj, str(c.guid))] = oid
+            self.obs_by_guid[(c.host, str(c.guid))].append(oid)
+
+    def _acting(self, r: _Row, c: _Ctx) -> None:
+        """The spoke's acting-process columns fill the OWNING process SCO
+        (additively) — the cascade resolved it, so it exists; never a second
+        process SCO minted from the spoke."""
+        cols = OBJECTS[c.obj]["acting"]
+        props, image_path, image_name = {}, None, None
+        for col in cols:
+            if col in ("pid", "src_pid"):
+                props["pid"] = r.int(col)
+            elif col == "ppid":
+                props["x_car_ppid"] = r.int(col)
+            elif col == "image_path":
+                image_path = r.get(col)
+            elif col == "exe":
+                image_name = r.get(col)
+        self.process(c.host, c.owning_guid, props, image_path=image_path, image_name=image_name,
+                     role="owning_guid")
+
+    # -- inferred nodes and relationships (car_inferred.jsonl / car_relationships.jsonl) --
+    def inferred(self, n: dict) -> str:
+        """A reconstructed node as a FLAGGED, opinion-style object: never the
+        would-be SCO type, never referenced by an observed-data."""
+        host, node_id = n.get("source_host"), n["node_id"]
+        nid = case_id(self.ns, "x-car-inferred-node", host, node_id)
+        fs, ls = stix_ts(n.get("first_seen")), stix_ts(n.get("last_seen"))
+        corr = n.get("corroborated_by") or []
+        if isinstance(corr, str):
+            try:
+                corr = json.loads(corr)
+            except ValueError:
+                corr = [corr]
+        self._put({"type": "x-car-inferred-node", "spec_version": SPEC, "id": nid,
+                   "created": fs or self.as_of, "modified": ls or fs or self.as_of,
+                   "created_by_ref": PRODUCER["id"],
+                   "labels": ["car:inferred", "car:reconstructed"],
+                   "confidence": CONFIDENCE["inferred"],
+                   "x_car_inferred": True, "x_car_asserted": False,
+                   "x_car_would_be": OBJECTS.get(n.get("object"), {}).get("sco"),
+                   "x_car_object": n.get("object"), "x_car_node_id": node_id,
+                   "x_car_source_host": host, "x_car_identity_key": n.get("identity_key"),
+                   "x_car_identity_value": n.get("identity_value"), "x_car_method": n.get("method"),
+                   "x_car_reason": n.get("reason"), "x_car_corroborated_by": corr,
+                   "x_car_corroborating_refs": [o for g in corr
+                                                for o in self.obs_by_guid.get((host, str(g)), [])],
+                   "x_car_properties": n.get("properties") or {},
+                   "x_car_first_seen": n.get("first_seen"), "x_car_last_seen": n.get("last_seen")})
+        return nid
+
+    def _end(self, host, obj, guid, inferred: bool, e: dict) -> str | None:
+        if guid is None:
+            return None
+        if inferred:
+            nid = case_id(self.ns, "x-car-inferred-node", host, guid)
+            if nid not in self.objs:     # named by the edge only: flag it from the edge itself
+                self.inferred({"node_id": guid, "source_host": host, "object": obj,
+                               "identity_key": e.get("identity_key"), "identity_value": guid,
+                               "method": e.get("method"), "corroborated_by": e.get("corroborated_by"),
+                               "reason": "referenced by a derived relationship only; "
+                                         "no observed record (reconstructed, not evidence)"})
+            return nid
+        # a user_account end (an actor edge): the sid:<SID> content node — the
+        # SAME global user-account SCO the content layer minted from that SID
+        if obj == "user_account" and str(guid).startswith("sid:"):
+            uid = global_id("user-account", {"user_id": str(guid)[len("sid:"):]})
+            return uid if uid in self.objs else None
+        key = (host, obj, str(guid))
+        if OBJECTS.get(obj, {}).get("sro_end") == "observed-data":
+            return self.obs.get(key)
+        sco = self.primary.get(key)
+        if sco is None and obj == "process":
+            sco = case_id(self.ns, "process", host, guid)
+            if sco not in self.objs:
+                sco = None
+        return sco
+
+    def edge(self, e: dict) -> None:
+        # the closed vocabulary excludes generics by construction: an edge with
+        # an empty/unmappable verb is COUNTED, never emitted as related-to —
+        # doubt is tallied, not modeled (conventions.yml relationships.unmapped).
+        # Checked BEFORE the ends resolve: _end() mints the inferred node for
+        # an inferred leg, and a dropped edge must not strand one on the wire.
+        verb = re.sub(r"[^a-z0-9-]+", "-", str(e.get("relationship") or "").lower()).strip("-")
+        if not verb:
+            self.stats["relationships_unmapped"] += 1
+            return
+        cls = e.get("class") or superset.DECLARED
+        inf = e.get("inferred_end")
+        host = e.get("source_host")
+        s = self._end(host, e.get("source_object"), e.get("source_guid"), inf == "source", e)
+        t = self._end(host, e.get("target_object"), e.get("target_guid"), inf == "target", e)
+        if s is None or t is None:
+            self.stats["relationships_unresolved"] += 1
+            return
+        evidence_ts = stix_ts(e.get("timestamp"))
+        ts = evidence_ts or self.as_of
+        corr = e.get("corroborated_by")
+        if isinstance(corr, str):
+            try:
+                corr = json.loads(corr)
+            except ValueError:
+                corr = [corr]
+        props = e.get("properties")
+        if isinstance(props, str):
+            try:
+                props = json.loads(props)
+            except ValueError:
+                props = None
+        rid = case_id(self.ns, "relationship", cls, verb, s, t, e.get("timestamp"), e.get("method"))
+        self._put({"type": "relationship", "spec_version": SPEC, "id": rid, "created": ts,
+                   "modified": ts, "created_by_ref": PRODUCER["id"], "relationship_type": verb,
+                   "source_ref": s, "target_ref": t, "start_time": evidence_ts,
+                   "labels": [f"car:{cls}"] + ([f"car:{e['method']}"] if e.get("method") else []),
+                   "confidence": CONFIDENCE.get(e.get("confidence")),
+                   "x_car_class": cls, "x_car_method": e.get("method"),
+                   "x_car_confidence": e.get("confidence"), "x_car_identity_key": e.get("identity_key"),
+                   "x_car_inferred_end": inf, "x_car_corroborated_by": corr,
+                   "x_car_properties": props, "x_car_source_host": host})
+        self.stats[f"relationships_{cls}"] += 1
+
+    # -- the behaviour layer (analytics.py hits over the in-memory events) ------
+    def _host_identity(self, host) -> str | None:
+        """The host as a system identity — where a behaviour was sighted."""
+        if host in _MISSING:
+            return None
+        hid = case_id(self.ns, "identity", host)
+        self._put({"type": "identity", "spec_version": SPEC, "id": hid,
+                   "created": self.as_of, "modified": self.as_of, "created_by_ref": PRODUCER["id"],
+                   "name": str(host), "identity_class": "system", "x_car_source_host": host})
+        return hid
+
+    def _indicates(self, an_id: str, tech_id: str, ind_id: str | None, ap_id: str | None) -> None:
+        """A GLOBAL indicator --indicates--> attack-pattern SRO (catalogue-keyed);
+        the target is MITRE's authoritative attack-pattern id (the airway —
+        referenced, never a bundle member)."""
+        if not ind_id or not ap_id:
+            return
+        rid = catalogue_id("relationship", "indicates", an_id, tech_id)
+        self._put({"type": "relationship", "spec_version": SPEC, "id": rid,
+                   "created": EPOCH, "modified": self._catalogue_modified,
+                   "created_by_ref": PRODUCER["id"],
+                   "relationship_type": "indicates", "source_ref": ind_id, "target_ref": ap_id,
+                   "labels": ["car:behaviour"]})
+
+    def _sighting(self, hit, ind_id: str) -> str | None:
+        """One BehaviourHit as a CASE-SCOPED Sighting of the analytic's indicator
+        over the matched row's observed-data (skipped when the row produced none,
+        the sighting still stands)."""
+        sid = case_id(self.ns, "sighting", hit.analytic_id, hit.guid, hit.timestamp, hit.clause)
+        ts = stix_ts(hit.timestamp)
+        o = {"type": "sighting", "spec_version": SPEC, "id": sid,
+             "created": ts or self.as_of, "modified": ts or self.as_of,
+             "created_by_ref": PRODUCER["id"], "sighting_of_ref": ind_id, "count": 1,
+             "first_seen": ts, "last_seen": ts,
+             "x_car_analytic": hit.analytic_id, "x_car_title": hit.title, "x_car_clause": hit.clause,
+             "x_car_object": hit.car_object, "x_car_action": hit.car_action,
+             "x_car_event_id": hit.guid, "x_car_source_host": hit.source_host,
+             "x_car_techniques": _coverage_ids(hit.coverage)}
+        oid = self.obs.get((hit.source_host, hit.car_object, str(hit.guid))) \
+            if hit.guid is not None else None
+        if oid:
+            o["observed_data_refs"] = [oid]
+        host_ref = self._host_identity(hit.source_host)
+        if host_ref:
+            o["where_sighted_refs"] = [host_ref]
+        self._put(o)
+        return sid
+
+    def behaviour(self, hits, catalogue: dict) -> None:
+        """Project the behaviour timeline: for every analytic that fired, its
+        indicator and the `indicates` SROs to the MITRE-authoritative
+        attack-patterns it covers (GLOBAL, emitted once; the attack-patterns
+        themselves are referenced, never bundle members); for every hit, a
+        case-scoped sighting. Retired analytics emit revoked tombstones."""
+        inds, covers = catalogue["indicators"], catalogue["covers"]
+        self._catalogue_modified = catalogue.get("modified") or CAR_CORPUS["modified"]
+        emitted: set = set()
+        for hit in hits or []:
+            ind = inds.get(hit.analytic_id)
+            if ind is None:            # a hit whose analytic is not in the runnable catalogue
+                continue
+            ind_id = ind["id"]
+            if hit.analytic_id not in emitted:
+                self._put(ind)
+                for tid, ap_id in covers.get(hit.analytic_id, []):
+                    if ap_id is None:  # the pinned index cannot resolve it: tallied, not dropped
+                        self.stats["behaviour_techniques_unresolved"] += 1
+                        continue
+                    self._indicates(hit.analytic_id, tid, ind_id, ap_id)
+                emitted.add(hit.analytic_id)
+            self._sighting(hit, ind_id)
+            self.stats["sightings"] += 1
+        self.stats["behaviour_indicators"] = len(emitted)
+
+    def tombstones(self) -> None:
+        """Retired analytics' revoked indicators (BP §3.1) — catalogue content,
+        case-independent: they ride EVERY bundle, hits or not."""
+        for an_id, meta in RETIRED_ANALYTICS.items():
+            self._put(_tombstone_obj(an_id, meta))
+
+    # -- observation connectedness (BP §5.9 / spec §4.14, contract v6) --------
+    def connect_observations(self) -> None:
+        """Each observation references a connected graph: the row's SCOs plus
+        every SRO both of whose ends the observation already references."""
+        obs = [o for o in self.objs.values() if o.get("type") == "observed-data"]
+        by_ref: dict[str, list] = defaultdict(list)
+        for o in obs:
+            for r in o.get("object_refs", []):
+                by_ref[r].append(o)
+        for rel in list(self.objs.values()):
+            if rel.get("type") != "relationship":
+                continue
+            s, t = rel.get("source_ref"), rel.get("target_ref")
+            for o in by_ref.get(s, []):
+                refs = o.get("object_refs", [])
+                if t in refs and rel["id"] not in refs:
+                    refs.append(rel["id"])
+
+    # -- the bundle -----------------------------------------------------------
+    def bundle(self) -> dict:
+        # PURE global SCOs (contract v6): the superset fill may have parked a
+        # scalar disagreement under x_car_conflicts — tallied, never on wire.
+        for pid in self.pure_ids:
+            o = self.objs.get(pid)
+            if o is not None and o.pop("x_car_conflicts", None) is not None:
+                self.stats["content_conflicts_tallied"] += 1
+
+        def key(o):
+            return (_ORDER.get(o["type"], 1), o["type"],
+                    o.get("first_observed") or o.get("start_time") or o.get("created") or "",
+                    o["id"])
+        return {"type": "bundle", "id": case_id(self.ns, "bundle", self.case),
+                "objects": [PRODUCER, evidence_extension_definition(PRODUCER["id"])]
+                           + sorted(self.objs.values(), key=key)}
+
+
+# --------------------------------------------------------------------------- #
+# Per-object builders: the row's ENTITY SCO(s); return the primary id
+# --------------------------------------------------------------------------- #
+def _b_process(p: Projection, r: _Row, c: _Ctx) -> str | None:
+    entity = c.owning_guid or c.key            # ECS: owning_guid names the ACTING process when set
+    props = {"pid": r.int("pid"), "command_line": r.get("command_line"),
+             "cwd": r.get("current_working_directory")}
+    if c.action == "create":
+        props["created_time"] = c.ts
+    il = r.peek("integrity_level")
+    if il is not None and str(il).lower() in _INTEGRITY:
+        props["extensions"] = {"windows-process-ext": {"integrity_level": str(r.get("integrity_level")).lower()}}
+    parent = r.get("parent_guid")
+    if parent:
+        props["parent_ref"] = p.process(c.host, parent,
+                                        {"pid": r.int("ppid"), "command_line": r.get("parent_command_line")},
+                                        image_path=r.get("parent_image_path"), image_name=r.get("parent_exe"))
+    else:                                       # a parent the cascade did not resolve: what the row says, no SCO
+        pp = {"pid": r.int("ppid"), "image_path": r.get("parent_image_path"), "exe": r.get("parent_exe"),
+              "command_line": r.get("parent_command_line")}
+        props["x_car_parent"] = _clean(pp)
+    ident = r.get("sid")
+    if ident is None:
+        ident = r.get("uid")
+    props["creator_user_ref"] = p.user(c.host, ident, r.get("user"), "sid" if ident is not None else "user")
+    pid_ = p.process(c.host, entity, props, image_path=r.get("image_path"), image_name=r.get("exe"),
+                     hashes=_hashes(r), role="process", x_car_signer=r.get("signer"),
+                     x_car_signature_valid=r.get("signature_valid"))
+    if c.action == "access":
+        tg = r.get("target_guid")
+        if tg:
+            p.process(c.host, tg, {"pid": r.int("target_pid")}, image_path=r.get("target_name"),
+                      role="target_guid")
+    return pid_
+
+
+def _b_file(p: Projection, r: _Row, c: _Ctx) -> str | None:
+    fid = p.file_instance(c.host, r.get("file_path"), r.get("file_name"), _hashes(r), "file",
+                          (c.obj, c.key), ctime=r.ts("creation_time"), mime_type=r.get("mime_type"),
+                          x_car_signer=r.get("signer"), x_car_signature_valid=r.get("signature_valid"))
+    p.user(c.host, r.get("owner_uid"), r.get("owner"), "owner_uid")
+    p.user(c.host, r.get("uid"), r.get("user"), "uid")
+    return fid
+
+
+def _b_module(p: Projection, r: _Row, c: _Ctx) -> str | None:
+    return p.file_instance(c.host, r.get("module_path"), r.get("module_name"), _hashes(r), "module",
+                           (c.obj, c.key), x_car_signer=r.get("signer"),
+                           x_car_signature_valid=r.get("signature_valid"),
+                           x_car_base_address=r.get("base_address"))
+
+
+def _b_driver(p: Projection, r: _Row, c: _Ctx) -> str | None:
+    return p.file_instance(c.host, r.get("image_path"), r.get("module_name"), _hashes(r), "driver",
+                           (c.obj, c.key), x_car_signer=r.get("signer"),
+                           x_car_signature_valid=r.get("signature_valid"),
+                           x_car_base_address=r.get("base_address"))
+
+
+def _b_registry(p: Projection, r: _Row, c: _Ctx) -> str:
+    key = r.get("key")
+    kid = case_id(p.ns, "windows-registry-key", c.host,
+                  *(("key", key) if key is not None else ("row", c.obj, c.key)))
+    o = {"type": "windows-registry-key", "spec_version": SPEC, "id": kid, "x_car_source_host": c.host,
+         "key": str(key) if key is not None else None}
+    if r.peek("value") is not None or r.peek("data") is not None:
+        val = {"name": r.get("value"), "data": r.get("data")}
+        typ = r.peek("type")
+        if typ is not None and str(typ).upper().startswith("REG_"):
+            val["data_type"] = str(r.get("type")).upper()
+        o["values"] = [{k: str(v) for k, v in val.items() if v is not None}]
+    o["creator_user_ref"] = p.user(c.host, None, r.get("user"), "user")
+    p._put(o)  # noqa: SLF001
+    p.ref(kid, "registry")
+    return kid
+
+
+def _network(p: Projection, r: _Row, c: _Ctx, src: str, dst: str, sport: str, dport: str) -> dict:
+    """The network-traffic instance shared by flow/socket: keyed by the row,
+    its ends the GLOBAL address SCOs."""
+    nid = case_id(p.ns, "network-traffic", c.host, c.obj, c.key)
+    return {"type": "network-traffic", "spec_version": SPEC, "id": nid, "x_car_source_host": c.host,
+            "x_car_object": c.obj, "src_ref": p.ip(r, src, src), "dst_ref": p.ip(r, dst, dst),
+            "src_port": r.int(sport), "dst_port": r.int(dport)}
+
+
+def _b_flow(p: Projection, r: _Row, c: _Ctx) -> str:
+    o = _network(p, r, c, "src_ip", "dest_ip", "src_port", "dest_port")
+    protos = [str(v).lower() for v in (r.get("transport_protocol"), r.get("application_protocol")) if v]
+    o.update({"protocols": protos or ["ip"],           # required by the spec; "ip" is the honest floor
+              "src_byte_count": r.int("out_bytes"), "dst_byte_count": r.int("in_bytes"),
+              "start": r.ts("start_time"), "end": r.ts("end_time")})
+    if o["end"]:
+        o["is_active"] = False
+    p._put(o)  # noqa: SLF001
+    p.ref(o["id"], "flow")
+    return o["id"]
+
+
+def _b_socket(p: Projection, r: _Row, c: _Ctx) -> str:
+    o = _network(p, r, c, "local_address", "remote_address", "local_port", "remote_port")
+    proto = r.get("protocol")
+    o["protocols"] = [str(proto).lower()] if proto else ["ip"]
+    fam = r.peek("family")
+    if fam is not None and str(fam).upper().startswith("AF_"):  # address_family is required in the ext
+        o["extensions"] = {"socket-ext": {"address_family": str(r.get("family")).upper(),
+                                          "is_listening": c.action == "listen"}}
+    p._put(o)  # noqa: SLF001
+    p.ref(o["id"], "socket")
+    return o["id"]
+
+
+def _b_http(p: Projection, r: _Row, c: _Ctx) -> str:
+    nid = case_id(p.ns, "network-traffic", c.host, c.obj, c.key)
+    host_hdr = r.peek("url_domain")
+    scheme = r.get("url_scheme")
+    o = {"type": "network-traffic", "spec_version": SPEC, "id": nid, "x_car_source_host": c.host,
+         "x_car_object": c.obj, "src_ref": p.ip(r, "requester_ip_address", "requester_ip_address"),
+         "dst_ref": p.domain(r, "url_domain", "url_domain"),
+         "protocols": ["tcp", str(scheme).lower() if scheme and str(scheme).lower() in ("http", "https") else "http"],
+         "x_car_url_ref": p.url(r, "url_full", "url_full"),
+         "x_car_response_status_code": r.get("response_status_code"),
+         "x_car_response_body_bytes": r.int("response_body_bytes")}
+    value = r.get("url_remainder")
+    if value is None and r.peek("url_full") is not None:
+        value = r.peek("url_full")
+    if value is not None:                     # request_method + request_value are required in the ext
+        ext = {"request_method": str(c.action).lower(), "request_value": str(value),
+               "request_version": r.get("http_version"),
+               "request_header": _clean({"User-Agent": r.get("user_agent_full"),
+                                         "Referer": r.get("request_referrer"), "Host": host_hdr}),
+               "message_body_length": r.int("request_body_bytes")}
+        o["extensions"] = {"http-request-ext": _clean(ext)}
+    p._put(o)  # noqa: SLF001
+    p.ref(nid, "http")
+    return nid
+
+
+def _b_authentication(p: Projection, r: _Row, c: _Ctx) -> str | None:
+    target = p.user(c.host, r.get("target_uid"), r.get("target_user"), "target_uid")
+    subject = p.user(c.host, r.get("uid"), r.get("user"), "uid")
+    return target or subject
+
+
+def _b_user_session(p: Projection, r: _Row, c: _Ctx) -> str | None:
+    u = p.user(c.host, r.get("uid"), r.get("user"), "uid")
+    p.ip(r, "src_ip", "src_ip")
+    p.ip(r, "dest_ip", "dest_ip")
+    return u
+
+
+def _b_service(p: Projection, r: _Row, c: _Ctx) -> str:
+    """STIX has no service SCO: a process with the windows-service-ext, keyed by
+    the service name on the host."""
+    name = r.get("name")
+    sid = case_id(p.ns, "process", c.host, *(("service", name) if name else ("row", c.obj, c.key)))
+    image_path, exe = r.get("image_path"), r.get("exe")
+    o = {"type": "process", "spec_version": SPEC, "id": sid, "x_car_source_host": c.host,
+         "x_car_object": "service", "command_line": r.get("command_line"), "pid": r.int("pid"),
+         "creator_user_ref": p.user(c.host, r.get("uid"), r.get("user"), "uid")}
+    if image_path is not None or exe is not None:
+        o["image_ref"] = p.file_instance(c.host, image_path, exe, {}, None, (c.obj, c.key))
+    if name:
+        o["extensions"] = {"windows-service-ext": {"service_name": str(name)}}
+    p._put(o)  # noqa: SLF001
+    p.ref(sid, "service")
+    return sid
+
+
+def _b_thread(p: Projection, r: _Row, c: _Ctx) -> str:
+    """STIX 2.1 has no thread SCO: the thread observation is carried as an
+    x-car-thread; its processes are the owning process (acting) and, via the
+    declared/derived SROs, the target."""
+    tid = case_id(p.ns, "x-car-thread", c.host, c.key)
+    o = {"type": "x-car-thread", "spec_version": SPEC, "id": tid, "x_car_source_host": c.host,
+         # homed onto the thread SCO, so consume it — otherwise it leaks
+         # (duplicates) into x_car_fields when owning_guid is absent and _acting
+         # never runs to claim it. When it does run, marking twice is idempotent.
+         "src_pid": r.get("src_pid")}
+    for f in ("src_tid", "tgt_pid", "tgt_tid", "start_address", "start_function", "start_module_name",
+              "stack_base", "stack_limit", "user_stack_base", "user_stack_limit"):
+        o[f] = r.get(f)
+    sm = r.get("start_module")
+    if sm is not None:
+        o["start_module_ref"] = p.file_instance(c.host, sm, None, {}, None, (c.obj, c.key))
+    o["creator_user_ref"] = p.user(c.host, r.get("uid"), r.get("user"), "uid")
+    p._put(o)  # noqa: SLF001
+    p.ref(tid, "thread")
+    return tid
+
+
+def _split(v) -> list:
+    out = []
+    for x in derive._values(v):  # noqa: SLF001 — a list column, JSON text or scalar
+        out.extend(s.strip() for s in re.split(r"[;,]", str(x)) if s.strip())
+    return out
+
+
+def _b_email(p: Projection, r: _Row, c: _Ctx) -> str:
+    eid = case_id(p.ns, "email-message", c.host, c.key)
+    o = {"type": "email-message", "spec_version": SPEC, "id": eid, "is_multipart": False,
+         "x_car_source_host": c.host, "from_ref": p.email_addr(r.get("from"), "from"),
+         "sender_ref": p.email_addr(r.get("return_address"), "return_address"),
+         "subject": r.get("subject"), "date": r.ts("date"), "body": r.get("message_body")}
+    if r.peek("to") is not None:
+        o["to_refs"] = [x for x in (p.email_addr(v, "to") for v in _split(r.get("to"))) if x]
+    att = r.get("attachment_name")
+    if att is not None:
+        o["x_car_attachment_ref"] = p.file_instance(c.host, None, att, {}, "attachment_name", (c.obj, c.key),
+                                                    mime_type=r.get("attachment_mime_type"),
+                                                    size=r.int("attachment_size"))
+    if r.peek("message_links") is not None:
+        o["x_car_link_refs"] = [x for x in (p._value_sco("url", v, "message_links")  # noqa: SLF001
+                                            for v in _split(r.get("message_links"))) if x]
+    p.ip(r, "src_ip", "src_ip")
+    p.ip(r, "dest_ip", "dest_ip")
+    p._put(o)  # noqa: SLF001
+    p.ref(eid, "email")
+    return eid
+
+
+_BUILDERS = {"authentication": _b_authentication, "driver": _b_driver, "email": _b_email,
+             "file": _b_file, "flow": _b_flow, "http": _b_http, "module": _b_module,
+             "process": _b_process, "registry": _b_registry, "service": _b_service,
+             "socket": _b_socket, "thread": _b_thread, "user_session": _b_user_session}
+
+
+# --------------------------------------------------------------------------- #
+# The pass
+# --------------------------------------------------------------------------- #
+def project(events: list[dict], edges: list[dict] = (), inferred_nodes: list[dict] = (),
+            case: str = "default", as_of: str | None = None,
+            behaviour_hits: list | None = None, analytics_list: list | None = None) -> tuple[dict, dict]:
+    """The bundle + a summary from in-memory stores: the enriched events (native
+    as _native), superset relationship rows, inferred_node rows. `as_of` is the
+    `created` stamp for objects that carry no evidence time (default: the
+    latest evidence time, so a re-export is byte-identical).
+
+    `behaviour_hits` (analytics.BehaviourHit list, computed from the same events)
+    add the behaviour layer — the attack-pattern / indicator catalogue and the
+    sightings; the timeline is projected only when hits are supplied (the SCO /
+    observation / relationship projection is unchanged when they are not)."""
+    if as_of is None:
+        stamps = [stix_ts(x.get("timestamp")) for x in list(events) + list(edges)]
+        as_of = max([s for s in stamps if s], default=EPOCH)
+    p = Projection(case, as_of)
+    p.content(events)
+    for ev in events:
+        p.row(ev)
+    for n in inferred_nodes:
+        p.inferred(n)
+    for e in edges:
+        p.edge(e)
+    p.connect_observations()
+    if behaviour_hits:
+        ans = analytics_list if analytics_list is not None else _load_runnable_analytics()
+        p.behaviour(behaviour_hits, behaviour_catalogue(ans))
+    p.tombstones()
+    bundle = p.bundle()
+    summary = {"case": case, "as_of": as_of, "objects": len(bundle["objects"]),
+               "by_type": dict(sorted(Counter(o["type"] for o in bundle["objects"]).items()))}
+    summary.update(sorted(p.stats.items()))
+    return bundle, summary
+
+
+def load(car_dir: str) -> tuple[list[dict], list[dict], list[dict]]:
+    """(events, relationship rows, inferred_node rows) from a materialised CAR
+    tree: every car_<object>.jsonl (events, native -> _native),
+    car_relationships.jsonl (edges) and car_inferred.jsonl (inferred nodes) —
+    read as they are. No SQLite is involved; a missing relationships/inferred
+    file simply contributes no edges/nodes (an object-only or --derive-less
+    tree is still exportable)."""
+    if not glob.glob(os.path.join(car_dir, "car_*.jsonl")):
+        raise SystemExit(f"no materialised CAR under {car_dir!r}")
+    events = derive.load_events(car_dir)
+    edges = list(store.read_jsonl(os.path.join(car_dir, "car_relationships.jsonl")))
+    nodes = list(store.read_jsonl(os.path.join(car_dir, "car_inferred.jsonl")))
+    return events, edges, nodes
+
+
+def _behaviour_pass(events: list[dict]) -> tuple[list | None, list | None]:
+    """(runnable analytics, behaviour hits) over the events `load()` already
+    read — the third pillar, projected from the SAME in-memory events this
+    export is adjacent to (analytics.flag_rows, not a second read of the
+    materialised tree via flag_store). Both None when the corpus is
+    unavailable: the behaviour layer is additive and must never break a STIX
+    export."""
+    try:
+        from . import analytics as _an
+        ans = _an.load_analytics()
+        rows_by_object: dict[str, list[dict]] = defaultdict(list)
+        for ev in events:
+            rows_by_object[ev["car_object"]].append(ev)
+        return ans, _an.flag_rows(rows_by_object, ans)
+    except (ImportError, SystemExit):
+        return None, None
+
+
+def export(car_dir: str, out_path: str | None = None, case: str | None = None,
+           as_of: str | None = None) -> dict:
+    """Derive <car_dir>/stix_bundle.json (or `out_path`) from the materialised
+    tree. `case` scopes the instance ids (default: the car directory's name)."""
+    case = case or os.path.basename(os.path.abspath(car_dir.rstrip("/\\"))) or "default"
+    events, edges, nodes = load(car_dir)
+    ans, hits = _behaviour_pass(events)
+    bundle, summary = project(events, edges, nodes, case=case, as_of=as_of,
+                              behaviour_hits=hits, analytics_list=ans)
+    out_path = out_path or os.path.join(car_dir, "stix_bundle.json")
+    with open(out_path, "w", encoding="utf-8") as fh:
+        json.dump(bundle, fh, ensure_ascii=False, default=str)
+        fh.write("\n")
+    summary["bundle"] = out_path
+    summary["bundle_id"] = bundle["id"]
+    return summary
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog="byakugan.stix",
+                                 description="STIX 2.1, derived from a source's stores at export")
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    ex = sub.add_parser("export", help="derive <car-dir>/stix_bundle.json from the materialised CAR tree")
+    ex.add_argument("car_dir", help="a source's car directory (car_<object>.jsonl [+ car_relationships.jsonl])")
+    ex.add_argument("--out", default=None, help="bundle path (default: <car-dir>/stix_bundle.json)")
+    ex.add_argument("--case", default=None,
+                    help="case id scoping the instance ids (default: the car directory's name)")
+    ex.add_argument("--as-of", default=None,
+                    help="ISO timestamp stamped as `created` where no evidence time exists "
+                         "(default: the latest evidence time)")
+    args = ap.parse_args(argv)
+    as_of = stix_ts(args.as_of) if args.as_of else None
+    if args.as_of and not as_of:
+        ap.error(f"--as-of is not an ISO-8601 timestamp: {args.as_of!r}")
+    json.dump(export(args.car_dir, args.out, args.case, as_of), sys.stdout, default=str)
+    sys.stdout.write("\n")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

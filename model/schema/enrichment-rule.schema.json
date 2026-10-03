@@ -1,0 +1,78 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/enrichment-rule.schema.json",
+ "title": "Enrichment Rules — self-enrichment declarations",
+ "description": "One declaration per rule (docs/design/schema-layers.md): applies_to, method (a registered code function, by name), inputs, emits, scope (self now; external later, with its source declared). Instances are GENERATED from byakugan/relationships.yml and the ir.json canon_user table by byakugan.schema_gen — enrichment provenance stays attributable to the rule that set it.",
+ "type": "object",
+ "allOf": [
+  {
+   "$ref": "envelope.schema.json"
+  }
+ ],
+ "properties": {
+  "schema_version": true,
+  "generated_from": true,
+  "source": true,
+  "rules": {
+   "type": "array",
+   "minItems": 1,
+   "items": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9_]+)*$"
+     },
+     "layer": {
+      "enum": [
+       "inheritance",
+       "dedupe",
+       "identity",
+       "derived",
+       "canonicalisation"
+      ]
+     },
+     "applies_to": {
+      "type": "string"
+     },
+     "method": {
+      "type": "string"
+     },
+     "scope": {
+      "enum": [
+       "self"
+      ]
+     },
+     "inputs": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "emits": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "declared_in": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "layer",
+     "applies_to",
+     "method",
+     "scope",
+     "declared_in"
+    ],
+    "unevaluatedProperties": false
+   }
+  }
+ },
+ "required": [
+  "rules"
+ ],
+ "unevaluatedProperties": false
+}
