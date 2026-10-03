@@ -31,7 +31,7 @@ jobs:
       KIBANA_SYSTEM_PASSWORD: ci-kibana-system-pw
       BYAKUGAN_LOADER_PASSWORD: ci-byakugan-loader-pw
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # scripts/e2e_elastic.py builds a real CarStore (byakugan.store),
           # whose carmodel.load() reads third_party/car/data_model/*.yaml —
@@ -40,7 +40,7 @@ jobs:
           # own import path, but recursive matches lint.yml's own checkout
           # (both submodules are the model sources) rather than diverging.
           submodules: recursive
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
       - name: Install
@@ -52,7 +52,7 @@ jobs:
       - name: Write elastic/.env (fixed CI credentials, not the .env.example placeholders)
         run: |
           cat > elastic/.env <<EOF
-          ELASTIC_VERSION=9.4.3
+          ELASTIC_VERSION=9.5.4
           ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
           KIBANA_SYSTEM_PASSWORD=${KIBANA_SYSTEM_PASSWORD}
           BYAKUGAN_LOADER_PASSWORD=${BYAKUGAN_LOADER_PASSWORD}
