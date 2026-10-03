@@ -10,7 +10,7 @@ name: byakugan-standalone
 
 services:
   elasticsearch:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-9.4.3}"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-9.5.4}"
     environment:
       discovery.type: single-node
       ELASTIC_PASSWORD: "${ELASTIC_PASSWORD:?set it in elastic/.env (see .env.example)}"
@@ -39,7 +39,7 @@ services:
   # and creates the least-privilege byakugan_loader identity (both
   # idempotent). No certificate generation — see the header comment above.
   setup:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-9.4.3}"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-9.5.4}"
     command: ["bash", "/usr/local/bin/byakugan-standalone-setup"]
     environment:
       ELASTIC_PASSWORD: "${ELASTIC_PASSWORD:?set it in elastic/.env (see .env.example)}"
@@ -49,7 +49,7 @@ services:
       - ./config/setup.sh:/usr/local/bin/byakugan-standalone-setup:ro
 
   kibana:
-    image: "docker.elastic.co/kibana/kibana:${ELASTIC_VERSION:-9.4.3}"
+    image: "docker.elastic.co/kibana/kibana:${ELASTIC_VERSION:-9.5.4}"
     depends_on:
       setup:
         condition: service_completed_successfully

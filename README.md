@@ -29,7 +29,7 @@ not just the events a single detection cares about.
 ## How it runs
 
 Byakugan is a **hybrid**. `go/bin/byakugan-parse` is the parse engine — build
-it once (`make -C go build`; prerequisite: **Go >= 1.24**) — and everything
+it once (`make -C go build`; prerequisite: **Go >= 1.27**) — and everything
 else — routing, enrichment, the relationship cascade, the CAR→ECS projection,
 the CLI itself — is the **Python package** you actually run, as
 `python -m byakugan`, `python -m byakugan.<module>`, or the `byakugan` console
@@ -63,7 +63,7 @@ Byakugan works as an individual component in three shapes:
 
 ```
 git submodule update --init --recursive          # the model comes from pinned submodules
-make -C go build                                 # the Go parse engine (Go >= 1.24)
+make -C go build                                 # the Go parse engine (Go >= 1.27)
 
 python -m byakugan --in <file-or-dir> --out <dir>   # build: one source
 python -m byakugan --batch <processed_dir>          # build: every source, isolated
