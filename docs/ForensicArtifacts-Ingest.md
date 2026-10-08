@@ -1,8 +1,8 @@
 # Ingest pipeline: ForensicArtifacts
 
-**Code:** `pipeline/ingest/forensicartifacts/` ·
+**Code:** `model/ingest_forensicartifacts.py` ·
 **Source:** `model/sources/forensicartifacts/` (submodule) ·
-**Output:** `pipeline/ingest/forensicartifacts/index.json` (committed, canonical)
+**Output:** `model/sources/forensicartifacts.index.json` (committed, canonical)
 
 ## What it ingests
 
@@ -20,16 +20,16 @@ OS scoping and grouping — never field semantics.
 
 ## The refresh-time pattern
 
-Per [docs/design/schema-layers.md](../../design/schema-layers.md), the
+Per [docs/design/schema-layers.md](design/schema-layers.md), the
 submodule is a refresh-time input: engines and tests never read it, and CI
 never checks it out (`GIT_SUBMODULE_STRATEGY` stays unset). Only `ingest.py`
 consults it, and the committed index is canonical.
 
 ```
 bump pin        git -C model/sources/forensicartifacts fetch && git -C model/sources/forensicartifacts checkout <new>
-regenerate      python pipeline/ingest/forensicartifacts/ingest.py
+regenerate      python model/ingest_forensicartifacts.py
 review          the index.json diff is the reviewable surface of the upstream change
-gate            python pipeline/ingest/forensicartifacts/ingest.py --check
+gate            python model/ingest_forensicartifacts.py --check
 ```
 
 `--check` regenerates in memory and byte-compares against the committed

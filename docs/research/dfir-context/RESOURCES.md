@@ -1,12 +1,12 @@
 # Ingested resources — credits
 
 The once-only ingests behind the DFIR-context evidence matrix
-([docs/research/dfir-context/](../../docs/research/dfir-context/)): each
+(this directory): each
 source was read at the pinned commit, what fitted the model was extracted
 with per-row citations, and what did not fit was recorded, not added. This
 file is the credit registry; recurring sources live as submodules under
 `model/sources/` instead (currently: ForensicArtifacts —
-[docs/pipelines/ingest/forensicartifacts.md](../../docs/pipelines/ingest/forensicartifacts.md)).
+[docs/ForensicArtifacts-Ingest.md](../../ForensicArtifacts-Ingest.md)).
 
 | source | pin | license | credit | taken | verdict |
 |---|---|---|---|---|---|
@@ -20,7 +20,7 @@ file is the credit registry; recurring sources live as submodules under
 
 Matching and validation: the 99 extracted rows were individually matched by
 mechanism into the 64 canonical rows of
-[matched-evidences.yaml](../../docs/research/dfir-context/matched-evidences.yaml)
+[matched-evidences.yaml](matched-evidences.yaml)
 (23 multi-source-corroborated; every source row cited; tier disagreements
 reconciled conservatively with the disagreement noted in-row; all rows
 validated against the CAR object/action vocabulary).

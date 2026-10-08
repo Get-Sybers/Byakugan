@@ -32,7 +32,7 @@ The model sources, and when each is read:
 - `model/sources/forensicartifacts` (submodule) — the ForensicArtifacts catalogue
   that seeds the Artefact Class layer. **Refresh-time only:** nothing reads it at
   run time, CI does not need it, and only
-  `pipeline/ingest/forensicartifacts/ingest.py` wants it checked out.
+  `model/ingest_forensicartifacts.py` wants it checked out.
 
 **Go >= 1.27 is a prerequisite.** The parse stage (raw file → pre-enrichment CAR
 events) is the Go engine in `go/`; `python -m byakugan` shells out to
