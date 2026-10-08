@@ -164,7 +164,7 @@ def render_vocab(legal: dict[str, list[str]]) -> str:
     action enums + the pair-wise if/then constraint block."""
     doc = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/vocab/car-actions.schema.json",
+        "$id": _GITHUB_RAW + "vocab/car-actions.schema.json",
         "title": "CAR object/action vocabulary — GENERATED from model/car/objects",
         "description": ("Never hand-edited: python -m byakugan.schema_gen regenerates it; "
                         "the conform rule class-regen gates drift."),

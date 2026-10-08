@@ -1,6 +1,6 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/wire/bundle.schema.json",
+ "$id": "https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/model/schema/wire/bundle.schema.json",
  "title": "Wire bundle — GENERATED envelope",
  "description": "Never hand-edited: python -m byakugan.schema_gen regenerates it (conform class-regen gates drift).",
  "type": "object",

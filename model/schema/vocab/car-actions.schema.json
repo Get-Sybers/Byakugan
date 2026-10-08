@@ -1,6 +1,6 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/vocab/car-actions.schema.json",
+ "$id": "https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/model/schema/vocab/car-actions.schema.json",
  "title": "CAR object/action vocabulary — GENERATED from model/car/objects",
  "description": "Never hand-edited: python -m byakugan.schema_gen regenerates it; the conform rule class-regen gates drift.",
  "$defs": {

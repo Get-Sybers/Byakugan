@@ -1,6 +1,6 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/enrichment-rule.schema.json",
+ "$id": "https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/model/schema/enrichment-rule.schema.json",
  "title": "Enrichment Rules — self-enrichment declarations",
  "description": "One declaration per rule (docs/design/schema-layers.md): applies_to, method (a registered code function, by name), inputs, emits, scope (self now; external later, with its source declared). Instances are GENERATED from byakugan/relationships.yml and the ir.json canon_user table by byakugan.schema_gen — enrichment provenance stays attributable to the rule that set it.",
  "type": "object",

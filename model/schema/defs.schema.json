@@ -1,6 +1,6 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/defs.schema.json",
+ "$id": "https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/model/schema/defs.schema.json",
  "title": "Shared property library",
  "$defs": {
   "semver": {
