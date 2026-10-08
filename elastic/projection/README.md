@@ -30,9 +30,7 @@ elastic/projection/
 │                                  non-keyword `ecs:`/`also:`/`derived:` targets objects/*.yml uses
 ├── validate.py                    the drift check (pyyaml only) — exit 1 on any problem
 ├── render_elastic.py              renders rendered/ from the contract (pyyaml only) — --check for drift
-├── rendered/                      GENERATED, committed: component templates, index templates, Kibana views
-├── test_projection_contract.py    thin pytest wrapper around validate.py + render_elastic.py --check
-└── test_kibana_assets.py          structural checks on rendered/kibana/*.ndjson
+└── rendered/                      GENERATED, committed: component templates, index templates, Kibana views
 ```
 
 ## The shape of the contract
@@ -172,11 +170,11 @@ python elastic/projection/render_elastic.py --check    # verify rendered/ is in 
 it re-renders to memory and byte-compares against the files on disk, exiting 1
 with a missing/drifted/orphan-file list on any mismatch — so `rendered/` going
 stale after a contract edit is caught exactly like an un-regenerated `sources/`
-manifest is. `test_projection_contract.py` runs `--check` in CI;
-`test_kibana_assets.py` separately checks the Kibana bundle's own internal
+manifest is. `tests/test_projection_contract.py` runs `--check` in CI;
+`tests/test_kibana_assets.py` separately checks the Kibana bundle's own internal
 consistency (every column/sort/timeField resolves against the rendered
 mappings of the streams its data view matches, references resolve, ids are
-unique); `tests/test_projection_rel_drift.py` (repo root) checks
+unique); `tests/test_projection_rel_drift.py` checks
 `relationships.yml`/`inferred.yml` against the *live* superset.py row shapes, not
 just their own declared coverage.
 

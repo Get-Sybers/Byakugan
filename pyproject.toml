@@ -31,6 +31,9 @@ Issues = "https://github.com/Get-Sybers/Byakugan/issues"
 byakugan = "byakugan.cli:main"
 
 [tool.pytest.ini_options]
+# every test lives under tests/ — the vendored trees under model/sources/ are
+# never walked
+testpaths = ["tests"]
 # tests/ holds shared helpers (go_engine.py, processed_fixtures.py) that the
 # test modules import as top-level modules (`from go_engine import ...`). Put
 # tests/ on sys.path explicitly so collection works regardless of pytest's
