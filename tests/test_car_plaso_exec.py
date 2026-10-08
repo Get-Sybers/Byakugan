@@ -1,4 +1,4 @@
-"""Tests for the plaso execution-evidence CAR maps (mappings/plaso_exec.py).
+"""Tests for the plaso execution-evidence CAR maps (go/internal/authoring/maps_plaso_exec.go).
 
 Rows are shaped exactly like the wrapped l2t JSONL the plaso lane emits
 (ingest/prepare.split_l2t): {"SourceImage","Timestamp","Parser","Record"} —

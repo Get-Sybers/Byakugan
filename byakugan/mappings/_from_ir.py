@@ -3,13 +3,13 @@
 Go is now the source of truth for the map DATA (authored in
 go/internal/authoring, serialized to ir.json by `byakugan-parse gen-ir`). The
 Python side no longer HAND-MAINTAINS the maps — it decodes them from ir.json,
-the exact inverse of byakugan.export_ir.encode_source/_encode_guid/_encode_leaf.
-The predicate FUNCTIONS stay in the per-artefact modules (the Python reference
-engine + the parity harness need them); only the map data moved to Go.
+the exact inverse of the encoding `byakugan-parse gen-ir` writes (and that the
+retired byakugan.export_ir once wrote). The predicate FUNCTIONS are Go too
+(go/internal/predicates): nothing on the Python side runs a map any more.
 
-`load_from_ir()` returns a table byte-for-byte equal to the old hand-written
-MAPPINGS (proven by test_mappings_from_ir), so every consumer — the reference
-normalize() engine, sources_model, sigma, the parity harness — is unchanged.
+`load_from_ir()` returns the table in the shape the hand-written Python MAPPINGS
+once had, so its consumers — sources_model, spindle, sigma, the tests — read it
+unchanged.
 """
 from __future__ import annotations
 
@@ -17,7 +17,8 @@ import json
 import os
 
 # the marker envelope key + per-kind argument signatures — the mirror of
-# export_ir._VARIADIC/_UNARY/_FIXED (kept in lockstep; a drift fails the tests).
+# the Go authoring layer's marker signatures (go/internal/authoring/authoring.go;
+# kept in lockstep — a drift fails the tests).
 _MARKER_KEY = "!"
 _VARIADIC = {"first", "concat"}
 _UNARY = {"basename", "ext", "lower", "domain_of", "epoch_ts", "exe_path",

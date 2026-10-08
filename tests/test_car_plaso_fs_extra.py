@@ -1,4 +1,4 @@
-"""Tests for the plaso PE/COFF map (mappings/plaso_fs_extra.py, `plaso_pecoff`).
+"""Tests for the plaso PE/COFF map (go/internal/authoring/maps_plaso_fs_extra.go, `plaso_pecoff`).
 
 Rows are the wrapped l2t JSONL shape ({SourceImage, Timestamp, Parser,
 Record}); synthetic, shaped per plaso's PEFileEventData and timeliner.yaml:
