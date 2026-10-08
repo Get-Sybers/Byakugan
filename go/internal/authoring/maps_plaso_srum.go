@@ -34,6 +34,8 @@ func init() {
 					{"image_path", srumPlasoImage()},
 					{"in_bytes", plr("bytes_received")},
 					{"out_bytes", plr("bytes_sent")},
+					// the user SID lands in uid: CAR's flow object has no sid column and its uid is
+					// "User ID or SID of the flow-handling entity" (data_model/flow.yaml)
 					{"uid", srumSid()},
 				},
 				NativeExtract: srumKeepNative(),
@@ -44,6 +46,9 @@ func init() {
 				Props: []Prop{
 					{"exe", srumPlasoExe()},
 					{"image_path", srumPlasoImage()},
+					// the user SID lands in sid: CAR's process object has both, and sid is "the
+					// Windows security identifier of the user token" (data_model/process.yaml);
+					// enrich canonicalises accounts from sid or uid alike
 					{"sid", srumSid()},
 				},
 				NativeExtract: append(srumKeepNative(),

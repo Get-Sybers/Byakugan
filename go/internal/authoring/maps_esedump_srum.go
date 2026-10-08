@@ -31,6 +31,8 @@ func init() {
 					{"image_path", srumImage()},
 					{"in_bytes", "BytesRecvd"},
 					{"out_bytes", "BytesSent"},
+					// the user SID lands in uid: CAR's flow object has no sid column and its uid is
+					// "User ID or SID of the flow-handling entity" (data_model/flow.yaml)
 					{"uid", srumSID()},
 				},
 				Keep: append(append([]string{}, srumKeepCommon...),
@@ -42,6 +44,9 @@ func init() {
 				Props: []Prop{
 					{"exe", srumExe()},
 					{"image_path", srumImage()},
+					// the user SID lands in sid: CAR's process object has both, and sid is "the
+					// Windows security identifier of the user token" (data_model/process.yaml);
+					// enrich canonicalises accounts from sid or uid alike
 					{"sid", srumSID()},
 				},
 				Keep: append(append([]string{}, srumKeepCommon...),

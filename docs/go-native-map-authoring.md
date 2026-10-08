@@ -44,9 +44,13 @@ this page records where the *authoring* side stands.
 What remains in Python is by decision: provenance the IR has no reason to
 carry, and the JSON Schema side.
 
-## Open items carried over from the port
+## Rulings on items carried over from the port
 
-- `_SID` is mapped to the **`uid`** column for SRUM network usage but **`sid`**
-  for application usage, in both `maps_plaso_srum.go` and `maps_esedump_srum.go`
-  — ported as found. Decide the canonical column (verify against the CAR model
-  and the existing tests first; it changes CAR output).
+- **SRUM `_SID` → `uid` on network usage, `sid` on application usage** (both
+  `maps_plaso_srum.go` and `maps_esedump_srum.go`) is the CAR model's split,
+  not a port inconsistency: the network rows are `flow` events, and CAR's
+  `flow` has no `sid` column — its `uid` is "User ID or SID of the
+  flow-handling entity"; the application rows are `process` events, and CAR's
+  `process` has both, with `sid` as "the Windows security identifier of the
+  user token". The enrich cascade canonicalises accounts from `sid` or `uid`
+  alike. Kept, and recorded in both maps.
