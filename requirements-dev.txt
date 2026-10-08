@@ -31,5 +31,5 @@
 -r requirements.txt
 
 pytest==9.1.1            # the suite (tests/, incl. the Go byte-parity harness)
-yamale==6.1.0            # sources/ validated against byakugan/car_source_schema.yaml
-yamllint==1.38.0         # style gate for sources/ and docs/to-be-validated/
+yamale==6.1.0            # the source manifests validated against byakugan/car_source_schema.yaml (tests/test_car_sources.py)
+yamllint==1.38.0         # style gate for docs/to-be-validated/

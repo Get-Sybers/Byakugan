@@ -60,7 +60,7 @@ byte-exact check and review diffs stay meaningful.
 ## Downstream
 
 The crosswalk of this index onto gomount's materialise sets and byakugan's
-`sources/` manifests selects which definitions become Artefact Class seed
+lane manifests (`byakugan.sources_model`) selects which definitions become Artefact Class seed
 instances under `model/schema/`. Group composition (`triage.yaml`'s
 `Triage*` surfaces, `WindowsPersistenceRegistryKeys`, …) is the upstream
 analogue of gomount's evidence sets and feeds the same seeding decision.

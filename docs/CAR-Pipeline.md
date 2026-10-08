@@ -224,7 +224,7 @@ engine in step; `model/spindle/identity.yml` is the resolved snapshot,
 `model/spindle/record.yml` the spindle's shape and `model/spindle/golden.yml`
 the golden vectors — per entry the key and the guid the engine mints for its
 sample (all `python model/generate.py`; `python -m byakugan.spindle
---check` in CI). Each generated source manifest (`sources/<map>.yaml`) states
+--check` in CI). Each source manifest (built by `byakugan.sources_model`; `<out>/sources.yaml` on every build, `python -m byakugan.gen_sources --out DIR` for the whole set) states
 the identity its guid carries — the registry entries with their kind, scope
 and version, or the external form. The registry today:
 
@@ -299,7 +299,7 @@ and the predicate only, `crosssource.py` is untouched.
 **Change protocol.** An entry's identity fields, names, rendering or golden
 sample change only with a `version` bump: edit → bump `version` →
 `python model/generate.py` → commit `model/spindle/` (golden.yml included) and
-the regenerated `sources/` → rebuild the stores (`--batch --force`; every guid
+the regenerated `model/spindle/` → rebuild the stores (`--batch --force`; every guid
 of that entry re-mints — a remint/audit tool is a follow-up). `spindle --check`
 and the generator refuse a golden guid that moved without its version, a
 version that moved without its guid, and any move of the recipe vector (that

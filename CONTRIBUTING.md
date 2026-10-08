@@ -52,18 +52,18 @@ each directory is):
 
 | you want to change | edit | then regenerate |
 |---|---|---|
-| a map (the object / action / props / guid of an artefact family), or one of its predicates | `go/internal/authoring/maps_<family>.go`, `go/internal/predicates/predicates_<family>.go` | `make -C go gen-ir` → `python -m byakugan.gen_sources` → `python -m byakugan.schema_gen` |
+| a map (the object / action / props / guid of an artefact family), or one of its predicates | `go/internal/authoring/maps_<family>.go`, `go/internal/predicates/predicates_<family>.go` | `make -C go gen-ir` → `python -m byakugan.schema_gen` |
 | which file names route to which maps | `irRoutes` / `irEvtxMaps` in `go/internal/authoring/ir_sections.go` (the pipeline reads them back from the IR) | as above |
-| a row identity (the fields a disk-image row's guid is minted from) | `byakugan/spindle.yml` **and** the `spindle` section of `ir_sections.go` — `tests/test_spindle_ir_sync.py` holds the shared entries together | `make -C go gen-ir` → `python model/generate.py` (→ `model/spindle/`) → `gen_sources` → `schema_gen` |
+| a row identity (the fields a disk-image row's guid is minted from) | `byakugan/spindle.yml` **and** the `spindle` section of `ir_sections.go` — `tests/test_spindle_ir_sync.py` holds the shared entries together | `make -C go gen-ir` → `python model/generate.py` (→ `model/spindle/`) → `python -m byakugan.schema_gen` |
 | the cascade rules, the relationship-verb bridge | `byakugan/relationships.yml`, `byakugan/cascade_relationships.yml` | `python model/generate.py` (→ `model/relationships/`) |
 | the Artefact Class / Parser Profile seeds | `model/schema/classes-seed.yaml`, `model/schema/profiles-seed.yaml` | `python -m byakugan.schema_gen` |
-| a source's provenance (tool, parser, URL, what it is derived from) | `DERIVATIONS` in `byakugan/sources_model.py` | `python -m byakugan.gen_sources` (→ `sources/`) |
+| a source's provenance (tool, parser, URL, what it is derived from) | `DERIVATIONS` in `byakugan/sources_model.py` | nothing — the manifests are built from the maps on demand (every build writes its `sources.yaml`; `python -m byakugan.gen_sources --out DIR` exports the set for reading) |
 | the CAR → ECS projection | `elastic/projection/*.yml` (hand-authored) | `python elastic/projection/render_elastic.py` |
 | the CAR → STIX projection | `model/stix/*.yml` (hand-authored) | `python model/stix/validate.py` |
 | a detection rule | `rules/<id>.yml` (+ `PINNED_IDS` in `rules/validate.py`) | `python rules/validate.py` |
 
 Generated — never hand-edited, always committed: `go/internal/ir/ir.json`,
-`sources/`, `model/car/`, `model/superset/`, `model/relationships/`,
+`model/car/`, `model/superset/`, `model/relationships/`,
 `model/spindle/`, `model/schema/{classes,mappings,profiles,vocab,wire}/`,
 `model/schema/conformance.json`, `model/schema/constants.yaml` and
 `elastic/projection/rendered/`.
@@ -84,7 +84,7 @@ After ANY dependency change, re-prove the repo:
 ```
 python -m pytest -q
 python elastic/projection/validate.py && python model/stix/validate.py
-python -m byakugan.gen_sources --check && python -m byakugan.spindle --check
+python -m byakugan.spindle --check
 python -m byakugan.schema_gen --check && python -m byakugan.conform --strict
 make -C go build test && ./go/bin/byakugan-parse gen-ir --check go/internal/ir/ir.json
 ```
@@ -105,7 +105,7 @@ python -m byakugan build|timeline|verify|car-vocab|load   # the env-driven sub-t
 python -m byakugan.build_data_model --write out/    # export the models for inspection
 make -C go build test                               # build the parse engine + go vet/test
 make -C go gen-ir                                   # re-serialise ir.json after a map / route / identity change
-python -m byakugan.gen_sources                      # regenerate sources/ after a map or route change
+python -m byakugan.gen_sources --out DIR            # export the source manifests the maps imply (a reading copy; nothing is committed)
 python -m byakugan.schema_gen                       # regenerate model/schema/{classes,mappings,profiles,vocab,wire}
 python model/generate.py                            # regenerate model/{car,superset,relationships,spindle}
 pytest -q                                           # the suite (the CAR map tests drive the Go engine)
@@ -113,9 +113,9 @@ pytest -q                                           # the suite (the CAR map tes
 
 The import package is `byakugan` — write all code against it.
 
-CI (`.github/workflows/lint.yml`) runs `gen_sources --check`, `spindle --check`
-(the identity registry, its snapshot and the golden vectors), `yamale` over
-`sources/`, `yamllint` over `sources/` and `docs/to-be-validated/`, `gofmt`,
+CI (`.github/workflows/lint.yml`) runs `spindle --check` (the identity
+registry, its snapshot and the golden vectors), `yamllint` over
+`docs/to-be-validated/`, `gofmt`,
 `make -C go build test`, `ir-check` (every IR predicate is ported) and
 `gen-ir --check` (ir.json is in step with the authoring tables), then `pytest`
 — with the submodules checked out and a Go toolchain installed. The
@@ -135,7 +135,7 @@ Elastic stack and runs `scripts/e2e_elastic.py` against it.
 - **Data, not code** — the cascade rules (`relationships.yml`), the
   relationship-verb bridge (`cascade_relationships.yml`), the spindle
   row-identity registry (`spindle.yml`; snapshot `model/spindle/`), the source
-  manifests (`sources/`, generated) and the schema layers (`model/schema/`) are
+  manifests (`byakugan.sources_model`, built from the IR) and the schema layers (`model/schema/`) are
   data; the engines implement mechanics.
 - **Honest mapping** — map a record only when it fits a canonical CAR
   object + action; nulls/duplicates are fine, near-misses are not (see
@@ -143,7 +143,7 @@ Elastic stack and runs `scripts/e2e_elastic.py` against it.
   `docs/to-be-validated/`.
 - Naming: `readers.py` = the memory-passthrough reader (the mapped-artefact
   readers are the Go engine); `sources_model.py` = the source-manifest
-  generator; `sources/` = its generated output. Keep those distinct.
+  builder (`gen_sources.py` only exports what it builds). Keep those distinct.
 
 ## Adding a map
 
@@ -171,8 +171,7 @@ Elastic stack and runs `scripts/e2e_elastic.py` against it.
    and, for a new artefact class, its seed rows in
    `model/schema/classes-seed.yaml` / `profiles-seed.yaml`.
 5. Regenerate, in this order, and commit the outputs: `make -C go gen-ir`,
-   `python -m byakugan.gen_sources`, `python -m byakugan.schema_gen`,
-   `python model/generate.py`.
+   `python -m byakugan.schema_gen`, `python model/generate.py`.
 6. Add a test under `tests/` (the map tests drive the engine through
    `tests/go_engine.py`); run `pytest -q` and `make -C go build test`.
 
@@ -186,9 +185,8 @@ with a `version` bump** — the version is hashed into every guid as `_v`:
    `make -C go gen-ir`;
 2. `python model/generate.py` — regenerates `model/spindle/` (the golden vector
    moves with the version; the generator refuses a guid that moved without it);
-3. commit the snapshot, `golden.yml` included, and the regenerated `sources/`
-   and `model/schema/mappings/` (each manifest states its identity entries and
-   versions);
+3. commit the snapshot, `golden.yml` included, and the regenerated
+   `model/schema/mappings/`;
 4. rebuild the stores (`--batch --force`) — every guid of that entry re-mints
    (a remint / audit tool is a follow-up). The id recipe itself (namespaces,
    canonical JSON) never changes under a version bump: that would move every

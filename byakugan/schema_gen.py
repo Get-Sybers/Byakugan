@@ -774,23 +774,21 @@ def render_mappings() -> dict[str, str]:
 # literally emits, one declaration per (parser, artefact class). GENERATED
 # from the curated seed (profiles-seed.yaml — tool metadata + the mined
 # in-house record structs, file:line grounded) joined with the reviewed
-# lane surfaces in sources/*.yaml (field_provenance sources + native/join
-# keys) and the spindle registry (identity-hashed fields).
+# lane manifests byakugan.sources_model builds (field_provenance sources +
+# native/join keys) and the spindle registry (identity-hashed fields).
 # --------------------------------------------------------------------------- #
 PROFILES_SEED_PATH = os.path.join(SCHEMA_DIR, "profiles-seed.yaml")
-SOURCES_DIR = os.path.join(_ROOT, "sources")
 SPINDLE_PATH = os.path.join(_HERE, "spindle.yml")
 
 
 def _lane_surfaces() -> dict[str, dict]:
-    """lane -> the reviewed sources/*.yaml surface, kept at PER-PAIR
+    """lane -> the reviewed lane-manifest surface (byakugan.sources_model —
+    the CAR sensor documents built from the maps + DERIVATIONS), kept at PER-PAIR
     granularity: consumed/native per (object, action), plus the raw->car
     provenance reverse map (which CAR fields a raw parser field feeds)."""
     out: dict[str, dict] = {}
-    for name in sorted(os.listdir(SOURCES_DIR)):
-        if not name.endswith(".yaml"):
-            continue
-        doc = yaml.safe_load(open(os.path.join(SOURCES_DIR, name), encoding="utf-8"))
+    from . import sources_model
+    for _source_id, doc in sorted(sources_model.all_source_docs().items()):
         consumed_by_pair: dict[tuple, set] = {}
         raw2car: dict[str, set] = {}
         for m in doc.get("mappings") or []:
@@ -906,7 +904,7 @@ def render_profiles() -> dict[str, str]:
               "# One Parser Profile per (parser, artefact class): the record\n"
               "# surface as data — curated in profiles-seed.yaml (in-house\n"
               "# structs mined file:line from the tool repos), joined with the\n"
-              "# reviewed lane surfaces in sources/*.yaml and the ir closure\n"
+              "# reviewed lane manifests (byakugan.sources_model) and the ir closure\n"
               "# (split lanes contribute PER VARIANT, never whole-lane).\n")
 
     # (tool, class) -> lanes, from the reviewed sources + seed lane families
@@ -983,7 +981,7 @@ def render_profiles() -> dict[str, str]:
                 "source": "generated",
                 "generated_from": {
                     "seed": "model/schema/profiles-seed.yaml",
-                    "surfaces": "sources/*.yaml (reviewed lane manifests) + "
+                    "surfaces": "byakugan.sources_model (the lane manifests) + "
                                 "go/internal/ir/ir.json (per-variant closure)",
                 },
                 "profile": f"{spec['slug']}--{fam or 'unrouted'}",

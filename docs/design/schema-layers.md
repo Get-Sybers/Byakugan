@@ -102,7 +102,7 @@ when at least one Parser Profile or one collection surface exists in-house
 
 Seeded by triangulation: gomount's `materialise-sets.yml` (the collection
 surface — 17 materialise sets including the OS-surface sets), byakugan's
-`sources/*.yaml` lanes (the parsing surface), and the ForensicArtifacts
+the lane manifests `byakugan.sources_model` builds (the parsing surface), and the ForensicArtifacts
 index (naming, scope and citations only).
 
 ### Parser Profile — what one parser literally emits
@@ -121,7 +121,7 @@ wiring. One declaration per (parser, artefact class):
   wired without duplicated effort.
 
 The parser binding and routing already exist as data
-(`byakugan/car_source_schema.yaml` + `sources/*.yaml`); what has no
+(`byakugan/car_source_schema.yaml` + the lane manifests `byakugan.sources_model` builds); what has no
 as-data source anywhere is the field/datatype surface — the record
 struct — which is authored fresh, mined from the Go record structs
 (read-only grounding from the toolz repos and anamnesis).
@@ -283,7 +283,7 @@ All meta-schemas are JSON Schema **2020-12**; closed shapes use
    cannot-produce case — no per-consumer opinions.
 3. **One artefact catalogue.** Artefact Class instances are seeded by the
    declared triangulation — gomount's `materialise-sets.yml` (collection
-   surface), byakugan's `sources/*.yaml` lanes (parsing surface), and the
+   surface), byakugan's lane manifests (parsing surface), and the
    ForensicArtifacts index (naming/scope/citations only) — under the
    admission rule; the dx_dfir evidence taxonomy is a directory
    *projection* of these classes, not a second catalogue, and upstream

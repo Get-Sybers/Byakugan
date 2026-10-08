@@ -32,7 +32,7 @@ this page records where the *authoring* side stands.
 | what | where | status |
 |---|---|---|
 | the row-identity registry | `byakugan/spindle.yml` + `byakugan/spindle.py` | `spindle --check`, the snapshot generator (`model/spindle/`) and the drift guards read the YAML. The IR's `spindle` section carries the same 26 identities and the 13 engine-minted external forms (the YAML also declares the 12 `memory_*` forms the Anamnesis passthrough carries, which the engine never mints); `tests/test_spindle_ir_sync.py` holds the shared part together. A **second hand-maintained copy** of that shared part. |
-| the source manifests | `byakugan/sources_model.py` (`DERIVATIONS` — tool / parser / URL provenance) + `gen_sources.py` → `sources/` | provenance the IR does not carry; `byakugan.schema_gen` reads `sources/` as the reviewed lane surface. |
+| the source manifests | `byakugan/sources_model.py` (`DERIVATIONS` — tool / parser / URL provenance; `gen_sources.py` exports what it builds) | provenance the IR does not carry. Nothing is committed: every build writes its own `sources.yaml` and `byakugan.schema_gen` reads the manifests in memory. |
 | the marker DSL constructors + value normalisers | `byakugan/normalize.py` | the introspection substrate for `sources_model`, `spindle` and `sigma`; the resolver that runs the markers is `go/internal/markers`. |
 | the schema generators and gates | `byakugan/schema_gen.py`, `conform.py`, `wirecheck.py` | Python owns the JSON Schema side by decision (the Go engine stays stdlib-only). |
 
