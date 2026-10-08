@@ -169,7 +169,7 @@ python elastic/projection/render_elastic.py --check    # verify rendered/ is in 
 `--check` is the drift guard (the same idea as `byakugan.gen_sources --check`):
 it re-renders to memory and byte-compares against the files on disk, exiting 1
 with a missing/drifted/orphan-file list on any mismatch — so `rendered/` going
-stale after a contract edit is caught exactly like an un-regenerated `sources/`
+stale after a contract edit is caught exactly like an un-regenerated `model/spindle/`
 manifest is. `tests/test_projection_contract.py` runs `--check` in CI;
 `tests/test_kibana_assets.py` separately checks the Kibana bundle's own internal
 consistency (every column/sort/timeField resolves against the rendered
