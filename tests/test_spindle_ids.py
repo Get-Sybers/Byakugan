@@ -9,7 +9,7 @@ the record's OWN stable-identity fields, keyed by name — so two tools parsing
 the same image converge. Sysmon / EVTX guids (already stable cross-tool keys)
 are untouched. Rows are shaped like the wrapped l2t JSONL split_l2t emits, with
 field values from the real-evidence fixtures of the sibling test modules. The
-registry that says WHICH fields (spindle.yml) has its own tests in
+registry that says WHICH fields (the IR's spindle section) has its own tests in
 test_spindle_model.py.
 """
 import json

@@ -36,8 +36,7 @@ gate            python model/ingest_forensicartifacts.py --check
 index. The index embeds the submodule commit under `generated_from`, so a
 pin bump without regeneration fails the check — the staleness gate the
 design doc requires. Because it needs the submodule, `--check` stays **out
-of the no-submodule CI tier**, alongside `gen_sources --check` and
-`spindle --check`.
+of the no-submodule CI tier**, alongside `spindle --check`.
 
 ## Index contract
 

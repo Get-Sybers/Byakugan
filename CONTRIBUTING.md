@@ -54,7 +54,7 @@ each directory is):
 |---|---|---|
 | a map (the object / action / props / guid of an artefact family), or one of its predicates | `go/internal/authoring/maps_<family>.go`, `go/internal/predicates/predicates_<family>.go` | `make -C go gen-ir` → `python -m byakugan.schema_gen` |
 | which file names route to which maps | `irRoutes` / `irEvtxMaps` in `go/internal/authoring/ir_sections.go` (the pipeline reads them back from the IR) | as above |
-| a row identity (the fields a disk-image row's guid is minted from) | `byakugan/spindle.yml` **and** the `spindle` section of `ir_sections.go` — `tests/test_spindle_ir_sync.py` holds the shared entries together | `make -C go gen-ir` → `python model/generate.py` (→ `model/spindle/`) → `python -m byakugan.schema_gen` |
+| a row identity (the fields a disk-image row's guid is minted from) | the `spindle` and `golden` sections of `go/internal/authoring/ir_sections.go` (+ the entry's note in `byakugan/spindle.yml`) | `make -C go gen-ir` → `python model/generate.py` (→ `model/spindle/`) → `python -m byakugan.schema_gen` |
 | the cascade rules, the relationship-verb bridge | `byakugan/relationships.yml`, `byakugan/cascade_relationships.yml` | `python model/generate.py` (→ `model/relationships/`) |
 | the Artefact Class / Parser Profile seeds | `model/schema/classes-seed.yaml`, `model/schema/profiles-seed.yaml` | `python -m byakugan.schema_gen` |
 | a source's provenance (tool, parser, URL, what it is derived from) | `DERIVATIONS` in `byakugan/sources_model.py` | nothing — the manifests are built from the maps on demand (every build writes its `sources.yaml`; `python -m byakugan.gen_sources --out DIR` exports the set for reading) |
@@ -134,7 +134,8 @@ Elastic stack and runs `scripts/e2e_elastic.py` against it.
   `byakugan/ids.py` and `go/internal/ids`. Import them rather than re-defining.
 - **Data, not code** — the cascade rules (`relationships.yml`), the
   relationship-verb bridge (`cascade_relationships.yml`), the spindle
-  row-identity registry (`spindle.yml`; snapshot `model/spindle/`), the source
+  row-identity registry (the IR's `spindle`/`golden` sections, with the notes
+  in `spindle.yml`; snapshot `model/spindle/`), the source
   manifests (`byakugan.sources_model`, built from the IR) and the schema layers (`model/schema/`) are
   data; the engines implement mechanics.
 - **Honest mapping** — map a record only when it fits a canonical CAR
@@ -157,13 +158,15 @@ Elastic stack and runs `scripts/e2e_elastic.py` against it.
 2. Route it: `irRoutes` (or `irEvtxMaps`, for a content-routed EVTX family) in
    `go/internal/authoring/ir_sections.go` — `byakugan.pipeline` reads the table
    back from the IR.
-3. A disk-image (l2t/Plaso) map names its row identity: add the entry to
-   `byakugan/spindle.yml` — `object`, `kind` (`record` | `entity`),
-   `scope: intrinsic`, `version: 1`, `validated_against: [plaso]`,
-   `stable_across`, the `identity` fields and a `golden` sample — and the same
-   entry to the `spindle` section of `ir_sections.go`; reference it from the map
-   with `Guid: GuidSpindle("<entry>")`. Any other map's raw guid form must be
-   one of the registry's `external:` forms. **The P7 rule:** a leaf that emits
+3. A disk-image (l2t/Plaso) map names its row identity: add the entry to the
+   `spindle` section of `ir_sections.go` — `object`, `kind` (`record` |
+   `entity`), `scope: intrinsic`, `version: 1`, the ordered `identity` fields —
+   pin its golden vector in the `golden` section (the sample's rendered key and
+   the guid the recipe mints for it: `python -m byakugan.spindle --check`
+   refuses a stale pin and prints the right one) and add its note to
+   `byakugan/spindle.yml` (`validated_against: [plaso]`, `stable_across`);
+   reference it from the map with `Guid: GuidSpindle("<entry>")`. Any other
+   map's raw guid form must be one of the IR's `external` forms. **The P7 rule:** a leaf that emits
    no timestamp (`Ts: nil` — a PE's compile stamp, an amcache Link Time) MUST
    name a time-free `kind: entity` entry; `spindle --check` refuses a Plaso leaf
    without an entry and a timed identity on an untimed leaf.
@@ -180,9 +183,10 @@ Elastic stack and runs `scripts/e2e_elastic.py` against it.
 An entry's identity fields, names, rendering or golden sample change **only
 with a `version` bump** — the version is hashed into every guid as `_v`:
 
-1. edit the entry in `spindle.yml` and bump its `version`; mirror the change in
-   the `spindle` section of `go/internal/authoring/ir_sections.go` and
-   `make -C go gen-ir`;
+1. edit the entry in the `spindle` section of `go/internal/authoring/ir_sections.go`,
+   bump its `version`, re-pin its golden vector in the `golden` section
+   (`python -m byakugan.spindle --check` prints the guid the recipe now yields)
+   and `make -C go gen-ir`;
 2. `python model/generate.py` — regenerates `model/spindle/` (the golden vector
    moves with the version; the generator refuses a guid that moved without it);
 3. commit the snapshot, `golden.yml` included, and the regenerated

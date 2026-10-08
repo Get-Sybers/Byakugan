@@ -135,7 +135,7 @@ def test_source_docs_state_the_row_identity_from_the_registry():
     for key in sources_model.DERIVATIONS:
         ident = docs[key]["identity"]
         if key in plaso:
-            assert ident["registry"] == "byakugan/spindle.yml", key
+            assert ident["registry"] == "go/internal/ir/ir.json", key
             assert ident["version"] == spindle.rules()["spindle"]["version"] and "external" not in ident
             assert ident["entries"], key
             for e in ident["entries"]:

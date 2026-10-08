@@ -203,7 +203,7 @@ key; `positional`: the per-record fallback, see below); `native.spindle_ref`
 says where the record came from, outside the key.
 
 **Which** fields identify each artefact's row is a rule, not code — declared as
-data in `byakugan/spindle.yml`, the registry. Per entry: the CAR object;
+data in the IR's `spindle` section (`go/internal/authoring/ir_sections.go`; its notes in `byakugan/spindle.yml`), the registry. Per entry: the CAR object;
 the **kind** (`record` — a record-numbered / journal key that asserts the
 *same record*: `l2t_mft`, `l2t_usnjrnl`, `plaso_fseventsd`; `entity` — a
 content-like key that asserts records that *coincide*: every other entry,

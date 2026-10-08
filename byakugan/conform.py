@@ -248,38 +248,41 @@ def _class_structure() -> Iterator[Finding]:
                               message="row cites no source (row-grounding MUST)")
 
 
+_REGISTRY_ID = "byakugan.spindle.rules() (ir.json spindle + golden, with the byakugan/spindle.yml notes)"
+
+
 @rule("identity-registry")
 def _identity_registry() -> Iterator[Finding]:
-    """byakugan/spindle.yml validates against the Identity Rules layer
-    (identity-rules.schema.json, structurally): every entry carries the
-    eight declared fields, legal kind/scope enums, an integer version and a
-    golden vector — the registry is validated IN PLACE, never copied."""
-    import yaml
-    path = os.path.join(_HERE, "spindle.yml")
-    doc = yaml.safe_load(open(path, encoding="utf-8"))
+    """The assembled spindle registry validates against the Identity Rules
+    layer (identity-rules.schema.json, structurally): every entry carries
+    the eight declared fields, legal kind/scope enums, an integer version
+    and a golden vector — the registry (the IR's spindle + golden sections
+    joined with the spindle.yml notes) is validated IN PLACE, never copied."""
+    from . import spindle
+    doc = spindle.rules()
     sp = doc.get("spindle") or {}
     if not isinstance(sp.get("version"), int) or sp.get("version") < 1:
-        yield Finding(object_id="byakugan/spindle.yml", rule="identity-registry",
+        yield Finding(object_id=_REGISTRY_ID, rule="identity-registry",
                       path="spindle.version", message="missing or non-positive")
     ns = sp.get("namespace") or {}
     if (ns.get("parent"), ns.get("label")) != ("CAR_NS", "spindle"):
-        yield Finding(object_id="byakugan/spindle.yml", rule="identity-registry",
+        yield Finding(object_id=_REGISTRY_ID, rule="identity-registry",
                       path="spindle.namespace", message="not the CAR_NS/spindle derivation")
     for key in ("object_key", "version_key"):
         if not isinstance(sp.get(key), str) or not sp.get(key):
-            yield Finding(object_id="byakugan/spindle.yml", rule="identity-registry",
+            yield Finding(object_id=_REGISTRY_ID, rule="identity-registry",
                           path=f"spindle.{key}", message="missing or not a non-empty string")
     if set(sp.get("scopes") or {}) != {"intrinsic", "positional"}:
-        yield Finding(object_id="byakugan/spindle.yml", rule="identity-registry",
+        yield Finding(object_id=_REGISTRY_ID, rule="identity-registry",
                       path="spindle.scopes",
                       message="must define exactly the intrinsic/positional scopes")
     if set(sp.get("kinds") or {}) != {"record", "entity"}:
-        yield Finding(object_id="byakugan/spindle.yml", rule="identity-registry",
+        yield Finding(object_id=_REGISTRY_ID, rule="identity-registry",
                       path="spindle.kinds",
                       message="must define exactly the record/entity kinds")
     pos = sp.get("positional") or {}
     if not pos.get("fields") or not isinstance(pos.get("version"), int) or not pos.get("golden"):
-        yield Finding(object_id="byakugan/spindle.yml", rule="identity-registry",
+        yield Finding(object_id=_REGISTRY_ID, rule="identity-registry",
                       path="spindle.positional", message="fields/version/golden incomplete")
     required = ("object", "kind", "scope", "version", "validated_against",
                 "stable_across", "identity", "golden")
@@ -287,20 +290,20 @@ def _identity_registry() -> Iterator[Finding]:
         where = f"identities.{name}"
         for field in required:
             if field not in entry:
-                yield Finding(object_id="byakugan/spindle.yml", rule="identity-registry",
+                yield Finding(object_id=_REGISTRY_ID, rule="identity-registry",
                               path=f"{where}.{field}", message="missing")
         if entry.get("kind") not in ("record", "entity"):
-            yield Finding(object_id="byakugan/spindle.yml", rule="identity-registry",
+            yield Finding(object_id=_REGISTRY_ID, rule="identity-registry",
                           path=f"{where}.kind", message=f"{entry.get('kind')!r} outside the enum")
         if entry.get("scope") not in ("intrinsic", "positional"):
-            yield Finding(object_id="byakugan/spindle.yml", rule="identity-registry",
+            yield Finding(object_id=_REGISTRY_ID, rule="identity-registry",
                           path=f"{where}.scope", message=f"{entry.get('scope')!r} outside the enum")
         if not isinstance(entry.get("version"), int) or entry.get("version", 0) < 1:
-            yield Finding(object_id="byakugan/spindle.yml", rule="identity-registry",
+            yield Finding(object_id=_REGISTRY_ID, rule="identity-registry",
                           path=f"{where}.version", message="not a positive integer")
         golden = entry.get("golden") or {}
         if golden.get("source") not in ("real", "synthetic") or not golden.get("values"):
-            yield Finding(object_id="byakugan/spindle.yml", rule="identity-registry",
+            yield Finding(object_id=_REGISTRY_ID, rule="identity-registry",
                           path=f"{where}.golden", message="source/values incomplete")
 
 
@@ -491,8 +494,8 @@ def _mapping_coverage() -> Iterator[Finding]:
     whens: set[str] = set()
     families = set(yaml.safe_load(open(os.path.join(SCHEMA_DIR, "classes-seed.yaml"),
                                        encoding="utf-8"))["families"])
-    recipes = set(yaml.safe_load(open(os.path.join(_HERE, "spindle.yml"),
-                                      encoding="utf-8"))["identities"])
+    from . import spindle as _spindle
+    recipes = set(_spindle.identities())
     for name in sorted(os.listdir(mappings_dir)):
         if not name.endswith(".yaml") or name == "routes.yaml":
             continue

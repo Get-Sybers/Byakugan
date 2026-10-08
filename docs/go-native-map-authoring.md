@@ -20,6 +20,12 @@ this page records where the *authoring* side stands.
   `_common.py` (helpers the spindle tests use). Nothing on the Python side
   runs a map, and `pipeline.ROUTES` / `EVTX_MAPS` are read from the IR's
   `routes` / `evtx_maps` — the Python literals are gone.
+- **The spindle registry is read from the IR.** The identity rules (entries,
+  positional fallback, engine-minted external forms, golden vectors) have one
+  home, the `spindle` and `golden` sections of `ir_sections.go`;
+  `byakugan.spindle` assembles its registry from `ir.json` plus the notes that
+  stay in `byakugan/spindle.yml` (prose, the equality rule, the passthrough's
+  forms) and re-mints every pinned golden vector as a guard.
 - **Retired:** `byakugan/export_ir.py` (replaced by `gen-ir`); `tests/parity/`
   and `tests/reference_plumbing.py` (the CAR tests drive the Go engine directly
   through `tests/go_engine.py`); `scripts/bench-parse.py` (it drove the deleted
@@ -31,14 +37,12 @@ this page records where the *authoring* side stands.
 
 | what | where | status |
 |---|---|---|
-| the row-identity registry | `byakugan/spindle.yml` + `byakugan/spindle.py` | `spindle --check`, the snapshot generator (`model/spindle/`) and the drift guards read the YAML. The IR's `spindle` section carries the same 26 identities and the 13 engine-minted external forms (the YAML also declares the 12 `memory_*` forms the Anamnesis passthrough carries, which the engine never mints); `tests/test_spindle_ir_sync.py` holds the shared part together. A **second hand-maintained copy** of that shared part. |
 | the source manifests | `byakugan/sources_model.py` (`DERIVATIONS` — tool / parser / URL provenance; `gen_sources.py` exports what it builds) | provenance the IR does not carry. Nothing is committed: every build writes its own `sources.yaml` and `byakugan.schema_gen` reads the manifests in memory. |
 | the marker DSL constructors + value normalisers | `byakugan/normalize.py` | the introspection substrate for `sources_model`, `spindle` and `sigma`; the resolver that runs the markers is `go/internal/markers`. |
 | the schema generators and gates | `byakugan/schema_gen.py`, `conform.py`, `wirecheck.py` | Python owns the JSON Schema side by decision (the Go engine stays stdlib-only). |
 
-The honest next step for the first two rows is the move the maps already made:
-have the pipeline and the spindle tooling read the IR, then delete the Python
-copies.
+What remains in Python is by decision: provenance the IR has no reason to
+carry, and the JSON Schema side.
 
 ## Open items carried over from the port
 

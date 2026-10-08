@@ -15,8 +15,8 @@ runs — nothing here re-implements the schema:
     model/superset/relationship-schema.yml the relationship-instance row shape
                                      (from byakugan.superset.REL_COLUMNS directly —
                                      the engine holds this in memory, not SQLite)
-    model/spindle/identity.yml       the spindle row-identity registry (byakugan/
-                                     spindle.yml) resolved against the live maps + ids.py
+    model/spindle/identity.yml       the spindle row-identity registry (the IR's
+                                     spindle section + the spindle.yml notes) resolved against the maps
     model/spindle/record.yml         the shape of a spindle — a minted-identity CAR row
     model/spindle/golden.yml         the golden vectors: per entry the key + guid the engine
                                      mints for its sample; the positional and recipe vectors
@@ -30,7 +30,7 @@ runs — nothing here re-implements the schema:
                                      from byakugan/relationships.yml `derived:`
 
 The sources of truth are the pinned submodules (and, for model/spindle/, the
-hand-authored registry byakugan/spindle.yml + the maps); a model refresh
+registry — the IR's spindle section + the byakugan/spindle.yml notes — and the maps); a model refresh
 is a submodule pin bump — or a registry / map change — after which re-running
 this script re-materializes model/ deterministically.
 
@@ -457,7 +457,7 @@ def gen_relationships() -> tuple[int, int]:
 
 def gen_spindle() -> int:
     """model/spindle/: the spindle row-identity registry snapshot + the spindle
-    record shape — resolved from byakugan/spindle.yml, the live maps and
+    record shape — resolved from the IR's spindle section, the spindle.yml notes, the live maps and
     ids.py by the SAME code the engine mints with (byakugan.spindle), so
     the snapshot can never describe an identity the pipeline does not mint."""
     problems = spindle.verify_registry()

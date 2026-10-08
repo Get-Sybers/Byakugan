@@ -63,7 +63,7 @@ def test_pe_header_stamp_is_a_compile_time_not_a_file_create_event():
     assert ev["_native"]["section_names"] == [".text", ".rdata", ".data", ".reloc"]
     assert ev["hostname"] == "HOST1.corp.example" and ev["source_host"] == "HOST1"
     # its identity is the PE as an ENTITY (path + its own hash): minted,
-    # time-free — no stamp of a PE is a host event (spindle.yml plaso_pecoff)
+    # time-free — no stamp of a PE is a host event (spindle entry plaso_pecoff)
     assert ev["guid"] and uuid.UUID(ev["guid"]).version == 5
     assert ev["_native"]["spindle_scope"] == "intrinsic"
     assert set(ev["_native"]["spindle_key"]) == {"_obj", "_v", "file_path", "sha256"}

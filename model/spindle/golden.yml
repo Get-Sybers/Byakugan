@@ -3,10 +3,11 @@
 # sample at the entry's version, the positional vector, one vector per external form,
 # and the recipe vector. The change protocol's evidence — a guid moves only with its
 # version; the recipe never.
-# Resolved from byakugan/spindle.yml (the rules), the live maps (byakugan.mappings)
-# and the id recipe (byakugan/ids.py) by byakugan.spindle — the code the engine
-# mints with. `python -m byakugan.spindle --check` and tests/test_spindle_model.py
-# fail on drift.
+# Resolved from the IR's spindle + golden sections (go/internal/authoring/ir_sections.go,
+# read from go/internal/ir/ir.json), the notes in byakugan/spindle.yml, the live maps
+# (byakugan.mappings) and the id recipe (byakugan/ids.py) by byakugan.spindle — the
+# recipe the engine mints with. `python -m byakugan.spindle --check` and
+# tests/test_spindle_model.py fail on drift.
 
 spindle:
   version: 2

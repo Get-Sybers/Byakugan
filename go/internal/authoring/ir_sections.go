@@ -511,6 +511,15 @@ func irCanonUser() pyjson.Value {
 }
 
 func irSpindle() pyjson.Value {
+	// The row-identity registry's RULES: the namespace recipe, the object and
+	// version keys, the renderings, the positional fallback, one entry per
+	// identity (object, kind, scope, version, the ordered identity fields) and
+	// the external forms the engine's other maps carry verbatim. byakugan.spindle
+	// reads this back from ir.json and joins the notes in byakugan/spindle.yml
+	// (prose, the equality rule, the passthrough's forms); `python -m
+	// byakugan.spindle --check` holds it, the maps, the recipe and the golden
+	// pins (irGolden) in step. Changing an entry's identity: bump its version and
+	// re-pin its golden vector — docs/Spindle-Identity.md, the change protocol.
 	return po(
 		"namespace", po(
 			"CAR_NS_URL", "https://github.com/Get-Sybers/Byakugan/stix",
@@ -1210,6 +1219,12 @@ func irSpindle() pyjson.Value {
 }
 
 func irGolden() pyjson.Value {
+	// The golden vectors: per entry the rendered key and the guid the recipe
+	// mints for its sample (a real corpus row, or a labelled synthetic one), the
+	// positional vector, one vector per external form and the recipe vector.
+	// Pins, not derivations: ids_test replays them here and byakugan.spindle
+	// re-mints them in Python, so a changed identity or sample without a new pin
+	// (and version) fails both. Each sample's provenance: the comment above it.
 	return po(
 		"spindle", po(
 			"version", pyjson.Int(2),
@@ -1245,6 +1260,7 @@ func irGolden() pyjson.Value {
 			"guid", "c2a2034c-66e0-5af6-9576-7f523a541f10",
 		),
 		"identities", pa(
+			// golden: real: M57-JO filestat row (tests/test_spindle_ids.py _FILESTAT); the fixture's wrap time
 			po(
 				"name", "l2t_filestat",
 				"kind", "entity",
@@ -1258,6 +1274,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "fef81767-4b0e-540a-a830-031b85f14bcc",
 			),
+			// golden: synthetic: M57-JO-shaped (tests/test_car_plaso_web.py)
 			po(
 				"name", "l2t_firefox_cache",
 				"kind", "entity",
@@ -1272,6 +1289,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "1bcdb758-ae1c-5b46-8420-57ec34d6ed5f",
 			),
+			// golden: synthetic: M57-JO-shaped (tests/test_car_plaso_web.py)
 			po(
 				"name", "l2t_firefox_places",
 				"kind", "entity",
@@ -1286,6 +1304,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "472d594d-b0be-540c-ae6b-c41ccd6cb215",
 			),
+			// golden: synthetic: M57-JO-shaped (tests/test_car_plaso_web.py)
 			po(
 				"name", "l2t_javaidx",
 				"kind", "entity",
@@ -1300,6 +1319,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "faf26bb5-c15f-54d2-9d91-dfa021c9faff",
 			),
+			// golden: synthetic: M57-JO-shaped (tests/test_car_plaso_web.py; the shortcut path is not the real one)
 			po(
 				"name", "l2t_lnk",
 				"kind", "entity",
@@ -1314,6 +1334,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "f686d851-c7c8-5ad5-afa0-4ca78a50fd2d",
 			),
+			// golden: synthetic: no real mft row in the corpus (tests/test_spindle_ids.py _MFT)
 			po(
 				"name", "l2t_mft",
 				"kind", "record",
@@ -1327,6 +1348,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "068d2085-7fa8-5c23-b8a0-708ad624c773",
 			),
+			// golden: synthetic: M57-JO-shaped visit (tests/test_car_plaso_web.py; the index.dat path is not the real one)
 			po(
 				"name", "l2t_msiecf",
 				"kind", "entity",
@@ -1341,6 +1363,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "f779714e-f2ab-5e43-b8a5-473efe90ccfe",
 			),
+			// golden: synthetic: M57-JO-shaped (tests/test_car_plaso_web.py)
 			po(
 				"name", "l2t_recyclebin",
 				"kind", "entity",
@@ -1355,6 +1378,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "8c5cd823-db54-563d-81b3-1536972aac3d",
 			),
+			// golden: synthetic: LoneWolf-shaped (tests/test_car_srum_recmd.py)
 			po(
 				"name", "l2t_srum/application_usage",
 				"kind", "entity",
@@ -1369,6 +1393,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "5d2c8766-f567-5a22-ba28-88db1338b619",
 			),
+			// golden: synthetic: LoneWolf-shaped (tests/test_car_srum_recmd.py)
 			po(
 				"name", "l2t_srum/network_usage",
 				"kind", "entity",
@@ -1384,6 +1409,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "46be4a7e-d922-5388-81a5-585aa3b1e738",
 			),
+			// golden: real: dualserver sshd Accepted row (tests/test_car_plaso_linux.py _SSH); the fixture's wrap time
 			po(
 				"name", "l2t_text",
 				"kind", "entity",
@@ -1398,6 +1424,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "e1a0dee2-1e31-5f03-8c97-e8d5bcedb9ac",
 			),
+			// golden: real: M57-JO usnjrnl row (tests/test_spindle_ids.py _USN)
 			po(
 				"name", "l2t_usnjrnl",
 				"kind", "record",
@@ -1411,6 +1438,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "e9e7f63e-c0a2-53b0-8a13-eb628df6843b",
 			),
+			// golden: real: dualserver wtmp USER_PROCESS row (tests/test_car_plaso_linux.py _UTMP); the fixture's wrap time
 			po(
 				"name", "l2t_utmp",
 				"kind", "entity",
@@ -1425,6 +1453,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "d08f2b4d-4324-5d5c-8a92-c135fac818d2",
 			),
+			// golden: synthetic: no utmpx row in the corpus; shaped like the utmp one
 			po(
 				"name", "l2t_utmpx",
 				"kind", "entity",
@@ -1439,6 +1468,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "3bbc38ab-8ac0-5aa2-bc78-d4028e4f5795",
 			),
+			// golden: real: dualserver cron task-run row (tests/test_car_plaso_exec.py _CRON)
 			po(
 				"name", "plaso_exec_cron",
 				"kind", "entity",
@@ -1453,6 +1483,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "02fb1264-b522-55cf-9c74-568b97d3f3ca",
 			),
+			// golden: real: M57-JO SVCHOST.EXE-3530F672.pf run (tests/test_car_plaso_exec.py _PREFETCH_EXEC)
 			po(
 				"name", "plaso_exec_prefetch",
 				"kind", "entity",
@@ -1467,6 +1498,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "9c9a2690-4727-5eda-94e1-6968d3e8168b",
 			),
+			// golden: synthetic: no amcache row in the corpus (tests/test_car_plaso_exec.py _AMCACHE)
 			po(
 				"name", "plaso_exec_winreg/amcache",
 				"kind", "entity",
@@ -1480,6 +1512,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "cbebdba4-d979-509a-95d2-f6086a7a9efc",
 			),
+			// golden: synthetic: the same entry's Link Time row (tests/test_car_plaso_exec.py _AMCACHE_LINK)
 			po(
 				"name", "plaso_exec_winreg/amcache_link_time",
 				"kind", "entity",
@@ -1493,6 +1526,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "781d4f10-ba73-54ab-a36e-71246cfb24ba",
 			),
+			// golden: real: M57-JO AppCompatCache row (tests/test_car_plaso_exec.py _APPCOMPAT)
 			po(
 				"name", "plaso_exec_winreg/appcompatcache",
 				"kind", "entity",
@@ -1506,6 +1540,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "8968e86e-b445-5d89-b6f0-4ada1121a0ba",
 			),
+			// golden: synthetic: no bam row in the corpus (tests/test_car_plaso_exec.py _BAM)
 			po(
 				"name", "plaso_exec_winreg/bam",
 				"kind", "entity",
@@ -1520,6 +1555,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "0ff183da-a2cc-5ff1-969d-98837e8c5c02",
 			),
+			// golden: real: M57-JO UserAssist row (tests/test_car_plaso_exec.py _USERASSIST_RUNPATH)
 			po(
 				"name", "plaso_exec_winreg/userassist",
 				"kind", "entity",
@@ -1534,6 +1570,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "e0862967-c63f-5dfb-aa1c-a6db372da12b",
 			),
+			// golden: synthetic: no fseventsd row in the corpus; the plaso FSEvents record shape
 			po(
 				"name", "plaso_fseventsd",
 				"kind", "record",
@@ -1547,6 +1584,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "cd7ebdf2-0e7f-554a-8c47-7c7a7975aa8f",
 			),
+			// golden: synthetic: no olecf row in the corpus; an OLE document's summary-info row
 			po(
 				"name", "plaso_olecf",
 				"kind", "entity",
@@ -1560,6 +1598,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "9dddb200-9b58-5f57-a1c5-96c6c6ae9961",
 			),
+			// golden: synthetic: tests/test_car_plaso_fs_extra.py _PE_HEADER
 			po(
 				"name", "plaso_pecoff",
 				"kind", "entity",
@@ -1573,6 +1612,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "f0b51854-1690-5460-9841-4e17061c24a2",
 			),
+			// golden: synthetic: M57-JO-shaped Run key snapshot (tests/test_spindle_ids.py _REGISTRY)
 			po(
 				"name", "plaso_registry",
 				"kind", "entity",
@@ -1587,6 +1627,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "a575d9ce-94fc-5bee-b275-796a81fdda40",
 			),
+			// golden: synthetic: a shell item embedded in the lnk above
 			po(
 				"name", "plaso_shellitem",
 				"kind", "entity",
@@ -1603,6 +1644,7 @@ func irGolden() pyjson.Value {
 			),
 		),
 		"external", pa(
+			// golden: real: LoneWolf SRUDB.dat ApplicationResourceUsage
 			po(
 				"name", "esedump_srum_application",
 				"kind", "record",
@@ -1615,6 +1657,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "process-388-951-2024-02-20T07:50:59Z",
 			),
+			// golden: real: LoneWolf SRUDB.dat NetworkDataUsage (scratchpad stage3-parity)
 			po(
 				"name", "esedump_srum_network",
 				"kind", "record",
@@ -1630,6 +1673,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "flow-102-8-1689399632855040-2024-02-20T07:50:00Z-2100-1440",
 			),
+			// golden: real: LoneWolf Security 4688 (tests/test_car_winevt_adapter.py)
 			po(
 				"name", "evtx_record",
 				"kind", "record",
@@ -1642,6 +1686,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "process-WIN-1M3263ACE5D-Security-2623",
 			),
+			// golden: synthetic (tests/test_car_jlecmd.py shape)
 			po(
 				"name", "jlecmd_entry",
 				"kind", "record",
@@ -1653,6 +1698,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "file-/in/fb3b.automaticDestinations-ms-1",
 			),
+			// golden: synthetic: 0x1a2b -> proc-1a2b (tests/test_derive.py)
 			po(
 				"name", "memory_proc_offset",
 				"kind", "entity",
@@ -1663,6 +1709,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "proc-1a2b",
 			),
+			// golden: real: LoneWolf ADDINUTIL.EXE-4E6085D4.pf
 			po(
 				"name", "prefetch_dump_pf",
 				"kind", "entity",
@@ -1674,6 +1721,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "process-ADDINUTIL.EXE-0x4E6085D4",
 			),
+			// golden: synthetic (tests/test_car_srum_recmd.py shape)
 			po(
 				"name", "recmd_value",
 				"kind", "record",
@@ -1686,6 +1734,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "registry-/in/UsrClass.dat-S-1-5-21-1_Classes\\X-LangID",
 			),
+			// golden: real: a Sysmon ProcessGuid (tests/test_car_winevt_adapter.py)
 			po(
 				"name", "sysmon_process_guid",
 				"kind", "entity",
@@ -1696,6 +1745,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "{DFAE8213-70EB-5CDD-0000-0010F66D0A00}",
 			),
+			// golden: synthetic (tests/test_car_zeek_x509.py)
 			po(
 				"name", "zeek_cert_fp",
 				"kind", "entity",
@@ -1706,6 +1756,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d",
 			),
+			// golden: synthetic (tests/test_car_zeek_extra.py)
 			po(
 				"name", "zeek_fuid",
 				"kind", "entity",
@@ -1716,6 +1767,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "file-FdEQ",
 			),
+			// golden: synthetic: Zeek uid shape (tests/test_car_zeek_conn.py)
 			po(
 				"name", "zeek_uid",
 				"kind", "entity",
@@ -1726,6 +1778,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "CtEReq24zLXEGt4V67",
 			),
+			// golden: synthetic (tests/test_car_zeek_extra.py)
 			po(
 				"name", "zeek_uid_trans_depth",
 				"kind", "record",
@@ -1737,6 +1790,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "http-Cno6-1",
 			),
+			// golden: synthetic (tests/test_car_zeek_dns.py)
 			po(
 				"name", "zeek_uid_trans_id",
 				"kind", "record",

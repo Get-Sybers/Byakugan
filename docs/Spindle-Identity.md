@@ -1,14 +1,22 @@
 # Spindle — the row-identity registry
 
-`byakugan/spindle.yml` is the registry the engine mints a disk-image row's
-guid from (`normalize._spindle`, via `ids.mint`). Like `relationships.yml`,
-it is **data**: *which* fields identify a row is a rule declared there; the
-engine only implements the mechanics. A map references an entry by name
-(`Guid: GuidSpindle("<name>")` in `go/internal/authoring/maps_*.go`) and never spells identity
-fields itself, so the registry and the maps cannot drift
+The engine mints a disk-image row's guid from the **row-identity registry**
+(`go/internal/spindle`, via `go/internal/ids` — the recipe `byakugan/ids.py`
+shares). Like `relationships.yml`, the registry is **data**: *which* fields
+identify a row is a rule declared there; the engine only implements the
+mechanics. The rules are authored with the maps, in Go — the `spindle` and
+`golden` sections of `go/internal/authoring/ir_sections.go`, serialised into
+`go/internal/ir/ir.json` — and `byakugan/spindle.yml` carries the notes the
+engine does not need: what each key holds across and what it was validated
+against, the scope/kind vocabulary, the cross-source equality rule, and the
+external forms the Anamnesis passthrough brings in. `byakugan.spindle` reads
+the two halves as one registry. A map references an entry by name
+(`Guid: GuidSpindle("<name>")` in `go/internal/authoring/maps_*.go`) and never
+spells identity fields itself, so the registry and the maps cannot drift
 (`byakugan.spindle.verify_registry` — `tests/test_spindle_model.py` and
-`python -m byakugan.spindle --check`). The resolved, materialized snapshot
-is `model/spindle/identity.yml`; the shape of a spindle row is
+`python -m byakugan.spindle --check`, which also re-mints every golden vector
+the IR pins). The resolved, materialized snapshot is
+`model/spindle/identity.yml`; the shape of a spindle row is
 `model/spindle/record.yml` (both `python model/generate.py`).
 
 ## The recipe
@@ -60,21 +68,27 @@ rows differing only in native stamps share it (`kind: entity`).
 
 ## Golden vectors
 
-Every entry carries a `golden` sample (the identity values as they stand
-on the normalized event: real M57-JO / dualserver values where a real row
-exists, `source: real`; otherwise a labelled synthetic sample,
-`source: synthetic`). `model/spindle/golden.yml` is the **generated**
-vector table: per entry the rendered key and the guid `ids.mint` yields
-for it, the positional vector, and the recipe vector (`canonical_json` +
-the namespaces).
+Every entry pins a golden vector in the IR's `golden` section (the identity
+values as they stand on the normalized event — real M57-JO / dualserver
+values where a real row exists, `source: real`; otherwise a labelled
+synthetic sample, `source: synthetic` — with the key and the guid the recipe
+mints for them; each sample's provenance is the comment above it in
+`ir_sections.go`). Pins, not derivations: the Go tests replay them and
+`python -m byakugan.spindle --check` re-mints them through `byakugan.ids`,
+so a stale pin fails on both sides. `model/spindle/golden.yml` is the
+**generated** vector table: per entry the rendered key and the guid, the
+positional vector, and the recipe vector (`canonical_json` + the
+namespaces).
 
 ## Change protocol
 
 An entry's identity fields, rendering, names or golden sample change
-**only** with a `version` bump: edit the entry, bump its version,
-regenerate `model/spindle/` (`python model/generate.py`), commit the
-snapshot (`golden.yml` included); every guid of that entry re-mints, so
-existing stores are rebuilt (`--batch --force`).
+**only** with a `version` bump: edit the entry in `ir_sections.go`, bump
+its version, re-pin its golden vector there (`spindle --check` prints the
+guid the recipe now yields), `make -C go gen-ir`, regenerate
+`model/spindle/` (`python model/generate.py`), commit the snapshot
+(`golden.yml` included); every guid of that entry re-mints, so existing
+stores are rebuilt (`--batch --force`).
 `python -m byakugan.spindle --check` (and the generator itself) refuse an
 entry whose golden guid moved without a version bump — or whose version
 moved without the guid — and a change of the recipe vector, which would

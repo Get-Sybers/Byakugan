@@ -778,7 +778,6 @@ def render_mappings() -> dict[str, str]:
 # native/join keys) and the spindle registry (identity-hashed fields).
 # --------------------------------------------------------------------------- #
 PROFILES_SEED_PATH = os.path.join(SCHEMA_DIR, "profiles-seed.yaml")
-SPINDLE_PATH = os.path.join(_HERE, "spindle.yml")
 
 
 def _lane_surfaces() -> dict[str, dict]:
@@ -880,7 +879,8 @@ def _lane_variant_facts() -> dict[str, list[dict]]:
 def _recipe_targets(recipes: set[str]) -> tuple[set[str], set[str]]:
     """(native keys, CAR fields) the given spindle recipes hash — the
     identity components' sources (`native.<key>` or a CAR field name)."""
-    reg = yaml.safe_load(open(SPINDLE_PATH, encoding="utf-8"))["identities"]
+    from . import spindle
+    reg = spindle.identities()
     native_keys: set[str] = set()
     car_fields: set[str] = set()
     for name in recipes:
