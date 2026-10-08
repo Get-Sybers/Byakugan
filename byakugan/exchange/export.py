@@ -119,7 +119,7 @@ UNCASED = "uncased"
 # package still takes the directory explicitly — a deployment may hand it its
 # own set. Released STIX references the stable released branch (main), not
 # dev (WIP), so exported artifacts don't point consumers at a moving target.
-RULE_URL = "https://github.com/Get-Sybers/Byakugan/-/blob/main/rules/{id}.yml"
+RULE_URL = "https://github.com/Get-Sybers/Byakugan/blob/main/rules/{id}.yml"
 # STIX 2.1 pattern-type-ov (§10.19). The rules' own languages are trust-group
 # values beyond it (BP §8.1) — documented in docs/STIX-Exchange.md, versioned by
 # ``pattern_version`` (the Elastic stack the rule is known to run on).

@@ -8,7 +8,7 @@
 
 contract:
   name: car-stix-projection
-  version: 6                       # bump on any change to an id recipe or a target property
+  version: 7                       # bump on any change to an id recipe or a target property
                                    # 2: the row identity's forms (the spindle uuid5 + native.spindle_*),
                                    #    the fold's native keys (contributions / contributed_by)
                                    # 3: the behaviour layer — attack-pattern / indicator / indicates
@@ -29,6 +29,12 @@ contract:
                                    #    observations reference their connecting SROs; the producer
                                    #    identity gains contact_information. Ids move: indicator,
                                    #    indicates. See model/stix/changelog/v6.md.
+                                   # 7: the URL-valued properties take their GitHub paths (the
+                                   #    producer's contact_information, both extension-definitions'
+                                   #    schema / external_references, the rules-as-code indicator
+                                   #    references); schema set 7.0.0. No id moves — `modified`
+                                   #    stamps and the evidence extension's version move. See
+                                   #    model/stix/changelog/v7.md.
   stix_version: '2.1'
   engine: byakugan/stix.py
   validated_by: model/stix/validate.py

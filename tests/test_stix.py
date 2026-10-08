@@ -367,7 +367,7 @@ def test_v6_evidence_extension_rides_the_bundle_and_every_carrier():
     d = defs[0]
     assert d["created_by_ref"] == stix.PRODUCER["id"]
     assert set(d["extension_types"]) == {"toplevel-property-extension", "new-sco", "new-sdo"}
-    assert d["schema"].startswith("https://github.com/Get-Sybers/")
+    assert d["schema"].startswith("https://raw.githubusercontent.com/Get-Sybers/Byakugan/")   # v7: the raw host serves the schema
     assert d["description"] and d["external_references"]                    # BP §9 completeness
     declared = set(d["extension_properties"])
     for o in objs:

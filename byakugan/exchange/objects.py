@@ -54,7 +54,7 @@ import uuid
 SPEC_VERSION = "2.1"
 DEFAULT_PRODUCER = "DX_DFIR"
 # BP §3.4: an identity that is not anonymised should carry contact information.
-DEFAULT_CONTACT = "https://github.com/Get-Sybers/Byakugan/-/issues"
+DEFAULT_CONTACT = "https://github.com/Get-Sybers/Byakugan/issues"
 
 # uuid5(NAMESPACE_URL, "https://github.com/Get-Sybers/DX_DFIR/stix") — the root of
 # every DX_DFIR-global deterministic id. Fixed for the life of the exchange:
@@ -68,42 +68,45 @@ SCO_NAMESPACE = uuid.UUID("00abedb4-aa42-466c-9c01-fed23315a9b7")
 # never moves; bump IDENTITY_MODIFIED when producer_identity() / host_identity()
 # change what they emit (that is a new version of every identity, §3.6).
 IDENTITY_CREATED = "2026-09-02T00:00:00.000Z"
-IDENTITY_MODIFIED = "2026-09-30T00:00:00.000Z"   # contact moved to github.com/Get-Sybers
+IDENTITY_MODIFIED = "2026-10-08T00:00:00.000Z"   # v7: the contact URL took its GitHub path (v6: moved to github.com/Get-Sybers)
 
 # The DX_DFIR property extension (STIX 2.1 §7.3). One definition, versioned:
 # bump EXTENSION_VERSION and EXTENSION_MODIFIED together when the schema
 # changes (1.1.0: the behaviour sighting's fields joined the schema, and the
-# schema/doc locations moved to the byakugan repo).
+# schema/doc locations moved to the byakugan repo). EXTENSION_MODIFIED alone
+# moved for contract v7: the documentation URL took its GitHub path, the
+# schema is unchanged.
 EXTENSION_ID = f"extension-definition--{uuid.uuid5(DX_NAMESPACE, 'extension-definition|dxdfir')}"
 EXTENSION_TYPE = "property-extension"
 EXTENSION_VERSION = "1.1.0"
 EXTENSION_CREATED = "2026-09-03T00:00:00.000Z"
-EXTENSION_MODIFIED = "2026-09-26T00:00:00.000Z"
+EXTENSION_MODIFIED = "2026-10-08T00:00:00.000Z"
 EXTENSION_NAME = "DX_DFIR detection exchange"
 # Released STIX references the stable released branch (main), not dev (WIP), so
 # consumers of the extension schema/docs don't chase a moving target.
 EXTENSION_SCHEMA_URL = ("https://raw.githubusercontent.com/Get-Sybers/byakugan/main/"
                         "byakugan/exchange/extension/dxdfir-extension.schema.json")
-EXTENSION_DOC_URL = "https://github.com/Get-Sybers/Byakugan/-/blob/main/docs/STIX-Exchange.md"
+EXTENSION_DOC_URL = "https://github.com/Get-Sybers/Byakugan/blob/main/docs/STIX-Exchange.md"
 
 RELATIONSHIP_CLASS_DECLARED = "declared"
 RELATIONSHIP_CLASS_DERIVED = "derived"
 RELATIONSHIP_CLASSES = (RELATIONSHIP_CLASS_DECLARED, RELATIONSHIP_CLASS_DERIVED)
 
-# The CAR evidence extension (contract v6, model/stix/changelog/v6.md §D2-B):
+# The CAR evidence extension (introduced by contract v6, model/stix/changelog/v6.md
+# §D2-B; its URLs took their GitHub paths in v7, changelog/v7.md):
 # one hybrid definition legalizing the car projection's x_car_* top-level
 # properties (toplevel-property-extension) and its extension-defined objects
 # (x-car-thread / x-car-record: new-sco; x-car-inferred-node: new-sdo).
 # EVIDENCE_EXTENSION_VERSION renders from the schema set's one version
 # (semver); bump it with EVIDENCE_EXTENSION_MODIFIED together.
 EVIDENCE_EXTENSION_ID = f"extension-definition--{uuid.uuid5(DX_NAMESPACE, 'extension-definition|dxdfir-evidence')}"
-EVIDENCE_EXTENSION_VERSION = "6.0.0"
+EVIDENCE_EXTENSION_VERSION = "7.0.0"
 EVIDENCE_EXTENSION_CREATED = "2026-09-30T00:00:00.000Z"
-EVIDENCE_EXTENSION_MODIFIED = "2026-09-30T00:00:00.000Z"
+EVIDENCE_EXTENSION_MODIFIED = "2026-10-08T00:00:00.000Z"
 EVIDENCE_EXTENSION_NAME = "Byakugan CAR evidence"
-EVIDENCE_EXTENSION_SCHEMA_URL = ("https://github.com/Get-Sybers/Byakugan/-/raw/main/"
+EVIDENCE_EXTENSION_SCHEMA_URL = ("https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/"
                                  "model/schema/extensions/dxdfir-evidence.schema.json")
-EVIDENCE_EXTENSION_DOC_URL = "https://github.com/Get-Sybers/Byakugan/-/blob/main/model/stix/changelog/v6.md"
+EVIDENCE_EXTENSION_DOC_URL = "https://github.com/Get-Sybers/Byakugan/blob/main/model/stix/changelog/v7.md"
 # The closed top-level property list — harvested from the EMITTED surface
 # (byakugan/stix.py + model/stix/{conventions,objects}.yml); the count-and-carry
 # gate tallies any emitted x_car_* name outside this tuple. The content
@@ -331,7 +334,7 @@ def evidence_extension_definition(created_by: str) -> dict:
                 extension_properties=list(EVIDENCE_PROPERTIES),
                 external_references=[{"source_name": "dxdfir",
                                       "url": EVIDENCE_EXTENSION_DOC_URL,
-                                      "description": "the car-stix-projection contract v6 change log"}])
+                                      "description": "the car-stix-projection contract v7 change log"}])
 
 
 def producer_identity(name: str = DEFAULT_PRODUCER, contact: str | None = DEFAULT_CONTACT) -> dict:
