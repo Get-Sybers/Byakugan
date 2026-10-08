@@ -35,6 +35,10 @@ func irMarkerKinds() pyjson.Value {
 }
 
 func irRoutes() pyjson.Value {
+	// filename pattern -> map keys, first match wins: the routing table
+	// byakugan.pipeline reads back from the IR (pipeline.ROUTES). A pattern
+	// routed to [] is a DECLARED state — the file is recognised and
+	// deliberately unmapped (its rows stay raw) — never an unknown file.
 	return pa(
 		pa(
 			"_EvtxECmd_Output",
@@ -49,6 +53,7 @@ func irRoutes() pyjson.Value {
 				"evtx_more",
 			),
 		),
+		// goevtx.jsonl: goevtx (the evtx lane): the same record shape, one file per log
 		pa(
 			"goevtx.jsonl",
 			pa(
@@ -92,18 +97,23 @@ func irRoutes() pyjson.Value {
 				"zeek_files",
 			),
 		),
+		// ssl.json: TLS handshake -> flow (SNI in dest_fqdn)
 		pa(
 			"ssl.json",
 			pa(
 				"zeek_ssl",
 			),
 		),
+		// x509.json: TLS certificate -> file (fingerprint = sha256)
 		pa(
 			"x509.json",
 			pa(
 				"zeek_x509",
 			),
 		),
+		// Zeek logs with no dedicated CAR object — routed to nothing EXPLICITLY (known,
+		// not unknown): their per-flow detail can enrich the flow by uid at the
+		// cascade stage, but they are not CAR objects.
 		pa(
 			"dhcp.json",
 			[]pyjson.Value{},
@@ -177,42 +187,49 @@ func irRoutes() pyjson.Value {
 				"l2t_usnjrnl",
 			),
 		),
+		// .L2tWinevt: Plaso legacy EVT  -> the winevtx CAR maps
 		pa(
 			".L2tWinevt",
 			pa(
 				"l2t_winevt",
 			),
 		),
+		// .L2tWinevtx: Plaso modern EVTX -> the winevtx CAR maps
 		pa(
 			".L2tWinevtx",
 			pa(
 				"l2t_winevt",
 			),
 		),
+		// .L2tMsiecf: IE index.dat visits -> http
 		pa(
 			".L2tMsiecf",
 			pa(
 				"l2t_msiecf",
 			),
 		),
+		// .L2tFirefoxCache: -> http (recorded method/status)
 		pa(
 			".L2tFirefoxCache",
 			pa(
 				"l2t_firefox_cache",
 			),
 		),
+		// .L2tSqlite: firefox page visits -> http (gated by data_type)
 		pa(
 			".L2tSqlite",
 			pa(
 				"l2t_firefox_places",
 			),
 		),
+		// .L2tJavaIdx: Java download cache -> http
 		pa(
 			".L2tJavaIdx",
 			pa(
 				"l2t_javaidx",
 			),
 		),
+		// .L2tLnk: shortcut target MAC times -> file (+ embedded shell items)
 		pa(
 			".L2tLnk",
 			pa(
@@ -220,6 +237,7 @@ func irRoutes() pyjson.Value {
 				"plaso_shellitem",
 			),
 		),
+		// .L2tRecycleBinInfo2: deletion events -> file/delete
 		pa(
 			".L2tRecycleBinInfo2",
 			pa(
@@ -232,12 +250,18 @@ func irRoutes() pyjson.Value {
 				"l2t_recyclebin",
 			),
 		),
+		// l2t tables with NO CAR object — routed to [] EXPLICITLY (known, not
+		// unknown): pe = compilation times (no CAR file action); olecf = document
+		// internal streams; rplog = restore-point info; fseventsd = macOS flags
+		// (2 rows, undecoded). Their rows stay raw.
+		// .L2tPe: pe_coff:file -> timestamp-less file record (path + sha256 + PE meta, compile_time native); dll_import/resource -> raw
 		pa(
 			".L2tPe",
 			pa(
 				"plaso_pecoff",
 			),
 		),
+		// .L2tOlecf: olecf:summary_info -> file (doc + authoring meta); olecf:item -> raw
 		pa(
 			".L2tOlecf",
 			pa(
@@ -248,34 +272,40 @@ func irRoutes() pyjson.Value {
 			".L2tRplog",
 			[]pyjson.Value{},
 		),
+		// .L2tFseventsd: macOS FSEvents -> file/modify (never dropped)
 		pa(
 			".L2tFseventsd",
 			pa(
 				"plaso_fseventsd",
 			),
 		),
+		// .L2tEsedb: Plaso esedb/srum -> flow + process (SRUM)
 		pa(
 			".L2tEsedb",
 			pa(
 				"l2t_srum",
 			),
 		),
+		// _RECmd_Batch_: RECmd --json batch output -> registry
 		pa(
 			"_RECmd_Batch_",
 			pa(
 				"recmd_batch",
 			),
 		),
+		// jlecmd_AutomaticDestinations: jump lists -> file (via adapter)
 		pa(
 			"jlecmd_AutomaticDestinations",
 			pa(
 				"jlecmd_dest",
 			),
 		),
+		// jlecmd_CustomDestinations: pin-centric, no interaction times -> raw
 		pa(
 			"jlecmd_CustomDestinations",
 			[]pyjson.Value{},
 		),
+		// _LECmd_Output: lnk: the l2t lnk map is canonical (artefact != processor)
 		pa(
 			"_LECmd_Output",
 			[]pyjson.Value{},
@@ -286,46 +316,66 @@ func irRoutes() pyjson.Value {
 				"recmd_batch",
 			),
 		),
+		// Get-Sybers Go parsers (DX_DFIR's godfir-toolz lane): ese_dump writes one
+		// JSONL per SRUM provider table (only Network/Application usage carry a CAR
+		// object — the map leaves the rest raw); prefetch_dump writes one output file.
+		// NetworkDataUsage: ese_dump SRUM -> flow (network usage)
 		pa(
 			"NetworkDataUsage",
 			pa(
 				"esedump_srum",
 			),
 		),
+		// ApplicationResourceUsage: ese_dump SRUM -> process (app usage)
 		pa(
 			"ApplicationResourceUsage",
 			pa(
 				"esedump_srum",
 			),
 		),
+		// PrefetchDump_Output: prefetch_dump -> process (execution)
 		pa(
 			"PrefetchDump_Output",
 			pa(
 				"prefetch_dump",
 			),
 		),
+		// The GoDFIR-toolz framework layout (godfir-toolz/<tool>/<item>/<tool>.jsonl,
+		// the tools in GODFIR_TOOLS): every Go tool writes one <tool>.jsonl per
+		// item, in the record shape the map above already consumes — the file name
+		// is the route.
+		// gore.jsonl: gore registry batch (recmd_batch shape) -> registry
 		pa(
 			"gore.jsonl",
 			pa(
 				"recmd_batch",
 			),
 		),
+		// goprefetch.jsonl: goprefetch -> process (execution)
 		pa(
 			"goprefetch.jsonl",
 			pa(
 				"prefetch_dump",
 			),
 		),
+		// gojle.jsonl: gojle jump lists (jlecmd_dest shape) -> file (via adapter)
 		pa(
 			"gojle.jsonl",
 			pa(
 				"jlecmd_dest",
 			),
 		),
+		// goese writes one <table>.jsonl per SRUM provider table (NetworkDataUsage /
+		// ApplicationResourceUsage route above) plus goese.jsonl, its per-table
+		// index; the other provider tables (NetworkConnectivityUsage, EnergyUsage,
+		// PushNotifications, ...) are SRUM-internal telemetry with no CAR object.
 		pa(
 			"goese.jsonl",
 			[]pyjson.Value{},
 		),
+		// Go tools with no CAR map yet — routed to nothing EXPLICITLY (known, not
+		// unknown): a raw $MFT entry, a shortcut, a $I record, a shellbag, an
+		// Amcache/ShimCache entry, a Timeline activity. Their records stay raw.
 		pa(
 			"gomft.jsonl",
 			[]pyjson.Value{},
@@ -376,15 +426,22 @@ func irRoutes() pyjson.Value {
 }
 
 func irEvtxMaps() pyjson.Value {
+	// EvtxECmd output is ONE uniform shape across all ~110 Windows channels, so it
+	// is CONTENT-routed, not filename-routed: every *_EvtxECmd_Output.json (and
+	// goevtx.jsonl) feeds this whole family and each map's (Channel, EventId)
+	// predicate decides which rows it claims. Adding a channel/EventId is a map
+	// change, never a routing change. The Security-audit families (4663/4657/
+	// 4660/4670/4689/5140/5145/5156/5157/5158/5058) are NOT here: unvalidated
+	// inferences, quarantined in docs/to-be-validated/evtx_audit.yml.
 	return pa(
-		"evtx_security",
-		"evtx_security_sessions",
-		"evtx_process",
-		"evtx_services",
-		"evtx_sysmon",
-		"evtx_bits",
-		"evtx_rdp",
-		"evtx_more",
+		"evtx_security",          // Security 4624/4625/4672 -> authentication
+		"evtx_security_sessions", // Security 4624/4634/4647/4778/4779 -> user_session
+		"evtx_process",           // Security 4688 -> process
+		"evtx_services",          // System 7045 / Security 4697 -> service
+		"evtx_sysmon",            // Sysmon EIDs -> process/flow/file/registry/module/driver/thread
+		"evtx_bits",              // BITS-Client 59/60 -> http
+		"evtx_rdp",               // TerminalServices 21/24/25 -> user_session
+		"evtx_more",              // 4907/5857/20003/30803/7001/7002/7034 -> file/module/service/flow/user_session
 	)
 }
 

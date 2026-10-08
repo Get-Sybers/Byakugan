@@ -15,9 +15,11 @@ this page records where the *authoring* side stands.
   serialises them to the embedded `go/internal/ir/ir.json`; `gen-ir --check`
   and `ir-check` gate drift and completeness in CI.
 - **Python reads the IR.** `byakugan/mappings/` is `_from_ir.py` (decodes
-  `MAPPINGS` from `ir.json` for `sources_model`, `spindle`, `sigma` and the
-  tests) plus `_common.py` (helpers the spindle tests use). Nothing on the
-  Python side runs a map.
+  `MAPPINGS`, the routing table and the EVTX family from `ir.json` for the
+  pipeline, `sources_model`, `spindle`, `sigma` and the tests) plus
+  `_common.py` (helpers the spindle tests use). Nothing on the Python side
+  runs a map, and `pipeline.ROUTES` / `EVTX_MAPS` are read from the IR's
+  `routes` / `evtx_maps` — the Python literals are gone.
 - **Retired:** `byakugan/export_ir.py` (replaced by `gen-ir`); `tests/parity/`
   and `tests/reference_plumbing.py` (the CAR tests drive the Go engine directly
   through `tests/go_engine.py`); `scripts/bench-parse.py` (it drove the deleted
@@ -29,7 +31,6 @@ this page records where the *authoring* side stands.
 
 | what | where | status |
 |---|---|---|
-| routing | `byakugan/pipeline.py` `ROUTES` / `EVTX_MAPS` | the pipeline routes files to the engine from here. The IR carries the same table (`irRoutes` / `irEvtxMaps`), `model/schema/mappings/routes.yaml` is generated from the IR, and `tests/test_routes_ir_sync.py` holds the two statements together. A **second hand-maintained copy** until the pipeline reads routing from the IR. |
 | the row-identity registry | `byakugan/spindle.yml` + `byakugan/spindle.py` | `spindle --check`, the snapshot generator (`model/spindle/`) and the drift guards read the YAML. The IR's `spindle` section carries the same 26 identities and the 13 engine-minted external forms (the YAML also declares the 12 `memory_*` forms the Anamnesis passthrough carries, which the engine never mints); `tests/test_spindle_ir_sync.py` holds the shared part together. A **second hand-maintained copy** of that shared part. |
 | the source manifests | `byakugan/sources_model.py` (`DERIVATIONS` — tool / parser / URL provenance) + `gen_sources.py` → `sources/` | provenance the IR does not carry; `byakugan.schema_gen` reads `sources/` as the reviewed lane surface. |
 | the marker DSL constructors + value normalisers | `byakugan/normalize.py` | the introspection substrate for `sources_model`, `spindle` and `sigma`; the resolver that runs the markers is `go/internal/markers`. |

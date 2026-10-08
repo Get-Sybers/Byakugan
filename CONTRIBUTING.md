@@ -53,7 +53,7 @@ each directory is):
 | you want to change | edit | then regenerate |
 |---|---|---|
 | a map (the object / action / props / guid of an artefact family), or one of its predicates | `go/internal/authoring/maps_<family>.go`, `go/internal/predicates/predicates_<family>.go` | `make -C go gen-ir` → `python -m byakugan.gen_sources` → `python -m byakugan.schema_gen` |
-| which file names route to which maps | `byakugan/pipeline.py` (`ROUTES` / `EVTX_MAPS`) **and** `go/internal/authoring/ir_sections.go` (`irRoutes` / `irEvtxMaps`), same entries in the same order — `tests/test_routes_ir_sync.py` holds the two together | as above |
+| which file names route to which maps | `irRoutes` / `irEvtxMaps` in `go/internal/authoring/ir_sections.go` (the pipeline reads them back from the IR) | as above |
 | a row identity (the fields a disk-image row's guid is minted from) | `byakugan/spindle.yml` **and** the `spindle` section of `ir_sections.go` — `tests/test_spindle_ir_sync.py` holds the shared entries together | `make -C go gen-ir` → `python model/generate.py` (→ `model/spindle/`) → `gen_sources` → `schema_gen` |
 | the cascade rules, the relationship-verb bridge | `byakugan/relationships.yml`, `byakugan/cascade_relationships.yml` | `python model/generate.py` (→ `model/relationships/`) |
 | the Artefact Class / Parser Profile seeds | `model/schema/classes-seed.yaml`, `model/schema/profiles-seed.yaml` | `python -m byakugan.schema_gen` |
@@ -154,9 +154,9 @@ Elastic stack and runs `scripts/e2e_elastic.py` against it.
    `go/internal/predicates/testdata/predicate_vectors/<family>.json` (and
    `go/internal/markers/testdata/marker_vectors/<family>.json` when the family
    needs marker coverage `core.json` does not already give).
-2. Route it: `byakugan/pipeline.py` (`ROUTES` / `EVTX_MAPS`) **and** `irRoutes` /
-   `irEvtxMaps` in `go/internal/authoring/ir_sections.go`, same entries in the
-   same order.
+2. Route it: `irRoutes` (or `irEvtxMaps`, for a content-routed EVTX family) in
+   `go/internal/authoring/ir_sections.go` — `byakugan.pipeline` reads the table
+   back from the IR.
 3. A disk-image (l2t/Plaso) map names its row identity: add the entry to
    `byakugan/spindle.yml` — `object`, `kind` (`record` | `entity`),
    `scope: intrinsic`, `version: 1`, `validated_against: [plaso]`,

@@ -48,8 +48,7 @@ unchanged enrich → store → superset → derive → STIX path, and
     byakugan-parse split-l2t --in RAW.jsonl --out-dir TMP
 
 for a raw log2timeline container, into a tempdir under the source's output dir.
-Routing (`pipeline.ROUTES` — the IR's `routes` is the same table, and
-`tests/test_routes_ir_sync.py` holds the two together), the decoded map tables
+Routing (`pipeline.ROUTES`, read back from the IR's `routes`), the decoded map tables
 (`byakugan.mappings`, read back from `ir.json`), normalize's marker constructors
 (the introspection substrate for sigma/sources_model/spindle) and the Anamnesis
 `car.db` passthrough stay in Python.
