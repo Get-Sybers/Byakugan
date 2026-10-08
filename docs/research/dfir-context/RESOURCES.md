@@ -20,7 +20,7 @@ file is the credit registry; recurring sources live as submodules under
 
 Matching and validation: the 99 extracted rows were individually matched by
 mechanism into the 64 canonical rows of
-[matched-evidences.yaml](matched-evidences.yaml)
+[model/schema/matched-evidences.yaml](../../../model/schema/matched-evidences.yaml)
 (23 multi-source-corroborated; every source row cited; tier disagreements
 reconciled conservatively with the disagreement noted in-row; all rows
 validated against the CAR object/action vocabulary).

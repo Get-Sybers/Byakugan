@@ -89,7 +89,7 @@ One declaration per artefact class:
   tier vocabulary; `time` is `event-time | bounded | none`; `when` selects
   over the class's OWN `dfir_fields` keys, never parser field names. The
   canonical set per family is the ir.json bootstrap closure UNION the
-  source-grounded overlay (`docs/research/dfir-context/matched-evidences.yaml`,
+  source-grounded overlay (`model/schema/matched-evidences.yaml`,
   whose `constraints:` block is the normative layer — backbones, the
   MAY class with absence-not-evidence, tier ceilings, pair bans, and the
   SRO derivation rules). Emitted pairs outside the declared set are

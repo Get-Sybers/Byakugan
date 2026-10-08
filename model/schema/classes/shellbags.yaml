@@ -6,7 +6,7 @@ source: generated
 generated_from:
   ir_version: 1
   seed: model/schema/classes-seed.yaml
-  overlay: docs/research/dfir-context/matched-evidences.yaml
+  overlay: model/schema/matched-evidences.yaml
   car_actions: model/car/objects
 family: shellbags
 platform:

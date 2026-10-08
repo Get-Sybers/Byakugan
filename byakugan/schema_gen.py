@@ -4,7 +4,7 @@ Scaffolds the class declarations from the curated seed table:
 
     model/schema/classes-seed.yaml   (human decisions: families, facets, lanes)
       + go/internal/ir/ir.json        (the reachable (object, action) closure)
-      + docs/research/dfir-context/matched-evidences.yaml  (the source overlay)
+      + model/schema/matched-evidences.yaml       (the curated source overlay)
       + model/car/objects/*.yml       (the legal action vocabularies)
     -> model/schema/vocab/car-actions.schema.json   (generated vocabulary)
     -> model/schema/classes/<family>.yaml           (one class per family)
@@ -35,7 +35,7 @@ CLASSES_DIR = os.path.join(SCHEMA_DIR, "classes")
 VOCAB_PATH = os.path.join(SCHEMA_DIR, "vocab", "car-actions.schema.json")
 SEED_PATH = os.path.join(SCHEMA_DIR, "classes-seed.yaml")
 IR_PATH = os.path.join(_ROOT, "go", "internal", "ir", "ir.json")
-OVERLAY_PATH = os.path.join(_ROOT, "docs", "research", "dfir-context",
+OVERLAY_PATH = os.path.join(SCHEMA_DIR,
                             "matched-evidences.yaml")
 CAR_OBJECTS_DIR = os.path.join(_ROOT, "model", "car", "objects")
 RELATIONSHIPS_PATH = os.path.join(_HERE, "relationships.yml")
@@ -293,7 +293,7 @@ def build_classes() -> tuple[dict[str, str], list[str], list[str]]:
             "generated_from": {
                 "ir_version": ir_version,
                 "seed": "model/schema/classes-seed.yaml",
-                "overlay": "docs/research/dfir-context/matched-evidences.yaml",
+                "overlay": "model/schema/matched-evidences.yaml",
                 "car_actions": "model/car/objects",
             },
             "family": fam,
