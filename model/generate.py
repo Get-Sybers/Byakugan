@@ -2,8 +2,9 @@
 """Materialize the model/ snapshot from the project's own model code.
 
 Single source that (re)generates every file under model/ from the pinned
-submodules (third_party/car + third_party/attack-datasources) via the SAME code
-the pipeline runs — nothing here re-implements the schema:
+sources (the third_party/car submodule + the vendored, frozen ATT&CK data-sources
+file under model/sources/attack-datasources/) via the SAME code the pipeline
+runs — nothing here re-implements the schema:
 
     model/car/objects/<object>.yml   one file per CAR object (13): the common
                                      store header + the object's MITRE CAR fields
@@ -92,12 +93,29 @@ def _submodule_sha(rel_path: str) -> str:
         return "<unknown — submodule not checked out>"
 
 
-CAR_SHA = _submodule_sha("third_party/car")
-ADS_SHA = _submodule_sha("third_party/attack-datasources")
+def _vendored_pin(rel_path: str) -> str:
+    """The upstream commit a vendored, frozen file was taken at — its own header
+    carries it (`#   commit: <sha> (...)`), there is no submodule to ask."""
+    try:
+        with open(os.path.join(_ROOT, rel_path), encoding="utf-8") as fh:
+            for line in fh:
+                if not line.startswith("#"):
+                    break
+                m = re.match(r"#\s+commit:\s*([0-9a-f]{40})", line)
+                if m:
+                    return m.group(1)
+    except OSError:
+        pass
+    return "<unknown — no commit pin in the file header>"
 
-_PROVENANCE = (f"# Source of truth (pinned submodules):\n"
-               f"#   third_party/car @ {CAR_SHA}\n"
-               f"#   third_party/attack-datasources @ {ADS_SHA}\n")
+
+_ADS_FILE = "model/sources/attack-datasources/attack_data_sources_objects.yaml"
+CAR_SHA = _submodule_sha("third_party/car")
+ADS_SHA = _vendored_pin(_ADS_FILE)
+
+_PROVENANCE = (f"# Source of truth (pinned sources):\n"
+               f"#   third_party/car (submodule) @ {CAR_SHA}\n"
+               f"#   {_ADS_FILE} (vendored) @ {ADS_SHA}\n")
 
 
 def _car_yaml_header(obj: str) -> str:
