@@ -17,6 +17,16 @@ routes:
   - evtx_bits
   - evtx_rdp
   - evtx_more
+- match: goevtx.jsonl
+  lanes:
+  - evtx_security
+  - evtx_security_sessions
+  - evtx_process
+  - evtx_services
+  - evtx_sysmon
+  - evtx_bits
+  - evtx_rdp
+  - evtx_more
 - match: conn.json
   lanes:
   - zeek_conn
@@ -140,6 +150,31 @@ routes:
 - match: PrefetchDump_Output
   lanes:
   - prefetch_dump
+- match: gore.jsonl
+  lanes:
+  - recmd_batch
+- match: goprefetch.jsonl
+  lanes:
+  - prefetch_dump
+- match: gojle.jsonl
+  lanes:
+  - jlecmd_dest
+- match: goese.jsonl
+  lanes: []
+- match: gomft.jsonl
+  lanes: []
+- match: gole.jsonl
+  lanes: []
+- match: gorb.jsonl
+  lanes: []
+- match: gosbe.jsonl
+  lanes: []
+- match: goamcache.jsonl
+  lanes: []
+- match: goappcompat.jsonl
+  lanes: []
+- match: gowxt.jsonl
+  lanes: []
 - match: .L2tUtmp
   lanes:
   - l2t_utmp

@@ -1,7 +1,7 @@
-// Code generated from ir.json (phase-3 bootstrap of the non-map IR sections).
-// The static IR data byakugan/{spindle.yml,pipeline.py,normalize.py} used to
-// source, now authored in Go. Regenerate with scripts/gen_ir_sections.py (bootstrap
-// only — hand-maintained thereafter). DO NOT edit the Python sources for these.
+// The static (non-map) IR sections — marker kinds, routes, evtx_maps, adapters,
+// canon_user, spindle, golden — authored here in Go. Bootstrapped once from the
+// committed ir.json when authoring moved out of Python; hand-maintained since.
+// `byakugan-parse gen-ir` serializes them and `gen-ir --check` gates drift.
 
 package authoring
 
@@ -38,6 +38,19 @@ func irRoutes() pyjson.Value {
 	return pa(
 		pa(
 			"_EvtxECmd_Output",
+			pa(
+				"evtx_security",
+				"evtx_security_sessions",
+				"evtx_process",
+				"evtx_services",
+				"evtx_sysmon",
+				"evtx_bits",
+				"evtx_rdp",
+				"evtx_more",
+			),
+		),
+		pa(
+			"goevtx.jsonl",
 			pa(
 				"evtx_security",
 				"evtx_security_sessions",
@@ -290,6 +303,56 @@ func irRoutes() pyjson.Value {
 			pa(
 				"prefetch_dump",
 			),
+		),
+		pa(
+			"gore.jsonl",
+			pa(
+				"recmd_batch",
+			),
+		),
+		pa(
+			"goprefetch.jsonl",
+			pa(
+				"prefetch_dump",
+			),
+		),
+		pa(
+			"gojle.jsonl",
+			pa(
+				"jlecmd_dest",
+			),
+		),
+		pa(
+			"goese.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"gomft.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"gole.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"gorb.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"gosbe.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"goamcache.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"goappcompat.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"gowxt.jsonl",
+			[]pyjson.Value{},
 		),
 		pa(
 			".L2tUtmp",

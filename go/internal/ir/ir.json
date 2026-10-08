@@ -18065,6 +18065,19 @@
    ]
   ],
   [
+   "goevtx.jsonl",
+   [
+    "evtx_security",
+    "evtx_security_sessions",
+    "evtx_process",
+    "evtx_services",
+    "evtx_sysmon",
+    "evtx_bits",
+    "evtx_rdp",
+    "evtx_more"
+   ]
+  ],
+  [
    "conn.json",
    [
     "zeek_conn"
@@ -18305,6 +18318,56 @@
    [
     "prefetch_dump"
    ]
+  ],
+  [
+   "gore.jsonl",
+   [
+    "recmd_batch"
+   ]
+  ],
+  [
+   "goprefetch.jsonl",
+   [
+    "prefetch_dump"
+   ]
+  ],
+  [
+   "gojle.jsonl",
+   [
+    "jlecmd_dest"
+   ]
+  ],
+  [
+   "goese.jsonl",
+   []
+  ],
+  [
+   "gomft.jsonl",
+   []
+  ],
+  [
+   "gole.jsonl",
+   []
+  ],
+  [
+   "gorb.jsonl",
+   []
+  ],
+  [
+   "gosbe.jsonl",
+   []
+  ],
+  [
+   "goamcache.jsonl",
+   []
+  ],
+  [
+   "goappcompat.jsonl",
+   []
+  ],
+  [
+   "gowxt.jsonl",
+   []
   ],
   [
    ".L2tUtmp",
