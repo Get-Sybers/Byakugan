@@ -1,0 +1,23 @@
+---
+- name: "malcolm-space | import {{ _malcolm_bundle | basename }}"
+  ansible.builtin.uri:
+    url: "{{ malcolm_space_kibana_url }}/s/{{ malcolm_space_id }}/api/saved_objects/_import?overwrite=true"
+    method: POST
+    ca_path: "{{ malcolm_space_ca_file | default('', true) or omit }}"
+    validate_certs: "{{ malcolm_space_validate_certs }}"
+    url_username: "{{ malcolm_space_elastic_user }}"
+    url_password: "{{ malcolm_space_elastic_password }}"
+    force_basic_auth: true
+    headers:
+      kbn-xsrf: "true"
+    body_format: form-multipart
+    body:
+      file:
+        filename: "{{ _malcolm_bundle }}"
+        mime_type: application/ndjson
+    status_code: [200]
+    timeout: 120
+  register: _malcolm_import
+  changed_when: (_malcolm_import['json']['successCount'] | default(0)) > 0
+  failed_when: not (_malcolm_import['json']['success'] | default(false))
+  no_log: true

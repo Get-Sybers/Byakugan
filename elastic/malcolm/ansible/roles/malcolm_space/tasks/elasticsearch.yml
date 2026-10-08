@@ -1,0 +1,29 @@
+---
+# Pipelines first (the templates bind them), then the component templates (the
+# index templates compose them), then the index templates.
+- name: "malcolm-space | converge the ingest pipelines"
+  ansible.builtin.include_tasks: es_object.yml
+  loop: "{{ query('ansible.builtin.fileglob', malcolm_space_assets_dir ~ '/elasticsearch/ingest_pipelines/*.json') | sort }}"
+  loop_control:
+    loop_var: _malcolm_file
+    label: "{{ _malcolm_file | basename }}"
+  vars:
+    _malcolm_api: _ingest/pipeline
+
+- name: "malcolm-space | converge the component templates"
+  ansible.builtin.include_tasks: es_object.yml
+  loop: "{{ query('ansible.builtin.fileglob', malcolm_space_assets_dir ~ '/elasticsearch/component_templates/*.json') | sort }}"
+  loop_control:
+    loop_var: _malcolm_file
+    label: "{{ _malcolm_file | basename }}"
+  vars:
+    _malcolm_api: _component_template
+
+- name: "malcolm-space | converge the index templates"
+  ansible.builtin.include_tasks: es_object.yml
+  loop: "{{ query('ansible.builtin.fileglob', malcolm_space_assets_dir ~ '/elasticsearch/index_templates/*.json') | sort }}"
+  loop_control:
+    loop_var: _malcolm_file
+    label: "{{ _malcolm_file | basename }}"
+  vars:
+    _malcolm_api: _index_template

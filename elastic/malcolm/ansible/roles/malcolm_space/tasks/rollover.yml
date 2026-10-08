@@ -1,0 +1,7 @@
+---
+- name: "malcolm-space | roll over the data streams of each pattern"
+  ansible.builtin.include_tasks: rollover_pattern.yml
+  loop: "{{ malcolm_space_streams }}"
+  loop_control:
+    loop_var: _malcolm_stream_spec
+    label: "{{ _malcolm_stream_spec['pattern'] }}"

@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "managed_by": "byakugan elastic/malcolm",
+    "version": 1
+  },
+  "description": "DX_DFIR detections stream: for Suricata EVE records @timestamp = the record's timestamp (Filebeat's read time moves to event.ingested), event.dataset = event_type, event.provider = suricata; YARA and Hayabusa records only get event.provider/dataset. Native fields are left untouched.",
+  "processors": [
+    {
+      "set": {
+        "copy_from": "@timestamp",
+        "field": "event.ingested",
+        "ignore_empty_value": true,
+        "override": false
+      }
+    },
+    {
+      "script": {
+        "description": "event.provider / event.dataset from the tool directory and event_type",
+        "lang": "painless",
+        "source": "def p = ctx.log?.file?.path; String tool = null; if (p instanceof String) { if (p.contains('/suricata/')) { tool = 'suricata'; } else if (p.contains('/hayabusa/')) { tool = 'hayabusa'; } else if (p.contains('/yara/')) { tool = 'yara'; } } if (tool == null && ctx.event_type != null) { tool = 'suricata'; } if (tool != null) { if (ctx.event == null) { ctx.event = new HashMap(); } if (ctx.event.provider == null) { ctx.event.provider = tool; } if (ctx.event.dataset == null) { if (tool == 'suricata') { ctx.event.dataset = ctx.event_type != null ? ctx.event_type.toString() : 'suricata'; if (p instanceof String && p.endsWith('/suricata.jsonl')) { ctx.event.dataset = 'suricata_index'; } } else { ctx.event.dataset = tool; } } if (tool == 'suricata' && ctx.event.kind == null && 'alert'.equals(ctx.event_type)) { ctx.event.kind = 'alert'; } }"
+      }
+    },
+    {
+      "date": {
+        "field": "timestamp",
+        "formats": [
+          "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ",
+          "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX",
+          "ISO8601"
+        ],
+        "if": "ctx.event_type != null && ctx.timestamp != null",
+        "on_failure": [
+          {
+            "append": {
+              "field": "tags",
+              "value": "malcolm_timestamp_unparsed"
+            }
+          }
+        ],
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "pipeline": {
+        "ignore_missing_pipeline": true,
+        "name": "logs@default-pipeline"
+      }
+    }
+  ]
+}

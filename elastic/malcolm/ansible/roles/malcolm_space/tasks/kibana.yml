@@ -1,0 +1,72 @@
+---
+- name: "malcolm-space | read the space {{ malcolm_space_id }}"
+  ansible.builtin.uri:
+    url: "{{ malcolm_space_kibana_url }}/api/spaces/space/{{ malcolm_space_id }}"
+    ca_path: "{{ malcolm_space_ca_file | default('', true) or omit }}"
+    validate_certs: "{{ malcolm_space_validate_certs }}"
+    url_username: "{{ malcolm_space_elastic_user }}"
+    url_password: "{{ malcolm_space_elastic_password }}"
+    force_basic_auth: true
+    headers:
+      kbn-xsrf: "true"
+    status_code: [200, 404]
+  register: _malcolm_space_current
+  changed_when: false
+  no_log: true
+
+- name: "malcolm-space | create the space {{ malcolm_space_id }}"
+  ansible.builtin.uri:
+    url: "{{ malcolm_space_kibana_url }}/api/spaces/space"
+    method: POST
+    ca_path: "{{ malcolm_space_ca_file | default('', true) or omit }}"
+    validate_certs: "{{ malcolm_space_validate_certs }}"
+    url_username: "{{ malcolm_space_elastic_user }}"
+    url_password: "{{ malcolm_space_elastic_password }}"
+    force_basic_auth: true
+    headers:
+      kbn-xsrf: "true"
+    body_format: json
+    body: "{{ _malcolm_space_wanted }}"
+    status_code: [200]
+  when: _malcolm_space_current['status'] == 404
+  changed_when: true
+  no_log: true
+  vars:
+    _malcolm_space_wanted: "{{ lookup('ansible.builtin.file', malcolm_space_assets_dir ~ '/kibana/space.json') | from_json }}"
+
+- name: "malcolm-space | update the space {{ malcolm_space_id }}"
+  ansible.builtin.uri:
+    url: "{{ malcolm_space_kibana_url }}/api/spaces/space/{{ malcolm_space_id }}"
+    method: PUT
+    ca_path: "{{ malcolm_space_ca_file | default('', true) or omit }}"
+    validate_certs: "{{ malcolm_space_validate_certs }}"
+    url_username: "{{ malcolm_space_elastic_user }}"
+    url_password: "{{ malcolm_space_elastic_password }}"
+    force_basic_auth: true
+    headers:
+      kbn-xsrf: "true"
+    body_format: json
+    body: "{{ _malcolm_space_wanted }}"
+    status_code: [200]
+  when:
+    - _malcolm_space_current['status'] == 200
+    - _malcolm_space_live != _malcolm_space_wanted
+  changed_when: true
+  no_log: true
+  vars:
+    _malcolm_space_wanted: "{{ lookup('ansible.builtin.file', malcolm_space_assets_dir ~ '/kibana/space.json') | from_json }}"
+    _malcolm_space_keys: "{{ _malcolm_space_wanted.keys() | list }}"
+    _malcolm_space_live: >-
+      {{ dict(_malcolm_space_keys | zip(_malcolm_space_keys | map('extract', _malcolm_space_current['json'] | default({})) | map('default', '') | list)) }}
+
+- name: "malcolm-space | import the data views into {{ malcolm_space_id }}"
+  ansible.builtin.include_tasks: kibana_import.yml
+  vars:
+    _malcolm_bundle: "{{ malcolm_space_assets_dir }}/kibana/data-views.ndjson"
+
+- name: "malcolm-space | import the dashboards into {{ malcolm_space_id }}"
+  ansible.builtin.include_tasks: kibana_import.yml
+  loop: "{{ query('ansible.builtin.fileglob', malcolm_space_assets_dir ~ '/kibana/dashboards/*.ndjson') | sort }}"
+  loop_control:
+    loop_var: _malcolm_bundle
+    label: "{{ _malcolm_bundle | basename }}"

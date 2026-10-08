@@ -1,0 +1,33 @@
+---
+- name: "malcolm-space | read the write index settings of {{ _malcolm_stream['name'] }}"
+  ansible.builtin.uri:
+    url: "{{ malcolm_space_es_url }}/{{ _malcolm_write_index }}/_settings"
+    ca_path: "{{ malcolm_space_ca_file | default('', true) or omit }}"
+    validate_certs: "{{ malcolm_space_validate_certs }}"
+    url_username: "{{ malcolm_space_elastic_user }}"
+    url_password: "{{ malcolm_space_elastic_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: _malcolm_write_settings
+  changed_when: false
+  no_log: true
+  vars:
+    _malcolm_write_index: "{{ (_malcolm_stream['indices'] | last)['index_name'] }}"
+
+- name: "malcolm-space | roll over {{ _malcolm_stream['name'] }}"
+  ansible.builtin.uri:
+    url: "{{ malcolm_space_es_url }}/{{ _malcolm_stream['name'] }}/_rollover"
+    method: POST
+    ca_path: "{{ malcolm_space_ca_file | default('', true) or omit }}"
+    validate_certs: "{{ malcolm_space_validate_certs }}"
+    url_username: "{{ malcolm_space_elastic_user }}"
+    url_password: "{{ malcolm_space_elastic_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  when: _malcolm_live_pipeline != _malcolm_stream_spec['pipeline']
+  changed_when: true
+  no_log: true
+  vars:
+    _malcolm_write_index: "{{ (_malcolm_stream['indices'] | last)['index_name'] }}"
+    _malcolm_index_settings: "{{ ((_malcolm_write_settings['json'] | default({}))[_malcolm_write_index] | default({}))['settings'] | default({}) }}"
+    _malcolm_live_pipeline: "{{ (_malcolm_index_settings['index'] | default({}))['default_pipeline'] | default('') }}"

@@ -1,0 +1,29 @@
+---
+# Elasticsearch and Kibana of the target stack. On a DX_DFIR host the inventory
+# values map one to one:
+#   malcolm_space_es_url:           "https://{{ dxdfir_elastic_bind }}:{{ dxdfir_elastic_es_port }}"
+#   malcolm_space_kibana_url:       "http://{{ dxdfir_elastic_bind }}:{{ dxdfir_elastic_kibana_port }}"
+#   malcolm_space_elastic_password: "{{ dxdfir_elastic_password }}"
+#   malcolm_space_ca_file:          "{{ dxdfir_elastic_ca_file }}"
+malcolm_space_es_url: "https://127.0.0.1:9200"
+malcolm_space_kibana_url: "http://127.0.0.1:5601"
+malcolm_space_elastic_user: elastic
+malcolm_space_elastic_password: ""
+# CA certificate for an https Elasticsearch/Kibana; empty = the system trust store
+malcolm_space_ca_file: ""
+malcolm_space_validate_certs: true
+
+# the Kibana space the saved objects are imported into (kibana/space.json)
+malcolm_space_id: malcolm
+
+# roll every existing data stream below so its next backing index is created
+# from the index templates (and therefore written through the ingest pipeline)
+malcolm_space_rollover: true
+malcolm_space_streams:
+  - pattern: "logs-dxdfir.zeek-*"
+    pipeline: "logs-dxdfir.zeek@malcolm"
+  - pattern: "logs-dxdfir.detections-*"
+    pipeline: "logs-dxdfir.detections@malcolm"
+
+# elastic/malcolm: kibana/ and elasticsearch/
+malcolm_space_assets_dir: "{{ role_path }}/../../.."

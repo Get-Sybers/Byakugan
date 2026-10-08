@@ -145,6 +145,17 @@ differs between them, only the TLS posture and the certificate dance it
 requires. Pick this stack when Byakugan is the whole job; point at DX_DFIR's
 when Byakugan is embedded in it.
 
+## The `malcolm` space: Malcolm dashboards on DX_DFIR's Zeek and Suricata
+
+[`malcolm/`](malcolm/README.md) holds a Kibana space named `malcolm`: 36
+dashboards derived from the cisagov/Malcolm project and converted to the
+documents DX_DFIR's Filebeat writes for Zeek (`logs-dxdfir.zeek-*`) and
+Suricata (`logs-dxdfir.detections-*`), with the ingest pipelines and index
+templates those streams need. The Ansible playbook
+`malcolm/ansible/malcolm-space.yml` loads the Elasticsearch objects, the space
+and the dashboards; [`malcolm/DASHBOARDS.md`](malcolm/DASHBOARDS.md) lists
+every dashboard with the logs it reads and the panels it carries.
+
 ## Teardown
 
 ```sh

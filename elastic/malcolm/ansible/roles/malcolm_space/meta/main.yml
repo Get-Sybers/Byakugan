@@ -1,0 +1,11 @@
+---
+galaxy_info:
+  role_name: malcolm_space
+  author: get-sybers
+  description: "Load the malcolm Kibana space (Zeek and Suricata dashboards) and the ingest pipelines its data streams use."
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: GenericLinux
+      versions: [all]
+dependencies: []

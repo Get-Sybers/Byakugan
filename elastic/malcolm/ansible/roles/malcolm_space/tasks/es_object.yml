@@ -1,0 +1,44 @@
+---
+# One pipeline / component template / index template: written when the stored
+# object is missing or its _meta.version differs from the file's.
+- name: "malcolm-space | read {{ _malcolm_api }}/{{ _malcolm_name }}"
+  ansible.builtin.uri:
+    url: "{{ malcolm_space_es_url }}/{{ _malcolm_api }}/{{ _malcolm_name }}"
+    ca_path: "{{ malcolm_space_ca_file | default('', true) or omit }}"
+    validate_certs: "{{ malcolm_space_validate_certs }}"
+    url_username: "{{ malcolm_space_elastic_user }}"
+    url_password: "{{ malcolm_space_elastic_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  register: _malcolm_current
+  changed_when: false
+  no_log: true
+  vars:
+    _malcolm_name: "{{ _malcolm_file | basename | regex_replace('\\.json$', '') }}"
+
+- name: "malcolm-space | put {{ _malcolm_api }}/{{ _malcolm_name }}"
+  ansible.builtin.uri:
+    url: "{{ malcolm_space_es_url }}/{{ _malcolm_api }}/{{ _malcolm_name }}"
+    method: PUT
+    ca_path: "{{ malcolm_space_ca_file | default('', true) or omit }}"
+    validate_certs: "{{ malcolm_space_validate_certs }}"
+    url_username: "{{ malcolm_space_elastic_user }}"
+    url_password: "{{ malcolm_space_elastic_password }}"
+    force_basic_auth: true
+    body_format: json
+    body: "{{ _malcolm_wanted }}"
+    status_code: [200]
+  when: _malcolm_live_version != _malcolm_wanted_version
+  no_log: true
+  vars:
+    _malcolm_name: "{{ _malcolm_file | basename | regex_replace('\\.json$', '') }}"
+    _malcolm_wanted: "{{ lookup('ansible.builtin.file', _malcolm_file) | from_json }}"
+    _malcolm_wanted_version: "{{ _malcolm_wanted['_meta']['version'] }}"
+    _malcolm_json: "{{ _malcolm_current['json'] | default({}) }}"
+    _malcolm_entries: "{{ _malcolm_json['component_templates'] | default(_malcolm_json['index_templates'] | default([])) }}"
+    _malcolm_entry: "{{ (_malcolm_entries | first) if (_malcolm_entries | length > 0) else {} }}"
+    _malcolm_live: >-
+      {{ (_malcolm_json[_malcolm_name] | default({}))
+         if _malcolm_api == '_ingest/pipeline'
+         else (_malcolm_entry['component_template'] | default(_malcolm_entry['index_template'] | default({}))) }}
+    _malcolm_live_version: "{{ (_malcolm_live['_meta'] | default({}))['version'] | default('') }}"

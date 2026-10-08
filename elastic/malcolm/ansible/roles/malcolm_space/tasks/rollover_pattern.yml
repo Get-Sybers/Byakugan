@@ -1,0 +1,20 @@
+---
+- name: "malcolm-space | list the data streams matching {{ _malcolm_stream_spec['pattern'] }}"
+  ansible.builtin.uri:
+    url: "{{ malcolm_space_es_url }}/_data_stream/{{ _malcolm_stream_spec['pattern'] }}"
+    ca_path: "{{ malcolm_space_ca_file | default('', true) or omit }}"
+    validate_certs: "{{ malcolm_space_validate_certs }}"
+    url_username: "{{ malcolm_space_elastic_user }}"
+    url_password: "{{ malcolm_space_elastic_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  register: _malcolm_streams
+  changed_when: false
+  no_log: true
+
+- name: "malcolm-space | roll over each stream whose write index is not on {{ _malcolm_stream_spec['pipeline'] }}"
+  ansible.builtin.include_tasks: rollover_stream.yml
+  loop: "{{ (_malcolm_streams['json'] | default({}))['data_streams'] | default([]) }}"
+  loop_control:
+    loop_var: _malcolm_stream
+    label: "{{ _malcolm_stream['name'] }}"

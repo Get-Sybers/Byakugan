@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "managed_by": "byakugan elastic/malcolm",
+    "version": 1
+  },
+  "description": "DX_DFIR Zeek stream: @timestamp = the record's ts (Filebeat's read time moves to event.ingested), event.dataset = the Zeek log name (from the file name), event.provider = zeek, network.bytes for conn. Native fields are left untouched.",
+  "processors": [
+    {
+      "set": {
+        "copy_from": "@timestamp",
+        "field": "event.ingested",
+        "ignore_empty_value": true,
+        "override": false
+      }
+    },
+    {
+      "date": {
+        "field": "ts",
+        "formats": [
+          "ISO8601"
+        ],
+        "if": "ctx.ts != null",
+        "on_failure": [
+          {
+            "append": {
+              "field": "tags",
+              "value": "malcolm_ts_unparsed"
+            }
+          }
+        ],
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "script": {
+        "description": "event.dataset from the log file name",
+        "lang": "painless",
+        "source": "def p = ctx.log?.file?.path; if (p instanceof String) { int i = p.lastIndexOf('/'); String base = i >= 0 ? p.substring(i + 1) : p; int d = base.lastIndexOf('.'); String name = d > 0 ? base.substring(0, d) : base; if (name == 'zeek' && base.endsWith('.jsonl')) { name = 'zeek_index'; } if (ctx.event == null) { ctx.event = new HashMap(); } if (ctx.event.dataset == null) { ctx.event.dataset = name; } }"
+      }
+    },
+    {
+      "set": {
+        "field": "event.provider",
+        "override": false,
+        "value": "zeek"
+      }
+    },
+    {
+      "script": {
+        "description": "network.bytes = orig_ip_bytes + resp_ip_bytes",
+        "if": "ctx.event?.dataset == 'conn' && (ctx.orig_ip_bytes != null || ctx.resp_ip_bytes != null)",
+        "lang": "painless",
+        "source": "long b = 0; if (ctx.orig_ip_bytes != null) { b += ((Number) ctx.orig_ip_bytes).longValue(); } if (ctx.resp_ip_bytes != null) { b += ((Number) ctx.resp_ip_bytes).longValue(); } if (ctx.network == null) { ctx.network = new HashMap(); } if (ctx.network.bytes == null) { ctx.network.bytes = b; }"
+      }
+    },
+    {
+      "pipeline": {
+        "ignore_missing_pipeline": true,
+        "name": "logs@default-pipeline"
+      }
+    }
+  ]
+}

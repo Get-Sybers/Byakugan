@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "description": "binds the logs-dxdfir.detections@malcolm ingest pipeline and types the fields it adds; every other field keeps the stack's dynamic mapping (ecs@mappings: strings -> keyword)",
+    "managed_by": "byakugan elastic/malcolm",
+    "version": 1
+  },
+  "template": {
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "event": {
+          "properties": {
+            "dataset": {
+              "type": "keyword"
+            },
+            "ingested": {
+              "type": "date"
+            },
+            "kind": {
+              "type": "keyword"
+            },
+            "provider": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "settings": {
+      "index": {
+        "default_pipeline": "logs-dxdfir.detections@malcolm",
+        "mapping": {
+          "total_fields": {
+            "limit": 4000
+          }
+        }
+      }
+    }
+  }
+}

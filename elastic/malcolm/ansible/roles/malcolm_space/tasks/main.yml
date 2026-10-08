@@ -1,0 +1,23 @@
+---
+- name: "malcolm-space | assert inputs"
+  ansible.builtin.assert:
+    that:
+      - malcolm_space_es_url | length > 0
+      - malcolm_space_kibana_url | length > 0
+      - malcolm_space_elastic_user | length > 0
+      - malcolm_space_elastic_password | length > 0
+    fail_msg: >-
+      malcolm_space needs malcolm_space_es_url, malcolm_space_kibana_url,
+      malcolm_space_elastic_user and malcolm_space_elastic_password.
+    quiet: true
+  tags: [always]
+
+- name: "malcolm-space | elasticsearch: ingest pipelines, component templates, index templates"
+  ansible.builtin.import_tasks: elasticsearch.yml
+
+- name: "malcolm-space | elasticsearch: roll the data streams onto the templates"
+  ansible.builtin.import_tasks: rollover.yml
+  when: malcolm_space_rollover | bool
+
+- name: "malcolm-space | kibana: the space and its saved objects"
+  ansible.builtin.import_tasks: kibana.yml

@@ -1,0 +1,9 @@
+---
+- name: "Malcolm | load the malcolm Kibana space"
+  hosts: "{{ malcolm_hosts | default('localhost') }}"
+  connection: "{{ malcolm_connection | default('local') }}"
+  gather_facts: false
+  tasks:
+    - name: "malcolm-space | run the malcolm_space role"
+      ansible.builtin.include_role:
+        name: malcolm_space

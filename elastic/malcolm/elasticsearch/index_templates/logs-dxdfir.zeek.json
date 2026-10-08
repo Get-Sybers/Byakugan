@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "description": "the stack's own logs template (logs@mappings, logs@settings, ecs@mappings) plus logs-dxdfir.zeek@malcolm; priority 200 beats the built-in 100",
+    "managed_by": "byakugan elastic/malcolm",
+    "version": 1
+  },
+  "allow_auto_create": true,
+  "composed_of": [
+    "logs@mappings",
+    "logs@settings",
+    "logs@custom",
+    "ecs@mappings",
+    "logs-dxdfir.zeek@malcolm"
+  ],
+  "data_stream": {},
+  "ignore_missing_component_templates": [
+    "logs@custom"
+  ],
+  "index_patterns": [
+    "logs-dxdfir.zeek-*"
+  ],
+  "priority": 200
+}

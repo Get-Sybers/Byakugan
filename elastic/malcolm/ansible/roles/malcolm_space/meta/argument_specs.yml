@@ -1,0 +1,69 @@
+---
+argument_specs:
+  main:
+    short_description: "Load the malcolm Kibana space and prepare its data streams."
+    description:
+      - >-
+        Puts the ingest pipelines, component templates and index templates
+        under elastic/malcolm/elasticsearch/ (an object is written when the
+        stored one is missing or carries a different _meta.version), rolls
+        the logs-dxdfir.zeek-* and logs-dxdfir.detections-* data streams over
+        when their write index is not yet on the pipeline, creates or updates
+        the Kibana space from elastic/malcolm/kibana/space.json, and imports
+        the data views and every dashboard file under elastic/malcolm/kibana/
+        into that space with overwrite. Every step converges: a second run
+        on an unchanged stack changes nothing but the saved-object import,
+        which Kibana always reports as written.
+      - >-
+        Authenticates with basic auth as malcolm_space_elastic_user on both
+        Elasticsearch and Kibana; the pipeline/template writes, the rollover
+        and the space creation need the privileges of the elastic superuser.
+    options:
+      malcolm_space_es_url:
+        type: str
+        required: false
+        default: "https://127.0.0.1:9200"
+        description: "Elasticsearch base URL."
+      malcolm_space_kibana_url:
+        type: str
+        required: false
+        default: "http://127.0.0.1:5601"
+        description: "Kibana base URL (without a space prefix)."
+      malcolm_space_elastic_user:
+        type: str
+        required: false
+        default: elastic
+        description: "User for both Elasticsearch and Kibana."
+      malcolm_space_elastic_password:
+        type: str
+        required: true
+        description: "Its password. Never logged."
+      malcolm_space_ca_file:
+        type: str
+        required: false
+        default: ""
+        description: "CA certificate (PEM) for https endpoints; empty uses the system trust store."
+      malcolm_space_validate_certs:
+        type: bool
+        required: false
+        default: true
+        description: "Verify TLS certificates."
+      malcolm_space_id:
+        type: str
+        required: false
+        default: malcolm
+        description: "Id of the Kibana space; must match kibana/space.json."
+      malcolm_space_rollover:
+        type: bool
+        required: false
+        default: true
+        description: "Roll over existing data streams whose write index is not on the pipeline."
+      malcolm_space_streams:
+        type: list
+        elements: dict
+        required: false
+        description: "The data-stream patterns to roll over and the pipeline each must be on."
+      malcolm_space_assets_dir:
+        type: str
+        required: false
+        description: "Directory holding kibana/ and elasticsearch/ (default: elastic/malcolm)."
