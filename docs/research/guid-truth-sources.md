@@ -164,7 +164,7 @@ So the seconds field spans the *second and third* text groups read as one
   validations land together.
 - Unvalidated and quarantined per the parent doc: the counter/tail
   semantics, and every claim above on *other* Sysmon versions —
-  `to-be-validated/` fixtures decide, never the layout doc alone.
+  `docs/to-be-validated/` fixtures decide, never the layout doc alone.
 
 ### 2.2 TraceLogging / EventSource provider GUIDs — derivation, pair-validated
 
@@ -288,7 +288,7 @@ New derive-rule candidates surfaced by §2: Sysmon start-time extraction
 | ADSchema pages carry `System-Id-Guid` / `Rights-GUID` | **verified** (two raw pages fetched, values quoted) |
 | edk2 DEC GUID format + licence | **verified** (sparse clone, 748 lines counted) |
 | winreg-kb layouts (MountedDevices offsets, FolderDescriptions values) | **verified** (docs read) |
-| Sysmon PG epoch field position + endianness | **verified on one fixture** (one host, one Sysmon vintage — widen via `to-be-validated/`) |
+| Sysmon PG epoch field position + endianness | **verified on one fixture** (one host, one Sysmon vintage — widen via `docs/to-be-validated/`) |
 | EventSource derivation | **verified** against one published pair (System.Runtime) |
 | MSI packed transform | **verified** against one known pair (Office 14) |
 | PG machine/counter fields; `LogonGuid` time; other Sysmon versions | unvalidated — fixture protocol per parent doc |

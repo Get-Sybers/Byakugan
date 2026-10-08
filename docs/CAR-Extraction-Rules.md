@@ -4,7 +4,7 @@ The MITRE CAR data model is Byakugan's extraction target. The CAR objects, their
 fields and their canonical actions are reconstructed live from the pinned CAR
 model (the forked MITRE model we own), baked into the hardened
 `get-sybers/byakugan` image at build time
-([GoDFIR-toolz/byakugan](https://github.com/Get-Sybers/GoDFIR-toolz/-/tree/main/byakugan)) —
+([GoDFIR-toolz/byakugan](https://github.com/Get-Sybers/GoDFIR-toolz/tree/main/byakugan)) —
 no committed copy, no host checkout — and the engine
 ([Byakugan](https://github.com/Get-Sybers/Byakugan))
 normalises every artefact into finished CAR events against it. These four

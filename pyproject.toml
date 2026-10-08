@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 # name — every deterministic id re-minted).
 name = "byakugan"
 version = "0.1.0"
-description = "Byakugan — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, Anamnesis) into finished MITRE CAR: per-source databases, an inference cascade, per-object JSON."
+description = "Byakugan — normalise raw DFIR processor output (EvtxECmd, log2timeline, Zeek, Anamnesis) into finished MITRE CAR: a materialised per-source JSONL tree, the relationship cascade, and the CAR→ECS / CAR→STIX projections."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
@@ -23,7 +23,7 @@ dev = ["pytest>=8", "yamale>=4", "yamllint>=1.30"]
 
 [project.urls]
 Repository = "https://github.com/Get-Sybers/Byakugan"
-Issues = "https://github.com/Get-Sybers/Byakugan/-/issues"
+Issues = "https://github.com/Get-Sybers/Byakugan/issues"
 
 [project.scripts]
 # the multi-tool entry point: `byakugan build|timeline|verify|car-vocab` driven
@@ -31,10 +31,10 @@ Issues = "https://github.com/Get-Sybers/Byakugan/-/issues"
 byakugan = "byakugan.cli:main"
 
 [tool.pytest.ini_options]
-# tests/ holds shared helpers (reference_plumbing.py) that the test modules
-# import as top-level modules (`from reference_plumbing import ...`). Put tests/
-# on sys.path explicitly so collection works regardless of pytest's import mode
-# or the directory pytest is invoked from.
+# tests/ holds shared helpers (go_engine.py, processed_fixtures.py) that the
+# test modules import as top-level modules (`from go_engine import ...`). Put
+# tests/ on sys.path explicitly so collection works regardless of pytest's
+# import mode or the directory pytest is invoked from.
 pythonpath = ["tests"]
 # Vendored source catalogues carry their own upstream test suites; collection
 # stops at the vendor boundary. norecursedirs REPLACES pytest's default list,

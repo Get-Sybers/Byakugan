@@ -1,5 +1,13 @@
 # Byakugan Go parse engine — design contract (v1)
 
+> **Status: a design record, not the live layout.** This is the contract the Go
+> migration was built against. The parity harness (`tests/parity/`), the frozen
+> reference plumbing, `tests/reference_plumbing.py`, `scripts/bench-parse.py` and
+> the per-family Python predicate modules it describes have all since been
+> retired, and the counts it quotes (24 markers / 77 predicates / 10 external
+> forms) are 22 / 80 / 13 today. The live layout, build and test story is
+> [README.md](README.md).
+
 Repo: /home/user/Byakugan (import package now `byakugan` after the rename).
 Go module: `github.com/Get-Sybers/Byakugan/go` (Go 1.27), lives at `go/` in the repo, mirroring DX_DFIR's layout.
 Binary: `go/cmd/byakugan-parse` → built to `go/bin/byakugan-parse` by `go/Makefile` (`make -C go build`).
@@ -123,7 +131,7 @@ JSON {"tables": {"L2tX": "path"...}, "lines": N} on stdout.
 - fixtures: tests/parity/fixtures/<artefact_or_family>/*.jsonl — REAL raw-shaped records:
   every inline fixture record extracted from the existing test files + authored fixtures for
   the zero-coverage maps (evtx_more variants per its docstring, plaso_fseventsd via
-  to-be-validated/plaso_fseventsd_flags.yml research, plaso_olecf, full-field plaso_registry/
+  docs/to-be-validated/plaso_fseventsd_flags.yml research, plaso_olecf, full-field plaso_registry/
   shellitem/srum, readers edge cases: BOM, trailing commas, bad lines, bad UTF-8).
 - each fixture dir carries manifest.json: {"artefacts": [keys], "host": "H"|null,
   "adapter": "none"|"winevt"|"jlecmd", "input": "<file>.jsonl"} — the runner discovers dirs.
@@ -231,7 +239,7 @@ wall clock + peak RSS; print a small table. Run once and record results in go/RE
   hand-roll, no external uuid dep needed).
 - Event order = input order everywhere; no parallelism that reorders output (v1: sequential;
   concurrency inside a file only if order-preserving and proven equal).
-- routes-to-[] and to-be-validated/ quarantined maps: Go must NOT emit them.
+- routes-to-[] and docs/to-be-validated/ quarantined maps: Go must NOT emit them.
 - Every deviation discovered between this doc and the Python source: THE PYTHON SOURCE WINS;
   note the deviation in your report.
 

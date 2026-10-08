@@ -31,7 +31,7 @@ Grounded in: `byakugan/third_party/car/data_model/flow.yaml`, `car_data_model.js
 
 ## Per-field provenance table
 
-Legend for "mapped?": **yes** = an active map fills it; **inherit** = filled by the enrich cascade from the owning process (fill-only-null, never overwrites native); **quarantined** = spec exists in `to-be-validated/`, not active; **NO** = no source in the repo fills it.
+Legend for "mapped?": **yes** = an active map fills it; **inherit** = filled by the enrich cascade from the owning process (fill-only-null, never overwrites native); **quarantined** = spec exists in `docs/to-be-validated/`, not active; **NO** = no source in the repo fills it.
 
 | field | sources (source → native field) | action(s) | currently mapped? | confidence & caveats |
 |---|---|---|---|---|
@@ -90,7 +90,7 @@ Legend for "mapped?": **yes** = an active map fills it; **inherit** = filled by 
 
 ### UNMAPPED opportunities, ranked (build-order)
 
-1. **WFP 5156/5157 → flow (U1)** — spec is written and schema-grounded in `to-be-validated/evtx_audit.yml` (`security_5156_wfp_connection_allowed` → flow/start; 5157 → flow/message). Gives endpoint 5-tuple + `image_path` + `pid` + `network_direction` from the **Windows Security log** (no Sysmon required). **Blocked only on a capture with the Filtering-Platform-Connection audit subcategory enabled** (absent from lonewolf/M57/attack-samples). Highest value: a second, log-native endpoint source.
+1. **WFP 5156/5157 → flow (U1)** — spec is written and schema-grounded in `docs/to-be-validated/evtx_audit.yml` (`security_5156_wfp_connection_allowed` → flow/start; 5157 → flow/message). Gives endpoint 5-tuple + `image_path` + `pid` + `network_direction` from the **Windows Security log** (no Sysmon required). **Blocked only on a capture with the Filtering-Platform-Connection audit subcategory enabled** (absent from lonewolf/M57/attack-samples). Highest value: a second, log-native endpoint source.
 2. **Memory netscan flow (S3) — already mapped, under-exercised.** Schema/pipeline complete; the on-hand memory image produced no netscan rows. Validate against an image that has live connections to prove the exe/pid/user/uid/ppid inheritance end-to-end.
 3. **Zeek dns/ssl/http → flow enrichment by `uid` (U2)** — fills `application_protocol` (richer), `proto_info`, and `dest_fqdn` for network-vantage flows. The logs are already produced and sit raw; a cascade `from_owning_flow`-style rule (the R3 pattern already used for http/file) would attach them.
 4. **Sysmon EID 22 DnsQuery (U3), Suricata EVE / NetFlow / pcap (U4)** — no mappers today; would add DNS-based `dest_fqdn`, and (pcap/Suricata) the only realistic path to `content`/`proto_info`.

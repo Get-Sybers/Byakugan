@@ -31,7 +31,7 @@ Grounded in:
 | Source | Native table/event | → CAR object here | socket status |
 |---|---|---|---|
 | **Volatility 3 `windows.netscan` / `windows.netstat` / `windows.anamnesis.network`** (Anamnesis) | bound/LISTENING pooled `_TCP/UDP` endpoint objects | **`socket`/`listen`** (via `is_bound_socket` predicate) | **ACTIVE** — `Anamnesis internal/normalize/mappings.yaml` `_SOCKET_MAP` |
-| **Security 5158** (WFP "connection bind allowed") | `SourceAddress/SourcePort/Protocol/Application/ProcessID` | **`socket`/`bind`** | **INERT** — `to-be-validated/evtx_audit.yml` key `security_5158_wfp_bind` |
+| **Security 5158** (WFP "connection bind allowed") | `SourceAddress/SourcePort/Protocol/Application/ProcessID` | **`socket`/`bind`** | **INERT** — `docs/to-be-validated/evtx_audit.yml` key `security_5158_wfp_bind` |
 | osquery 4.6.0 `socket_events` | (bind/listen/close) | `socket` bind/listen/close **(upstream CAR coverage map only)** | **NOT INGESTED** — no osquery collector or mapping in this repo |
 | Sysmon 3 (NetworkConnect) | `SourceIp/DestinationIp/…/Initiated` | **`flow`/`start`** (`mappings/sysmon.py` EID 3) | routed to flow, **not socket** |
 | Security 5156 / 5157 (WFP conn allowed/blocked) | `SourceAddress/DestAddress/…` | **`flow`** start/message | routed to flow (5156/5157 in the same `to-be-validated` file) |
@@ -58,14 +58,14 @@ Legend — **action**: which socket action the row carries. **mapped?**: `yes+wh
 | source (native → field) | action | mapped? | confidence & caveats |
 |---|---|---|---|
 | Vol3 netscan (owning process) | listen | **yes (by ENRICHMENT)** — anamnesis `enrich.py` `_INHERIT` (line 72) fills `image_path` from the owning process | **High.** NOT native to the netscan row (netscan `Owner` = `ImageFileName`, the process **name** only, no path — `Anamnesis internal/collect (collectNetwork)`). Filled from the owner's `image_path`, joined **definitively** on `OwnerOffset` (the kernel `_EPROCESS` pointer), falling back to (reusable) PID. Null if the owning process isn't recovered. |
-| Security 5158 WFP `Application` → `image_path` | bind | **INERT** — `to-be-validated/evtx_audit.yml` (`image_path: Application`) | Native full path when promoted; inert today. |
+| Security 5158 WFP `Application` → `image_path` | bind | **INERT** — `docs/to-be-validated/evtx_audit.yml` (`image_path: Application`) | Native full path when promoted; inert today. |
 | osquery `socket_events` | bind/listen/close | NO (not ingested) | upstream coverage lists osquery |
 
 ### `local_address` — IP the socket accepts on (no port)
 | source (native → field) | action | mapped? | confidence & caveats |
 |---|---|---|---|
 | Vol3 netscan `LocalAddr` → `local_address` | listen | **yes** — `_SOCKET_MAP` | **High.** `0.0.0.0`/`::` legitimately appears for wildcard listeners (also the `is_bound_socket` trigger). |
-| Security 5158 WFP `SourceAddress` → `local_address` | bind | **INERT** — `to-be-validated/evtx_audit.yml` | High once promoted. |
+| Security 5158 WFP `SourceAddress` → `local_address` | bind | **INERT** — `docs/to-be-validated/evtx_audit.yml` | High once promoted. |
 | osquery `socket_events` | bind/listen/close | NO (not ingested) | upstream |
 
 ### `local_path` — AF_UNIX socket filesystem path (`/tmp/foo`)
@@ -77,21 +77,21 @@ Legend — **action**: which socket action the row carries. **mapped?**: `yes+wh
 | source (native → field) | action | mapped? | confidence & caveats |
 |---|---|---|---|
 | Vol3 netscan `LocalPort` → `local_port` | listen | **yes** — `_SOCKET_MAP` | **High.** |
-| Security 5158 WFP `SourcePort` → `local_port` | bind | **INERT** — `to-be-validated/evtx_audit.yml` | High once promoted. |
+| Security 5158 WFP `SourcePort` → `local_port` | bind | **INERT** — `docs/to-be-validated/evtx_audit.yml` | High once promoted. |
 | osquery `socket_events` | bind/listen/close | NO (not ingested) | upstream |
 
 ### `pid` — process that acted on the socket
 | source (native → field) | action | mapped? | confidence & caveats |
 |---|---|---|---|
 | Vol3 netscan `PID` → `pid` (+ `owning_pid=PID`, `owning_offset=OwnerOffset`) | listen | **yes** — `_SOCKET_MAP` | **High.** The `pid` value is the heuristic/reusable owner PID (kept for humans); the **definitive** process linkage is `OwnerOffset` (`network.py:16` "reusable PID is only a heuristic"). |
-| Security 5158 WFP `ProcessID` (**decimal**) → `pid` | bind | **INERT** — `to-be-validated/evtx_audit.yml` | Note: WFP `ProcessID` is decimal (unlike hex 4663 `ProcessId`). |
+| Security 5158 WFP `ProcessID` (**decimal**) → `pid` | bind | **INERT** — `docs/to-be-validated/evtx_audit.yml` | Note: WFP `ProcessID` is decimal (unlike hex 4663 `ProcessId`). |
 | osquery `socket_events` | bind/listen/close | NO (not ingested) | upstream |
 
 ### `protocol` — TCP / UDP
 | source (native → field) | action | mapped? | confidence & caveats |
 |---|---|---|---|
 | Vol3 netscan `Proto` → `transport()` → `TCP`/`UDP` | listen | **yes** — `_SOCKET_MAP` (`transport("Proto")`) | **High.** Clean `TCPv4`→`TCP` extraction (`normalize.py`). |
-| Security 5158 WFP `Protocol` → `protocol` (**raw**) | bind | **INERT** — `to-be-validated/evtx_audit.yml` | **Caveat:** mapped **raw** (numeric IP proto `6`/`17`), *not* normalized — unlike sibling 5156/5157 which apply `map_value(Protocol,{6:tcp,17:udp})`. Fix on promotion. |
+| Security 5158 WFP `Protocol` → `protocol` (**raw**) | bind | **INERT** — `docs/to-be-validated/evtx_audit.yml` | **Caveat:** mapped **raw** (numeric IP proto `6`/`17`), *not* normalized — unlike sibling 5156/5157 which apply `map_value(Protocol,{6:tcp,17:udp})`. Fix on promotion. |
 | osquery `socket_events` | bind/listen/close | NO (not ingested) | upstream |
 
 ### `remote_address` — IP at the remote end
@@ -108,7 +108,7 @@ Legend — **action**: which socket action the row carries. **mapped?**: `yes+wh
 | source (native → field) | action | mapped? | confidence & caveats |
 |---|---|---|---|
 | Vol3 netscan → `const(True)` | listen | **yes** — `_SOCKET_MAP` (`"success": const(True)`) | **High-but-inferential.** Not observed — **proven by existence**: "a kernel socket object exists only after a successful bind/listen" (`mappings.py:51`, CHANGELOG). Never `false` (no failure events captured). |
-| Security 5158 WFP → `const(true)` | bind | **INERT** — `to-be-validated/evtx_audit.yml` (`success: const(true)`) | Same existence inference (5158 is the *allowed* bind). A *blocked* bind has no distinct EID mapped. |
+| Security 5158 WFP → `const(true)` | bind | **INERT** — `docs/to-be-validated/evtx_audit.yml` (`success: const(true)`) | Same existence inference (5158 is the *allowed* bind). A *blocked* bind has no distinct EID mapped. |
 | osquery `socket_events` | — | NO | **Upstream CAR coverage map also leaves `success` EMPTY** — no sensor supplies it upstream either. |
 
 ---
@@ -118,7 +118,7 @@ Legend — **action**: which socket action the row carries. **mapped?**: `yes+wh
 | action | source(s) | mapped? | note |
 |---|---|---|---|
 | **`listen`** | Vol3 memory netscan/netstat/`anamnesis.network` | **yes (ACTIVE)** — anamnesis `_SOCKET_MAP action=listen` | A memory snapshot sees the **steady-state** listener → `listen`. This is the entire active socket object. |
-| **`bind`** | Security 5158 WFP | **INERT** — `to-be-validated/evtx_audit.yml` | Schema-grounded, not sample-verified; absent from all corpora. |
+| **`bind`** | Security 5158 WFP | **INERT** — `docs/to-be-validated/evtx_audit.yml` | Schema-grounded, not sample-verified; absent from all corpora. |
 | **`close`** | — | **NO SOURCE** | No producer emits `close`: a memory snapshot can't observe a close transition; no WFP close EID is mapped; osquery upstream has it but isn't ingested. |
 
 Minor: the cascade verb map (`byakugan/byakugan/cascade_relationships.yml:38`) declares only `socket: bind: "bound to"` — the **active `listen`** action falls through to `default_spoke_verb: accessed`. Cosmetic (STIX/relations narration), not a data gap.
@@ -133,7 +133,7 @@ Minor: the cascade verb map (`byakugan/byakugan/cascade_relationships.yml:38`) d
 Windows AF_INET/INET6 only. 4 of 10 fields have **no** active source (`local_path`, `remote_address`,
 `remote_port`, and — for the `bind`/`close` actions — everything).
 
-**What's built but inert:** `socket`/`bind` from **WFP 5158** (`to-be-validated/evtx_audit.yml`) — adds the
+**What's built but inert:** `socket`/`bind` from **WFP 5158** (`docs/to-be-validated/evtx_audit.yml`) — adds the
 `bind` action + `local_address`/`local_port`/`protocol`/`image_path`/`pid`/`success`.
 
 **What has no source at all:** `local_path` (AF_UNIX / auditd), `remote_address`/`remote_port` (those are
@@ -142,7 +142,7 @@ Windows AF_INET/INET6 only. 4 of 10 fields have **no** active source (`local_pat
 ### UNMAPPED gaps, ranked
 
 1. **Memory socket capability ACTIVE but UNEXERCISED in the corpus (collection gap).** `data_store/processed/volatility/memdump.mem/plugins/` contains only `banners`, `mftscan`, `anamnesis.processes`, `anamnesis.registry`, `anamnesis.sessions`, `pslist` — **no `netscan`/`netstat`/`windows.anamnesis.network` output**. So the *entire* listen/bind socket object is invisible in current evidence. **Fix: run `windows.anamnesis.network` (or `netscan`/`netstat`) over `memdump.mem`** — the map already handles the output 1:1 (passthrough via `pipeline.py:150`). Highest value, zero code.
-2. **Promote WFP 5158 (`to-be-validated/evtx_audit.yml` → active `mappings/*.py`).** The only path to the **`bind`** action and to socket coverage from Windows event logs. Needs a capture with the *Filtering Platform Connection* auditpol subcategory enabled to validate, then port back (prior impl in git history: `mappings/evtx_audit.py`). **On promotion, fix `protocol` to normalize** (`map_value(Protocol,{6:tcp,17:udp})`) rather than passing the raw numeric, to match the memory source's `TCP`/`UDP`.
+2. **Promote WFP 5158 (`docs/to-be-validated/evtx_audit.yml` → active `mappings/*.py`).** The only path to the **`bind`** action and to socket coverage from Windows event logs. Needs a capture with the *Filtering Platform Connection* auditpol subcategory enabled to validate, then port back (prior impl in git history: `mappings/evtx_audit.py`). **On promotion, fix `protocol` to normalize** (`map_value(Protocol,{6:tcp,17:udp})`) rather than passing the raw numeric, to match the memory source's `TCP`/`UDP`.
 3. **`family` value-form normalization.** Memory emits `ipv4`/`ipv6`; the STIX `socket-ext` gate expects `AF_*` and silently drops the extension. Decide one canonical form (CAR docs say `AF_INET`; ECS projection says `ipv4`) and align emitter + STIX gate.
 4. **`remote_address`/`remote_port` — no socket source (by design).** Only worth revisiting if an *established* (non-listening) endpoint should ever be represented as `socket` rather than `flow`. Currently intentional; low priority.
 5. **`local_path` (AF_UNIX) — true no-source.** Would require **Linux auditd `SOCKADDR`** ingestion (`plaso_linux.py` currently emits only `user_session` + `file`). Even upstream CAR has no source for it. Lowest priority.

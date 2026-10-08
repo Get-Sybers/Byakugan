@@ -175,7 +175,7 @@ zeek↔host-flow bridge.
 
 A triage over the real lonewolf image (55k records / 842 distinct
 Channel+EventId) added maps for every event that has a CLEAN canonical CAR home
-(`mappings/evtx_more.py`, wired into `EVTX_MAPS` so it also serves the
+(`go/internal/authoring/maps_evtx_more.go`, wired into `EVTX_MAPS` so it also serves the
 `l2t_winevt` Plaso adapter). lonewolf coverage rose **2808 → 4852 events (+73%)**:
 
 | (Channel, EventId) | → object/action | count |

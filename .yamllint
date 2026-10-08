@@ -1,6 +1,6 @@
-# yamllint config for Byakugan YAML artefacts (sources/, to-be-validated/).
+# yamllint config for Byakugan YAML artefacts (sources/, docs/to-be-validated/).
 # sources/*.yaml are machine-generated (PyYAML: block sequences at the parent
-# indent); to-be-validated/*.yml are hand-written (indented sequences). Both are
+# indent); docs/to-be-validated/*.yml are hand-written (indented sequences). Both are
 # internally consistent, so indent-sequences=consistent accepts each; the schema
 # itself is enforced by yamale + gen_sources --check, not here.
 extends: default

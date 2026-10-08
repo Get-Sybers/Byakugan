@@ -37,7 +37,7 @@ plus a source×field coverage matrix.
 
 ## How to read it
 - **"currently mapped?"** is the gap column — a `NO` where a genuine source exists is a completeness gap (see [COMPLETENESS-BACKLOG.md](COMPLETENESS-BACKLOG.md)); a `NO` with no source is an **honest null** (documented, never faked).
-- Grounded in `byakugan/byakugan/mappings/` + `sources/*.yaml` (engine), `Anamnesis internal/normalize/mappings.yaml` (memory), `to-be-validated/evtx_audit.yml` (the quarantined audit family), and `car_data_model.json`.
+- Grounded in `byakugan/byakugan/mappings/` + `sources/*.yaml` (engine), `Anamnesis internal/normalize/mappings.yaml` (memory), `docs/to-be-validated/evtx_audit.yml` (the quarantined audit family), and `car_data_model.json`.
 - **Do not trust the upstream `*.yaml` `coverage_map`s** — the agents found driver/thread/flow sensor cards overclaim (`pid`, `src_tid`, `uid` listed but not on the wire). The per-field tables here are ground truth.
 
 Generated 2026-09-07 by a per-object deep audit; §1 of `docs/CAR-Extraction-Rules.md` (extract every field the artefact can supply) is the governing principle.

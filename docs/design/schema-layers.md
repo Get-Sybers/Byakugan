@@ -27,7 +27,7 @@ Elasticsearch deployment) consume the same schema files — Go via
 proving it implements exactly the declared model. Drift between the
 engines becomes a CI failure, not a review catch. Types and behaviour
 stay in code; every static declaration lives as data
-([go-standards §5, "Static declarations are data, not code"](https://github.com/Get-Sybers/DX_DFIR/-/blob/main/docs/reference/go-standards.md),
+([go-standards §5, "Static declarations are data, not code"](https://github.com/Get-Sybers/DX_DFIR/blob/main/docs/reference/go-standards.md),
 restored to its intended direction).
 
 ## The layers

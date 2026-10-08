@@ -57,7 +57,7 @@ EVTX_MAPS = ["evtx_security",           # Security 4624/4625/4672 -> authenticat
              "evtx_more"]               # 4907/5857/20003/30803/7001/7002/7034 -> file/module/service/flow/user_session
 # NB: the Security-audit families (4663/4657/4660/4670/4689/5140/5145/5156/5157/
 # 5158/5058 -> file/registry/process/flow/socket) are NOT active — their mappings
-# are unvalidated inferences quarantined in ../to-be-validated/evtx_audit.yml
+# are unvalidated inferences quarantined in ../docs/to-be-validated/evtx_audit.yml
 # until confirmed against an audit-enabled capture. Promote from there.
 
 # filename-pattern -> artefact map keys (explicit, first match wins)

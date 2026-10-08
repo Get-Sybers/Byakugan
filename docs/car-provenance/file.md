@@ -6,7 +6,7 @@ Authoritative "find once, done" map of **every canonical field → every artefac
 - **Canonical fields (26):** company, content, creation_time, extension, file_name, file_path, fqdn, gid, group, hostname, image_path, link_target, md5_hash, mime_type, mode, owner, owner_uid, pid, ppid, previous_creation_time, sha1_hash, sha256_hash, signature_valid, signer, uid, user.
 - **Actions (7):** acl_modify, create, delete, modify, read, timestomp, write.
 
-**Legend for "mapped?"** — `YES` (active map emits it) with file:line; `INERT` (spec exists but quarantined in `to-be-validated/evtx_audit.yml`, never runs); `NO` (nothing in the engine, source may or may not exist).
+**Legend for "mapped?"** — `YES` (active map emits it) with file:line; `INERT` (spec exists but quarantined in `docs/to-be-validated/evtx_audit.yml`, never runs); `NO` (nothing in the engine, source may or may not exist).
 
 ---
 

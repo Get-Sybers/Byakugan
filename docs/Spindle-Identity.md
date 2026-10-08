@@ -4,7 +4,7 @@
 guid from (`normalize._spindle`, via `ids.mint`). Like `relationships.yml`,
 it is **data**: *which* fields identify a row is a rule declared there; the
 engine only implements the mechanics. A map references an entry by name
-(`"guid": spindle("<name>")` in `mappings/*.py`) and never spells identity
+(`Guid: GuidSpindle("<name>")` in `go/internal/authoring/maps_*.go`) and never spells identity
 fields itself, so the registry and the maps cannot drift
 (`byakugan.spindle.verify_registry` — `tests/test_spindle_model.py` and
 `python -m byakugan.spindle --check`). The resolved, materialized snapshot
@@ -31,7 +31,7 @@ the key — that is what must stay invariant so two tools parsing the same
 image mint the same guid for the same record. The identity names (+
 version) are therefore the cross-tool contract: a second tool's map over
 the same artefact reuses the entry. What a real multi-tool corpus must
-still confirm is `to-be-validated/spindle_identity.yml`.
+still confirm is `docs/to-be-validated/spindle_identity.yml`.
 
 ## Identity value sources
 
