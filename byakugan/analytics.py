@@ -8,7 +8,7 @@ CAR analytic "does this row exhibit your behaviour?" — turning an *artefact*
 timeline (what was logged) into a *behaviour* timeline (what the adversary did).
 
 **Data, not code** — the analytics are reconstructed LIVE from the pinned car
-submodule (third_party/car/analytics/*.yaml), the same discipline carmodel.py
+submodule (model/sources/car/analytics/*.yaml), the same discipline carmodel.py
 uses for the object model: nothing is hand-copied, a refresh is a pin bump. The
 engine here is only the MECHANIC — a compiler from the analytic's CAR-native
 `pseudocode` implementation to a predicate over a CAR object row.
@@ -48,7 +48,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(_HERE)
 # the analytics are a PINNED submodule — never a vendored copy (build_data_model
 # reconstructs the object model from the sibling data_model/ the same way)
-_ANALYTICS_DIR = os.path.join(_ROOT, "third_party", "car", "analytics")
+_ANALYTICS_DIR = os.path.join(_ROOT, "model", "sources", "car", "analytics")
 
 # CAR object words that are not one of the 13 objects (so an analytic searching
 # them cannot run against the CAR object model) — aliased or genuinely absent.
@@ -467,7 +467,7 @@ def load_analytics(analytics_dir: str | None = None) -> list[CarAnalytic]:
     files = sorted(glob.glob(os.path.join(d, "*.yaml")))
     if not files:
         raise SystemExit("car analytics submodule not checked out — run: "
-                         "git submodule update --init --recursive third_party/car")
+                         "git submodule update --init --recursive model/sources/car")
     out: list[CarAnalytic] = []
     for path in files:
         with open(path, encoding="utf-8") as fh:

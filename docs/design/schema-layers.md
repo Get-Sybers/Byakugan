@@ -11,7 +11,7 @@ library** (see [the alignment study](../research/attack-data-model-alignment.md)
 
 The object/relationship model lives in three places that agree only by
 discipline: the Go IR (authored as Go literals, `ir.json` generated FROM
-code), the CAR model (reconstructed at runtime from the `third_party/car`
+code), the CAR model (reconstructed at runtime from the `model/sources/car`
 submodule), and per-consumer copies (anamnesis embeds its own
 `car_data_model.json`, enrich data and normalize mappings; the elastic
 projection commits its own rendered artifacts). Nothing gates the engines
@@ -166,7 +166,7 @@ anamnesis's `internal/normalize/mappings.yaml` resolver grammar
 - The OASIS JSON schemas for the core types are vendored under
   `model/schema/vendor/oasis/` (informative per STIX §1.2.12); our
   schemas compose them, never fork them.
-- The CAR upstream (`third_party/car`) becomes a REFRESH-TIME input: a
+- The CAR upstream (`model/sources/car`) becomes a REFRESH-TIME input: a
   maintenance task regenerates Object Model declarations from it, humans
   review the diff, and the committed files are canonical. Engines and
   tests never read the submodule again. Staleness is gated, not trusted:
@@ -305,7 +305,7 @@ All meta-schemas are JSON Schema **2020-12**; closed shapes use
 3. Gates on: both engines validate against the schema dir; `gen-ir`
    flips from owner to consumer behind its drift check; count-and-carry
    findings wired into `--check`.
-4. Only then: retire runtime submodule use; `third_party/` stays for the
+4. Only then: retire runtime submodule use; `model/sources/` stays for the
    refresh task alone.
 
 ## Non-goals (this mission)

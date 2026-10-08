@@ -40,7 +40,7 @@ pythonpath = ["tests"]
 # stops at the vendor boundary. norecursedirs REPLACES pytest's default list,
 # so the stock entries are restated here alongside the vendor dirs.
 norecursedirs = [".*", "build", "dist", "*.egg", "node_modules", "venv", "_darcs", "CVS", "{arch}",
-                 "third_party", "forensicartifacts"]
+                 "sources"]
 
 [tool.setuptools]
 # byakugan.adapters is gone: the winevt/jlecmd/l2t-split plumbing it held now

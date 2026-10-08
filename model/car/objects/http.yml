@@ -3,7 +3,7 @@
 # store.HEADER (properties) and build_data_model.build_superset (car_action),
 # enriched with field descriptions from the pinned car data_model/http.yaml.
 # Source of truth (pinned sources):
-#   third_party/car (submodule) @ 1b922fe1527d956e222a99473472e594f10f610b
+#   model/sources/car (submodule) @ 1b922fe1527d956e222a99473472e594f10f610b
 #   model/sources/attack-datasources/attack_data_sources_objects.yaml (vendored) @ 5d50f731de441eb09078623a2c29cc3420a01949
 
 name: http

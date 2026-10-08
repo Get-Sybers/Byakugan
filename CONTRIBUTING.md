@@ -9,7 +9,7 @@ initialise that submodule, then install and build:
 ```
 git clone https://github.com/Get-Sybers/Byakugan
 cd Byakugan
-git submodule update --init third_party/car    # the CAR model — the one submodule the engine reads
+git submodule update --init model/sources/car    # the CAR model — the one submodule the engine reads
 pip install -e '.[dev]'                        # loose install, from pyproject's extras
 make -C go build                               # the Go parse engine — REQUIRED to run the pipeline
 ```
@@ -24,7 +24,7 @@ pip install -e .                       # the package itself, no extras
 
 The model sources, and when each is read:
 
-- `third_party/car` (submodule) — the MITRE CAR data model (the 13 CAR objects)
+- `model/sources/car` (submodule) — the MITRE CAR data model (the 13 CAR objects)
   and the CAR analytics. **Read at run time.**
 - `model/sources/attack-datasources/attack_data_sources_objects.yaml` (vendored,
   frozen; its pin rides in the file's own header) — the ATT&CK data-sources model

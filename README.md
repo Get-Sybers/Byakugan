@@ -62,7 +62,7 @@ Byakugan works as an individual component in three shapes:
 ## Quickstart
 
 ```
-git submodule update --init third_party/car     # the pinned CAR model (the only submodule the engine reads)
+git submodule update --init model/sources/car     # the pinned CAR model (the only submodule the engine reads)
 make -C go build                                 # the Go parse engine (Go >= 1.27)
 
 python -m byakugan --in <file-or-dir> --out <dir>   # build: one source
@@ -150,11 +150,10 @@ What each top-level directory is, and whether anything runs from it:
 |---|---|---|
 | `byakugan/` | the Python package: the CLI, source discovery and routing, enrichment, the relationship cascade, the CAR→ECS and CAR→STIX projections, the STIX/CTI exchange, and the generators (`gen_sources`, `schema_gen`, `spindle`) | **live** — what `pip install -e .` installs and what the image runs from `/opt/byakugan` |
 | `go/` | the parse engine (`go/bin/byakugan-parse`) and the map tables, authored in Go (`go/internal/authoring/maps_<family>.go`) and serialised to the embedded `go/internal/ir/ir.json` | **live** — the single source of truth for every map and predicate; `make -C go build test` |
-| `model/` | the materialised model: `schema/` (the JSON Schema authority the engine validates against — read at run time), `car/`, `superset/`, `relationships/`, `spindle/` (readable snapshots), `stix/` (the hand-authored CAR→STIX contract), `sources/` (upstream inputs: the vendored ATT&CK data-sources file, the ForensicArtifacts submodule) | **live** — `schema/` is read at run time; the snapshots are written by `python model/generate.py` / `python -m byakugan.schema_gen` and drift-gated in CI |
+| `model/` | the materialised model: `schema/` (the JSON Schema authority the engine validates against — read at run time), `car/`, `superset/`, `relationships/`, `spindle/` (readable snapshots), `stix/` (the hand-authored CAR→STIX contract), `sources/` (the upstream inputs, all three: the pinned CAR submodule, the vendored ATT&CK data-sources file, the ForensicArtifacts submodule) | **live** — `schema/` is read at run time; the snapshots are written by `python model/generate.py` / `python -m byakugan.schema_gen` and drift-gated in CI |
 | `elastic/` | Byakugan's standalone Elastic stack (`docker-compose.yml`, `config/`) and `projection/`, the hand-authored CAR→ECS contract with its rendered templates | **live** — `byakugan.elastic.load` reads `projection/` at run time; the `elastic-e2e` workflow dogfoods the stack |
 | `rules/` | the Elastic detection rules-as-code | **live** — baked into the image at `/rules`; `rules/validate.py` gates the pinned set |
 | `sources/` | the per-source CAR sensor manifests | **generated** by `python -m byakugan.gen_sources` from the maps + routing; CI holds them in sync (`--check`, yamale, yamllint); `byakugan.schema_gen` reads them |
-| `third_party/car` | the pinned MITRE CAR fork (submodule) | **live** — the object model and the CAR analytics are reconstructed from it at run time |
 | `pipeline/ingest/` | the ForensicArtifacts refresh-time ingest (`ingest.py` → the committed `index.json`) and the credits registry for the once-only research ingests | **refresh-time only** — nothing reads it at run time; `--check` needs the `model/sources/forensicartifacts` submodule |
 | `scripts/` | `e2e_elastic.py`, the live-Elasticsearch gate the `elastic-e2e` workflow runs | **live (CI)** |
 | `tests/` | the pytest suite; the CAR map tests drive the Go engine through `tests/go_engine.py` | **live** |

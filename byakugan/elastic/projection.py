@@ -9,7 +9,7 @@ Pure and import-light (stdlib + pyyaml only, like the contract's own
 validate.py/render_elastic.py) so `byakugan.elastic.load` — and any other
 consumer — can import it without pulling in sqlite3, argparse or the rest of
 the engine. `load_contract()` resolves `elastic/projection/` relative to the
-package the way `byakugan/build_data_model.py` resolves `third_party/` (its
+package the way `byakugan/build_data_model.py` resolves `model/sources/` (its
 `_HERE`/`_ROOT`): a fixed number of levels up from `byakugan/elastic/` to the
 repo root, not an installed data file, because — like the CAR model itself —
 the contract is meant to be read from the checked-out source tree, never

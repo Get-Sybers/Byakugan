@@ -14,7 +14,7 @@
 # go/README.md, "Dependencies"). Everything else Byakugan uses is the Python
 # standard library by design (json, uuid, re, argparse; sqlite3 only for the
 # Anamnesis car.db passthrough); the object model is not a dependency at all —
-# it is reconstructed live from the pinned CAR submodule (third_party/car) and
+# it is reconstructed live from the pinned CAR submodule (model/sources/car) and
 # the vendored ATT&CK data-sources file (model/sources/attack-datasources/).
 #
 # TO UPGRADE a dependency:

@@ -8,7 +8,7 @@ never hand-edited copies, so nothing can drift from upstream.
 
 The canonical MITRE CAR model: `authentication, driver, email, file, flow, http,
 module, process, registry, service, socket, thread, user_session`. Reconstructed
-by `carmodel.load()` from `third_party/car/data_model/*.yaml` (the pinned
+by `carmodel.load()` from `model/sources/car/data_model/*.yaml` (the pinned
 [mitre-attack/car](https://github.com/mitre-attack/car) fork). CAR is the source
 of **scalar fields** — the row shape of every object `store.CarStore` holds
 (and every `car_<object>.jsonl` line materialises).
@@ -50,7 +50,7 @@ generated from them (`python model/generate.py`), never hand-edited. To export
 them for inspection:
 
 ```
-git submodule update --init third_party/car
+git submodule update --init model/sources/car
 python -m byakugan.build_data_model --write out/
 ```
 

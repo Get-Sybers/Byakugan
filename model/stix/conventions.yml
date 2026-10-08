@@ -276,7 +276,7 @@ inferred_nodes:
 # corpus (case-independent), so the GLOBAL ids carry identical content everywhere.
 behaviour:
   source: 'the object events via analytics (the runnable single-search+filter CAR analytics)'
-  corpus_pin:                        # third_party/car — catalogue `modified` derives from it
+  corpus_pin:                        # model/sources/car — catalogue `modified` derives from it
     commit: 1b922fe1527d956e222a99473472e594f10f610b
     date: '2025-05-16T14:27:55.000Z'
   catalogue:                         # GLOBAL, catalogue-keyed (id_derivation.catalogue)

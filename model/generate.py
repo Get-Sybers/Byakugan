@@ -2,7 +2,7 @@
 """Materialize the model/ snapshot from the project's own model code.
 
 Single source that (re)generates every file under model/ from the pinned
-sources (the third_party/car submodule + the vendored, frozen ATT&CK data-sources
+sources (the model/sources/car submodule + the vendored, frozen ATT&CK data-sources
 file under model/sources/attack-datasources/) via the SAME code the pipeline
 runs — nothing here re-implements the schema:
 
@@ -54,7 +54,7 @@ if _ROOT not in sys.path:
 
 from byakugan import build_data_model, carmodel, spindle, store, superset  # noqa: E402
 
-_CAR_DM = os.path.join(_ROOT, "third_party", "car", "data_model")
+_CAR_DM = os.path.join(_ROOT, "model", "sources", "car", "data_model")
 
 # The 13 CAR objects, in the canonical order used everywhere else.
 CAR_OBJECTS = [
@@ -110,11 +110,11 @@ def _vendored_pin(rel_path: str) -> str:
 
 
 _ADS_FILE = "model/sources/attack-datasources/attack_data_sources_objects.yaml"
-CAR_SHA = _submodule_sha("third_party/car")
+CAR_SHA = _submodule_sha("model/sources/car")
 ADS_SHA = _vendored_pin(_ADS_FILE)
 
 _PROVENANCE = (f"# Source of truth (pinned sources):\n"
-               f"#   third_party/car (submodule) @ {CAR_SHA}\n"
+               f"#   model/sources/car (submodule) @ {CAR_SHA}\n"
                f"#   {_ADS_FILE} (vendored) @ {ADS_SHA}\n")
 
 
@@ -184,7 +184,7 @@ def gen_car_objects() -> int:
             # store.HEADER — the common CAR-event header shared by all 13 objects
             # (byakugan/store.py). The CAR model does not describe these.
             "common_header": list(store.HEADER),
-            # the object's MITRE CAR fields (third_party/car data_model/<obj>.yaml).
+            # the object's MITRE CAR fields (model/sources/car data_model/<obj>.yaml).
             "object_fields": object_fields,
         }
         _write(os.path.join(_HERE, "car", "objects", f"{obj}.yml"),

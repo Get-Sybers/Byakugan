@@ -19,7 +19,7 @@ and the code that reconstructs the models from them:
 
 | Submodule | Pinned commit |
 |-----------|---------------|
-| [`third_party/car`](../third_party/car) (MITRE CAR data model) | `1b922fe1527d956e222a99473472e594f10f610b` |
+| [`model/sources/car`](sources/car) (MITRE CAR data model) | `1b922fe1527d956e222a99473472e594f10f610b` |
 | [`model/sources/attack-datasources/`](sources/attack-datasources/) (ATT&CK data sources — vendored frozen file; upstream archived) | `5d50f731de441eb09078623a2c29cc3420a01949` (in the envelope header) |
 
 The files under `model/` are a **materialized snapshot of that pinned model**
@@ -86,7 +86,7 @@ its `car_action` list (from the superset `model_object.actions`), and its
   example the CAR data model provides for each.
 
 > **Descriptions and examples are copied verbatim from the upstream MITRE CAR
-> data model** (the pinned `third_party/car` submodule). They are intentionally
+> data model** (the pinned `model/sources/car` submodule). They are intentionally
 > *not* edited here — this directory is a faithful snapshot — so they may carry
 > upstream typos or imperfect example values (e.g. a `flow.dest_port` example
 > that shows an IP address). Corrections belong upstream in the car data model,
@@ -187,7 +187,7 @@ One command, from the repo root, after the submodules are checked out and the
 package is installed:
 
 ```sh
-git submodule update --init third_party/car   # attack-datasources is vendored (model/sources/attack-datasources/)
+git submodule update --init model/sources/car   # attack-datasources is vendored (model/sources/attack-datasources/)
 pip install -e .
 python model/generate.py
 ```
