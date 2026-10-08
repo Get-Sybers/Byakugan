@@ -1,6 +1,6 @@
 # macOS FSEvents (macos:fseventsd:record) precise flag -> file action decode.
 #
-# The active map (mappings/plaso_fs_extra.py -> plaso_fseventsd) ingests every
+# The active map (go/internal/authoring/maps_plaso_fs_extra.go -> plaso_fseventsd) ingests every
 # fsevents record as file/modify (a generic filesystem change — never a false
 # create/delete claim) with the raw `flags` int kept in native. This file holds
 # the PRECISE change-decode we could not confirm without a real macOS image
@@ -25,6 +25,6 @@ to_validate:
     - "FinderInfoMod / XattrMod / ChangeOwner -> file/modify (metadata)"
   note: >
     Once the change-bit constants are confirmed, replace the single generic
-    file/modify variant in plaso_fs_extra.py with per-flag variants (predicate
+    file/modify variant in maps_plaso_fs_extra.go with per-flag variants (predicate
     tests flags & <bit>), priority delete > create > rename > modify.
 status: to-be-validated

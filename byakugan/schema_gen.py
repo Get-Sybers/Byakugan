@@ -4,7 +4,7 @@ Scaffolds the class declarations from the curated seed table:
 
     model/schema/classes-seed.yaml   (human decisions: families, facets, lanes)
       + go/internal/ir/ir.json        (the reachable (object, action) closure)
-      + docs/research/dfir-context/matched-evidences.yaml  (the source overlay)
+      + model/schema/matched-evidences.yaml       (the curated source overlay)
       + model/car/objects/*.yml       (the legal action vocabularies)
     -> model/schema/vocab/car-actions.schema.json   (generated vocabulary)
     -> model/schema/classes/<family>.yaml           (one class per family)
@@ -35,7 +35,7 @@ CLASSES_DIR = os.path.join(SCHEMA_DIR, "classes")
 VOCAB_PATH = os.path.join(SCHEMA_DIR, "vocab", "car-actions.schema.json")
 SEED_PATH = os.path.join(SCHEMA_DIR, "classes-seed.yaml")
 IR_PATH = os.path.join(_ROOT, "go", "internal", "ir", "ir.json")
-OVERLAY_PATH = os.path.join(_ROOT, "docs", "research", "dfir-context",
+OVERLAY_PATH = os.path.join(SCHEMA_DIR,
                             "matched-evidences.yaml")
 CAR_OBJECTS_DIR = os.path.join(_ROOT, "model", "car", "objects")
 RELATIONSHIPS_PATH = os.path.join(_HERE, "relationships.yml")
@@ -164,7 +164,7 @@ def render_vocab(legal: dict[str, list[str]]) -> str:
     action enums + the pair-wise if/then constraint block."""
     doc = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/vocab/car-actions.schema.json",
+        "$id": _GITHUB_RAW + "vocab/car-actions.schema.json",
         "title": "CAR object/action vocabulary — GENERATED from model/car/objects",
         "description": ("Never hand-edited: python -m byakugan.schema_gen regenerates it; "
                         "the conform rule class-regen gates drift."),
@@ -293,7 +293,7 @@ def build_classes() -> tuple[dict[str, str], list[str], list[str]]:
             "generated_from": {
                 "ir_version": ir_version,
                 "seed": "model/schema/classes-seed.yaml",
-                "overlay": "docs/research/dfir-context/matched-evidences.yaml",
+                "overlay": "model/schema/matched-evidences.yaml",
                 "car_actions": "model/car/objects",
             },
             "family": fam,
@@ -774,23 +774,20 @@ def render_mappings() -> dict[str, str]:
 # literally emits, one declaration per (parser, artefact class). GENERATED
 # from the curated seed (profiles-seed.yaml — tool metadata + the mined
 # in-house record structs, file:line grounded) joined with the reviewed
-# lane surfaces in sources/*.yaml (field_provenance sources + native/join
-# keys) and the spindle registry (identity-hashed fields).
+# lane manifests byakugan.sources_model builds (field_provenance sources +
+# native/join keys) and the spindle registry (identity-hashed fields).
 # --------------------------------------------------------------------------- #
 PROFILES_SEED_PATH = os.path.join(SCHEMA_DIR, "profiles-seed.yaml")
-SOURCES_DIR = os.path.join(_ROOT, "sources")
-SPINDLE_PATH = os.path.join(_HERE, "spindle.yml")
 
 
 def _lane_surfaces() -> dict[str, dict]:
-    """lane -> the reviewed sources/*.yaml surface, kept at PER-PAIR
+    """lane -> the reviewed lane-manifest surface (byakugan.sources_model —
+    the CAR sensor documents built from the maps + DERIVATIONS), kept at PER-PAIR
     granularity: consumed/native per (object, action), plus the raw->car
     provenance reverse map (which CAR fields a raw parser field feeds)."""
     out: dict[str, dict] = {}
-    for name in sorted(os.listdir(SOURCES_DIR)):
-        if not name.endswith(".yaml"):
-            continue
-        doc = yaml.safe_load(open(os.path.join(SOURCES_DIR, name), encoding="utf-8"))
+    from . import sources_model
+    for _source_id, doc in sorted(sources_model.all_source_docs().items()):
         consumed_by_pair: dict[tuple, set] = {}
         raw2car: dict[str, set] = {}
         for m in doc.get("mappings") or []:
@@ -882,7 +879,8 @@ def _lane_variant_facts() -> dict[str, list[dict]]:
 def _recipe_targets(recipes: set[str]) -> tuple[set[str], set[str]]:
     """(native keys, CAR fields) the given spindle recipes hash — the
     identity components' sources (`native.<key>` or a CAR field name)."""
-    reg = yaml.safe_load(open(SPINDLE_PATH, encoding="utf-8"))["identities"]
+    from . import spindle
+    reg = spindle.identities()
     native_keys: set[str] = set()
     car_fields: set[str] = set()
     for name in recipes:
@@ -906,7 +904,7 @@ def render_profiles() -> dict[str, str]:
               "# One Parser Profile per (parser, artefact class): the record\n"
               "# surface as data — curated in profiles-seed.yaml (in-house\n"
               "# structs mined file:line from the tool repos), joined with the\n"
-              "# reviewed lane surfaces in sources/*.yaml and the ir closure\n"
+              "# reviewed lane manifests (byakugan.sources_model) and the ir closure\n"
               "# (split lanes contribute PER VARIANT, never whole-lane).\n")
 
     # (tool, class) -> lanes, from the reviewed sources + seed lane families
@@ -983,7 +981,7 @@ def render_profiles() -> dict[str, str]:
                 "source": "generated",
                 "generated_from": {
                     "seed": "model/schema/profiles-seed.yaml",
-                    "surfaces": "sources/*.yaml (reviewed lane manifests) + "
+                    "surfaces": "byakugan.sources_model (the lane manifests) + "
                                 "go/internal/ir/ir.json (per-variant closure)",
                 },
                 "profile": f"{spec['slug']}--{fam or 'unrouted'}",

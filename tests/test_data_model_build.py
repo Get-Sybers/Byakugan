@@ -1,7 +1,7 @@
 """The data-model generator (epic #12).
 
 Reconstructs, from the pinned submodules: car_data_model.json = the 13 canonical
-CAR objects (from third_party/car), and superset_data_model.json = CAR 13 + ATT&CK
+CAR objects (from model/sources/car), and superset_data_model.json = CAR 13 + ATT&CK
 data-source objects (from the vendored model/sources/attack-datasources file), plus the ATT&CK
 relationship edge catalogue. These tests keep that derivation honest.
 """

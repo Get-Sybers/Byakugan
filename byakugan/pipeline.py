@@ -41,99 +41,26 @@ import sys
 import tempfile
 
 from . import enrich, readers, store
+from .mappings import _from_ir
 
 # EvtxECmd output is ONE uniform shape across all ~110 Windows channels, so it
-# is CONTENT-routed, not filename-routed: every *_EvtxECmd_Output.json feeds the
-# whole evtx map family and each map's (Channel, EventId) predicate decides which
-# rows it claims (a row matching none is dropped). Adding a channel/EventId is a
-# map change, never a routing change.
-EVTX_MAPS = ["evtx_security",           # Security 4624/4625/4672 -> authentication
-             "evtx_security_sessions",  # Security 4624/4634/4647/4778/4779 -> user_session
-             "evtx_process",            # Security 4688 -> process
-             "evtx_services",           # System 7045 / Security 4697 -> service
-             "evtx_sysmon",             # Sysmon EIDs -> process/flow/file/registry/module/driver/thread
-             "evtx_bits",               # BITS-Client 59/60 -> http
-             "evtx_rdp",                # TerminalServices 21/24/25 -> user_session
-             "evtx_more"]               # 4907/5857/20003/30803/7001/7002/7034 -> file/module/service/flow/user_session
+# is CONTENT-routed, not filename-routed: every *_EvtxECmd_Output.json (and
+# goevtx.jsonl) feeds the whole evtx map family and each map's (Channel,
+# EventId) predicate decides which rows it claims (a row matching none is
+# dropped). Adding a channel/EventId is a map change, never a routing change.
 # NB: the Security-audit families (4663/4657/4660/4670/4689/5140/5145/5156/5157/
 # 5158/5058 -> file/registry/process/flow/socket) are NOT active — their mappings
-# are unvalidated inferences quarantined in ../to-be-validated/evtx_audit.yml
+# are unvalidated inferences quarantined in ../docs/to-be-validated/evtx_audit.yml
 # until confirmed against an audit-enabled capture. Promote from there.
+EVTX_MAPS: list[str] = _from_ir.load_evtx_maps()
 
-# filename-pattern -> artefact map keys (explicit, first match wins)
-ROUTES = [
-    ("_EvtxECmd_Output", EVTX_MAPS),
-    ("goevtx.jsonl", EVTX_MAPS),        # goevtx (the evtx lane): the same record shape, one file per log
-    ("conn.json", ["zeek_conn"]),
-    ("dns.json", ["zeek_dns"]),
-    ("http.json", ["zeek_http"]),
-    ("smtp.json", ["zeek_smtp"]),
-    ("files.json", ["zeek_files"]),
-    ("ssl.json", ["zeek_ssl"]),        # TLS handshake -> flow (SNI in dest_fqdn)
-    ("x509.json", ["zeek_x509"]),      # TLS certificate -> file (fingerprint = sha256)
-    # Zeek logs with no dedicated CAR object — routed to nothing EXPLICITLY (known,
-    # not unknown): their per-flow detail can enrich the flow by uid at the
-    # cascade stage, but they are not CAR objects.
-    ("dhcp.json", []),
-    ("ntp.json", []), ("snmp.json", []), ("ocsp.json", []), ("weird.json", []),
-    ("pe.json", []), ("packet_filter.json", []),
-    (".L2tPrefetch", ["plaso_exec_prefetch"]),
-    (".L2tWinreg", ["plaso_exec_winreg", "plaso_registry", "plaso_shellitem"]),
-    (".L2tSyslog", ["plaso_exec_cron", "l2t_text"]),
-    (".L2tCron", ["plaso_exec_cron"]),
-    (".L2tFilestat", ["l2t_filestat"]),
-    (".L2tMft", ["l2t_mft"]),
-    (".L2tUsnjrnl", ["l2t_usnjrnl"]),
-    (".L2tWinevt", ["l2t_winevt"]),     # Plaso legacy EVT  -> the winevtx CAR maps
-    (".L2tWinevtx", ["l2t_winevt"]),    # Plaso modern EVTX -> the winevtx CAR maps
-    (".L2tMsiecf", ["l2t_msiecf"]),     # IE index.dat visits -> http
-    (".L2tFirefoxCache", ["l2t_firefox_cache"]),  # -> http (recorded method/status)
-    (".L2tSqlite", ["l2t_firefox_places"]),       # firefox page visits -> http (gated by data_type)
-    (".L2tJavaIdx", ["l2t_javaidx"]),   # Java download cache -> http
-    (".L2tLnk", ["l2t_lnk", "plaso_shellitem"]),  # shortcut target MAC times -> file (+ embedded shell items)
-    (".L2tRecycleBinInfo2", ["l2t_recyclebin"]),  # deletion events -> file/delete
-    (".L2tRecycleBin", ["l2t_recyclebin"]),
-    # l2t tables with NO CAR object — routed to [] EXPLICITLY (known, not
-    # unknown): pe = compilation times (no CAR file action); olecf = document
-    # internal streams; rplog = restore-point info; fseventsd = macOS flags
-    # (2 rows, undecoded). Their rows stay raw.
-    (".L2tPe", ["plaso_pecoff"]),        # pe_coff:file -> timestamp-less file record (path + sha256 + PE meta, compile_time native); dll_import/resource -> raw
-    (".L2tOlecf", ["plaso_olecf"]),      # olecf:summary_info -> file (doc + authoring meta); olecf:item -> raw
-    (".L2tRplog", []),
-    (".L2tFseventsd", ["plaso_fseventsd"]),  # macOS FSEvents -> file/modify (never dropped)
-    (".L2tEsedb", ["l2t_srum"]),        # Plaso esedb/srum -> flow + process (SRUM)
-    ("_RECmd_Batch_", ["recmd_batch"]), # RECmd --json batch output -> registry
-    ("jlecmd_AutomaticDestinations", ["jlecmd_dest"]),  # jump lists -> file (via adapter)
-    ("jlecmd_CustomDestinations", []),  # pin-centric, no interaction times -> raw
-    ("_LECmd_Output", []),              # lnk: the l2t lnk map is canonical (artefact != processor)
-    ("recmd_batch.json", ["recmd_batch"]),
-    # Get-Sybers Go parsers (DX_DFIR's godfir-toolz lane): ese_dump writes one
-    # JSONL per SRUM provider table (only Network/Application usage carry a CAR
-    # object — the map leaves the rest raw); prefetch_dump writes one output file.
-    ("NetworkDataUsage", ["esedump_srum"]),        # ese_dump SRUM -> flow (network usage)
-    ("ApplicationResourceUsage", ["esedump_srum"]),  # ese_dump SRUM -> process (app usage)
-    ("PrefetchDump_Output", ["prefetch_dump"]),    # prefetch_dump -> process (execution)
-    # The GoDFIR-toolz framework layout (godfir-toolz/<tool>/<item>/<tool>.jsonl,
-    # the tools in GODFIR_TOOLS): every Go tool writes one <tool>.jsonl per
-    # item, in the record shape the map above already consumes — the file name
-    # is the route.
-    ("gore.jsonl", ["recmd_batch"]),           # gore registry batch (recmd_batch shape) -> registry
-    ("goprefetch.jsonl", ["prefetch_dump"]),   # goprefetch -> process (execution)
-    ("gojle.jsonl", ["jlecmd_dest"]),          # gojle jump lists (jlecmd_dest shape) -> file (via adapter)
-    # goese writes one <table>.jsonl per SRUM provider table (NetworkDataUsage /
-    # ApplicationResourceUsage route above) plus goese.jsonl, its per-table
-    # index; the other provider tables (NetworkConnectivityUsage, EnergyUsage,
-    # PushNotifications, ...) are SRUM-internal telemetry with no CAR object.
-    ("goese.jsonl", []),
-    # Go tools with no CAR map yet — routed to nothing EXPLICITLY (known, not
-    # unknown): a raw $MFT entry, a shortcut, a $I record, a shellbag, an
-    # Amcache/ShimCache entry, a Timeline activity. Their records stay raw.
-    ("gomft.jsonl", []), ("gole.jsonl", []), ("gorb.jsonl", []), ("gosbe.jsonl", []),
-    ("goamcache.jsonl", []), ("goappcompat.jsonl", []), ("gowxt.jsonl", []),
-    (".L2tUtmp", ["l2t_utmp"]),
-    (".L2tUtmpx", ["l2t_utmpx"]),
-    (".L2tText", ["l2t_text"]),
-]
+# filename-pattern -> artefact map keys (explicit, first match wins). A route is
+# a fact about the map tables, so it is authored with them — in Go, with the
+# per-pattern rationale: go/internal/authoring/ir_sections.go `irRoutes` — and
+# read back here from ir.json. A pattern routed to [] is a DECLARED state (the
+# file is recognised and deliberately unmapped; its rows stay raw), never an
+# unknown file.
+ROUTES: list[tuple[str, list[str]]] = _from_ir.load_routes()
 
 # The GoDFIR-toolz Go tools: each has a godfir-toolz/<tool>/ output dir and a
 # <tool>.jsonl route above (mapped, or explicitly to nothing).

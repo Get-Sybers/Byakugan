@@ -73,4 +73,4 @@ def test_every_rule_resolves_through_the_engine_reader():
             assert loaded is not None, f"{r['id']}: {reason}"
         else:
             assert loaded is None and reason == "stub_rule"
-    assert export.RULE_URL.startswith("https://github.com/Get-Sybers/Byakugan/-/blob/main/rules/")
+    assert export.RULE_URL.startswith("https://github.com/Get-Sybers/Byakugan/blob/main/rules/")

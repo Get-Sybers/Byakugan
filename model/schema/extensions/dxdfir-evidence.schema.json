@@ -1,9 +1,9 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/extensions/dxdfir-evidence.schema.json",
+ "$id": "https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/model/schema/extensions/dxdfir-evidence.schema.json",
  "title": "Byakugan CAR evidence extension (dxdfir-evidence)",
- "description": "The CAR evidence surface of the Byakugan projection (car-stix-projection contract v6, model/stix/changelog/v6.md): the closed x_car_* top-level property set carried under a toplevel-property-extension entry, and the extension-defined objects x-car-thread, x-car-record (new-SCO) and x-car-inferred-node (new-SDO). Extension id: extension-definition--b8c68e7b-701a-5c99-897d-a1c674311493.",
- "version": "6.0.0",
+ "description": "The CAR evidence surface of the Byakugan projection (car-stix-projection contract v7, model/stix/changelog/v7.md; introduced by v6): the closed x_car_* top-level property set carried under a toplevel-property-extension entry, and the extension-defined objects x-car-thread, x-car-record (new-SCO) and x-car-inferred-node (new-SDO). Extension id: extension-definition--b8c68e7b-701a-5c99-897d-a1c674311493.",
+ "version": "7.0.0",
  "$defs": {
   "extension-entry": {
    "type": "object",

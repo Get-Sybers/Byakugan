@@ -46,7 +46,7 @@ CAR_NS_URL = "https://github.com/Get-Sybers/Byakugan/stix"
 CAR_NS = uuid.uuid5(uuid.NAMESPACE_URL, CAR_NS_URL)
 # the CAR row-identity namespace, one level under CAR_NS: a row guid can never
 # coincide with a case-scoped id or a §2.9 global id. The registry
-# (spindle.yml) documents the same recipe; spindle.verify_registry holds the two in step.
+# (the IR's spindle section; go/internal/ids) carries the same recipe; spindle.verify_registry holds the two in step.
 SPINDLE_LABEL = "spindle"
 SPINDLE_NS = uuid.uuid5(CAR_NS, SPINDLE_LABEL)
 

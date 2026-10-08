@@ -4,7 +4,7 @@ translation from Anamnesis's own `car.db` schema into this store's event
 shape. Two drift guards:
 
   (a) the CAR object model — `byakugan.carmodel.load()` (reconstructed LIVE
-      from the pinned `third_party/car` submodule) vs.
+      from the pinned `model/sources/car` submodule) vs.
       `tests/fixtures/anamnesis_car_data_model.json` (a committed COPY of
       Anamnesis's own embedded, statically-compiled copy of the same model,
       `internal/carmodel/car_data_model.json`) — must match exactly, in

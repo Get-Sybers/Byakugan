@@ -1,6 +1,6 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/envelope.schema.json",
+ "$id": "https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/model/schema/envelope.schema.json",
  "title": "Schema Envelope — the provenance triple",
  "description": "Every declaration file in every layer carries this envelope: one formal schema_version for the whole set, generated_from upstream pins when derived, and source (hand-authored vs generator). Layer schemas compose it under allOf.",
  "type": "object",

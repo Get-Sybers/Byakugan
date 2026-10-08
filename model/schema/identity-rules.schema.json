@@ -1,8 +1,8 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/identity-rules.schema.json",
+ "$id": "https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/model/schema/identity-rules.schema.json",
  "title": "Identity Rules — the row-identity registry, validated in place",
- "description": "Validates byakugan/spindle.yml — the SINGLE registry (wire format, its own version-bump change protocol) — rather than copying it: one recipe per identified thing, inputs + canonicalisation + namespace + recipe version, golden vectors as part of the declaration. Object-id scopes live in identity/object-ids.yaml (docs/design/schema-layers.md, Identity Rules).",
+ "description": "Validates the spindle registry as byakugan.spindle.rules() assembles it — the IR's spindle and golden sections (authored in go/internal/authoring/ir_sections.go) joined with the notes in byakugan/spindle.yml; wire format, its own version-bump change protocol — rather than copying it: one recipe per identified thing, inputs + canonicalisation + namespace + recipe version, golden vectors as part of the declaration. Object-id scopes live in identity/object-ids.yaml (docs/design/schema-layers.md, Identity Rules).",
  "type": "object",
  "properties": {
   "spindle": {

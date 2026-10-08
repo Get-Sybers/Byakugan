@@ -3,7 +3,7 @@
 Nothing is committed — the models are always the pinned upstream source:
 
 - build_car() -> the 13 CAR objects (name / actions / scalar fields), from
-  third_party/car/data_model/*.yaml. CAR is the only source of scalar fields.
+  model/sources/car/data_model/*.yaml. CAR is the only source of scalar fields.
 - build_superset() -> the CAR + ATT&CK-data-sources superset: the 13 CAR objects
   plus the objects ATT&CK adds (user_account, group, volume, …), from
   the vendored attack-datasources file (model/sources/attack-datasources/). ATT&CK has NO scalar fields — it describes an
@@ -29,7 +29,7 @@ _ROOT = os.path.dirname(_HERE)
 # are a vendored FROZEN file: upstream (attack-datasources) is archived, the
 # one consumed file is immutable, and its pin rides in the file's own
 # envelope header (model/sources/attack-datasources/).
-_CAR_DM = os.path.join(_ROOT, "third_party", "car", "data_model")
+_CAR_DM = os.path.join(_ROOT, "model", "sources", "car", "data_model")
 _ADS = os.path.join(_ROOT, "model", "sources", "attack-datasources",
                     "attack_data_sources_objects.yaml")
 # Nothing is committed: the CAR model (13), the CAR+ATT&CK superset (~38) and the
@@ -44,7 +44,7 @@ def _load_car_base() -> dict:
     files = sorted(glob.glob(os.path.join(_CAR_DM, "*.yaml")))
     if not files:
         raise SystemExit("car submodule not checked out — run: "
-                         "git submodule update --init third_party/car")
+                         "git submodule update --init model/sources/car")
     objects = []
     for path in files:
         with open(path, encoding="utf-8") as fh:

@@ -129,15 +129,15 @@ def test_vocab_file_matches_car_model():
 # phase 3 (#132): Identity + Enrichment layers
 # --------------------------------------------------------------------------- #
 def test_identity_registry_validates_in_place():
-    """spindle.yml passes the layer's structural gate; the meta-schema exists
+    """The assembled spindle registry passes the layer's structural gate; the meta-schema exists
     and its enums match the registry's vocabulary."""
     from byakugan import conform as c
     assert [f.as_dict() for f in c._RULES["identity-registry"]()] == []
     meta = json.load(open(os.path.join(c.SCHEMA_DIR, "identity-rules.schema.json")))
     assert meta["$defs"]["entry"]["properties"]["kind"]["enum"] == ["record", "entity"]
     assert meta["$defs"]["entry"]["properties"]["scope"]["enum"] == ["intrinsic", "positional"]
-    reg = yaml.safe_load(open(os.path.join(_ROOT, "byakugan", "spindle.yml")))
-    assert len(reg["identities"]) >= 26
+    from byakugan import spindle
+    assert len(spindle.identities()) >= 26
 
 
 def test_object_id_scopes_match_constants():

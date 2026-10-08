@@ -12,9 +12,10 @@
 # The parse stage is NOT in here: it is the Go engine, whose requirements file
 # is go/go.mod — stdlib-only, no third-party modules, no go.sum (see
 # go/README.md, "Dependencies"). Everything else Byakugan uses is the Python
-# standard library by design (sqlite3, json, uuid, re, argparse, sqlite JSON1);
-# the object model is not a dependency at all — it is reconstructed live from
-# the pinned submodules in third_party/.
+# standard library by design (json, uuid, re, argparse; sqlite3 only for the
+# Anamnesis car.db passthrough); the object model is not a dependency at all —
+# it is reconstructed live from the pinned CAR submodule (model/sources/car) and
+# the vendored ATT&CK data-sources file (model/sources/attack-datasources/).
 #
 # TO UPGRADE a dependency:
 #   1. edit the range HERE and in pyproject.toml [project] dependencies — both,
@@ -24,9 +25,8 @@
 #        python -m pytest -q
 #        python elastic/projection/validate.py
 #        python model/stix/validate.py
-#        python -m byakugan.gen_sources --check
 #        python -m byakugan.spindle --check
-#        python -m byakugan.export_ir --check
+#        ./go/bin/byakugan-parse gen-ir --check go/internal/ir/ir.json
 #        make -C go build test
 #
 # Python itself: >= 3.10 (pyproject requires-python); proven here on CPython

@@ -1,13 +1,14 @@
 # Data model
 
-Two models and a relationship catalogue, all reconstructed **live from pinned
-submodules** — never committed copies, so nothing can drift from upstream.
+Two models and a relationship catalogue, all reconstructed **live from the
+pinned sources** — the CAR submodule and the vendored ATT&CK data-sources file —
+never hand-edited copies, so nothing can drift from upstream.
 
 ## CAR — 13 objects
 
 The canonical MITRE CAR model: `authentication, driver, email, file, flow, http,
 module, process, registry, service, socket, thread, user_session`. Reconstructed
-by `carmodel.load()` from `third_party/car/data_model/*.yaml` (the pinned
+by `carmodel.load()` from `model/sources/car/data_model/*.yaml` (the pinned
 [mitre-attack/car](https://github.com/mitre-attack/car) fork). CAR is the source
 of **scalar fields** — the row shape of every object `store.CarStore` holds
 (and every `car_<object>.jsonl` line materialises).
@@ -17,7 +18,8 @@ of **scalar fields** — the row shape of every object `store.CarStore` holds
 CAR has no principal/host/volume object and no relationship model. The
 [ATT&CK data-sources](https://github.com/mitre-attack/attack-datasources) model
 supplies them, so `build_data_model.build_superset()` merges the two (from the
-pinned `third_party/attack-datasources` submodule):
+vendored, frozen `model/sources/attack-datasources/attack_data_sources_objects.yaml`
+— upstream is archived, and the pin rides in the file's own header):
 
 - the 13 CAR objects (kept verbatim — the only source of scalar fields), **plus**
 - the ATT&CK data-source objects CAR lacks (`user_account`, `group`, `volume`,
@@ -43,15 +45,18 @@ relationship *instances* land in `SupersetStore.relationships`, exported as
 
 ## Regenerating / inspecting
 
-The models are built on demand; nothing is committed. To export them for
-inspection:
+The models are built on demand; the readable snapshot under `model/` is
+generated from them (`python model/generate.py`), never hand-edited. To export
+them for inspection:
 
 ```
-git submodule update --init --recursive
+git submodule update --init model/sources/car
 python -m byakugan.build_data_model --write out/
 ```
 
-A model refresh is a **submodule-pin bump**, not a code or data-file edit.
+A model refresh is a **submodule-pin bump** (CAR) or a refresh of the vendored
+file with its header pin (ATT&CK data sources) — then `python model/generate.py`
+— never a hand edit of the model.
 
 ## The stored header
 

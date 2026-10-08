@@ -2,12 +2,19 @@
 materialized snapshot, and the guards that hold registry, maps and engine in step.
 
 WHICH fields identify a disk-image row is a RULE, not code (the discipline
-relationships.yml sets for the cascade): byakugan/spindle.yml declares,
-per artefact, the CAR object, the kind (record | entity), the identity-key
-version and the ordered identity fields — each a path on the normalized
-event — plus the positional fallback; the EXTERNAL forms every other map
-carries verbatim (a sensor's or tool's own id); and the cross-source
-EQUALITY rule. normalize._spindle mints, through the one seam ids.mint,
+relationships.yml sets for the cascade). The rules are authored with the
+maps, in Go — the `spindle` and `golden` sections of
+go/internal/authoring/ir_sections.go, read back here from
+go/internal/ir/ir.json: per artefact, the CAR object, the kind (record |
+entity), the identity-key version and the ordered identity fields — each a
+path on the normalized event — plus the positional fallback, the EXTERNAL
+forms the engine's other maps carry verbatim (a sensor's or tool's own id),
+and the golden vectors. byakugan/spindle.yml carries what the engine does not
+need: the vocabulary prose, a validation note per entry, the cross-source
+EQUALITY rule and the external forms the Anamnesis memory passthrough brings
+in (never minted here); rules() assembles the two halves into one registry.
+The engine (go/internal/spindle) mints, through the one recipe
+(go/internal/ids — byakugan.ids.mint is the same recipe),
 
     guid = uuid5(SPINDLE_NS, canonical_json({"_obj": <car_object>, "_v": <version>,
                                              <name>: <value>, ...}))
@@ -43,7 +50,8 @@ import yaml
 from . import ids
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-REGISTRY_PATH = os.path.join(_HERE, "spindle.yml")
+# the notes half of the registry; the rules half is the IR (mappings._from_ir)
+NOTES_PATH = os.path.join(_HERE, "spindle.yml")
 # the snapshot lives beside the other materialized models
 DEFAULT_OUT = os.path.join(_HERE, "..", "model", "spindle")
 REGISTRY_FILE, RECORD_FILE, GOLDEN_FILE = "identity.yml", "record.yml", "golden.yml"
@@ -74,13 +82,81 @@ _rules_cache: dict | None = None
 
 
 # --------------------------------------------------------------------------- #
-# The registry (spindle.yml)
+# The registry: the IR's spindle + golden sections (authored in Go) joined with
+# the notes in spindle.yml, in the one shape the guards, the snapshot and the
+# manifests read.
 # --------------------------------------------------------------------------- #
+def _ir() -> dict:
+    from .mappings import _from_ir
+    return _from_ir.load_ir()
+
+
+def notes() -> dict:
+    """The notes half (spindle.yml): vocabulary prose, a note per entry, the
+    equality rule, the passthrough's external forms."""
+    with open(NOTES_PATH, encoding="utf-8") as fh:
+        return yaml.safe_load(fh) or {}
+
+
+def _sample_values(key: dict | None) -> dict:
+    """A golden vector's sample: its rendered key minus the reserved object /
+    version keys — every value in the rendering the recipe hashes."""
+    return {k: v for k, v in (key or {}).items() if k not in ids.RESERVED_KEYS}
+
+
+def _assemble() -> dict:
+    ir = _ir()
+    sp, golden, nts = ir["spindle"], ir.get("golden") or {}, notes()
+    id_notes, ext_notes = nts.get("identities") or {}, nts.get("external") or {}
+    vectors = {g.get("name"): g for g in golden.get("identities") or []}
+    ext_vectors = {g.get("name"): g for g in golden.get("external") or []}
+    identities: dict[str, dict] = {}
+    for name, spec in sp["identities"].items():
+        g, note = vectors.get(name) or {}, id_notes.get(name) or {}
+        identity: dict = {}
+        for iname, source, mode in spec["identity"]:
+            identity[iname] = source if mode is None else {"source": source, "normalize": mode}
+        identities[name] = {
+            "object": spec["object"], "kind": spec["kind"], "scope": spec["scope"],
+            "version": spec["version"],
+            "validated_against": list(note.get("validated_against") or []),
+            "stable_across": note.get("stable_across"),
+            "identity": identity,
+            "golden": {"source": g.get("source"), "values": _sample_values(g.get("key"))},
+        }
+    external: dict[str, dict] = {}
+    for name, spec in sp["external"].items():
+        g, note = ext_vectors.get(name) or {}, ext_notes.get(name) or {}
+        external[name] = {
+            "kind": g.get("kind"), "form": spec["form"],
+            "stable_across": note.get("stable_across"),
+            "golden": {"source": g.get("source"), "object": g.get("car_object"),
+                       "values": dict(g.get("values") or {})},
+        }
+    for name, e in (nts.get("passthrough") or {}).items():
+        external[name] = dict(e)                 # the engine never mints these
+    pos, gpos = sp["positional"], golden.get("positional") or {}
+    spec = {
+        "version": (golden.get("spindle") or {}).get("version"),
+        "namespace": {"parent": "CAR_NS", "label": (sp.get("namespace") or {}).get("SPINDLE_LABEL")},
+        "object_key": sp.get("object_key"), "version_key": sp.get("version_key"),
+        "rendering": ids.RENDER_STR, "normalize": list(sp.get("renderings") or []),
+        "positional": {"fields": list(pos["fields"]), "version": pos["version"],
+                       "golden": {"source": gpos.get("source"),
+                                  "object": (gpos.get("key") or {}).get(ids.OBJECT_KEY),
+                                  "values": _sample_values(gpos.get("key"))}},
+        "scopes": dict((nts.get("spindle") or {}).get("scopes") or {}),
+        "kinds": dict((nts.get("spindle") or {}).get("kinds") or {}),
+    }
+    return {"spindle": spec, "identities": identities, "external": external,
+            "equality": dict(nts.get("equality") or {})}
+
+
 def rules() -> dict:
+    """The assembled registry (see _assemble), built once per process."""
     global _rules_cache
     if _rules_cache is None:
-        with open(REGISTRY_PATH, encoding="utf-8") as fh:
-            _rules_cache = yaml.safe_load(fh)
+        _rules_cache = _assemble()
     return _rules_cache
 
 
@@ -93,7 +169,7 @@ def entry(name: str) -> dict:
     (silently minting nothing would drop the row's identity)."""
     e = identities().get(name)
     if e is None:
-        raise KeyError(f"no spindle identity {name!r} in spindle.yml")
+        raise KeyError(f"no spindle identity {name!r} in the IR's spindle section")
     return e
 
 
@@ -490,6 +566,51 @@ def verify_registry() -> list[str]:
         elif name not in ext_used and not carried_by:
             problems.append(f"external {name}: carried by no map leaf "
                             "(an interchange producer's form declares carried_by: <producer>)")
+
+    # the notes half names only what the IR declares, and declares the
+    # passthrough's forms only where the engine mints nothing
+    nts, ir = notes(), _ir()
+    engine_ext = set((ir.get("spindle") or {}).get("external") or {})
+    for name in sorted(set(nts.get("identities") or {}) - set(idents)):
+        problems.append(f"spindle.yml notes {name!r}: no such identity in the IR's spindle section")
+    for name in sorted(set(nts.get("external") or {}) - engine_ext):
+        problems.append(f"spindle.yml notes external {name!r}: no such external form in the IR")
+    for name in sorted(set(nts.get("passthrough") or {}) & engine_ext):
+        problems.append(f"spindle.yml passthrough {name!r}: the engine mints this form — the IR declares it")
+    # the golden vectors the IR pins are what the one recipe yields — a stale
+    # pin (an identity or sample changed in Go without re-minting) is caught here
+    golden_ir = ir.get("golden") or {}
+    for row in golden_ir.get("identities") or []:
+        e = idents.get(row.get("name"))
+        if not isinstance(e, dict) or e.get("object") not in model or not isinstance(e.get("version"), int):
+            continue
+        try:
+            guid, _key = golden_vector(e["object"], e)
+        except Exception:                      # already reported above
+            continue
+        if guid != row.get("guid"):
+            problems.append(f"{row.get('name')}: the IR pins golden guid {row.get('guid')} but the "
+                            f"recipe yields {guid} — re-pin the vector in ir_sections.go (golden)")
+    prow = golden_ir.get("positional") or {}
+    if pos.get("fields") and isinstance(pos.get("version"), int) and pv:
+        try:
+            pguid, _pkey = positional_vector()
+            if prow.get("guid") not in (None, pguid):
+                problems.append(f"positional: the IR pins golden guid {prow.get('guid')} but the recipe "
+                                f"yields {pguid} — re-pin the vector in ir_sections.go (golden)")
+        except Exception:
+            pass
+    for row in golden_ir.get("external") or []:
+        e = ext.get(row.get("name"))
+        if e is None or forms.get(row.get("name")) is None:
+            continue
+        try:
+            vec = external_vector(e)
+        except Exception:
+            continue
+        if vec != row.get("guid"):
+            problems.append(f"external {row.get('name')}: the IR pins golden guid {row.get('guid')} but "
+                            f"the engine's path yields {vec} — re-pin the vector in ir_sections.go (golden)")
     return problems
 
 
@@ -594,7 +715,7 @@ def record_doc() -> dict:
                         "are not spindles: their guids are the sensor's own (the registry's external "
                         "forms)."),
         "is_a": "CAR event row — model/car/objects/<car_object>.yml (common_header + object_fields); no column is added",
-        "minted_by": "byakugan.normalize._spindle, from the registry entry (identity.yml) via byakugan.ids.mint",
+        "minted_by": "go/internal/spindle (the parse engine), from the IR's registry entry (identity.yml is its snapshot) via go/internal/ids — the recipe byakugan.ids.mint shares",
         "properties": {
             "common_header": list(store.HEADER),
             "spindle": [
@@ -711,10 +832,11 @@ def golden_doc() -> dict:
 _HEADER = ("# GENERATED by `python model/generate.py` (or `python -m byakugan.spindle`) — "
            "do not edit by hand.\n"
            "# {what}\n"
-           "# Resolved from byakugan/spindle.yml (the rules), the live maps (byakugan.mappings)\n"
-           "# and the id recipe (byakugan/ids.py) by byakugan.spindle — the code the engine\n"
-           "# mints with. `python -m byakugan.spindle --check` and tests/test_spindle_model.py\n"
-           "# fail on drift.\n\n")
+           "# Resolved from the IR's spindle + golden sections (go/internal/authoring/ir_sections.go,\n"
+           "# read from go/internal/ir/ir.json), the notes in byakugan/spindle.yml, the live maps\n"
+           "# (byakugan.mappings) and the id recipe (byakugan/ids.py) by byakugan.spindle — the\n"
+           "# recipe the engine mints with. `python -m byakugan.spindle --check` and\n"
+           "# tests/test_spindle_model.py fail on drift.\n\n")
 
 _WHAT = {
     REGISTRY_FILE: ("The spindle row-identity registry: per artefact, the CAR object, the kind, the\n"
@@ -905,7 +1027,7 @@ def validate_record(ev: dict) -> list[str]:
 # --------------------------------------------------------------------------- #
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="byakugan.spindle",
-                                 description="the spindle identity registry: verify it, snapshot it under model/spindle")
+                                 description="the spindle identity registry (the IR's spindle/golden sections + the spindle.yml notes): verify it, snapshot it under model/spindle")
     ap.add_argument("--out", default=DEFAULT_OUT,
                     help="snapshot directory (default: ./model/spindle)")
     ap.add_argument("--check", action="store_true",

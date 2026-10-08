@@ -32,7 +32,8 @@ extended (car_source_schema.yaml) with the end-to-end provenance —
 ``derived_from`` / ``extractor`` / ``input_pattern`` — and the row IDENTITY the
 source's guid carries (``identity``: the spindle registry entries a Plaso map
 mints from, or the external form(s) any other source carries verbatim —
-byakugan/spindle.yml).
+the spindle registry: the IR's spindle section, plus the passthrough forms
+byakugan/spindle.yml declares).
 """
 from __future__ import annotations
 
@@ -186,7 +187,7 @@ _PASSTHROUGH = {
             "https://github.com/Get-Sybers/Anamnesis", "memory image (car.db)",
             "memory image"),
         "input_pattern": ["car.db"],
-        # the guid anamnesis mints: the _EPROCESS offset as proc-<hex> (spindle.yml external:)
+        # the guid anamnesis mints: the _EPROCESS offset as proc-<hex> (spindle.yml passthrough:)
         "identity": {"external": ["memory_proc_offset"]},
         "description": (
             "anamnesis normalises a memory image directly into finished MITRE "
@@ -371,7 +372,7 @@ def identity_block(artefact_key: str) -> dict:
     entries, external = spindle.identity_of_map(artefact_key)
     block: dict = {}
     if entries:
-        block["registry"] = "byakugan/spindle.yml"
+        block["registry"] = "go/internal/ir/ir.json"
         block["version"] = spindle.rules()["spindle"]["version"]
         block["entries"] = [{"name": n, "kind": spindle.entry(n)["kind"], "scope": spindle.entry(n)["scope"],
                              "version": spindle.entry(n)["version"]} for n in entries]
@@ -450,7 +451,7 @@ def build_source_doc(artefact_key: str) -> dict:
         "derived_from": d.evidence,
         "extractor": _extractor_block(d),
         "input_pattern": input_patterns(artefact_key),
-        # --- the row identity the guid carries (byakugan/spindle.yml) ---
+        # --- the row identity the guid carries (the spindle registry) ---
         "identity": identity_block(artefact_key),
         # --- CAR data-model coverage (introspected from the map) --------------
         "data_model_coverage": ", ".join(objects_covered),

@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # scripts/e2e_elastic.py builds a real CarStore (byakugan.store),
-          # whose carmodel.load() reads third_party/car/data_model/*.yaml —
+          # whose carmodel.load() reads model/sources/car/data_model/*.yaml —
           # the pinned CAR submodule — for every invocation, including
           # --offline-selftest. attack-datasources is not on this script's
           # own import path, but recursive matches lint.yml's own checkout

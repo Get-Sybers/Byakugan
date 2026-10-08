@@ -8878,6 +8878,6 @@
  "generated_from": {
   "commit": "72726309f0cf8232d633c27e26dc1c0348709351",
   "repo": "https://github.com/ForensicArtifacts/artifacts.git",
-  "tool": "pipeline/ingest/forensicartifacts/ingest.py"
+  "tool": "model/ingest_forensicartifacts.py"
  }
 }

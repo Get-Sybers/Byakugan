@@ -2,8 +2,9 @@
 """Materialize the model/ snapshot from the project's own model code.
 
 Single source that (re)generates every file under model/ from the pinned
-submodules (third_party/car + third_party/attack-datasources) via the SAME code
-the pipeline runs — nothing here re-implements the schema:
+sources (the model/sources/car submodule + the vendored, frozen ATT&CK data-sources
+file under model/sources/attack-datasources/) via the SAME code the pipeline
+runs — nothing here re-implements the schema:
 
     model/car/objects/<object>.yml   one file per CAR object (13): the common
                                      store header + the object's MITRE CAR fields
@@ -14,8 +15,8 @@ the pipeline runs — nothing here re-implements the schema:
     model/superset/relationship-schema.yml the relationship-instance row shape
                                      (from byakugan.superset.REL_COLUMNS directly —
                                      the engine holds this in memory, not SQLite)
-    model/spindle/identity.yml       the spindle row-identity registry (byakugan/
-                                     spindle.yml) resolved against the live maps + ids.py
+    model/spindle/identity.yml       the spindle row-identity registry (the IR's
+                                     spindle section + the spindle.yml notes) resolved against the maps
     model/spindle/record.yml         the shape of a spindle — a minted-identity CAR row
     model/spindle/golden.yml         the golden vectors: per entry the key + guid the engine
                                      mints for its sample; the positional and recipe vectors
@@ -29,7 +30,7 @@ the pipeline runs — nothing here re-implements the schema:
                                      from byakugan/relationships.yml `derived:`
 
 The sources of truth are the pinned submodules (and, for model/spindle/, the
-hand-authored registry byakugan/spindle.yml + the maps); a model refresh
+registry — the IR's spindle section + the byakugan/spindle.yml notes — and the maps); a model refresh
 is a submodule pin bump — or a registry / map change — after which re-running
 this script re-materializes model/ deterministically.
 
@@ -53,7 +54,7 @@ if _ROOT not in sys.path:
 
 from byakugan import build_data_model, carmodel, spindle, store, superset  # noqa: E402
 
-_CAR_DM = os.path.join(_ROOT, "third_party", "car", "data_model")
+_CAR_DM = os.path.join(_ROOT, "model", "sources", "car", "data_model")
 
 # The 13 CAR objects, in the canonical order used everywhere else.
 CAR_OBJECTS = [
@@ -92,12 +93,29 @@ def _submodule_sha(rel_path: str) -> str:
         return "<unknown — submodule not checked out>"
 
 
-CAR_SHA = _submodule_sha("third_party/car")
-ADS_SHA = _submodule_sha("third_party/attack-datasources")
+def _vendored_pin(rel_path: str) -> str:
+    """The upstream commit a vendored, frozen file was taken at — its own header
+    carries it (`#   commit: <sha> (...)`), there is no submodule to ask."""
+    try:
+        with open(os.path.join(_ROOT, rel_path), encoding="utf-8") as fh:
+            for line in fh:
+                if not line.startswith("#"):
+                    break
+                m = re.match(r"#\s+commit:\s*([0-9a-f]{40})", line)
+                if m:
+                    return m.group(1)
+    except OSError:
+        pass
+    return "<unknown — no commit pin in the file header>"
 
-_PROVENANCE = (f"# Source of truth (pinned submodules):\n"
-               f"#   third_party/car @ {CAR_SHA}\n"
-               f"#   third_party/attack-datasources @ {ADS_SHA}\n")
+
+_ADS_FILE = "model/sources/attack-datasources/attack_data_sources_objects.yaml"
+CAR_SHA = _submodule_sha("model/sources/car")
+ADS_SHA = _vendored_pin(_ADS_FILE)
+
+_PROVENANCE = (f"# Source of truth (pinned sources):\n"
+               f"#   model/sources/car (submodule) @ {CAR_SHA}\n"
+               f"#   {_ADS_FILE} (vendored) @ {ADS_SHA}\n")
 
 
 def _car_yaml_header(obj: str) -> str:
@@ -166,7 +184,7 @@ def gen_car_objects() -> int:
             # store.HEADER — the common CAR-event header shared by all 13 objects
             # (byakugan/store.py). The CAR model does not describe these.
             "common_header": list(store.HEADER),
-            # the object's MITRE CAR fields (third_party/car data_model/<obj>.yaml).
+            # the object's MITRE CAR fields (model/sources/car data_model/<obj>.yaml).
             "object_fields": object_fields,
         }
         _write(os.path.join(_HERE, "car", "objects", f"{obj}.yml"),
@@ -439,7 +457,7 @@ def gen_relationships() -> tuple[int, int]:
 
 def gen_spindle() -> int:
     """model/spindle/: the spindle row-identity registry snapshot + the spindle
-    record shape — resolved from byakugan/spindle.yml, the live maps and
+    record shape — resolved from the IR's spindle section, the spindle.yml notes, the live maps and
     ids.py by the SAME code the engine mints with (byakugan.spindle), so
     the snapshot can never describe an identity the pipeline does not mint."""
     problems = spindle.verify_registry()

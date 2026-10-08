@@ -8,7 +8,7 @@ import pathlib
 import subprocess
 import sys
 
-HERE = pathlib.Path(__file__).resolve().parent
+HERE = pathlib.Path(__file__).resolve().parent.parent / "elastic" / "projection"
 
 
 def _validator():

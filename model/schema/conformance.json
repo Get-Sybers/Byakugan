@@ -48,7 +48,7 @@
    "name": "identity-registry",
    "engine": "python",
    "command": "python -m byakugan.conform --strict",
-   "proves": "byakugan/spindle.yml validates against the Identity Rules layer"
+   "proves": "The assembled spindle registry validates against the Identity Rules"
   },
   {
    "name": "mapping-coverage",

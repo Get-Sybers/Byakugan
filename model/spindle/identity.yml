@@ -4,10 +4,11 @@
 # <- source path on the event), the scope, the positional fallback; the external
 # forms and the maps that carry them; the equality rule; the namespaces and the mint
 # rule, materialized.
-# Resolved from byakugan/spindle.yml (the rules), the live maps (byakugan.mappings)
-# and the id recipe (byakugan/ids.py) by byakugan.spindle — the code the engine
-# mints with. `python -m byakugan.spindle --check` and tests/test_spindle_model.py
-# fail on drift.
+# Resolved from the IR's spindle + golden sections (go/internal/authoring/ir_sections.go,
+# read from go/internal/ir/ir.json), the notes in byakugan/spindle.yml, the live maps
+# (byakugan.mappings) and the id recipe (byakugan/ids.py) by byakugan.spindle — the
+# recipe the engine mints with. `python -m byakugan.spindle --check` and
+# tests/test_spindle_model.py fail on drift.
 
 spindle:
   version: 2

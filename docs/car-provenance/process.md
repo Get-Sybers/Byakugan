@@ -17,7 +17,7 @@ Grounded in (read verbatim):
 `Anamnesis mappings.yaml`, the memory plugin `Anamnesis internal/collect (collectProcesses/collectAccess)`;
 generated sources `sources/{evtx_sysmon,evtx_process,memory,plaso_exec_prefetch,plaso_exec_winreg,plaso_exec_cron}.yaml`;
 `byakugan/byakugan/enrich.py` + `relationships.yml`; `docs/CAR-Relations.md`; the quarantined
-`to-be-validated/evtx_audit.yml`; and real evidence
+`docs/to-be-validated/evtx_audit.yml`; and real evidence
 (`data_store/processed/volatility/memdump.mem/car.db`, 180 process rows;
 `data_store/processed/windows_logs/.../log_EvtxECmd_Output.json`).
 

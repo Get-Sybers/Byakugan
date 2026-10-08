@@ -1,6 +1,6 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/model-mapping.schema.json",
+ "$id": "https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/model/schema/model-mapping.schema.json",
  "title": "Model Mapping — the hourglass waist as declarations",
  "description": "One declaration per ir lane (docs/design/schema-layers.md): input is the Artefact Class the lane feeds, output the (object, action) pairs, identity the spindle recipe, predicates BY NAME ONLY — implementations live in the code registries (go/internal/predicates; the Python engine registry at phase 7) and conform rule mapping-coverage holds declared == registered against ir.json both ways. Instances are GENERATED from go/internal/ir/ir.json by byakugan.schema_gen; gen-ir keeps ir.json byte-exact against the Go authoring tables. mappings/routes.yaml carries the routing table ($defs/routing).",
  "$defs": {

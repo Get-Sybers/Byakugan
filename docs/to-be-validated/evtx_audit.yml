@@ -12,7 +12,7 @@
 # the %%-token strings (which depend on EvtxECmd message resolution).
 #
 # TO PROMOTE: once confirmed against a real audit-enabled capture, port a family
-# back into an active mappings/*.py map (this file is the exact spec) and delete
+# back into an active Go map (go/internal/authoring; this file is the exact spec) and delete
 # it here. The prior working implementation is in git history (mappings/evtx_audit.py
 # before removal). Engine marker vocabulary: payload(), userdata(), hex_int(),
 # basename(), ext(), host_label(), map_value(), const(), regex1().

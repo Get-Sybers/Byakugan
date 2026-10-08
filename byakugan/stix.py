@@ -110,7 +110,7 @@ PRODUCER = {"type": "identity", "spec_version": SPEC,
             "contact_information": "https://github.com/Get-Sybers/Byakugan",
             "description": "the materialised MITRE CAR tree, projected to STIX 2.1 at export"}
 
-# The pinned CAR corpus (third_party/car): the catalogue objects' `modified`
+# The pinned CAR corpus (model/sources/car): the catalogue objects' `modified`
 # derives from the pin so a corpus update always moves `modified` (BP §3.1 —
 # never two contents under one id+modified). Bump both with the submodule pin.
 CAR_CORPUS = {"commit": "1b922fe1527d956e222a99473472e594f10f610b",

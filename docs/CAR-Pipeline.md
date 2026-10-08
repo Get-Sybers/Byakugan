@@ -68,9 +68,9 @@ python -m byakugan --in <file-or-dir> --out <dir> [--host NAME] [--artefacts k1,
 |---|---|
 | `carmodel.py` | the 13 CAR objects, reconstructed live via `build_data_model` from the pinned CAR model — no committed copy |
 | `build_data_model.py` | builds the CAR (13) + the CAR+ATT&CK superset (~38) + the relationship catalogue live from the pinned CAR + ATT&CK model — no committed copy |
-| `mappings/` | per-artefact declarative maps (one file per family; auto-discovered) |
-| `normalize.py` | the marker engine: `normalize(artefact, record) → CAR event`, or `None` if unmapped |
-| `../go/` (`byakugan-parse`) | the **parse engine**: raw file → pre-enrichment CAR events. Holds the line reader, the winevt adapter (Plaso winevt(x) record → EvtxECmd shape, so the evtx maps run unchanged), the jlecmd flatten, the l2t container splitter (→ per-parser wrapped tables: `SourceImage`, `RecordId`, `Timestamp`, `Parser`, `Record`), the marker resolver and the spindle identity — reading the mapping tables through `internal/ir/ir.json` (`python -m byakugan.export_ir`) |
+| `mappings/` | decodes the per-artefact map tables from `go/internal/ir/ir.json` (authored in `go/internal/authoring/`) for the Python introspection consumers |
+| `normalize.py` | the marker DSL constructors and value normalisers (introspection substrate for `sources_model` / `spindle` / `sigma`); the engine that resolves them is `go/internal/markers` |
+| `../go/` (`byakugan-parse`) | the **parse engine**: raw file → pre-enrichment CAR events. Holds the line reader, the winevt adapter (Plaso winevt(x) record → EvtxECmd shape, so the evtx maps run unchanged), the jlecmd flatten, the l2t container splitter (→ per-parser wrapped tables: `SourceImage`, `RecordId`, `Timestamp`, `Parser`, `Record`), the marker resolver and the spindle identity — reading the mapping tables through the embedded `internal/ir/ir.json` (authored in `internal/authoring`, serialised by `make -C go gen-ir`) |
 | `ids.py` | the one id recipe — canonical JSON + the namespaces (`STIX_NS`, `CAR_NS`, `SPINDLE_NS`) — shared by the STIX projection and the spindle row guid |
 | `enrich.py` | the relationship + inheritance cascade (identity, joins, inheritance, dedupe, canonical accounts) |
 | `store.py` | the in-memory per-object `CarStore` + `export_jsonl()`/`read_object_jsonl()`/`read_events()` (the downstream ingest contract and its read-back) |
@@ -84,7 +84,7 @@ The CAR object/field/action set is a **verified exact match** to `car.mitre.org`
 — every object, action, and field (diffed 13/13, 0 missing, 0 extra),
 reconstructed live from the pinned CAR model — no committed copy. That model is
 materialised inside the hardened `get-sybers/byakugan` image at build time (a
-recursive clone; see [GoDFIR-toolz/byakugan](https://github.com/Get-Sybers/GoDFIR-toolz/-/tree/main/byakugan)),
+recursive clone; see [GoDFIR-toolz/byakugan](https://github.com/Get-Sybers/GoDFIR-toolz/tree/main/byakugan)),
 so there is no host model checkout at runtime. The 13 objects:
 authentication, driver, email, file, flow, http, module, process, registry,
 service, socket, thread, user_session.
@@ -203,7 +203,7 @@ key; `positional`: the per-record fallback, see below); `native.spindle_ref`
 says where the record came from, outside the key.
 
 **Which** fields identify each artefact's row is a rule, not code — declared as
-data in `byakugan/spindle.yml`, the registry. Per entry: the CAR object;
+data in the IR's `spindle` section (`go/internal/authoring/ir_sections.go`; its notes in `byakugan/spindle.yml`), the registry. Per entry: the CAR object;
 the **kind** (`record` — a record-numbered / journal key that asserts the
 *same record*: `l2t_mft`, `l2t_usnjrnl`, `plaso_fseventsd`; `entity` — a
 content-like key that asserts records that *coincide*: every other entry,
@@ -224,7 +224,7 @@ engine in step; `model/spindle/identity.yml` is the resolved snapshot,
 `model/spindle/record.yml` the spindle's shape and `model/spindle/golden.yml`
 the golden vectors — per entry the key and the guid the engine mints for its
 sample (all `python model/generate.py`; `python -m byakugan.spindle
---check` in CI). Each generated source manifest (`sources/<map>.yaml`) states
+--check` in CI). Each source manifest (built by `byakugan.sources_model`; `<out>/sources.yaml` on every build, `python -m byakugan.gen_sources --out DIR` for the whole set) states
 the identity its guid carries — the registry entries with their kind, scope
 and version, or the external form. The registry today:
 
@@ -299,7 +299,7 @@ and the predicate only, `crosssource.py` is untouched.
 **Change protocol.** An entry's identity fields, names, rendering or golden
 sample change only with a `version` bump: edit → bump `version` →
 `python model/generate.py` → commit `model/spindle/` (golden.yml included) and
-the regenerated `sources/` → rebuild the stores (`--batch --force`; every guid
+the regenerated `model/spindle/` → rebuild the stores (`--batch --force`; every guid
 of that entry re-mints — a remint/audit tool is a follow-up). `spindle --check`
 and the generator refuse a golden guid that moved without its version, a
 version that moved without its guid, and any move of the recipe vector (that
@@ -309,7 +309,7 @@ a time-free `kind: entity` entry; a timed identity on an untimed leaf is
 refused, and a Plaso leaf without an entry is refused. The shapes not yet
 confirmed against a multi-tool corpus (cross-tool renderings of
 `file_reference`, timestamps, `db_path`, `prefetch_hash`; the registry
-value-level component) are recorded in `to-be-validated/spindle_identity.yml`;
+value-level component) are recorded in `docs/to-be-validated/spindle_identity.yml`;
 until that corpus is processed the component is complete *within Plaso*.
 
 ## 8. Output contract (per-object JSONL)

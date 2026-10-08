@@ -4,8 +4,8 @@
 # committed structural index next to this script. The committed file is
 # canonical; the submodule is only consulted when this tool runs.
 #
-#   python pipeline/ingest/forensicartifacts/ingest.py           # regenerate
-#   python pipeline/ingest/forensicartifacts/ingest.py --check   # drift gate
+#   python model/ingest_forensicartifacts.py           # regenerate
+#   python model/ingest_forensicartifacts.py --check   # drift gate
 #
 # --check regenerates in memory and byte-compares against the committed
 # index. Because the index embeds the submodule commit under
@@ -24,10 +24,10 @@ import sys
 import yaml
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_ROOT = os.path.normpath(os.path.join(_HERE, "..", "..", ".."))
+_ROOT = os.path.normpath(os.path.join(_HERE, ".."))
 _SOURCE = os.path.join(_ROOT, "model", "sources", "forensicartifacts")
 _DATA = os.path.join(_SOURCE, "artifacts", "data")
-_INDEX = os.path.join(_HERE, "index.json")
+_INDEX = os.path.join(_SOURCE + ".index.json")
 _UPSTREAM = "https://github.com/ForensicArtifacts/artifacts.git"
 
 
@@ -87,7 +87,7 @@ def build_index() -> dict:
         "generated_from": {
             "commit": _source_commit(),
             "repo": _UPSTREAM,
-            "tool": "pipeline/ingest/forensicartifacts/ingest.py",
+            "tool": "model/ingest_forensicartifacts.py",
         },
         "artifact_count": len(artifacts),
         "artifacts": artifacts,
@@ -117,7 +117,7 @@ def main() -> int:
         if committed != rendered:
             print(
                 f"OUT OF DATE: {os.path.relpath(_INDEX, _ROOT)} — regenerate "
-                "with: python pipeline/ingest/forensicartifacts/ingest.py"
+                "with: python model/ingest_forensicartifacts.py"
             )
             return 1
         print(f"OK: {os.path.relpath(_INDEX, _ROOT)} in sync with the submodule pin")

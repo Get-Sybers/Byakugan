@@ -302,7 +302,7 @@ What the dissector powers, in existing mechanisms:
 - **Sysmon `ProcessGuid`/`LogonGuid`** (already our CAR `guid` for EID 1/5,
   `maps_sysmon.go:42-45`) are structured values embedding a machine token and
   a start time — a promising dissection target, but the byte layout must be
-  validated against fixtures first: `to-be-validated/` is the right
+  validated against fixtures first: `docs/to-be-validated/` is the right
   quarantine.
 
 ## The input side (GoDFIR-toolz @ `ee688cf`)

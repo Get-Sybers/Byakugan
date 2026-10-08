@@ -178,7 +178,7 @@ def test_verify_is_dispatchable_from_the_command(tmp_path):
     dispatches through __main__ to the env-driven sub-tool; `byakugan verify
     <dir>` is the pass-through to the engine's own CLI."""
     if not _model_present():
-        pytest.skip("the pinned CAR model (third_party/car) is not checked out")
+        pytest.skip("the pinned CAR model (model/sources/car) is not checked out")
     car = tmp_path / "car"
     _write(car, "sysmon", "process", [_row("process", "create", command_line="cmd.exe",
                                           sid="S-1-5-18", pid="1")])
@@ -294,7 +294,7 @@ def test_version_and_bad_argv(env, capsys):
 
 def test_car_vocab_is_the_model_vocabulary(env, capsys):
     if not _model_present():
-        pytest.skip("the pinned CAR model (third_party/car) is not checked out")
+        pytest.skip("the pinned CAR model (model/sources/car) is not checked out")
     assert cli.main(["car-vocab"]) == 0
     vocab, _err = _summary(capsys)
     assert set(vocab) >= set(verify._OBJECTS)

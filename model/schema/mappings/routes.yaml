@@ -2,12 +2,22 @@
 # The Model Mapping layer: the ir surface as declarations; gen-ir
 # keeps ir.json byte-exact against the Go authoring tables and the
 # conform rules hold these declarations to ir.json both ways.
-schema_version: 6.0.0
+schema_version: 7.0.0
 source: generated
 generated_from:
   ir: go/internal/ir/ir.json (ir_version 1)
 routes:
 - match: _EvtxECmd_Output
+  lanes:
+  - evtx_security
+  - evtx_security_sessions
+  - evtx_process
+  - evtx_services
+  - evtx_sysmon
+  - evtx_bits
+  - evtx_rdp
+  - evtx_more
+- match: goevtx.jsonl
   lanes:
   - evtx_security
   - evtx_security_sessions
@@ -140,6 +150,31 @@ routes:
 - match: PrefetchDump_Output
   lanes:
   - prefetch_dump
+- match: gore.jsonl
+  lanes:
+  - recmd_batch
+- match: goprefetch.jsonl
+  lanes:
+  - prefetch_dump
+- match: gojle.jsonl
+  lanes:
+  - jlecmd_dest
+- match: goese.jsonl
+  lanes: []
+- match: gomft.jsonl
+  lanes: []
+- match: gole.jsonl
+  lanes: []
+- match: gorb.jsonl
+  lanes: []
+- match: gosbe.jsonl
+  lanes: []
+- match: goamcache.jsonl
+  lanes: []
+- match: goappcompat.jsonl
+  lanes: []
+- match: gowxt.jsonl
+  lanes: []
 - match: .L2tUtmp
   lanes:
   - l2t_utmp

@@ -4,7 +4,7 @@
 # reproduce this file byte-identically (tests/test_schema_foundations.py).
 # These are wire format: they never change (schema-layers.md, Identity Rules).
 
-schema_version: "6.0.0"   # THE one version; renders into extension-definition.version
+schema_version: "7.0.0"   # THE one version; renders into extension-definition.version
 
 namespaces:
   STIX_NS: 00abedb4-aa42-466c-9c01-fed23315a9b7    # STIX 2.1 s2.9 SCO namespace — mints SCO ids ONLY

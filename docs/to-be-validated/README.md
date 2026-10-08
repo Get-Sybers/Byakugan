@@ -10,7 +10,8 @@ action-decision logic, field mappings, join keys, and the reason it's unvalidate
 
 **To promote one:** confirm it against a real capture that actually contains the
 event (e.g. an image with the relevant `auditpol` subcategory enabled), then port
-the family into an active `mappings/*.py` map using this spec, and delete it here.
+the family as a Go map (`go/internal/authoring/maps_<family>.go`, its predicates in
+`go/internal/predicates/`) using this spec, and delete it here.
 
 ## Contents
 
@@ -21,6 +22,11 @@ the family into an active `mappings/*.py` map using this spec, and delete it her
   AccessMask. Absent from all current corpora (except 5058, whose action is still
   an inference). The prior working Python implementation is in git history
   (`mappings/evtx_audit.py`, removed when this was quarantined).
+- `plaso_fseventsd_flags.yml` — the macOS FSEvents change-flag decode (`Created` →
+  file/create, `Removed` → file/delete, …) behind the active `plaso_fseventsd` map,
+  which ingests every record as the generic file/modify with the raw `flags` kept in
+  native. Only `IsDirectory` and `EndOfTransaction` are confirmed; the change bits
+  need a real macOS image with content records before the action split is promoted.
 - `spindle_identity.yml` — the spindle row identity (the minted guid every
   l2t/Plaso row carries): the cross-tool renderings not yet confirmed against a
   multi-tool corpus (`file_reference`, timestamps, browser `db_path`,

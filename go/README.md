@@ -17,15 +17,15 @@ enrichment, spindle, STIX) and decodes those same tables from ir.json.
 
 | package            | what                                                              |
 | ------------------ | ----------------------------------------------------------------- |
-| `internal/pyjson`  | Python-faithful value model + JSON codec (`Dumps`, `Canonical`, `Str`) — byte-identical to CPython `json` / `str()`; vectors recorded by `tests/parity/gen_pyjson_vectors.py` |
+| `internal/pyjson`  | Python-faithful value model + JSON codec (`Dumps`, `Canonical`, `Str`) — byte-identical to CPython `json` / `str()`; vectors under `testdata/` |
 | `internal/ids`     | the identity recipe of `byakugan/ids.py`: uuid5 chain, `Mint`, `GuidOf`, `Render`, `FieldsGuid` — pinned to `model/spindle/golden.yml` via the IR |
-| `internal/pyre`    | Python-regex adapter: RE2 compile + the start-anchored negative-lookahead idiom as {deny, accept} pairs; vectors from `tests/parity/gen_pyre_vectors.py` |
+| `internal/pyre`    | Python-regex adapter: RE2 compile + the start-anchored negative-lookahead idiom as {deny, accept} pairs; vectors under `testdata/` |
 | `internal/ir`      | embedded IR load + validation                                     |
 | `internal/record`  | the input-record type: ordered object, blank rule, Python str()/truthiness/strip/int()/float(), EvtxECmd Payload lazy parse (stripped view) + `EvtxPayloadField` (unstripped gating view) |
-| `internal/readers` | `iter_jsonl` semantics: utf-8-sig, errors='replace' maximal subparts, universal newlines, line cleaning; byte-level vectors from `tests/parity/gen_reader_vectors.py` |
-| `internal/markers` | the 24-kind resolver (`normalize._resolve`), `parse_ts`, `_clean_ts`, epoch/isoformat rendering; vectors globbed from `testdata/marker_vectors/*.json`, written by `tests/parity/genf/<family>.py` (`core.json` = the engine-wide set) |
-| `internal/predicates` | `Register(name, fn)` registry, one `predicates_<family>.go` per Python mapping module — all 77 IR predicates ported; `Check` is a HARD completeness gate (`ir-check` exits 1, `TestRegistryAgainstIR` fails). Vectors globbed from `testdata/predicate_vectors/*.json`, one file per family, written by `tests/parity/genf/<family>.py` |
-| `internal/spindle` | identity resolution over the normalized event + positional fallback + spindle natives; vectors from `tests/parity/gen_spindle_vectors.py` |
+| `internal/readers` | `iter_jsonl` semantics: utf-8-sig, errors='replace' maximal subparts, universal newlines, line cleaning; byte-level vectors under `testdata/` |
+| `internal/markers` | the 22-kind resolver (the Python marker DSL's `_resolve`), `parse_ts`, `_clean_ts`, epoch/isoformat rendering; vectors globbed from `testdata/marker_vectors/*.json` (`core.json` = the engine-wide set) |
+| `internal/predicates` | `Register(name, fn)` registry, one `predicates_<family>.go` per map family — all 80 IR predicates; `Check` is a HARD completeness gate (`ir-check` exits 1, `TestRegistryAgainstIR` fails). Vectors globbed from `testdata/predicate_vectors/*.json`, one file per family |
+| `internal/spindle` | identity resolution over the normalized event + positional fallback + spindle natives; vectors under `testdata/` |
 | `internal/normalize` | the orchestrator: variant select → action gate → exact event key order → natives → props → guid LAST |
 | `internal/adapt`   | the winevt RULES table (wrapped Plaso winevt/winevtx row → EvtxECmd shape) and the jlecmd DestList flatten, ported from `byakugan/adapters/` |
 | `internal/split`   | the raw-l2t container splitter (`byakugan/adapters/l2t_split.py`): physical-line `RecordId`, `L2t<Camel>` table names, plaso-µs `Timestamp` |
@@ -48,32 +48,32 @@ unchanged enrich → store → superset → derive → STIX path, and
     byakugan-parse split-l2t --in RAW.jsonl --out-dir TMP
 
 for a raw log2timeline container, into a tempdir under the source's output dir.
-Routing (`pipeline.ROUTES`), the mapping tables, normalize's marker
-constructors (the introspection substrate for sigma/sources_model/spindle) and
-the Anamnesis `car.db` passthrough stay in Python.
+Routing (`pipeline.ROUTES`, read back from the IR's `routes`), the decoded map tables
+(`byakugan.mappings`, read back from `ir.json`), normalize's marker constructors
+(the introspection substrate for sigma/sources_model/spindle) and the Anamnesis
+`car.db` passthrough stay in Python.
 
-## Parity harness
+## Tests
 
-`tests/parity/test_go_parity.py` runs every `tests/parity/fixtures/<name>/`
-manifest through BOTH engines (frozen reference plumbing + live Python maps
-vs `byakugan-parse parse`) and asserts per-line byte equality. Fixture dirs
-are discovered by glob, so a newly ported family is picked up with no harness
-edit. All 38 IR artefact keys are covered by at least one fixture, across 42
-fixture directories (adapter fan-out included). `tests/parity/test_split_parity.py`
-does the same for `split-l2t` against the frozen reference splitter.
+`make -C go test` replays the committed vectors under each package's
+`testdata/` — recorded from the Python reference engine before it was retired,
+so they are the byte-level spec now — and `TestRegistryAgainstIR` /
+`TestEveryRegisteredPredicateHasAVector` hold the predicate registry complete
+against the IR. The CAR behaviour is exercised end to end by the Python map
+tests (`pytest -q`), which drive this binary through `tests/go_engine.py`;
+there is no second engine to compare against any more.
 
 ## Benchmark
 
-Measured, never estimated. `scripts/bench-parse.py` synthesises a corpus whose
-record shapes are cloned from `tests/parity/fixtures/*/input.jsonl`, proves both
-sides emit **byte-identical output on a head slice of that very corpus** before
-timing anything, then times the frozen pre-migration Python path
-(`tests/parity/reference/` plumbing driving the live maps — the implementation
-this engine replaced) against this binary. Best wall clock of three runs per
-side, both writing to `/dev/null`, each side a fresh child process; CPU time
-from the child's rusage, peak RSS from its `/proc/<pid>/status` VmHWM.
-
-    python scripts/bench-parse.py --repeat 3        # ~3.5 min; the corpus is deleted after
+Measured once, while the Python parse path still existed: a since-retired
+`scripts/bench-parse.py` synthesised a corpus from the parity fixtures, proved
+both sides emitted **byte-identical output on a head slice of that very corpus**
+before timing anything, then timed the frozen pre-migration Python path against
+this binary (best wall clock of three runs per side, both writing to
+`/dev/null`, each a fresh child process; CPU time from the child's rusage, peak
+RSS from its `/proc/<pid>/status` VmHWM). The script went with the parity
+harness and the Python path it measured; the numbers stay as the record of
+what the move bought.
 
 | corpus | input | records | events | Python wall (cpu) | Go wall (cpu) | wall speed-up | peak RSS py / go |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -115,7 +115,7 @@ shape of it is worth knowing before optimising anything here:
 fetched either: `internal/ir/ir.json` is embedded at build time. Upgrading the
 Go side means bumping the `go` directive in `go.mod` (and the toolchain version
 in `.github/workflows/lint.yml` + CONTRIBUTING.md), then re-running
-`make -C go build test` and `pytest -q tests/parity`.
+`make -C go build test` and `pytest -q`.
 `tests/test_requirements_sync.py::test_go_module_is_stdlib_only` fails the
 moment a third-party module or a `go.sum` appears, so this paragraph cannot go
 stale. The Python side's inventories are `requirements.txt` and

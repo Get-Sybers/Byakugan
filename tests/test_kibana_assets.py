@@ -20,7 +20,7 @@ import os
 
 import pytest
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "elastic", "projection")
 RENDERED = os.path.join(HERE, "rendered")
 KIBANA_DIR = os.path.join(RENDERED, "kibana")
 COMPONENT_DIR = os.path.join(RENDERED, "component_templates")

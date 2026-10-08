@@ -1,7 +1,7 @@
-// Code generated from ir.json (phase-3 bootstrap of the non-map IR sections).
-// The static IR data byakugan/{spindle.yml,pipeline.py,normalize.py} used to
-// source, now authored in Go. Regenerate with scripts/gen_ir_sections.py (bootstrap
-// only — hand-maintained thereafter). DO NOT edit the Python sources for these.
+// The static (non-map) IR sections — marker kinds, routes, evtx_maps, adapters,
+// canon_user, spindle, golden — authored here in Go. Bootstrapped once from the
+// committed ir.json when authoring moved out of Python; hand-maintained since.
+// `byakugan-parse gen-ir` serializes them and `gen-ir --check` gates drift.
 
 package authoring
 
@@ -35,9 +35,27 @@ func irMarkerKinds() pyjson.Value {
 }
 
 func irRoutes() pyjson.Value {
+	// filename pattern -> map keys, first match wins: the routing table
+	// byakugan.pipeline reads back from the IR (pipeline.ROUTES). A pattern
+	// routed to [] is a DECLARED state — the file is recognised and
+	// deliberately unmapped (its rows stay raw) — never an unknown file.
 	return pa(
 		pa(
 			"_EvtxECmd_Output",
+			pa(
+				"evtx_security",
+				"evtx_security_sessions",
+				"evtx_process",
+				"evtx_services",
+				"evtx_sysmon",
+				"evtx_bits",
+				"evtx_rdp",
+				"evtx_more",
+			),
+		),
+		// goevtx.jsonl: goevtx (the evtx lane): the same record shape, one file per log
+		pa(
+			"goevtx.jsonl",
 			pa(
 				"evtx_security",
 				"evtx_security_sessions",
@@ -79,18 +97,23 @@ func irRoutes() pyjson.Value {
 				"zeek_files",
 			),
 		),
+		// ssl.json: TLS handshake -> flow (SNI in dest_fqdn)
 		pa(
 			"ssl.json",
 			pa(
 				"zeek_ssl",
 			),
 		),
+		// x509.json: TLS certificate -> file (fingerprint = sha256)
 		pa(
 			"x509.json",
 			pa(
 				"zeek_x509",
 			),
 		),
+		// Zeek logs with no dedicated CAR object — routed to nothing EXPLICITLY (known,
+		// not unknown): their per-flow detail can enrich the flow by uid at the
+		// cascade stage, but they are not CAR objects.
 		pa(
 			"dhcp.json",
 			[]pyjson.Value{},
@@ -164,42 +187,49 @@ func irRoutes() pyjson.Value {
 				"l2t_usnjrnl",
 			),
 		),
+		// .L2tWinevt: Plaso legacy EVT  -> the winevtx CAR maps
 		pa(
 			".L2tWinevt",
 			pa(
 				"l2t_winevt",
 			),
 		),
+		// .L2tWinevtx: Plaso modern EVTX -> the winevtx CAR maps
 		pa(
 			".L2tWinevtx",
 			pa(
 				"l2t_winevt",
 			),
 		),
+		// .L2tMsiecf: IE index.dat visits -> http
 		pa(
 			".L2tMsiecf",
 			pa(
 				"l2t_msiecf",
 			),
 		),
+		// .L2tFirefoxCache: -> http (recorded method/status)
 		pa(
 			".L2tFirefoxCache",
 			pa(
 				"l2t_firefox_cache",
 			),
 		),
+		// .L2tSqlite: firefox page visits -> http (gated by data_type)
 		pa(
 			".L2tSqlite",
 			pa(
 				"l2t_firefox_places",
 			),
 		),
+		// .L2tJavaIdx: Java download cache -> http
 		pa(
 			".L2tJavaIdx",
 			pa(
 				"l2t_javaidx",
 			),
 		),
+		// .L2tLnk: shortcut target MAC times -> file (+ embedded shell items)
 		pa(
 			".L2tLnk",
 			pa(
@@ -207,6 +237,7 @@ func irRoutes() pyjson.Value {
 				"plaso_shellitem",
 			),
 		),
+		// .L2tRecycleBinInfo2: deletion events -> file/delete
 		pa(
 			".L2tRecycleBinInfo2",
 			pa(
@@ -219,12 +250,18 @@ func irRoutes() pyjson.Value {
 				"l2t_recyclebin",
 			),
 		),
+		// l2t tables with NO CAR object — routed to [] EXPLICITLY (known, not
+		// unknown): pe = compilation times (no CAR file action); olecf = document
+		// internal streams; rplog = restore-point info; fseventsd = macOS flags
+		// (2 rows, undecoded). Their rows stay raw.
+		// .L2tPe: pe_coff:file -> timestamp-less file record (path + sha256 + PE meta, compile_time native); dll_import/resource -> raw
 		pa(
 			".L2tPe",
 			pa(
 				"plaso_pecoff",
 			),
 		),
+		// .L2tOlecf: olecf:summary_info -> file (doc + authoring meta); olecf:item -> raw
 		pa(
 			".L2tOlecf",
 			pa(
@@ -235,34 +272,40 @@ func irRoutes() pyjson.Value {
 			".L2tRplog",
 			[]pyjson.Value{},
 		),
+		// .L2tFseventsd: macOS FSEvents -> file/modify (never dropped)
 		pa(
 			".L2tFseventsd",
 			pa(
 				"plaso_fseventsd",
 			),
 		),
+		// .L2tEsedb: Plaso esedb/srum -> flow + process (SRUM)
 		pa(
 			".L2tEsedb",
 			pa(
 				"l2t_srum",
 			),
 		),
+		// _RECmd_Batch_: RECmd --json batch output -> registry
 		pa(
 			"_RECmd_Batch_",
 			pa(
 				"recmd_batch",
 			),
 		),
+		// jlecmd_AutomaticDestinations: jump lists -> file (via adapter)
 		pa(
 			"jlecmd_AutomaticDestinations",
 			pa(
 				"jlecmd_dest",
 			),
 		),
+		// jlecmd_CustomDestinations: pin-centric, no interaction times -> raw
 		pa(
 			"jlecmd_CustomDestinations",
 			[]pyjson.Value{},
 		),
+		// _LECmd_Output: lnk: the l2t lnk map is canonical (artefact != processor)
 		pa(
 			"_LECmd_Output",
 			[]pyjson.Value{},
@@ -273,23 +316,93 @@ func irRoutes() pyjson.Value {
 				"recmd_batch",
 			),
 		),
+		// Get-Sybers Go parsers (DX_DFIR's godfir-toolz lane): ese_dump writes one
+		// JSONL per SRUM provider table (only Network/Application usage carry a CAR
+		// object — the map leaves the rest raw); prefetch_dump writes one output file.
+		// NetworkDataUsage: ese_dump SRUM -> flow (network usage)
 		pa(
 			"NetworkDataUsage",
 			pa(
 				"esedump_srum",
 			),
 		),
+		// ApplicationResourceUsage: ese_dump SRUM -> process (app usage)
 		pa(
 			"ApplicationResourceUsage",
 			pa(
 				"esedump_srum",
 			),
 		),
+		// PrefetchDump_Output: prefetch_dump -> process (execution)
 		pa(
 			"PrefetchDump_Output",
 			pa(
 				"prefetch_dump",
 			),
+		),
+		// The GoDFIR-toolz framework layout (godfir-toolz/<tool>/<item>/<tool>.jsonl,
+		// the tools in GODFIR_TOOLS): every Go tool writes one <tool>.jsonl per
+		// item, in the record shape the map above already consumes — the file name
+		// is the route.
+		// gore.jsonl: gore registry batch (recmd_batch shape) -> registry
+		pa(
+			"gore.jsonl",
+			pa(
+				"recmd_batch",
+			),
+		),
+		// goprefetch.jsonl: goprefetch -> process (execution)
+		pa(
+			"goprefetch.jsonl",
+			pa(
+				"prefetch_dump",
+			),
+		),
+		// gojle.jsonl: gojle jump lists (jlecmd_dest shape) -> file (via adapter)
+		pa(
+			"gojle.jsonl",
+			pa(
+				"jlecmd_dest",
+			),
+		),
+		// goese writes one <table>.jsonl per SRUM provider table (NetworkDataUsage /
+		// ApplicationResourceUsage route above) plus goese.jsonl, its per-table
+		// index; the other provider tables (NetworkConnectivityUsage, EnergyUsage,
+		// PushNotifications, ...) are SRUM-internal telemetry with no CAR object.
+		pa(
+			"goese.jsonl",
+			[]pyjson.Value{},
+		),
+		// Go tools with no CAR map yet — routed to nothing EXPLICITLY (known, not
+		// unknown): a raw $MFT entry, a shortcut, a $I record, a shellbag, an
+		// Amcache/ShimCache entry, a Timeline activity. Their records stay raw.
+		pa(
+			"gomft.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"gole.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"gorb.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"gosbe.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"goamcache.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"goappcompat.jsonl",
+			[]pyjson.Value{},
+		),
+		pa(
+			"gowxt.jsonl",
+			[]pyjson.Value{},
 		),
 		pa(
 			".L2tUtmp",
@@ -313,15 +426,22 @@ func irRoutes() pyjson.Value {
 }
 
 func irEvtxMaps() pyjson.Value {
+	// EvtxECmd output is ONE uniform shape across all ~110 Windows channels, so it
+	// is CONTENT-routed, not filename-routed: every *_EvtxECmd_Output.json (and
+	// goevtx.jsonl) feeds this whole family and each map's (Channel, EventId)
+	// predicate decides which rows it claims. Adding a channel/EventId is a map
+	// change, never a routing change. The Security-audit families (4663/4657/
+	// 4660/4670/4689/5140/5145/5156/5157/5158/5058) are NOT here: unvalidated
+	// inferences, quarantined in docs/to-be-validated/evtx_audit.yml.
 	return pa(
-		"evtx_security",
-		"evtx_security_sessions",
-		"evtx_process",
-		"evtx_services",
-		"evtx_sysmon",
-		"evtx_bits",
-		"evtx_rdp",
-		"evtx_more",
+		"evtx_security",          // Security 4624/4625/4672 -> authentication
+		"evtx_security_sessions", // Security 4624/4634/4647/4778/4779 -> user_session
+		"evtx_process",           // Security 4688 -> process
+		"evtx_services",          // System 7045 / Security 4697 -> service
+		"evtx_sysmon",            // Sysmon EIDs -> process/flow/file/registry/module/driver/thread
+		"evtx_bits",              // BITS-Client 59/60 -> http
+		"evtx_rdp",               // TerminalServices 21/24/25 -> user_session
+		"evtx_more",              // 4907/5857/20003/30803/7001/7002/7034 -> file/module/service/flow/user_session
 	)
 }
 
@@ -391,6 +511,15 @@ func irCanonUser() pyjson.Value {
 }
 
 func irSpindle() pyjson.Value {
+	// The row-identity registry's RULES: the namespace recipe, the object and
+	// version keys, the renderings, the positional fallback, one entry per
+	// identity (object, kind, scope, version, the ordered identity fields) and
+	// the external forms the engine's other maps carry verbatim. byakugan.spindle
+	// reads this back from ir.json and joins the notes in byakugan/spindle.yml
+	// (prose, the equality rule, the passthrough's forms); `python -m
+	// byakugan.spindle --check` holds it, the maps, the recipe and the golden
+	// pins (irGolden) in step. Changing an entry's identity: bump its version and
+	// re-pin its golden vector — docs/Spindle-Identity.md, the change protocol.
 	return po(
 		"namespace", po(
 			"CAR_NS_URL", "https://github.com/Get-Sybers/Byakugan/stix",
@@ -1090,6 +1219,12 @@ func irSpindle() pyjson.Value {
 }
 
 func irGolden() pyjson.Value {
+	// The golden vectors: per entry the rendered key and the guid the recipe
+	// mints for its sample (a real corpus row, or a labelled synthetic one), the
+	// positional vector, one vector per external form and the recipe vector.
+	// Pins, not derivations: ids_test replays them here and byakugan.spindle
+	// re-mints them in Python, so a changed identity or sample without a new pin
+	// (and version) fails both. Each sample's provenance: the comment above it.
 	return po(
 		"spindle", po(
 			"version", pyjson.Int(2),
@@ -1125,6 +1260,7 @@ func irGolden() pyjson.Value {
 			"guid", "c2a2034c-66e0-5af6-9576-7f523a541f10",
 		),
 		"identities", pa(
+			// golden: real: M57-JO filestat row (tests/test_spindle_ids.py _FILESTAT); the fixture's wrap time
 			po(
 				"name", "l2t_filestat",
 				"kind", "entity",
@@ -1138,6 +1274,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "fef81767-4b0e-540a-a830-031b85f14bcc",
 			),
+			// golden: synthetic: M57-JO-shaped (tests/test_car_plaso_web.py)
 			po(
 				"name", "l2t_firefox_cache",
 				"kind", "entity",
@@ -1152,6 +1289,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "1bcdb758-ae1c-5b46-8420-57ec34d6ed5f",
 			),
+			// golden: synthetic: M57-JO-shaped (tests/test_car_plaso_web.py)
 			po(
 				"name", "l2t_firefox_places",
 				"kind", "entity",
@@ -1166,6 +1304,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "472d594d-b0be-540c-ae6b-c41ccd6cb215",
 			),
+			// golden: synthetic: M57-JO-shaped (tests/test_car_plaso_web.py)
 			po(
 				"name", "l2t_javaidx",
 				"kind", "entity",
@@ -1180,6 +1319,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "faf26bb5-c15f-54d2-9d91-dfa021c9faff",
 			),
+			// golden: synthetic: M57-JO-shaped (tests/test_car_plaso_web.py; the shortcut path is not the real one)
 			po(
 				"name", "l2t_lnk",
 				"kind", "entity",
@@ -1194,6 +1334,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "f686d851-c7c8-5ad5-afa0-4ca78a50fd2d",
 			),
+			// golden: synthetic: no real mft row in the corpus (tests/test_spindle_ids.py _MFT)
 			po(
 				"name", "l2t_mft",
 				"kind", "record",
@@ -1207,6 +1348,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "068d2085-7fa8-5c23-b8a0-708ad624c773",
 			),
+			// golden: synthetic: M57-JO-shaped visit (tests/test_car_plaso_web.py; the index.dat path is not the real one)
 			po(
 				"name", "l2t_msiecf",
 				"kind", "entity",
@@ -1221,6 +1363,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "f779714e-f2ab-5e43-b8a5-473efe90ccfe",
 			),
+			// golden: synthetic: M57-JO-shaped (tests/test_car_plaso_web.py)
 			po(
 				"name", "l2t_recyclebin",
 				"kind", "entity",
@@ -1235,6 +1378,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "8c5cd823-db54-563d-81b3-1536972aac3d",
 			),
+			// golden: synthetic: LoneWolf-shaped (tests/test_car_srum_recmd.py)
 			po(
 				"name", "l2t_srum/application_usage",
 				"kind", "entity",
@@ -1249,6 +1393,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "5d2c8766-f567-5a22-ba28-88db1338b619",
 			),
+			// golden: synthetic: LoneWolf-shaped (tests/test_car_srum_recmd.py)
 			po(
 				"name", "l2t_srum/network_usage",
 				"kind", "entity",
@@ -1264,6 +1409,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "46be4a7e-d922-5388-81a5-585aa3b1e738",
 			),
+			// golden: real: dualserver sshd Accepted row (tests/test_car_plaso_linux.py _SSH); the fixture's wrap time
 			po(
 				"name", "l2t_text",
 				"kind", "entity",
@@ -1278,6 +1424,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "e1a0dee2-1e31-5f03-8c97-e8d5bcedb9ac",
 			),
+			// golden: real: M57-JO usnjrnl row (tests/test_spindle_ids.py _USN)
 			po(
 				"name", "l2t_usnjrnl",
 				"kind", "record",
@@ -1291,6 +1438,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "e9e7f63e-c0a2-53b0-8a13-eb628df6843b",
 			),
+			// golden: real: dualserver wtmp USER_PROCESS row (tests/test_car_plaso_linux.py _UTMP); the fixture's wrap time
 			po(
 				"name", "l2t_utmp",
 				"kind", "entity",
@@ -1305,6 +1453,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "d08f2b4d-4324-5d5c-8a92-c135fac818d2",
 			),
+			// golden: synthetic: no utmpx row in the corpus; shaped like the utmp one
 			po(
 				"name", "l2t_utmpx",
 				"kind", "entity",
@@ -1319,6 +1468,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "3bbc38ab-8ac0-5aa2-bc78-d4028e4f5795",
 			),
+			// golden: real: dualserver cron task-run row (tests/test_car_plaso_exec.py _CRON)
 			po(
 				"name", "plaso_exec_cron",
 				"kind", "entity",
@@ -1333,6 +1483,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "02fb1264-b522-55cf-9c74-568b97d3f3ca",
 			),
+			// golden: real: M57-JO SVCHOST.EXE-3530F672.pf run (tests/test_car_plaso_exec.py _PREFETCH_EXEC)
 			po(
 				"name", "plaso_exec_prefetch",
 				"kind", "entity",
@@ -1347,6 +1498,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "9c9a2690-4727-5eda-94e1-6968d3e8168b",
 			),
+			// golden: synthetic: no amcache row in the corpus (tests/test_car_plaso_exec.py _AMCACHE)
 			po(
 				"name", "plaso_exec_winreg/amcache",
 				"kind", "entity",
@@ -1360,6 +1512,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "cbebdba4-d979-509a-95d2-f6086a7a9efc",
 			),
+			// golden: synthetic: the same entry's Link Time row (tests/test_car_plaso_exec.py _AMCACHE_LINK)
 			po(
 				"name", "plaso_exec_winreg/amcache_link_time",
 				"kind", "entity",
@@ -1373,6 +1526,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "781d4f10-ba73-54ab-a36e-71246cfb24ba",
 			),
+			// golden: real: M57-JO AppCompatCache row (tests/test_car_plaso_exec.py _APPCOMPAT)
 			po(
 				"name", "plaso_exec_winreg/appcompatcache",
 				"kind", "entity",
@@ -1386,6 +1540,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "8968e86e-b445-5d89-b6f0-4ada1121a0ba",
 			),
+			// golden: synthetic: no bam row in the corpus (tests/test_car_plaso_exec.py _BAM)
 			po(
 				"name", "plaso_exec_winreg/bam",
 				"kind", "entity",
@@ -1400,6 +1555,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "0ff183da-a2cc-5ff1-969d-98837e8c5c02",
 			),
+			// golden: real: M57-JO UserAssist row (tests/test_car_plaso_exec.py _USERASSIST_RUNPATH)
 			po(
 				"name", "plaso_exec_winreg/userassist",
 				"kind", "entity",
@@ -1414,6 +1570,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "e0862967-c63f-5dfb-aa1c-a6db372da12b",
 			),
+			// golden: synthetic: no fseventsd row in the corpus; the plaso FSEvents record shape
 			po(
 				"name", "plaso_fseventsd",
 				"kind", "record",
@@ -1427,6 +1584,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "cd7ebdf2-0e7f-554a-8c47-7c7a7975aa8f",
 			),
+			// golden: synthetic: no olecf row in the corpus; an OLE document's summary-info row
 			po(
 				"name", "plaso_olecf",
 				"kind", "entity",
@@ -1440,6 +1598,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "9dddb200-9b58-5f57-a1c5-96c6c6ae9961",
 			),
+			// golden: synthetic: tests/test_car_plaso_fs_extra.py _PE_HEADER
 			po(
 				"name", "plaso_pecoff",
 				"kind", "entity",
@@ -1453,6 +1612,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "f0b51854-1690-5460-9841-4e17061c24a2",
 			),
+			// golden: synthetic: M57-JO-shaped Run key snapshot (tests/test_spindle_ids.py _REGISTRY)
 			po(
 				"name", "plaso_registry",
 				"kind", "entity",
@@ -1467,6 +1627,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "a575d9ce-94fc-5bee-b275-796a81fdda40",
 			),
+			// golden: synthetic: a shell item embedded in the lnk above
 			po(
 				"name", "plaso_shellitem",
 				"kind", "entity",
@@ -1483,6 +1644,7 @@ func irGolden() pyjson.Value {
 			),
 		),
 		"external", pa(
+			// golden: real: LoneWolf SRUDB.dat ApplicationResourceUsage
 			po(
 				"name", "esedump_srum_application",
 				"kind", "record",
@@ -1495,6 +1657,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "process-388-951-2024-02-20T07:50:59Z",
 			),
+			// golden: real: LoneWolf SRUDB.dat NetworkDataUsage (scratchpad stage3-parity)
 			po(
 				"name", "esedump_srum_network",
 				"kind", "record",
@@ -1510,6 +1673,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "flow-102-8-1689399632855040-2024-02-20T07:50:00Z-2100-1440",
 			),
+			// golden: real: LoneWolf Security 4688 (tests/test_car_winevt_adapter.py)
 			po(
 				"name", "evtx_record",
 				"kind", "record",
@@ -1522,6 +1686,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "process-WIN-1M3263ACE5D-Security-2623",
 			),
+			// golden: synthetic (tests/test_car_jlecmd.py shape)
 			po(
 				"name", "jlecmd_entry",
 				"kind", "record",
@@ -1533,6 +1698,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "file-/in/fb3b.automaticDestinations-ms-1",
 			),
+			// golden: synthetic: 0x1a2b -> proc-1a2b (tests/test_derive.py)
 			po(
 				"name", "memory_proc_offset",
 				"kind", "entity",
@@ -1543,6 +1709,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "proc-1a2b",
 			),
+			// golden: real: LoneWolf ADDINUTIL.EXE-4E6085D4.pf
 			po(
 				"name", "prefetch_dump_pf",
 				"kind", "entity",
@@ -1554,6 +1721,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "process-ADDINUTIL.EXE-0x4E6085D4",
 			),
+			// golden: synthetic (tests/test_car_srum_recmd.py shape)
 			po(
 				"name", "recmd_value",
 				"kind", "record",
@@ -1566,6 +1734,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "registry-/in/UsrClass.dat-S-1-5-21-1_Classes\\X-LangID",
 			),
+			// golden: real: a Sysmon ProcessGuid (tests/test_car_winevt_adapter.py)
 			po(
 				"name", "sysmon_process_guid",
 				"kind", "entity",
@@ -1576,6 +1745,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "{DFAE8213-70EB-5CDD-0000-0010F66D0A00}",
 			),
+			// golden: synthetic (tests/test_car_zeek_x509.py)
 			po(
 				"name", "zeek_cert_fp",
 				"kind", "entity",
@@ -1586,6 +1756,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "bac9e9e2d4e38c7716fc17dcd701dd45e226cd9b623f21e9a145921fb5b6dc4d",
 			),
+			// golden: synthetic (tests/test_car_zeek_extra.py)
 			po(
 				"name", "zeek_fuid",
 				"kind", "entity",
@@ -1596,6 +1767,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "file-FdEQ",
 			),
+			// golden: synthetic: Zeek uid shape (tests/test_car_zeek_conn.py)
 			po(
 				"name", "zeek_uid",
 				"kind", "entity",
@@ -1606,6 +1778,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "CtEReq24zLXEGt4V67",
 			),
+			// golden: synthetic (tests/test_car_zeek_extra.py)
 			po(
 				"name", "zeek_uid_trans_depth",
 				"kind", "record",
@@ -1617,6 +1790,7 @@ func irGolden() pyjson.Value {
 				),
 				"guid", "http-Cno6-1",
 			),
+			// golden: synthetic (tests/test_car_zeek_dns.py)
 			po(
 				"name", "zeek_uid_trans_id",
 				"kind", "record",

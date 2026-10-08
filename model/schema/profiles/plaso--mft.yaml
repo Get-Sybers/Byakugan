@@ -2,13 +2,13 @@
 # One Parser Profile per (parser, artefact class): the record
 # surface as data — curated in profiles-seed.yaml (in-house
 # structs mined file:line from the tool repos), joined with the
-# reviewed lane surfaces in sources/*.yaml and the ir closure
+# reviewed lane manifests (byakugan.sources_model) and the ir closure
 # (split lanes contribute PER VARIANT, never whole-lane).
-schema_version: 6.0.0
+schema_version: 7.0.0
 source: generated
 generated_from:
   seed: model/schema/profiles-seed.yaml
-  surfaces: sources/*.yaml (reviewed lane manifests) + go/internal/ir/ir.json (per-variant
+  surfaces: byakugan.sources_model (the lane manifests) + go/internal/ir/ir.json (per-variant
     closure)
 profile: plaso--mft
 parser:

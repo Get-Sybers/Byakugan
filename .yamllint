@@ -1,8 +1,7 @@
-# yamllint config for Byakugan YAML artefacts (sources/, to-be-validated/).
-# sources/*.yaml are machine-generated (PyYAML: block sequences at the parent
-# indent); to-be-validated/*.yml are hand-written (indented sequences). Both are
-# internally consistent, so indent-sequences=consistent accepts each; the schema
-# itself is enforced by yamale + gen_sources --check, not here.
+# yamllint config for the hand-written YAML specs under docs/to-be-validated/
+# (indented sequences). The source manifests are no longer a committed tree:
+# the tests validate what byakugan.sources_model builds against
+# byakugan/car_source_schema.yaml (yamale), so nothing else is linted here.
 extends: default
 rules:
   line-length: disable

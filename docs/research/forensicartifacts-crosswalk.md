@@ -1,7 +1,7 @@
 # ForensicArtifacts crosswalk — seeding the Artefact Class layer
 
 **Inputs:** `model/sources/forensicartifacts/` at pin `7272630` (732
-definitions; structural index at `pipeline/ingest/forensicartifacts/index.json`),
+definitions; structural index at `model/sources/forensicartifacts.index.json`),
 gomount `materialise-sets.yml` (17 sets), byakugan `sources/*.yaml` +
 `car_source_schema.yaml`, and [the design doc](../design/schema-layers.md).
 Method: four independent readers (format spec + tooling, windows, unix/mac,

@@ -1,6 +1,6 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/wire/objects.schema.json",
+ "$id": "https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/model/schema/wire/objects.schema.json",
  "title": "Wire bundle members — GENERATED type-dispatched composition",
  "description": "Never hand-edited: python -m byakugan.schema_gen regenerates it (conform class-regen gates drift). The closed type inventory is harvested from the projection source; attack-pattern and marking-definition are excluded by design (the airway / spec singletons — wirecheck tallies them, the schema never admits them).",
  "type": "object",

@@ -40,14 +40,14 @@ extractor:
   parser: str()                           # the specific parser/channel/handler invoked
   url: str()
   alternates: list(str(), required=False) # same-coverage alternate derivations
-# the row identity (byakugan/spindle.yml): a Plaso-derived source mints its
+# the row identity (the spindle registry — the IR's spindle section): a Plaso-derived source mints its
 # guid from the registry entries its map names; any other source carries one of
 # the registry's external forms verbatim (a sensor's / tool's own id).
 identity:
-  registry: str(required=False)           # byakugan/spindle.yml
+  registry: str(required=False)           # the registry: go/internal/ir/ir.json (spindle section)
   version: int(required=False)            # the registry version (spindle.version)
   entries: list(include('identity_entry'), required=False)
-  external: list(str(), required=False)   # spindle.yml external: form names
+  external: list(str(), required=False)   # the registry's external form names (IR + spindle.yml passthrough)
 identity_entry:
   name: str()                             # the entry (the map key, or <map>/<variant>)
   kind: enum('record', 'entity')

@@ -11,7 +11,7 @@ library** (see [the alignment study](../research/attack-data-model-alignment.md)
 
 The object/relationship model lives in three places that agree only by
 discipline: the Go IR (authored as Go literals, `ir.json` generated FROM
-code), the CAR model (reconstructed at runtime from the `third_party/car`
+code), the CAR model (reconstructed at runtime from the `model/sources/car`
 submodule), and per-consumer copies (anamnesis embeds its own
 `car_data_model.json`, enrich data and normalize mappings; the elastic
 projection commits its own rendered artifacts). Nothing gates the engines
@@ -27,7 +27,7 @@ Elasticsearch deployment) consume the same schema files — Go via
 proving it implements exactly the declared model. Drift between the
 engines becomes a CI failure, not a review catch. Types and behaviour
 stay in code; every static declaration lives as data
-([go-standards §5, "Static declarations are data, not code"](https://github.com/Get-Sybers/DX_DFIR/-/blob/main/docs/reference/go-standards.md),
+([go-standards §5, "Static declarations are data, not code"](https://github.com/Get-Sybers/DX_DFIR/blob/main/docs/reference/go-standards.md),
 restored to its intended direction).
 
 ## The layers
@@ -89,7 +89,7 @@ One declaration per artefact class:
   tier vocabulary; `time` is `event-time | bounded | none`; `when` selects
   over the class's OWN `dfir_fields` keys, never parser field names. The
   canonical set per family is the ir.json bootstrap closure UNION the
-  source-grounded overlay (`docs/research/dfir-context/matched-evidences.yaml`,
+  source-grounded overlay (`model/schema/matched-evidences.yaml`,
   whose `constraints:` block is the normative layer — backbones, the
   MAY class with absence-not-evidence, tier ceilings, pair bans, and the
   SRO derivation rules). Emitted pairs outside the declared set are
@@ -102,7 +102,7 @@ when at least one Parser Profile or one collection surface exists in-house
 
 Seeded by triangulation: gomount's `materialise-sets.yml` (the collection
 surface — 17 materialise sets including the OS-surface sets), byakugan's
-`sources/*.yaml` lanes (the parsing surface), and the ForensicArtifacts
+the lane manifests `byakugan.sources_model` builds (the parsing surface), and the ForensicArtifacts
 index (naming, scope and citations only).
 
 ### Parser Profile — what one parser literally emits
@@ -121,7 +121,7 @@ wiring. One declaration per (parser, artefact class):
   wired without duplicated effort.
 
 The parser binding and routing already exist as data
-(`byakugan/car_source_schema.yaml` + `sources/*.yaml`); what has no
+(`byakugan/car_source_schema.yaml` + the lane manifests `byakugan.sources_model` builds); what has no
 as-data source anywhere is the field/datatype surface — the record
 struct — which is authored fresh, mined from the Go record structs
 (read-only grounding from the toolz repos and anamnesis).
@@ -166,7 +166,7 @@ anamnesis's `internal/normalize/mappings.yaml` resolver grammar
 - The OASIS JSON schemas for the core types are vendored under
   `model/schema/vendor/oasis/` (informative per STIX §1.2.12); our
   schemas compose them, never fork them.
-- The CAR upstream (`third_party/car`) becomes a REFRESH-TIME input: a
+- The CAR upstream (`model/sources/car`) becomes a REFRESH-TIME input: a
   maintenance task regenerates Object Model declarations from it, humans
   review the diff, and the committed files are canonical. Engines and
   tests never read the submodule again. Staleness is gated, not trusted:
@@ -283,7 +283,7 @@ All meta-schemas are JSON Schema **2020-12**; closed shapes use
    cannot-produce case — no per-consumer opinions.
 3. **One artefact catalogue.** Artefact Class instances are seeded by the
    declared triangulation — gomount's `materialise-sets.yml` (collection
-   surface), byakugan's `sources/*.yaml` lanes (parsing surface), and the
+   surface), byakugan's lane manifests (parsing surface), and the
    ForensicArtifacts index (naming/scope/citations only) — under the
    admission rule; the dx_dfir evidence taxonomy is a directory
    *projection* of these classes, not a second catalogue, and upstream
@@ -305,7 +305,7 @@ All meta-schemas are JSON Schema **2020-12**; closed shapes use
 3. Gates on: both engines validate against the schema dir; `gen-ir`
    flips from owner to consumer behind its drift check; count-and-carry
    findings wired into `--check`.
-4. Only then: retire runtime submodule use; `third_party/` stays for the
+4. Only then: retire runtime submodule use; `model/sources/` stays for the
    refresh task alone.
 
 ## Non-goals (this mission)

@@ -1,6 +1,7 @@
 """The spindle identity model as DATA.
 
-byakugan/spindle.yml is the single source of the per-artefact identity
+The IR's spindle + golden sections (go/internal/authoring/ir_sections.go), joined
+with the notes in byakugan/spindle.yml, are the single source of the per-artefact identity
 rules the engine mints disk-image guids from (the relationships.yml discipline:
 rules are data, the engine is mechanics); model/spindle/ holds its deterministic
 snapshot plus the spindle record's shape, generated like model/generate.py

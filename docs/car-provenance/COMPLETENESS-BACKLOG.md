@@ -6,7 +6,7 @@ genuinely exists but the pipeline doesn't (yet) turn into the CAR field. Honest
 no-source fields are listed last — document them as permanent nulls, never fake.
 
 ## The biggest lever — promote the quarantined audit family
-`to-be-validated/evtx_audit.yml` holds schema-grounded, INERT maps for the
+`docs/to-be-validated/evtx_audit.yml` holds schema-grounded, INERT maps for the
 Windows object-access audit family. It needs one audit-enabled capture to
 validate, then promotion into `mappings/`. It alone unlocks:
 - **file** `write`/`read` actions (4663/4660/4670/5140/5145/5058) — today file has **no `write` source at all**.

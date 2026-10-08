@@ -11,7 +11,6 @@ import pytest
 
 from byakugan import carmodel, gen_sources, mappings, sources_model
 
-_SOURCES_DIR = os.path.join(os.path.dirname(__file__), "..", "sources")
 
 
 def test_registry_is_consistent_with_maps_and_routing():
@@ -103,22 +102,17 @@ def test_generation_is_deterministic_and_idempotent(tmp_path):
     assert sources_model.verify_coverage(str(tmp_path)) == []
 
 
-def test_committed_sources_are_in_sync_if_present():
-    # if the repo ships generated sources, they must match the current maps
-    if not os.path.isdir(_SOURCES_DIR):
-        pytest.skip("no committed sources/ directory")
-    assert sources_model.verify_coverage(_SOURCES_DIR) == []
-
-
-def test_sources_validate_against_yamale_schema():
-    """Full yamale validation against car_source_schema.yaml — runs in CI (where
-    yamale is installed), skips locally if it is not."""
+def test_sources_validate_against_yamale_schema(tmp_path):
+    """Full yamale validation of the exported manifests against
+    car_source_schema.yaml — runs in CI (where yamale is installed), skips
+    locally if it is not. Nothing is committed: the export IS the surface."""
     import glob
     yamale = pytest.importorskip("yamale")
     schema_path = os.path.join(os.path.dirname(__file__), "..",
                                "byakugan", "car_source_schema.yaml")
     schema = yamale.make_schema(schema_path)
-    docs = glob.glob(os.path.join(_SOURCES_DIR, "*.yaml"))
+    gen_sources.write_all(str(tmp_path))
+    docs = glob.glob(os.path.join(str(tmp_path), "*.yaml"))
     assert docs, "no source manifests to validate"
     for path in docs:
         yamale.validate(schema, yamale.make_data(path))
@@ -141,7 +135,7 @@ def test_source_docs_state_the_row_identity_from_the_registry():
     for key in sources_model.DERIVATIONS:
         ident = docs[key]["identity"]
         if key in plaso:
-            assert ident["registry"] == "byakugan/spindle.yml", key
+            assert ident["registry"] == "go/internal/ir/ir.json", key
             assert ident["version"] == spindle.rules()["spindle"]["version"] and "external" not in ident
             assert ident["entries"], key
             for e in ident["entries"]:
@@ -157,7 +151,7 @@ def test_source_docs_state_the_row_identity_from_the_registry():
     assert [e["name"] for e in docs["plaso_exec_winreg"]["identity"]["entries"]] == [
         "plaso_exec_winreg/amcache", "plaso_exec_winreg/amcache_link_time", "plaso_exec_winreg/appcompatcache",
         "plaso_exec_winreg/bam", "plaso_exec_winreg/userassist"]
-    # identity drift on disk is caught by gen_sources --check exactly like coverage drift
+    # identity drift in an exported tree is caught by gen_sources --check DIR exactly like coverage drift
     with tempfile.TemporaryDirectory() as d:
         gen_sources.write_all(d)
         assert sources_model.verify_coverage(d) == []

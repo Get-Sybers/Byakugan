@@ -1,6 +1,6 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/wire/relationship.schema.json",
+ "$id": "https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/model/schema/wire/relationship.schema.json",
  "title": "Wire relationship — GENERATED from model/superset/relationship-types.yml",
  "description": "Never hand-edited: python -m byakugan.schema_gen regenerates it (conform class-regen gates drift). Composed over the verbatim vendored OASIS core; the closed relationship_type enum means an undeclared verb cannot pass vacuously (generics like related-to are excluded by construction — doubt is tallied, never modeled).",
  "allOf": [

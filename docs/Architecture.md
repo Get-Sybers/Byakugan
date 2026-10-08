@@ -18,8 +18,8 @@
   (never an action-less phantom). The only floor is that the object must exist in
   the model.
 - **Everything is data, reconstructed from source.** The object model and the
-  relationship vocabulary are reconstructed **live from pinned submodules**, never
-  hand-copied (see [DataModel.md](DataModel.md)). The cascade rules, source
+  relationship vocabulary are reconstructed **live from the pinned CAR submodule
+  and the vendored ATT&CK data-sources file**, never hand-copied (see [DataModel.md](DataModel.md)). The cascade rules, source
   manifests, and relationship-verb bridge are generated/declared as data, with
   drift-guarding tests — the engine implements mechanics, data declares rules.
 - **Confidence is explicit.** Every enrichment link is tagged `definitive` (a
@@ -55,9 +55,9 @@ one contract every consumer reads: downstream ingestion, `byakugan.verify`,
 |---|---|
 | `byakugan/carmodel.py` | the 13 CAR objects, reconstructed live from the pinned car submodule |
 | `byakugan/build_data_model.py` | reconstructs CAR (13) and the CAR+ATT&CK superset (38) + the ATT&CK relationship catalogue from the pinned submodules |
-| `byakugan/mappings/` | declarative per-artefact maps (auto-discovered, one file per family) |
-| `byakugan/normalize.py` | the marker engine: raw record → CAR event |
-| `go/` | the **parse engine** (`go/bin/byakugan-parse`, `make -C go build`): line reading, the format adapters (Plaso winevt(x) → EvtxECmd shape; jump lists), l2t container splitting, the marker resolver and the spindle identity — byte-identical to the Python path it replaced (tests/parity) |
+| `go/internal/authoring/` → `go/internal/ir/ir.json` | the declarative per-artefact maps, authored in Go (one `maps_<family>.go` per family, predicates in `go/internal/predicates/`) and serialised to the IR the engine embeds; `byakugan/mappings/` decodes the same tables from `ir.json` for the Python introspection consumers |
+| `byakugan/normalize.py` | the marker DSL constructors and value normalisers — the introspection substrate for `sources_model`, `spindle` and `sigma`; the resolver that runs the markers at parse time is `go/internal/markers` |
+| `go/` | the **parse engine** (`go/bin/byakugan-parse`, `make -C go build`): line reading, the format adapters (Plaso winevt(x) → EvtxECmd shape; jump lists), l2t container splitting, the marker resolver and the spindle identity — proven byte-identical to the Python path it replaced before that path was retired; the committed Go vectors are the spec now |
 | `byakugan/relationships.yml` | the within-source cascade & inheritance rules, as data |
 | `byakugan/cascade_relationships.yml` | the CAR-action → ATT&CK-verb bridge for relationship instances |
 | `byakugan/enrich.py` | the cascade: identity, two-tier owner/parent links, LUID auth↔session join, file→process, null-only inheritance, dedupe |
@@ -81,4 +81,4 @@ one contract every consumer reads: downstream ingestion, `byakugan.verify`,
 
 Records with no canonical CAR object/action are routed to nothing **explicitly**
 (known, not unknown); their rows stay raw. Unvalidated inference specs live in
-`to-be-validated/` until confirmed against real evidence.
+`docs/to-be-validated/` until confirmed against real evidence.

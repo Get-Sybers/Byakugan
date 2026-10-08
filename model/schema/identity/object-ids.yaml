@@ -1,7 +1,7 @@
 # Object-id scopes — the R1-R5 rule set (model/stix/changelog/v6.md, ratified),
 # stated as data. Namespaces are the constants.yaml values; this file names the
 # recipe per scope. Hand-authored: a new scope is an explicit decision.
-schema_version: "6.0.0"
+schema_version: "7.0.0"
 source: hand-authored
 generated_from:
   changelog: model/stix/changelog/v6.md

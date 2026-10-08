@@ -1,6 +1,6 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://github.com/Get-Sybers/Byakugan/-/raw/main/model/schema/wire/row.schema.json",
+ "$id": "https://raw.githubusercontent.com/Get-Sybers/Byakugan/main/model/schema/wire/row.schema.json",
  "title": "Engine-input rows — GENERATED load gate",
  "description": "Never hand-edited: python -m byakugan.schema_gen regenerates it (conform class-regen gates drift). byakugan.elastic.load validates every consumed row against the matching $def — count-and-carry: a nonconforming row is TALLIED in the load summary, never a crash and never silently admitted. Rows stay open beyond the gated surface (per-object properties ride flat); the gate is the closed (object, action) vocabulary plus the header/edge grammar.",
  "$defs": {
