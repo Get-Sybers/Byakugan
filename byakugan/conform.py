@@ -689,10 +689,10 @@ def _elastic_contract() -> Iterator[Finding]:
 
 @rule("elastic-rendered")
 def _elastic_rendered() -> Iterator[Finding]:
-    """The rendered Elastic config tree (elastic/: component/index templates,
-    the Byakugan Kibana space) byte-matches a regeneration from the projection
-    contract (model/projection/render_elastic.py --check) — the wire-format
-    rule applied to the served-store artifacts."""
+    """The rendered elastic/ tree byte-matches a regeneration from the contract
+    (model/projection/render_elastic.py --check: the component/index templates
+    and the Byakugan Kibana space) — the wire-format rule applied to the
+    served-store artifacts."""
     import subprocess
     proc = subprocess.run([sys.executable,
                            os.path.join(_ROOT, "model", "projection",

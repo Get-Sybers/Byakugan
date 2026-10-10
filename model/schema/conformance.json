@@ -30,7 +30,7 @@
    "name": "elastic-rendered",
    "engine": "python",
    "command": "python -m byakugan.conform --strict",
-   "proves": "The rendered Elastic config tree (elastic/: component/index templates,"
+   "proves": "The rendered elastic/ tree byte-matches a regeneration from the contract"
   },
   {
    "name": "enrichment-structure",
