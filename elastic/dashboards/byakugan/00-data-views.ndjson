@@ -1,0 +1,1 @@
+{"attributes": {"name": "CAR (logs-car.*)", "timeFieldName": "@timestamp", "title": "logs-car.*"}, "id": "car-logs-all", "managed": false, "references": [], "type": "index-pattern"}

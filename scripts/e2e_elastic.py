@@ -2,13 +2,14 @@
 """The live-Elasticsearch end-to-end gate (epic #99 phase 8): the one claim
 unit tests cannot make — that a real Elasticsearch + Kibana, driven only
 through `byakugan.elastic.load`/`byakugan.timeline`'s own public surface,
-actually behaves the way the projection contract and the standalone stack's
-README promise. `tests/test_load.py` (a stdlib `http.server` stand-in) and
+actually behaves the way the projection contract and the rendered elastic/
+tree promise. `tests/test_load.py` (a stdlib `http.server` stand-in) and
 `tests/test_timeline_elastic.py` already prove the WIRE PROTOCOL against a
-stub; this proves the CLUSTER — real templates, real aliases, a real least-
-privilege identity, a real re-push — which only CI (GitHub's ubuntu-latest,
-`.github/workflows/elastic-e2e.yml`, `elastic/docker-compose.yml`) can run,
-since this sandbox has no Docker daemon.
+stub; this proves the CLUSTER — real templates, a real Kibana space, real
+aliases, a real least-privilege identity, a real re-push — which only CI
+(GitHub's ubuntu-latest, `.github/workflows/elastic-e2e.yml`: a throwaway
+Elasticsearch + Kibana started with plain `docker run`, no compose file or
+stack of this repo's own) can run, since this sandbox has no Docker daemon.
 
 Five steps, run in order against one namespace:
 
@@ -17,20 +18,22 @@ Five steps, run in order against one namespace:
      `byakugan.derive.derive` — the exact sequence `byakugan/pipeline.py`'s own
      `_process_one` runs), never hand-built JSON pretending to be one.
   B. First load, push mode, as the `elastic` superuser: `--setup` (templates +
-     Kibana import) + a genuine push; assert per-stream created == bundled,
+     the Kibana space) + a genuine push; assert per-stream created == bundled,
      every stream verified, the composed `logs-car-process` index template
-     exists, and the `car-timeline-dashboard` Kibana saved object was imported.
+     exists, the `byakugan` Kibana space exists, and the
+     `car-timeline-dashboard` saved object was imported INTO that space.
   C. Prove the CAR-name field ALIASES are live: a term query on
      `car.process.command_line` (an Elasticsearch field alias onto
-     `process.command_line` — see `elastic/projection/render_elastic.py`)
+     `process.command_line` — see `model/projection/render_elastic.py`)
      finds the one process row seeded with it; a `logs-car.rel-*` document
      carries `car.rel.relationship`.
   D. Re-push the SAME tree, `--force`, authenticated as `byakugan_loader`
-     (created by `elastic/config/setup.sh`, role `logs_car_writer`:
-     create_doc/create_index/read/view_index_metadata on `logs-car.*` only —
-     no template/cluster privileges) — proves both idempotency (100%
-     already_present against a live cluster) and that this identity's
-     narrower grant is sufficient for the steady-state path.
+     (role `logs_car_writer`: create_doc/create_index/read/view_index_metadata
+     on `logs-car.*` only — no template/cluster privileges; the workflow
+     creates both with the same two calls DX_DFIR's stack deploy makes) —
+     proves both idempotency (100% already_present against a live cluster)
+     and that this identity's narrower grant is sufficient for the
+     steady-state path.
   E. `byakugan.timeline.build_timeline` (local) vs `--elastic` (the same
      namespace) — byte-compare `timeline.jsonl`.
 
@@ -41,7 +44,7 @@ against without a live cluster, e.g. in this repo's own sandboxes; steps
 B-E's Elasticsearch/Kibana calls only run in CI.
 
     python scripts/e2e_elastic.py --offline-selftest
-    python scripts/e2e_elastic.py --es-url http://127.0.0.1:9201 --kibana-url http://127.0.0.1:5602 \
+    python scripts/e2e_elastic.py --es-url http://127.0.0.1:9200 --kibana-url http://127.0.0.1:5601 \
         --es-user elastic --es-password "$ELASTIC_PASSWORD" \
         --loader-user byakugan_loader --loader-password "$BYAKUGAN_LOADER_PASSWORD" \
         --namespace e2e
@@ -262,7 +265,13 @@ def step_b_first_load(args, car_dir: str, out_dir: str) -> dict:
           f"step B: GET _index_template/logs-car-process: HTTP {status}, body={raw[:300]!r}")
 
     kheaders = {**load.auth_headers("", args.es_user, args.es_password), "kbn-xsrf": "true"}
-    kurl = f"{args.kibana_url.rstrip('/')}/api/saved_objects/_find?type=dashboard"
+    surl = f"{args.kibana_url.rstrip('/')}/api/spaces/space/byakugan"
+    sstatus, sparsed, sraw = load.http_json(surl, "GET", None, kheaders, load.ssl_context(None))
+    _check(sstatus == 200 and (sparsed or {}).get("id") == "byakugan",
+          f"step B: Kibana GET {surl}: HTTP {sstatus}, body={sraw[:300]!r} (the byakugan space must exist)")
+    _check((setup.get("kibana") or {}).get("spaces", {}).get("byakugan", {}).get("space") == "created",
+          f"step B: the byakugan space was not reported created: {setup.get('kibana')}")
+    kurl = f"{args.kibana_url.rstrip('/')}/s/byakugan/api/saved_objects/_find?type=dashboard"
     kstatus, kparsed, kraw = load.http_json(kurl, "GET", None, kheaders, load.ssl_context(None))
     ids = [o.get("id") for o in (kparsed or {}).get("saved_objects") or []]
     _check(kstatus == 200 and "car-timeline-dashboard" in ids,
@@ -270,7 +279,8 @@ def step_b_first_load(args, car_dir: str, out_dir: str) -> dict:
 
     total_docs = sum(s["documents"] for s in summary["streams"].values())
     _proof(f"step B OK: {total_docs} documents created across {len(summary['streams'])} streams "
-          f"(as {args.es_user}); logs-car-process index template + car-timeline-dashboard confirmed")
+          f"(as {args.es_user}); logs-car-process index template + the byakugan space "
+          "+ its car-timeline-dashboard confirmed")
     return summary
 
 
@@ -363,9 +373,9 @@ def main(argv: list[str] | None = None) -> int:
         description="the live-Elasticsearch end-to-end gate: a real byakugan.elastic.load push, "
                     "the CAR-name aliases, the byakugan_loader least-privilege identity, an "
                     "idempotent re-push and a byte-identical byakugan.timeline --elastic, against "
-                    "a real Elasticsearch + Kibana (elastic/docker-compose.yml, in CI).")
-    ap.add_argument("--es-url", default="", help="Elasticsearch base URL (e.g. http://127.0.0.1:9201)")
-    ap.add_argument("--kibana-url", default="", help="Kibana base URL (e.g. http://127.0.0.1:5602)")
+                    "a real Elasticsearch + Kibana (.github/workflows/elastic-e2e.yml, in CI).")
+    ap.add_argument("--es-url", default="", help="Elasticsearch base URL (e.g. http://127.0.0.1:9200)")
+    ap.add_argument("--kibana-url", default="", help="Kibana base URL (e.g. http://127.0.0.1:5601)")
     ap.add_argument("--es-user", default="elastic", help="superuser for --setup + the first push (step B)")
     ap.add_argument("--es-password", default="")
     ap.add_argument("--loader-user", default="byakugan_loader",

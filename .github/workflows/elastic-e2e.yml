@@ -1,17 +1,26 @@
 name: elastic-e2e
 
-# The live-Elasticsearch end-to-end gate (epic #99 phase 8): dogfoods the
-# shipped elastic/ deliverable itself (its own docker-compose.yml, its own
-# config/setup.sh) rather than standing up ad-hoc service containers — see
-# scripts/e2e_elastic.py's module docstring for the 5 steps this proves.
-# Path-filtered: only runs when the stack, the engine or the gate itself
-# changes; always runnable by hand via workflow_dispatch.
+# The live-Elasticsearch end-to-end gate (epic #99 phase 8): proves the
+# rendered elastic/ tree (model/projection/render_elastic.py) and
+# byakugan.elastic.load against a REAL Elasticsearch + Kibana — see
+# scripts/e2e_elastic.py's module docstring for the 5 steps. The cluster is a
+# throwaway pair of docker.elastic.co containers started here with plain
+# `docker run`: this repository ships no compose file, Dockerfile or stack of
+# its own — Byakugan's standalone container is get-sybers/byakugan, built by
+# GoDFIR-toolz (https://github.com/Get-Sybers/GoDFIR-toolz/tree/main/byakugan),
+# and it loads into whatever Elasticsearch it is pointed at. The two
+# identity calls below (kibana_system's password, the least-privilege
+# byakugan_loader user + logs_car_writer role) are exactly the ones DX_DFIR's
+# dxdfir_stack role makes on deploy.
+# Path-filtered: only runs when the contract, the rendered tree, the engine
+# or the gate itself changes; always runnable by hand via workflow_dispatch.
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
       - elastic/**
+      - model/projection/**
       - byakugan/**
       - scripts/e2e_elastic.py
       - .github/workflows/elastic-e2e.yml
@@ -19,26 +28,29 @@ on:
     branches: [main]
     paths:
       - elastic/**
+      - model/projection/**
       - byakugan/**
       - scripts/e2e_elastic.py
       - .github/workflows/elastic-e2e.yml
 
+env:
+  ELASTIC_VERSION: 9.5.4
+  ELASTIC_PASSWORD: ci-elastic-superuser-pw
+  KIBANA_SYSTEM_PASSWORD: ci-kibana-system-pw
+  BYAKUGAN_LOADER_PASSWORD: ci-byakugan-loader-pw
+  ES_URL: http://127.0.0.1:9200
+  KIBANA_URL: http://127.0.0.1:5601
+
 jobs:
   elastic-e2e:
     runs-on: ubuntu-latest
-    env:
-      ELASTIC_PASSWORD: ci-elastic-superuser-pw
-      KIBANA_SYSTEM_PASSWORD: ci-kibana-system-pw
-      BYAKUGAN_LOADER_PASSWORD: ci-byakugan-loader-pw
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # scripts/e2e_elastic.py builds a real CarStore (byakugan.store),
           # whose carmodel.load() reads model/sources/car/data_model/*.yaml —
           # the pinned CAR submodule — for every invocation, including
-          # --offline-selftest. attack-datasources is not on this script's
-          # own import path, but recursive matches lint.yml's own checkout
-          # (both submodules are the model sources) rather than diverging.
+          # --offline-selftest. Recursive matches lint.yml's own checkout.
           submodules: recursive
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
@@ -49,55 +61,62 @@ jobs:
           pip install -e .
       - name: Host prerequisite for a single-node Elasticsearch container
         run: sudo sysctl -w vm.max_map_count=262144
-      - name: Write elastic/.env (fixed CI credentials, not the .env.example placeholders)
+      - name: Start a throwaway single-node Elasticsearch (security on, HTTP TLS off, loopback only)
         run: |
-          cat > elastic/.env <<EOF
-          ELASTIC_VERSION=9.5.4
-          ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-          KIBANA_SYSTEM_PASSWORD=${KIBANA_SYSTEM_PASSWORD}
-          BYAKUGAN_LOADER_PASSWORD=${BYAKUGAN_LOADER_PASSWORD}
-          KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY=$(openssl rand -hex 32)
-          KIBANA_SECURITY_ENCRYPTION_KEY=$(openssl rand -hex 32)
-          KIBANA_REPORTING_ENCRYPTION_KEY=$(openssl rand -hex 32)
-          ES_JAVA_OPTS=-Xms1g -Xmx1g
-          EOF
-      - name: Bring up the standalone Elastic stack
-        run: docker compose -f elastic/docker-compose.yml up -d
-      - name: Wait for Elasticsearch (authenticated) on 127.0.0.1:9201
+          docker network create byakugan-e2e
+          docker run -d --name es --network byakugan-e2e -p 127.0.0.1:9200:9200 \
+            -e discovery.type=single-node \
+            -e ELASTIC_PASSWORD="${ELASTIC_PASSWORD}" \
+            -e xpack.security.enabled=true \
+            -e xpack.security.http.ssl.enabled=false \
+            -e xpack.license.self_generated.type=basic \
+            -e ES_JAVA_OPTS="-Xms1g -Xmx1g" \
+            "docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}"
+      - name: Wait for Elasticsearch (authenticated)
         run: |
           set -u
           for i in $(seq 1 60); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' -u "elastic:${ELASTIC_PASSWORD}" http://127.0.0.1:9201/ || true)
+            code=$(curl -s -o /dev/null -w '%{http_code}' -u "elastic:${ELASTIC_PASSWORD}" "${ES_URL}/" || true)
             echo "attempt $i: HTTP $code"
             [ "$code" = "200" ] && exit 0
             sleep 5
           done
           echo "::error::Elasticsearch did not answer authenticated within the timeout"
           exit 1
-      - name: Wait for the setup service to exit 0 (templates identity, done by config/setup.sh)
+      - name: Create the stack identities (kibana_system's password; the least-privilege byakugan_loader)
+        run: |
+          set -eu
+          curl -sf -X POST -u "elastic:${ELASTIC_PASSWORD}" -H 'Content-Type: application/json' \
+            "${ES_URL}/_security/user/kibana_system/_password" \
+            -d "{\"password\":\"${KIBANA_SYSTEM_PASSWORD}\"}"
+          # create_doc/create_index/read/view_index_metadata on logs-car.* only —
+          # evidence immutability at the credential layer (step D authenticates as it)
+          curl -sf -X PUT -u "elastic:${ELASTIC_PASSWORD}" -H 'Content-Type: application/json' \
+            "${ES_URL}/_security/role/logs_car_writer" \
+            -d '{"indices":[{"names":["logs-car.*"],"privileges":["create_doc","create_index","read","view_index_metadata"]}]}'
+          curl -sf -X PUT -u "elastic:${ELASTIC_PASSWORD}" -H 'Content-Type: application/json' \
+            "${ES_URL}/_security/user/byakugan_loader" \
+            -d "{\"password\":\"${BYAKUGAN_LOADER_PASSWORD}\",\"roles\":[\"logs_car_writer\"],\"full_name\":\"byakugan load (CAR to logs-car.*)\"}"
+      - name: Start a throwaway Kibana
+        run: |
+          # the three encryption keys are not optional: Kibana 9.x runs its Fleet
+          # setup unconditionally at boot and retries forever without them
+          docker run -d --name kibana --network byakugan-e2e -p 127.0.0.1:5601:5601 \
+            -e SERVER_NAME=byakugan-e2e-kibana \
+            -e SERVER_PUBLICBASEURL="${KIBANA_URL}" \
+            -e ELASTICSEARCH_HOSTS=http://es:9200 \
+            -e ELASTICSEARCH_USERNAME=kibana_system \
+            -e ELASTICSEARCH_PASSWORD="${KIBANA_SYSTEM_PASSWORD}" \
+            -e TELEMETRY_OPTIN=false \
+            -e XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY="$(openssl rand -hex 32)" \
+            -e XPACK_SECURITY_ENCRYPTIONKEY="$(openssl rand -hex 32)" \
+            -e XPACK_REPORTING_ENCRYPTIONKEY="$(openssl rand -hex 32)" \
+            "docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}"
+      - name: Wait for Kibana's /api/status
         run: |
           set -u
           for i in $(seq 1 60); do
-            cid=$(docker compose -f elastic/docker-compose.yml ps -a -q setup)
-            if [ -n "$cid" ]; then
-              status=$(docker inspect --format='{{.State.Status}}' "$cid")
-              code=$(docker inspect --format='{{.State.ExitCode}}' "$cid")
-              echo "attempt $i: setup status=$status exit_code=$code"
-              if [ "$status" = "exited" ]; then
-                [ "$code" = "0" ] && exit 0
-                echo "::error::the setup service exited with code $code"
-                exit 1
-              fi
-            fi
-            sleep 5
-          done
-          echo "::error::the setup service did not complete within the timeout"
-          exit 1
-      - name: Wait for Kibana's /api/status on 127.0.0.1:5602
-        run: |
-          set -u
-          for i in $(seq 1 60); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' -u "elastic:${ELASTIC_PASSWORD}" http://127.0.0.1:5602/api/status || true)
+            code=$(curl -s -o /dev/null -w '%{http_code}' -u "elastic:${ELASTIC_PASSWORD}" "${KIBANA_URL}/api/status" || true)
             echo "attempt $i: HTTP $code"
             [ "$code" = "200" ] && exit 0
             sleep 5
@@ -107,13 +126,17 @@ jobs:
       - name: Run the live-Elasticsearch end-to-end gate
         run: |
           python scripts/e2e_elastic.py \
-            --es-url http://127.0.0.1:9201 --kibana-url http://127.0.0.1:5602 \
+            --es-url "${ES_URL}" --kibana-url "${KIBANA_URL}" \
             --es-user elastic --es-password "${ELASTIC_PASSWORD}" \
             --loader-user byakugan_loader --loader-password "${BYAKUGAN_LOADER_PASSWORD}" \
             --namespace e2e
-      - name: Dump compose logs
+      - name: Dump container logs
         if: always()
-        run: docker compose -f elastic/docker-compose.yml logs
-      - name: Tear down the stack
+        run: |
+          docker logs es 2>&1 | tail -200 || true
+          docker logs kibana 2>&1 | tail -200 || true
+      - name: Tear down
         if: always()
-        run: docker compose -f elastic/docker-compose.yml down -v
+        run: |
+          docker rm -f kibana es || true
+          docker network rm byakugan-e2e || true

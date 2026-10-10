@@ -676,30 +676,30 @@ def _row_gate() -> Iterator[Finding]:
 @rule("elastic-contract")
 def _elastic_contract() -> Iterator[Finding]:
     """The ECS projection contract validates against the CAR model
-    (elastic/projection/validate.py) — the Object Model side of the served
+    (model/projection/validate.py) — the Object Model side of the served
     store, run as a conform rule so ONE command proves the whole authority."""
     import subprocess
     proc = subprocess.run([sys.executable,
-                           os.path.join(_ROOT, "elastic", "projection", "validate.py")],
+                           os.path.join(_ROOT, "model", "projection", "validate.py")],
                           capture_output=True, text=True)
     if proc.returncode != 0:
-        yield Finding(object_id="elastic/projection", rule="elastic-contract",
+        yield Finding(object_id="model/projection", rule="elastic-contract",
                       message=(proc.stderr or proc.stdout).strip()[-200:])
 
 
 @rule("elastic-rendered")
 def _elastic_rendered() -> Iterator[Finding]:
-    """The rendered Elastic assets (component/index templates, Kibana bundle)
-    byte-match a regeneration from the projection contract
-    (render_elastic.py --check) — the wire-format rule applied to the
+    """The rendered elastic/ tree byte-matches a regeneration from the contract
+    (model/projection/render_elastic.py --check: the component/index templates
+    and the Byakugan Kibana space) — the wire-format rule applied to the
     served-store artifacts."""
     import subprocess
     proc = subprocess.run([sys.executable,
-                           os.path.join(_ROOT, "elastic", "projection",
+                           os.path.join(_ROOT, "model", "projection",
                                         "render_elastic.py"), "--check"],
                           capture_output=True, text=True)
     if proc.returncode != 0:
-        yield Finding(object_id="elastic/projection/rendered", rule="elastic-rendered",
+        yield Finding(object_id="elastic", rule="elastic-rendered",
                       message=(proc.stderr or proc.stdout).strip()[-200:])
 
 

@@ -1,4 +1,4 @@
-"""Structural checks for the rendered Kibana bundle (rendered/kibana/*.ndjson).
+"""Structural checks for the rendered Kibana assets (elastic/dashboards/).
 
 Mirrors the idea in /home/user/uSaid/tests/test_kibana_views.py: a saved-object
 bundle is an import artifact, not code, so nothing catches a renamed/typo'd
@@ -6,10 +6,14 @@ field at import time -- a saved search just renders an empty column forever.
 These checks hold the rendered bundle to the same contract render_elastic.py's
 own decisions imply: every column/sort/timeField must actually be a field
 (concrete or alias) of some stream the referenced data view's title pattern
-matches, every reference must resolve within the file, and every object id
-must be unique. render_elastic.py --check (test_projection_contract.py) is
-what proves the bundle on disk is what render_elastic.py would write today;
-this file proves what it writes is internally consistent.
+matches, every reference must resolve within its IMPORT UNIT (a space
+directory's *.ndjson are imported together as one payload, so a reference
+may cross files inside a space; the default space's top-level *.ndjson are
+another unit), every object id must be unique within its unit, and every
+space.json is what Kibana's spaces API takes. render_elastic.py --check
+(test_projection_contract.py) is what proves the tree on disk is what
+render_elastic.py would write today; this file proves what it writes is
+internally consistent.
 """
 from __future__ import annotations
 
@@ -20,18 +24,35 @@ import os
 
 import pytest
 
-HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "elastic", "projection")
-RENDERED = os.path.join(HERE, "rendered")
-KIBANA_DIR = os.path.join(RENDERED, "kibana")
-COMPONENT_DIR = os.path.join(RENDERED, "component_templates")
-INDEX_DIR = os.path.join(RENDERED, "index_templates")
+ELASTIC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "elastic")
+DASHBOARDS_DIR = os.path.join(ELASTIC, "dashboards")
+COMPONENT_DIR = os.path.join(ELASTIC, "templates", "component")
+INDEX_DIR = os.path.join(ELASTIC, "templates", "index")
 
-BUNDLES = sorted(glob.glob(os.path.join(KIBANA_DIR, "*.ndjson")))
+BUNDLES = sorted(glob.glob(os.path.join(DASHBOARDS_DIR, "*.ndjson"))
+                 + glob.glob(os.path.join(DASHBOARDS_DIR, "*", "*.ndjson")))
+SPACE_FILES = sorted(glob.glob(os.path.join(DASHBOARDS_DIR, "*", "space.json")))
 
 
 def _objects(path: str) -> list[dict]:
     with open(path, encoding="utf-8") as fh:
         return [json.loads(ln) for ln in fh if ln.strip()]
+
+
+def _import_unit(path: str) -> list[str]:
+    """The files imported together with `path` as one payload: a space
+    directory's *.ndjson, or the default space's top-level *.ndjson."""
+    d = os.path.dirname(path)
+    if os.path.exists(os.path.join(d, "space.json")):
+        return sorted(glob.glob(os.path.join(d, "*.ndjson")))
+    return sorted(glob.glob(os.path.join(DASHBOARDS_DIR, "*.ndjson")))
+
+
+def _unit_objects(path: str) -> list[dict]:
+    objs: list[dict] = []
+    for p in _import_unit(path):
+        objs += _objects(p)
+    return objs
 
 
 def _load_json(path: str) -> dict:
@@ -102,7 +123,28 @@ def _field_ok(field: str, fields: set[str]) -> bool:
 
 
 def test_rendered_kibana_bundle_exists():
-    assert BUNDLES, f"no {KIBANA_DIR}/*.ndjson -- run python elastic/projection/render_elastic.py"
+    assert BUNDLES, f"no *.ndjson under {DASHBOARDS_DIR} -- run python model/projection/render_elastic.py"
+
+
+def test_the_byakugan_space_is_rendered():
+    assert os.path.join(DASHBOARDS_DIR, "byakugan", "space.json") in SPACE_FILES
+
+
+@pytest.mark.parametrize("path", SPACE_FILES, ids=lambda p: os.path.basename(os.path.dirname(p)))
+def test_space_json_is_what_the_spaces_api_takes(path):
+    """space.json: the id names its directory, and the fields are the ones
+    POST /api/spaces/space accepts (id, name, initials <= 2 chars, a hex
+    colour, disabledFeatures a list) — the same shape DX_DFIR's
+    elastic/dashboards/<id>/space.json carries, so either deployer reads it."""
+    space = _load_json(path)
+    assert space["id"] == os.path.basename(os.path.dirname(path))
+    assert space["id"] == space["id"].lower() and " " not in space["id"]
+    assert space["name"]
+    assert len(space["initials"]) <= 2
+    assert len(space["color"]) == 7 and space["color"].startswith("#")
+    int(space["color"][1:], 16)
+    assert isinstance(space["disabledFeatures"], list)
+    assert set(space) <= {"id", "name", "description", "initials", "color", "disabledFeatures"}
 
 
 @pytest.mark.parametrize("path", BUNDLES, ids=lambda p: os.path.basename(p))
@@ -111,13 +153,13 @@ def test_bundle_parses(path):
 
 
 @pytest.mark.parametrize("path", BUNDLES, ids=lambda p: os.path.basename(p))
-def test_ids_unique_and_references_resolve_in_file(path):
-    objs = _objects(path)
-    ids = [o["id"] for o in objs]
+def test_ids_unique_and_references_resolve_in_import_unit(path):
+    unit = _unit_objects(path)
+    ids = [o["id"] for o in unit]
     dupes = sorted({i for i in ids if ids.count(i) > 1})
-    assert not dupes, f"{path}: duplicate id(s) {dupes}"
+    assert not dupes, f"{path}: duplicate id(s) {dupes} within its import unit"
     ids_here = set(ids)
-    for o in objs:
+    for o in _objects(path):
         for ref in o.get("references", []):
             assert ref["id"] in ids_here, f"{path}: {o['id']} -> dangling ref {ref['id']!r}"
 
@@ -140,7 +182,7 @@ def test_data_view_time_field_exists(path):
 @pytest.mark.parametrize("path", BUNDLES, ids=lambda p: os.path.basename(p))
 def test_search_columns_and_sort_exist_in_matched_streams(path):
     objs = _objects(path)
-    views = {o["id"]: o for o in objs if o["type"] == "index-pattern"}
+    views = {o["id"]: o for o in _unit_objects(path) if o["type"] == "index-pattern"}
     for o in objs:
         if o["type"] != "search":
             continue
@@ -178,7 +220,7 @@ def test_dashboard_is_last_object_in_the_file(path):
 @pytest.mark.parametrize("path", BUNDLES, ids=lambda p: os.path.basename(p))
 def test_dashboard_panels_reference_consistently(path):
     objs = _objects(path)
-    ids_here = {o["id"] for o in objs}
+    ids_here = {o["id"] for o in _unit_objects(path)}
     for o in objs:
         if o["type"] != "dashboard":
             continue
@@ -195,7 +237,7 @@ def test_dashboard_panels_reference_consistently(path):
 @pytest.mark.parametrize("path", BUNDLES, ids=lambda p: os.path.basename(p))
 def test_lens_source_fields_exist_in_matched_streams(path):
     objs = _objects(path)
-    views = {o["id"]: o for o in objs if o["type"] == "index-pattern"}
+    views = {o["id"]: o for o in _unit_objects(path) if o["type"] == "index-pattern"}
     for o in objs:
         if o["type"] != "lens":
             continue

@@ -298,7 +298,7 @@ def run(car_dir: str = ".") -> _Checker:
                "relationships: class in {declared, derived}")
         # confidence is class-aware: the DECLARED cascade's vocabulary is
         # closed; a DERIVED edge's word is open (a rule's own word, `inferred`
-        # on a reconstruct — elastic/projection/relationships.yml) but never empty
+        # on a reconstruct — model/projection/relationships.yml) but never empty
         c.zero(RELATIONSHIPS, lambda r: (r.get("class") or "declared") == "declared"
                and (r.get("confidence") or "") not in ("definitive", "heuristic", ""),
                "relationships: declared confidence in {definitive, heuristic}")

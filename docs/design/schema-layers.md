@@ -258,7 +258,7 @@ All meta-schemas are JSON Schema **2020-12**; closed shapes use
 - Python: package the same dir; `jsonschema` validation of graph-engine
   input/output; the ES index templates and ECS projection are drift-gated
   against the Object Model — regeneration must reproduce the committed
-  rendered artifacts (`elastic/projection/`), and changing the projection
+  rendered artifacts (`model/projection/` → `elastic/`), and changing the projection
   output stays a separate, explicit decision (wire format rule).
 - Validation policy is **count-and-carry**: every object validates, every
   failure tallies into a neutral finding record

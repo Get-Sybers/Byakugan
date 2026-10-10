@@ -8,7 +8,9 @@ its companion inverse (ECS->CAR, `byakugan timeline --elastic`); `load.py` is
 stdlib-only HTTP plumbing (auth headers, TLS context, the one JSON request
 primitive) both `load.py` and `byakugan/timeline.py`'s own `--elastic` fetch
 go through. The projection CONTRACT these modules read — conventions.yml,
-objects/<object>.yml, relationships.yml, inferred.yml, ecs_types.yml, and the
-rendered Elastic/Kibana assets — is not code and lives one level up, at the
-repo root's `elastic/projection/` (see that directory's own README.md).
+objects/<object>.yml, relationships.yml, inferred.yml, content.yml,
+ecs_types.yml — is not code and lives at the repo root's `model/projection/`
+(see that directory's own README.md); the RENDERED tree it produces — the
+repo-root `elastic/` (component/index templates, the Byakugan Kibana space)
+— is what `load.py --setup` applies (see elastic/README.md).
 """

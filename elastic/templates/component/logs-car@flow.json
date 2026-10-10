@@ -1,0 +1,240 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "generated_by": "python model/projection/render_elastic.py",
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "model/projection/conventions.yml",
+      "model/projection/objects/flow.yml",
+      "model/projection/ecs_types.yml"
+    ],
+    "version": 3
+  },
+  "template": {
+    "mappings": {
+      "properties": {
+        "car": {
+          "properties": {
+            "flow": {
+              "properties": {
+                "application_protocol": {
+                  "path": "network.protocol",
+                  "type": "alias"
+                },
+                "content": {
+                  "type": "text"
+                },
+                "dest_fqdn": {
+                  "path": "destination.domain",
+                  "type": "alias"
+                },
+                "dest_hostname": {
+                  "path": "destination.domain",
+                  "type": "alias"
+                },
+                "dest_ip": {
+                  "path": "destination.ip",
+                  "type": "alias"
+                },
+                "dest_port": {
+                  "path": "destination.port",
+                  "type": "alias"
+                },
+                "end_time": {
+                  "path": "event.end",
+                  "type": "alias"
+                },
+                "exe": {
+                  "path": "process.name",
+                  "type": "alias"
+                },
+                "fqdn": {
+                  "path": "host.hostname",
+                  "type": "alias"
+                },
+                "hostname": {
+                  "path": "host.hostname",
+                  "type": "alias"
+                },
+                "image_path": {
+                  "path": "process.executable",
+                  "type": "alias"
+                },
+                "in_bytes": {
+                  "path": "destination.bytes",
+                  "type": "alias"
+                },
+                "network_direction": {
+                  "path": "network.direction",
+                  "type": "alias"
+                },
+                "out_bytes": {
+                  "path": "source.bytes",
+                  "type": "alias"
+                },
+                "packet_count": {
+                  "path": "network.packets",
+                  "type": "alias"
+                },
+                "pid": {
+                  "path": "process.pid",
+                  "type": "alias"
+                },
+                "ppid": {
+                  "path": "process.parent.pid",
+                  "type": "alias"
+                },
+                "proto_info": {
+                  "type": "text"
+                },
+                "src_fqdn": {
+                  "path": "source.domain",
+                  "type": "alias"
+                },
+                "src_hostname": {
+                  "path": "source.domain",
+                  "type": "alias"
+                },
+                "src_ip": {
+                  "path": "source.ip",
+                  "type": "alias"
+                },
+                "src_port": {
+                  "path": "source.port",
+                  "type": "alias"
+                },
+                "start_time": {
+                  "path": "event.start",
+                  "type": "alias"
+                },
+                "tcp_flags": {
+                  "type": "keyword"
+                },
+                "transport_protocol": {
+                  "path": "network.transport",
+                  "type": "alias"
+                },
+                "uid": {
+                  "path": "user.id",
+                  "type": "alias"
+                },
+                "user": {
+                  "path": "user.name",
+                  "type": "alias"
+                }
+              }
+            }
+          }
+        },
+        "destination": {
+          "properties": {
+            "bytes": {
+              "type": "long"
+            },
+            "domain": {
+              "type": "keyword"
+            },
+            "ip": {
+              "type": "ip"
+            },
+            "port": {
+              "type": "long"
+            }
+          }
+        },
+        "event": {
+          "properties": {
+            "end": {
+              "type": "date"
+            },
+            "start": {
+              "type": "date"
+            }
+          }
+        },
+        "host": {
+          "properties": {
+            "hostname": {
+              "type": "keyword"
+            }
+          }
+        },
+        "network": {
+          "properties": {
+            "direction": {
+              "type": "keyword"
+            },
+            "packets": {
+              "type": "long"
+            },
+            "protocol": {
+              "type": "keyword"
+            },
+            "transport": {
+              "type": "keyword"
+            }
+          }
+        },
+        "process": {
+          "properties": {
+            "executable": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "parent": {
+              "properties": {
+                "pid": {
+                  "type": "long"
+                }
+              }
+            },
+            "pid": {
+              "type": "long"
+            }
+          }
+        },
+        "related": {
+          "properties": {
+            "hosts": {
+              "type": "keyword"
+            },
+            "ip": {
+              "type": "ip"
+            },
+            "user": {
+              "type": "keyword"
+            }
+          }
+        },
+        "source": {
+          "properties": {
+            "bytes": {
+              "type": "long"
+            },
+            "domain": {
+              "type": "keyword"
+            },
+            "ip": {
+              "type": "ip"
+            },
+            "port": {
+              "type": "long"
+            }
+          }
+        },
+        "user": {
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}

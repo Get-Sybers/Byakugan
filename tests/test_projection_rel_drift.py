@@ -1,8 +1,8 @@
-"""relationships.yml / inferred.yml (elastic/projection/) declare the exact
+"""relationships.yml / inferred.yml (model/projection/) declare the exact
 column lists of SupersetStore's `relationships` / `inferred_nodes` row shapes
 (the former SQLite `relationship`/`inferred_node` tables' columns, minus the
 `id` autoincrement — there is no SQLite, and no surrogate key, any more).
-elastic/projection/validate.py checks that declaration is internally
+model/projection/validate.py checks that declaration is internally
 consistent (no dup, no unknown key, every column covered) against a list it
 hardcodes, since it stays pyyaml-only and cannot import byakugan. This is the
 other half: it derives the REAL, live column list from the engine itself
@@ -19,7 +19,7 @@ import yaml
 from byakugan import superset
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
-PROJECTION = REPO_ROOT / "elastic" / "projection"
+PROJECTION = REPO_ROOT / "model" / "projection"
 
 
 def _declared_columns(contract_file: str) -> list:
@@ -33,7 +33,7 @@ def test_relationships_yml_matches_the_live_relationship_schema():
     declared = _declared_columns("relationships.yml")
     assert len(declared) == len(set(declared)), "relationships.yml: duplicate car: entries"
     assert set(declared) == set(live), (
-        "elastic/projection/relationships.yml is out of step with byakugan.superset.REL_COLUMNS -- "
+        "model/projection/relationships.yml is out of step with byakugan.superset.REL_COLUMNS -- "
         f"missing {sorted(set(live) - set(declared))}, extra {sorted(set(declared) - set(live))}")
 
 
@@ -43,7 +43,7 @@ def test_inferred_yml_matches_the_live_inferred_node_schema():
     declared = _declared_columns("inferred.yml")
     assert len(declared) == len(set(declared)), "inferred.yml: duplicate car: entries"
     assert set(declared) == set(live), (
-        "elastic/projection/inferred.yml is out of step with byakugan.superset.INFERRED_COLUMNS -- "
+        "model/projection/inferred.yml is out of step with byakugan.superset.INFERRED_COLUMNS -- "
         f"missing {sorted(set(live) - set(declared))}, extra {sorted(set(declared) - set(live))}")
 
 
@@ -53,5 +53,5 @@ def test_content_yml_matches_the_live_content_node_schema():
     declared = _declared_columns("content.yml")
     assert len(declared) == len(set(declared)), "content.yml: duplicate car: entries"
     assert set(declared) == set(live), (
-        "elastic/projection/content.yml is out of step with byakugan.superset.CONTENT_COLUMNS -- "
+        "model/projection/content.yml is out of step with byakugan.superset.CONTENT_COLUMNS -- "
         f"missing {sorted(set(live) - set(declared))}, extra {sorted(set(declared) - set(live))}")

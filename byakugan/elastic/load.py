@@ -34,8 +34,9 @@ framework's `network: optional` requires):
           `<es>/<stream>/_bulk` in chunks, treats 409 (version_conflict) as
           already-present, and verifies per-stream document counts with an
           `_search` ids query. `--setup` additionally PUTs the rendered
-          component/index templates (elastic/projection/rendered/) before
-          loading, and — with `--kibana-url` — imports the Kibana bundle.
+          component/index templates (the repo-root elastic/templates/) before
+          loading, and — with `--kibana-url` — creates the Byakugan Kibana
+          space and imports its saved objects (elastic/dashboards/byakugan/).
 
 Discovery mirrors byakugan/timeline.py's `_find_stores`, keyed on the JSONL
 export (`car_*.jsonl` — the engine's only on-disk product, no SQLite anywhere):
@@ -370,8 +371,19 @@ def push_all(es_url: str, streams: dict, headers: dict, context: ssl.SSLContext 
 
 
 # --------------------------------------------------------------------------- #
-# Setup: rendered component/index templates + the Kibana bundle.
+# Setup: the rendered elastic/ config tree (model/projection/render_elastic.py)
+# — templates/component + templates/index PUT in that order, then the Kibana
+# spaces: every dashboards/<id>/space.json created (or updated when a field
+# differs) and that directory's *.ndjson imported into it as ONE payload,
+# the same walk DX_DFIR's dxdfir_stack role does over its own tree.
 # --------------------------------------------------------------------------- #
+TEMPLATES_DIR = os.path.join(projection.ELASTIC_DIR, "templates")
+DASHBOARDS_DIR = os.path.join(projection.ELASTIC_DIR, "dashboards")
+# the fields of a space.json the spaces API round-trips — compared to decide
+# "unchanged" vs "updated" (Kibana adds its own, e.g. `_reserved`)
+_SPACE_KEYS = ("name", "description", "initials", "color", "disabledFeatures")
+
+
 def _template_shape(stored: dict) -> dict:
     return {k: stored[k] for k in _TEMPLATE_META_KEYS if k in stored}
 
@@ -396,16 +408,30 @@ def _apply_template(es_url: str, url_prefix: str, name: str, body: dict, headers
     return True, "applied"
 
 
-def _import_kibana(kibana_url: str, ndjson_path: str, headers: dict,
-                   context: ssl.SSLContext | None) -> dict:
-    with open(ndjson_path, "rb") as fh:
-        content = fh.read()
+def _concat_ndjson(files: list[str]) -> bytes:
+    """One import payload from a directory's *.ndjson, in sorted order (so
+    00-data-views.ndjson lands before the objects that reference it)."""
+    parts = []
+    for path in files:
+        with open(path, "rb") as fh:
+            data = fh.read()
+        if data and not data.endswith(b"\n"):
+            data += b"\n"
+        parts.append(data)
+    return b"".join(parts)
+
+
+def _import_kibana(kibana_url: str, content: bytes, filename: str, headers: dict,
+                   context: ssl.SSLContext | None, space_id: str | None = None) -> dict:
+    """POST one saved-objects payload (overwrite=true) — into `space_id`
+    (/s/<id>/api/...) or, with none, the default space."""
     boundary = "byakuganload" + hashlib.sha1(content).hexdigest()[:16]
     body = (f"--{boundary}\r\n"
-           'Content-Disposition: form-data; name="file"; filename="logs-car-views.ndjson"\r\n'
+           f'Content-Disposition: form-data; name="file"; filename="{filename}"\r\n'
            "Content-Type: application/ndjson\r\n\r\n").encode("utf-8") + content + \
           f"\r\n--{boundary}--\r\n".encode("utf-8")
-    url = f"{kibana_url}/api/saved_objects/_import?overwrite=true"
+    base = f"{kibana_url}/s/{space_id}" if space_id else kibana_url
+    url = f"{base}/api/saved_objects/_import?overwrite=true"
     try:
         status, parsed, raw = http_json(
             url, "POST", body,
@@ -420,18 +446,91 @@ def _import_kibana(kibana_url: str, ndjson_path: str, headers: dict,
     return out
 
 
+def _ensure_space(kibana_url: str, space: dict, headers: dict,
+                  context: ssl.SSLContext | None) -> tuple[bool, str]:
+    """(ok, "created"|"updated"|"unchanged"|an error message): the space as
+    space.json declares it. GET first; 404 -> POST; a field differing -> PUT;
+    otherwise left alone, so a re-setup is a no-op here too."""
+    kh = {**headers, "kbn-xsrf": "true", "Content-Type": "application/json"}
+    body = json.dumps(space, separators=(",", ":"))
+    url = f"{kibana_url}/api/spaces/space/{space['id']}"
+    try:
+        status, parsed, raw = http_json(url, "GET", None, kh, context)
+        if status == 404:
+            status, _parsed, raw = http_json(f"{kibana_url}/api/spaces/space", "POST", body, kh, context)
+            if status >= 300:
+                return False, f"POST api/spaces/space ({space['id']}) failed: HTTP {status}: {raw[:200]!r}"
+            return True, "created"
+        if status != 200 or not isinstance(parsed, dict):
+            return False, f"GET api/spaces/space/{space['id']} failed: HTTP {status}: {raw[:200]!r}"
+        if all(parsed.get(k) == space[k] for k in _SPACE_KEYS if k in space):
+            return True, "unchanged"
+        status, _parsed, raw = http_json(url, "PUT", body, kh, context)
+        if status >= 300:
+            return False, f"PUT api/spaces/space/{space['id']} failed: HTTP {status}: {raw[:200]!r}"
+        return True, "updated"
+    except OSError as e:
+        return False, f"api/spaces/space/{space['id']}: {e}"
+
+
+def discover_spaces(dashboards_dir: str = DASHBOARDS_DIR) -> list[tuple[dict, list[str]]]:
+    """Every `<dashboards_dir>/<id>/space.json` (the space, as its file
+    declares it) with that directory's sorted *.ndjson — the Kibana half of
+    the rendered tree, in the shape DX_DFIR's elastic/dashboards/ uses."""
+    spaces = []
+    for path in sorted(glob.glob(os.path.join(dashboards_dir, "*", "space.json"))):
+        with open(path, encoding="utf-8") as fh:
+            space = json.load(fh)
+        files = sorted(glob.glob(os.path.join(os.path.dirname(path), "*.ndjson")))
+        spaces.append((space, files))
+    return spaces
+
+
+def run_kibana_setup(kibana_url: str, headers: dict, context: ssl.SSLContext | None,
+                     dashboards_dir: str = DASHBOARDS_DIR) -> dict:
+    """The Kibana half of `--setup`: the default space's `dashboards/*.ndjson`
+    (none rendered today — the slot DX_DFIR's tree shape has), then every
+    space directory: the space ensured, its objects imported into it."""
+    result: dict = {"ok": True, "spaces": {}}
+    default_files = sorted(glob.glob(os.path.join(dashboards_dir, "*.ndjson")))
+    if default_files:
+        imported = _import_kibana(kibana_url, _concat_ndjson(default_files),
+                                  "byakugan-saved-objects.ndjson", headers, context)
+        result["default"] = imported
+        result["ok"] = result["ok"] and imported["ok"]
+    for space, files in discover_spaces(dashboards_dir):
+        ok, action = _ensure_space(kibana_url, space, headers, context)
+        entry: dict = {"space": action if ok else "failed"}
+        if not ok:
+            entry["error"] = action
+        elif files:
+            imported = _import_kibana(kibana_url, _concat_ndjson(files),
+                                      f"{space['id']}-saved-objects.ndjson", headers, context,
+                                      space_id=space["id"])
+            entry["import"] = imported
+            ok = imported["ok"]
+            if not ok:
+                entry["error"] = imported.get("error")
+        result["spaces"][space["id"]] = entry
+        result["ok"] = result["ok"] and ok
+    if not result["ok"]:
+        result["error"] = "; ".join(f"{sid}: {e['error']}" for sid, e in result["spaces"].items()
+                                    if "error" in e) or (result.get("default") or {}).get("error")
+    return result
+
+
 def run_setup(es_url: str, headers: dict, context: ssl.SSLContext | None,
              kibana_url: str | None) -> dict:
     """PUT every rendered component template then index template
-    (elastic/projection/rendered/), skipping any already applied unchanged;
-    with `kibana_url`, also import the rendered Kibana bundle."""
-    rendered = os.path.join(projection.MODEL_DIR, "rendered")
+    (elastic/templates/{component,index}/), skipping any already applied
+    unchanged; with `kibana_url`, also the Kibana spaces and their saved
+    objects (elastic/dashboards/) — see run_kibana_setup."""
     applied: list[str] = []
     unchanged: list[str] = []
     errors: list[str] = []
-    for kind, prefix in (("component_templates", "_component_template"),
-                         ("index_templates", "_index_template")):
-        for path in sorted(glob.glob(os.path.join(rendered, kind, "*.json"))):
+    for kind, prefix in (("component", "_component_template"),
+                         ("index", "_index_template")):
+        for path in sorted(glob.glob(os.path.join(TEMPLATES_DIR, kind, "*.json"))):
             name = os.path.splitext(os.path.basename(path))[0]
             with open(path, encoding="utf-8") as fh:
                 body = json.load(fh)
@@ -449,8 +548,7 @@ def run_setup(es_url: str, headers: dict, context: ssl.SSLContext | None,
     if errors:
         result["errors"] = errors
     if kibana_url:
-        kibana = _import_kibana(kibana_url, os.path.join(rendered, "kibana", "logs-car-views.ndjson"),
-                                headers, context)
+        kibana = run_kibana_setup(kibana_url, headers, context)
         result["kibana"] = kibana
         result["ok"] = result["ok"] and kibana["ok"]
     return result
@@ -515,7 +613,9 @@ def render_report(summary: dict) -> str:
                     + ("" if setup.get("ok", True) else f", errors: {setup.get('errors')}"))
         if "kibana" in setup:
             k = setup["kibana"]
-            lines.append(f"  kibana import: {'ok' if k.get('ok') else 'FAILED: ' + str(k.get('error'))}")
+            spaces = ", ".join(f"{sid} ({e.get('space')})" for sid, e in (k.get("spaces") or {}).items())
+            lines.append(f"  kibana spaces [{spaces}]: "
+                         f"{'ok' if k.get('ok') else 'FAILED: ' + str(k.get('error'))}")
     lines.append("")
     lines.append(f"records={summary['records']} processed={summary['processed']} "
                 f"skipped={summary['skipped']} failed={summary['failed']}")
@@ -620,7 +720,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--es-password", default="")
     ap.add_argument("--es-password-file", default="")
     ap.add_argument("--es-ca-file", default="", help="CA bundle for the Elasticsearch TLS certificate")
-    ap.add_argument("--kibana-url", default="", help="also import the Kibana bundle (--setup only)")
+    ap.add_argument("--kibana-url", default="",
+                    help="also create the Byakugan Kibana space and import its saved objects (--setup only)")
     ap.add_argument("--setup", action="store_true",
                     help="apply the rendered index/component templates before loading (push mode only)")
     a = ap.parse_args(argv)
