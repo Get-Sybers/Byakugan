@@ -1,6 +1,6 @@
 """The CAR->ECS forward projector: a `car_<object>.jsonl` / `car_relationships.jsonl`
 / `car_inferred.jsonl` row -> its Elasticsearch document, per the hand-authored
-contract in `elastic/projection/` (conventions.yml + objects/<object>.yml (13) +
+contract in `model/projection/` (conventions.yml + objects/<object>.yml (13) +
 relationships.yml + inferred.yml + ecs_types.yml — read those first; this
 module is deliberately silent on WHY a field lands where it does, since the
 contract already says so at length).
@@ -8,12 +8,14 @@ contract already says so at length).
 Pure and import-light (stdlib + pyyaml only, like the contract's own
 validate.py/render_elastic.py) so `byakugan.elastic.load` — and any other
 consumer — can import it without pulling in sqlite3, argparse or the rest of
-the engine. `load_contract()` resolves `elastic/projection/` relative to the
+the engine. `load_contract()` resolves `model/projection/` relative to the
 package the way `byakugan/build_data_model.py` resolves `model/sources/` (its
 `_HERE`/`_ROOT`): a fixed number of levels up from `byakugan/elastic/` to the
 repo root, not an installed data file, because — like the CAR model itself —
 the contract is meant to be read from the checked-out source tree, never
-vendored.
+vendored. The RENDERED tree the contract produces (the repo-root `elastic/`:
+component/index templates + the Byakugan Kibana space) is what
+`byakugan.elastic.load --setup` applies; this module never reads it.
 
 Design note: this is the FORWARD projection (CAR -> ECS, what `byakugan load`
 bulk-loads into Elasticsearch). The INVERSE (ECS -> CAR, reconstructing a CAR
@@ -85,7 +87,10 @@ from ..normalize import parse_ts
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))
-MODEL_DIR = os.path.join(_ROOT, "elastic", "projection")
+MODEL_DIR = os.path.join(_ROOT, "model", "projection")
+# the rendered config tree (model/projection/render_elastic.py -> elastic/):
+# what `byakugan load --setup` PUTs / imports
+ELASTIC_DIR = os.path.join(_ROOT, "elastic")
 CONVENTIONS_PATH = os.path.join(MODEL_DIR, "conventions.yml")
 OBJECTS_DIR = os.path.join(MODEL_DIR, "objects")
 RELATIONSHIPS_PATH = os.path.join(MODEL_DIR, "relationships.yml")

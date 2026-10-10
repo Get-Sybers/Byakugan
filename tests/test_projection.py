@@ -1,5 +1,5 @@
 """The CAR->ECS forward projector (byakugan/elastic/projection.py), driven by
-the elastic/projection/ contract (epic #99 phase 2)."""
+the model/projection/ contract (epic #99 phase 2)."""
 import hashlib
 
 from byakugan.elastic import projection as pj

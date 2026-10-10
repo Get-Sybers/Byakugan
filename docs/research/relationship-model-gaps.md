@@ -20,7 +20,7 @@ Research base, read in full for this register:
   (`data_model/*.yaml`, field descriptions read verbatim).
 - All three Byakugan layers: the hand-authored sources
   (`byakugan/cascade_relationships.yml`, `byakugan/relationships.yml`,
-  `byakugan/spindle.yml`, `model/stix/*`, `elastic/projection/*`), the generated
+  `byakugan/spindle.yml`, `model/stix/*`, `model/projection/*`), the generated
   `model/` snapshot, and the engine (`superset.py`, `derive.py`, `enrich.py`,
   `verify.py`, `stix.py`).
 - The memory producer's mapping table
@@ -321,7 +321,7 @@ or external form.
    and `logs-car.inferred-*` but no content stream — a hash's
    many-record-union is invisible in Kibana except as per-document hash
    fields. Record as a decision: either a `logs-car.content-*` projection or
-   an explicit "STIX-only layer" statement in `elastic/projection/README`.
+   an explicit "STIX-only layer" statement in `model/projection/README`.
 3. **The readable rendering of the declared model does not exist.** `model/`
    renders the *upstream vocabulary* (`relationship-types.yml`) and the *row
    shape* (`relationship-schema.yml`) but nothing renders **our
@@ -409,7 +409,7 @@ association, an impersonation verb if a future pin adds one).
 8. ⏳ **Owner decisions** (§9), then their fallout.
 
 Validation per increment, as #109 specifies: `python model/generate.py` ·
-`python model/stix/validate.py` · `python elastic/projection/validate.py` ·
+`python model/stix/validate.py` · `python model/projection/validate.py` ·
 `python -m byakugan.spindle --check` · `pytest -q`.
 
 ## 9. Decisions — RULED by the owner (2026-09-22); how each landed

@@ -149,7 +149,7 @@ def _filter_and_sort(rows: list[dict], host: str | None, after: str | None,
 # logs-car.*-<namespace>, excluding the non-timeline datasets car.inferred
 # (reconstructed evidence about an object, never an event row) and
 # car.content (the attribution layer's content nodes — global entities, not
-# events; see elastic/projection/inferred.yml and content.yml),
+# events; see model/projection/inferred.yml and content.yml),
 # each hit inverted back to the local entry shape (byakugan.elastic.inverse_projection),
 # then handed to the exact same _filter_and_sort/write_jsonl as the local source.
 # --------------------------------------------------------------------------- #

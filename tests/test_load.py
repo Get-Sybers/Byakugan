@@ -196,6 +196,10 @@ class _StubES(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         st = self.server.state
         parts = self.path.split("?", 1)[0].strip("/").split("/")
+        if parts[:3] == ["api", "spaces", "space"] and len(parts) == 4:
+            space = st["spaces"].get(parts[3])
+            self._json(200, space) if space else self._json(404, {"statusCode": 404})
+            return
         if len(parts) == 2 and parts[0] in ("_component_template", "_index_template"):
             store_ = st["component"] if parts[0] == "_component_template" else st["index"]
             if parts[1] in store_:
@@ -211,6 +215,11 @@ class _StubES(http.server.BaseHTTPRequestHandler):
         st = self.server.state
         parts = self.path.split("?", 1)[0].strip("/").split("/")
         body = json.loads(self._body() or b"{}")
+        if parts[:3] == ["api", "spaces", "space"] and len(parts) == 4:
+            st["spaces"][parts[3]] = body
+            st["space_calls"].append(f"PUT {parts[3]}")
+            self._json(200, body)
+            return
         if len(parts) == 2 and parts[0] in ("_component_template", "_index_template"):
             store_ = st["component"] if parts[0] == "_component_template" else st["index"]
             store_[parts[1]] = body
@@ -256,9 +265,22 @@ class _StubES(http.server.BaseHTTPRequestHandler):
             total = sum(1 for i in ids if i in index)
             self._json(200, {"hits": {"total": {"value": total}}})
             return
+        if path == "api/spaces/space":
+            space = json.loads(raw)
+            st["spaces"][space["id"]] = space
+            st["space_calls"].append(f"POST {space['id']}")
+            self._json(200, space)
+            return
         if path == "api/saved_objects/_import":
-            st["kibana_imports"].append(raw)
+            st["kibana_imports"].append((None, raw))
             self._json(200, {"success": True, "successCount": 2})
+            return
+        if len(parts) == 5 and parts[0] == "s" and parts[2:] == ["api", "saved_objects", "_import"]:
+            if parts[1] not in st["spaces"]:
+                self._json(404, {"statusCode": 404, "message": f"space {parts[1]} not found"})
+                return
+            st["kibana_imports"].append((parts[1], raw))
+            self._json(200, {"success": True, "successCount": 4})
             return
         self._json(404, {"error": "not_found"})
 
@@ -266,7 +288,7 @@ class _StubES(http.server.BaseHTTPRequestHandler):
 @pytest.fixture
 def es_stub():
     state = {"component": {}, "index": {}, "indices": {}, "bulk_calls": [], "bulk_queries": [],
-            "puts": [], "kibana_imports": [], "fail_streams": set(),
+            "puts": [], "kibana_imports": [], "spaces": {}, "space_calls": [], "fail_streams": set(),
             "drop_bulk_items_when_filter_path": False}
     server = http.server.HTTPServer(("127.0.0.1", 0), _StubES)
     server.state = state
@@ -315,8 +337,8 @@ def test_push_mode_chunks_and_verifies(tmp_path, es_stub):
 
 def test_push_mode_es_url_scheme_is_plain_http_not_https(tmp_path, es_stub):
     """`--es-url` takes the URL's OWN scheme — push mode never requires or
-    assumes https. The standalone lab stack (elastic/, HTTP TLS off — see
-    elastic/README.md) is reached over plain http://127.0.0.1:9201, so this
+    assumes https. A lab Elasticsearch with HTTP TLS off (the elastic-e2e
+    workflow's throwaway cluster) is reached over plain http://, so this
     makes that contract explicit rather than incidental: every `es_stub` push
     test above already runs over http (the stub only ever serves plain HTTP),
     proving it end to end; this test just names why that is safe. `load.run`
@@ -406,13 +428,59 @@ def test_setup_applies_templates_then_reports_unchanged(tmp_path, es_stub):
     assert state["puts"] == puts_after_first                # no new PUTs on the no-op pass
 
 
-def test_setup_with_kibana_url_imports_the_bundle(tmp_path, es_stub):
+def test_setup_with_kibana_url_creates_the_space_and_imports_into_it(tmp_path, es_stub):
+    """The Kibana half of --setup is the rendered elastic/dashboards/ tree:
+    the byakugan space created from its space.json, then that directory's
+    *.ndjson imported INTO the space (/s/byakugan/...) as one payload — the
+    data view first, the dashboard last."""
     es_url, state = es_stub
     result = load.run_setup(es_url, {}, None, kibana_url=es_url)
     assert result["ok"] is True
     assert result["kibana"]["ok"] is True
+    assert result["kibana"]["spaces"]["byakugan"]["space"] == "created"
+    assert state["space_calls"] == ["POST byakugan"]
+    assert state["spaces"]["byakugan"]["color"] == "#4682B4"
     assert len(state["kibana_imports"]) == 1
-    assert b"multipart" not in state["kibana_imports"][0]   # the raw ndjson content itself
+    space_id, payload = state["kibana_imports"][0]
+    assert space_id == "byakugan"
+    # the multipart body: the part headers, a blank line, the ndjson, the closing boundary
+    assert b'filename="byakugan-saved-objects.ndjson"' in payload
+    ndjson = payload.split(b"\r\n\r\n", 1)[1].rsplit(b"\r\n--", 1)[0]
+    objs = [json.loads(ln) for ln in ndjson.decode("utf-8").splitlines() if ln.strip()]
+    assert objs[0]["type"] == "index-pattern" and objs[-1]["type"] == "dashboard"
+    assert {o["id"] for o in objs} == {"car-logs-all", "car-timeline",
+                                       "car-timeline-histogram", "car-timeline-dashboard"}
+
+    # a re-setup leaves the space alone (unchanged) and re-imports with overwrite
+    result2 = load.run_setup(es_url, {}, None, kibana_url=es_url)
+    assert result2["kibana"]["spaces"]["byakugan"]["space"] == "unchanged"
+    assert state["space_calls"] == ["POST byakugan"]
+    assert len(state["kibana_imports"]) == 2
+
+
+def test_setup_updates_a_space_whose_fields_drifted(tmp_path, es_stub):
+    es_url, state = es_stub
+    state["spaces"]["byakugan"] = {"id": "byakugan", "name": "Old name", "initials": "By",
+                                  "color": "#000000", "disabledFeatures": []}
+    result = load.run_setup(es_url, {}, None, kibana_url=es_url)
+    assert result["kibana"]["spaces"]["byakugan"]["space"] == "updated"
+    assert state["space_calls"] == ["PUT byakugan"]
+    assert state["spaces"]["byakugan"]["name"] == "Byakugan"
+
+
+def test_discover_spaces_reads_the_dashboards_tree(tmp_path):
+    """discover_spaces walks <dir>/<id>/space.json + that dir's sorted *.ndjson
+    — the DX_DFIR elastic/dashboards/ shape — and ignores a dir without one."""
+    d = tmp_path / "dashboards"
+    (d / "alpha").mkdir(parents=True)
+    (d / "alpha" / "space.json").write_text(json.dumps({"id": "alpha", "name": "A"}))
+    (d / "alpha" / "10-b.ndjson").write_text("{}\n")
+    (d / "alpha" / "00-a.ndjson").write_text("{}\n")
+    (d / "not-a-space").mkdir()
+    (d / "not-a-space" / "x.ndjson").write_text("{}\n")
+    spaces = load.discover_spaces(str(d))
+    assert [s["id"] for s, _ in spaces] == ["alpha"]
+    assert [os.path.basename(f) for f in spaces[0][1]] == ["00-a.ndjson", "10-b.ndjson"]
 
 
 def test_run_with_setup_true_runs_setup_before_loading(tmp_path, es_stub):

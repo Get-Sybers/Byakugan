@@ -58,15 +58,15 @@ each directory is):
 | the cascade rules, the relationship-verb bridge | `byakugan/relationships.yml`, `byakugan/cascade_relationships.yml` | `python model/generate.py` (→ `model/relationships/`) |
 | the Artefact Class / Parser Profile seeds | `model/schema/classes-seed.yaml`, `model/schema/profiles-seed.yaml` | `python -m byakugan.schema_gen` |
 | a source's provenance (tool, parser, URL, what it is derived from) | `DERIVATIONS` in `byakugan/sources_model.py` | nothing — the manifests are built from the maps on demand (every build writes its `sources.yaml`; `python -m byakugan.gen_sources --out DIR` exports the set for reading) |
-| the CAR → ECS projection | `elastic/projection/*.yml` (hand-authored) | `python elastic/projection/render_elastic.py` |
+| the CAR → ECS projection | `model/projection/*.yml` (hand-authored) | `python model/projection/validate.py`, then `python model/projection/render_elastic.py` (→ the repo-root `elastic/` tree: `templates/`, `dashboards/byakugan/`) |
 | the CAR → STIX projection | `model/stix/*.yml` (hand-authored) | `python model/stix/validate.py` |
 | a detection rule | `rules/<id>.yml` (+ `PINNED_IDS` in `rules/validate.py`) | `python rules/validate.py` |
 
 Generated — never hand-edited, always committed: `go/internal/ir/ir.json`,
 `model/car/`, `model/superset/`, `model/relationships/`,
 `model/spindle/`, `model/schema/{classes,mappings,profiles,vocab,wire}/`,
-`model/schema/conformance.json`, `model/schema/constants.yaml` and
-`elastic/projection/rendered/`.
+`model/schema/conformance.json`, `model/schema/constants.yaml`,
+`elastic/templates/` and `elastic/dashboards/`.
 
 ## Dependencies
 
@@ -83,7 +83,7 @@ After ANY dependency change, re-prove the repo:
 
 ```
 python -m pytest -q
-python elastic/projection/validate.py && python model/stix/validate.py
+python model/projection/validate.py && python model/projection/render_elastic.py --check && python model/stix/validate.py
 python -m byakugan.spindle --check
 python -m byakugan.schema_gen --check && python -m byakugan.conform --strict
 make -C go build test && ./go/bin/byakugan-parse gen-ir --check go/internal/ir/ir.json
@@ -119,8 +119,10 @@ registry, its snapshot and the golden vectors), `yamllint` over
 `make -C go build test`, `ir-check` (every IR predicate is ported) and
 `gen-ir --check` (ir.json is in step with the authoring tables), then `pytest`
 — with the submodules checked out and a Go toolchain installed. The
-`elastic-e2e` workflow (path-filtered, or by hand) brings up the standalone
-Elastic stack and runs `scripts/e2e_elastic.py` against it.
+`elastic-e2e` workflow (path-filtered, or by hand) starts a throwaway
+Elasticsearch + Kibana with plain `docker run` and runs
+`scripts/e2e_elastic.py` against it — this repo ships no stack or Dockerfile
+of its own; the container is GoDFIR-toolz's `get-sybers/byakugan`.
 
 ## Code style — [module-best-practices](https://github.com/mattdesl/module-best-practices)
 

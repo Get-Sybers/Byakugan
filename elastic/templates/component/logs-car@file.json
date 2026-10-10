@@ -1,0 +1,243 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "generated_by": "python model/projection/render_elastic.py",
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "model/projection/conventions.yml",
+      "model/projection/objects/file.yml",
+      "model/projection/ecs_types.yml"
+    ],
+    "version": 3
+  },
+  "template": {
+    "mappings": {
+      "properties": {
+        "car": {
+          "properties": {
+            "file": {
+              "properties": {
+                "company": {
+                  "path": "file.pe.company",
+                  "type": "alias"
+                },
+                "content": {
+                  "type": "text"
+                },
+                "creation_time": {
+                  "path": "file.created",
+                  "type": "alias"
+                },
+                "extension": {
+                  "path": "file.extension",
+                  "type": "alias"
+                },
+                "file_name": {
+                  "path": "file.name",
+                  "type": "alias"
+                },
+                "file_path": {
+                  "path": "file.path",
+                  "type": "alias"
+                },
+                "fqdn": {
+                  "path": "host.hostname",
+                  "type": "alias"
+                },
+                "gid": {
+                  "path": "file.gid",
+                  "type": "alias"
+                },
+                "group": {
+                  "path": "file.group",
+                  "type": "alias"
+                },
+                "hostname": {
+                  "path": "host.hostname",
+                  "type": "alias"
+                },
+                "image_path": {
+                  "path": "process.executable",
+                  "type": "alias"
+                },
+                "link_target": {
+                  "path": "file.target_path",
+                  "type": "alias"
+                },
+                "md5_hash": {
+                  "path": "file.hash.md5",
+                  "type": "alias"
+                },
+                "mime_type": {
+                  "path": "file.mime_type",
+                  "type": "alias"
+                },
+                "mode": {
+                  "path": "file.mode",
+                  "type": "alias"
+                },
+                "owner": {
+                  "path": "file.owner",
+                  "type": "alias"
+                },
+                "owner_uid": {
+                  "path": "file.uid",
+                  "type": "alias"
+                },
+                "pid": {
+                  "path": "process.pid",
+                  "type": "alias"
+                },
+                "ppid": {
+                  "path": "process.parent.pid",
+                  "type": "alias"
+                },
+                "previous_creation_time": {
+                  "type": "date"
+                },
+                "sha1_hash": {
+                  "path": "file.hash.sha1",
+                  "type": "alias"
+                },
+                "sha256_hash": {
+                  "path": "file.hash.sha256",
+                  "type": "alias"
+                },
+                "signature_valid": {
+                  "path": "file.code_signature.valid",
+                  "type": "alias"
+                },
+                "signer": {
+                  "path": "file.code_signature.subject_name",
+                  "type": "alias"
+                },
+                "uid": {
+                  "path": "user.id",
+                  "type": "alias"
+                },
+                "user": {
+                  "path": "user.name",
+                  "type": "alias"
+                }
+              }
+            }
+          }
+        },
+        "file": {
+          "properties": {
+            "code_signature": {
+              "properties": {
+                "subject_name": {
+                  "type": "keyword"
+                },
+                "valid": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "created": {
+              "type": "date"
+            },
+            "extension": {
+              "type": "keyword"
+            },
+            "gid": {
+              "type": "keyword"
+            },
+            "group": {
+              "type": "keyword"
+            },
+            "hash": {
+              "properties": {
+                "md5": {
+                  "type": "keyword"
+                },
+                "sha1": {
+                  "type": "keyword"
+                },
+                "sha256": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "mime_type": {
+              "type": "keyword"
+            },
+            "mode": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "owner": {
+              "type": "keyword"
+            },
+            "path": {
+              "type": "keyword"
+            },
+            "pe": {
+              "properties": {
+                "company": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "target_path": {
+              "type": "keyword"
+            },
+            "uid": {
+              "type": "keyword"
+            }
+          }
+        },
+        "host": {
+          "properties": {
+            "hostname": {
+              "type": "keyword"
+            }
+          }
+        },
+        "process": {
+          "properties": {
+            "executable": {
+              "type": "keyword"
+            },
+            "parent": {
+              "properties": {
+                "pid": {
+                  "type": "long"
+                }
+              }
+            },
+            "pid": {
+              "type": "long"
+            }
+          }
+        },
+        "related": {
+          "properties": {
+            "hash": {
+              "type": "keyword"
+            },
+            "hosts": {
+              "type": "keyword"
+            },
+            "user": {
+              "type": "keyword"
+            }
+          }
+        },
+        "user": {
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}

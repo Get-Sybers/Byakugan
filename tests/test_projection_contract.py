@@ -8,7 +8,7 @@ import pathlib
 import subprocess
 import sys
 
-HERE = pathlib.Path(__file__).resolve().parent.parent / "elastic" / "projection"
+HERE = pathlib.Path(__file__).resolve().parent.parent / "model" / "projection"
 
 
 def _validator():
@@ -27,7 +27,7 @@ def test_validate_cli_passes():
 
 
 def test_render_elastic_check_passes():
-    """rendered/ (component templates, index templates, the Kibana bundle) is
+    """elastic/ (component/index templates, the Byakugan Kibana space) is
     committed output — --check re-renders to memory and must find it in sync."""
     r = subprocess.run([sys.executable, str(HERE / "render_elastic.py"), "--check"],
                        capture_output=True, text=True, check=False)

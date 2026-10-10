@@ -1,0 +1,187 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "generated_by": "python model/projection/render_elastic.py",
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "model/projection/conventions.yml",
+      "model/projection/objects/authentication.yml",
+      "model/projection/ecs_types.yml"
+    ],
+    "version": 3
+  },
+  "template": {
+    "mappings": {
+      "properties": {
+        "car": {
+          "properties": {
+            "authentication": {
+              "properties": {
+                "ad_domain": {
+                  "path": "user.domain",
+                  "type": "alias"
+                },
+                "app_name": {
+                  "path": "process.name",
+                  "type": "alias"
+                },
+                "auth_service": {
+                  "path": "service.name",
+                  "type": "alias"
+                },
+                "auth_target": {
+                  "path": "destination.domain",
+                  "type": "alias"
+                },
+                "decision_reason": {
+                  "path": "event.reason",
+                  "type": "alias"
+                },
+                "fqdn": {
+                  "path": "source.domain",
+                  "type": "alias"
+                },
+                "hostname": {
+                  "path": "source.domain",
+                  "type": "alias"
+                },
+                "method": {
+                  "type": "keyword"
+                },
+                "response_time": {
+                  "path": "event.duration",
+                  "type": "alias"
+                },
+                "target_ad_domain": {
+                  "path": "user.domain",
+                  "type": "alias"
+                },
+                "target_uid": {
+                  "path": "user.id",
+                  "type": "alias"
+                },
+                "target_user": {
+                  "path": "user.name",
+                  "type": "alias"
+                },
+                "target_user_role": {
+                  "path": "user.roles",
+                  "type": "alias"
+                },
+                "target_user_type": {
+                  "type": "keyword"
+                },
+                "uid": {
+                  "path": "user.id",
+                  "type": "alias"
+                },
+                "user": {
+                  "path": "user.name",
+                  "type": "alias"
+                },
+                "user_agent": {
+                  "path": "user_agent.original",
+                  "type": "alias"
+                },
+                "user_role": {
+                  "path": "user.roles",
+                  "type": "alias"
+                },
+                "user_type": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "destination": {
+          "properties": {
+            "domain": {
+              "type": "keyword"
+            }
+          }
+        },
+        "event": {
+          "properties": {
+            "duration": {
+              "type": "long"
+            },
+            "reason": {
+              "type": "keyword"
+            }
+          }
+        },
+        "process": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            }
+          }
+        },
+        "related": {
+          "properties": {
+            "hosts": {
+              "type": "keyword"
+            },
+            "user": {
+              "type": "keyword"
+            }
+          }
+        },
+        "service": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            }
+          }
+        },
+        "source": {
+          "properties": {
+            "domain": {
+              "type": "keyword"
+            },
+            "user": {
+              "properties": {
+                "domain": {
+                  "type": "keyword"
+                },
+                "id": {
+                  "type": "keyword"
+                },
+                "name": {
+                  "type": "keyword"
+                },
+                "roles": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "user": {
+          "properties": {
+            "domain": {
+              "type": "keyword"
+            },
+            "id": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "roles": {
+              "type": "keyword"
+            }
+          }
+        },
+        "user_agent": {
+          "properties": {
+            "original": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}

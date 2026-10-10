@@ -42,10 +42,18 @@ then `PATH`) — see [go/README.md](go/README.md) for the engine.
 
 Byakugan works as an individual component in three shapes:
 
-- **Standalone.** Point it at whatever your forensic tooling already produces
-  (the Quickstart below) — `car_<object>.jsonl` + `car_relationships.jsonl` is
-  a complete, self-contained result on its own. For a queryable tier, stand up
-  Byakugan's own Elasticsearch + Kibana: [elastic/README.md](elastic/README.md).
+- **Standalone.** The `get-sybers/byakugan` container image — built by
+  [GoDFIR-toolz](https://github.com/Get-Sybers/GoDFIR-toolz/tree/main/byakugan)
+  from this repository at a pinned ref — is the standalone tool: one hardened
+  image carrying the engine, its model and its Elastic config tree, driven by
+  the `byakugan <sub-tool>` env contract that README documents. Point `build`
+  at whatever your forensic tooling already produces (the Quickstart below is
+  the same engine from a checkout) and `car_<object>.jsonl` +
+  `car_relationships.jsonl` is a complete, self-contained result on its own;
+  point `load` at any Elasticsearch + Kibana (push mode, `--setup`) and it
+  installs the `logs-car.*` templates and the Byakugan Kibana space from its
+  own [elastic/](elastic/README.md) tree first. Nothing Docker lives here:
+  this repository is the engine, GoDFIR-toolz the image.
 - **Fed by Anamnesis alone.** `memory/<image>/car.db` — Anamnesis's own
   finished CAR — is a first-class input on its own, no other evidence
   required: passthrough, links preserved. The exact translation, and what the
@@ -127,13 +135,15 @@ file is Anamnesis's own output format, a component boundary, not Byakugan's
 store).
 
 `byakugan load` projects that same materialised tree, through the CAR→ECS
-projection contract (`elastic/projection/`), into `logs-car.*` Elasticsearch
+projection contract (`model/projection/`), into `logs-car.*` Elasticsearch
 data streams — the **served, queryable tier**: bundle mode renders the
 `_bulk` NDJSON offline (the air-gap path); push mode also POSTs it, to
-DX_DFIR's integrated stack, Byakugan's own standalone one
-([elastic/](elastic/README.md)), or any other Elasticsearch that serves the
-same contract. `byakugan.timeline --elastic` reads that served tier back into
-the exact same `timeline.jsonl` shape a local JSONL-backed run produces.
+DX_DFIR's integrated stack or any other Elasticsearch — `--setup` first
+installs the contract's rendered [elastic/](elastic/README.md) tree there
+(the `logs-car.*` component/index templates and, with a Kibana URL, the
+**Byakugan Kibana space** with its CAR timeline). `byakugan.timeline
+--elastic` reads that served tier back into the exact same `timeline.jsonl`
+shape a local JSONL-backed run produces.
 
 **The STIX/CTI exchange is the engine's too** (`byakugan.exchange`, sub-tools
 `stix-export` / `stix-behaviour` / `cti-pull` / `cti-sightings`): detections
@@ -150,8 +160,8 @@ What each top-level directory is, and whether anything runs from it:
 |---|---|---|
 | `byakugan/` | the Python package: the CLI, source discovery and routing, enrichment, the relationship cascade, the CAR→ECS and CAR→STIX projections, the STIX/CTI exchange, and the generators (`schema_gen`, `spindle`) and the manifest exporter (`gen_sources`) | **live** — what `pip install -e .` installs and what the image runs from `/opt/byakugan` |
 | `go/` | the parse engine (`go/bin/byakugan-parse`) and the map tables, authored in Go (`go/internal/authoring/maps_<family>.go`) and serialised to the embedded `go/internal/ir/ir.json` | **live** — the single source of truth for every map and predicate; `make -C go build test` |
-| `model/` | the materialised model: `schema/` (the JSON Schema authority the engine validates against — read at run time — with its curated inputs `classes-seed.yaml`, `profiles-seed.yaml` and `matched-evidences.yaml`), `car/`, `superset/`, `relationships/`, `spindle/` (readable snapshots), `stix/` (the hand-authored CAR→STIX contract), `sources/` (the upstream inputs, all three: the pinned CAR submodule, the vendored ATT&CK data-sources file, the ForensicArtifacts submodule, plus `forensicartifacts.index.json`, the refresh-time index `model/ingest_forensicartifacts.py` writes from it — nothing reads it at run time) | **live** — `schema/` is read at run time; the snapshots are written by `python model/generate.py` / `python -m byakugan.schema_gen` and drift-gated in CI |
-| `elastic/` | Byakugan's standalone Elastic stack (`docker-compose.yml`, `config/`) and `projection/`, the hand-authored CAR→ECS contract with its rendered templates | **live** — `byakugan.elastic.load` reads `projection/` at run time; the `elastic-e2e` workflow dogfoods the stack |
+| `model/` | the materialised model: `schema/` (the JSON Schema authority the engine validates against — read at run time — with its curated inputs `classes-seed.yaml`, `profiles-seed.yaml` and `matched-evidences.yaml`), `car/`, `superset/`, `relationships/`, `spindle/` (readable snapshots), the two hand-authored boundary contracts — `projection/` (CAR→ECS: what `byakugan load` projects by, and what `elastic/` is rendered from) and `stix/` (CAR→STIX) — and `sources/` (the upstream inputs, all three: the pinned CAR submodule, the vendored ATT&CK data-sources file, the ForensicArtifacts submodule, plus `forensicartifacts.index.json`, the refresh-time index `model/ingest_forensicartifacts.py` writes from it — nothing reads it at run time) | **live** — `schema/` and `projection/` are read at run time; the snapshots are written by `python model/generate.py` / `python -m byakugan.schema_gen` and drift-gated in CI |
+| `elastic/` | Byakugan's Elastic config tree, **rendered from `model/projection/`** in the shape of DX_DFIR's own `elastic/`: `templates/component/` (`logs-car@<model>`), `templates/index/` (`logs-car-<stream>`) and `dashboards/byakugan/` — the Byakugan Kibana space (`space.json`) with its data view and CAR timeline | **live** — `byakugan load --setup` applies it to whatever Elasticsearch + Kibana it is pointed at; the `elastic-e2e` workflow proves it against a live cluster |
 | `rules/` | the Elastic detection rules-as-code | **live** — baked into the image at `/rules`; `rules/validate.py` gates the pinned set |
 | `scripts/` | `e2e_elastic.py`, the live-Elasticsearch gate the `elastic-e2e` workflow runs | **live (CI)** |
 | `tests/` | the pytest suite; the CAR map tests drive the Go engine through `tests/go_engine.py` | **live** |
@@ -159,7 +169,7 @@ What each top-level directory is, and whether anything runs from it:
 
 The generated layers are regenerable, never hand-edited, and each has a
 CI gate: `model/spindle/` (`spindle --check`), `model/schema/` (`schema_gen --check` + `conform --strict`),
-`elastic/projection/rendered/` (`render_elastic.py --check`) and
+`elastic/templates/` + `elastic/dashboards/` (`model/projection/render_elastic.py --check`) and
 `go/internal/ir/ir.json` (`gen-ir --check`).
 
 ## Documentation
@@ -177,7 +187,8 @@ CI gate: `model/spindle/` (`spindle --check`), `model/schema/` (`schema_gen --ch
 | [docs/STIX-Exchange.md](docs/STIX-Exchange.md) | the STIX 2.1 / OpenCTI exchange: what a hit becomes, ids and versioning, the property extension, the CTI round-trip |
 | [docs/ForensicArtifacts-Ingest.md](docs/ForensicArtifacts-Ingest.md) | the refresh-time ForensicArtifacts ingest: the index contract and the refresh procedure |
 | [rules/README.md](rules/README.md) | the Elastic detection rules-as-code: the pinned set, the tagged-evidence-line contract, the car-detections lookup contract and the cti indicator-match rule — baked into the image at `/rules` |
-| [elastic/README.md](elastic/README.md) | Byakugan's own standalone Elastic stack: bring-up, the one-command load, coexisting with DX_DFIR |
+| [model/projection/README.md](model/projection/README.md) | the hand-authored CAR→ECS boundary contract: every CAR object and field's ECS home, the data-stream shape, the validator and the renderer |
+| [elastic/README.md](elastic/README.md) | the rendered Elastic config tree: the `logs-car.*` templates and the Byakugan Kibana space, how `byakugan load --setup` installs them into any stack, and how DX_DFIR's stack receives them |
 | [docs/car-provenance/](docs/car-provenance/README.md) | the property-provenance catalogue: every CAR field → every artefact that can supply it |
 | [docs/research/cross-source-linkage/](docs/research/cross-source-linkage/README.md) | the research arc — resolving entities across sources and lining detections up against them |
 

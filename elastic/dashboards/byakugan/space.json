@@ -1,0 +1,8 @@
+{
+  "color": "#4682B4",
+  "description": "The Byakugan MITRE CAR engine's served tier: the logs-car.* data streams (13 CAR objects, the relationship timeline, inferred and content nodes) and the CAR timeline dashboard",
+  "disabledFeatures": [],
+  "id": "byakugan",
+  "initials": "By",
+  "name": "Byakugan"
+}

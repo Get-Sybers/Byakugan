@@ -23,7 +23,7 @@
 #   2. pip install -r requirements.txt
 #   3. re-prove the repo:
 #        python -m pytest -q
-#        python elastic/projection/validate.py
+#        python model/projection/validate.py
 #        python model/stix/validate.py
 #        python -m byakugan.spindle --check
 #        ./go/bin/byakugan-parse gen-ir --check go/internal/ir/ir.json

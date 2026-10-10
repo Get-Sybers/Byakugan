@@ -1,11 +1,14 @@
 # The served store: SQLite → Elasticsearch — decision and cross-repo plan
 
 **Status: implemented** (epic #99 — and since extended past this plan: the
-projection contract now lives in `elastic/projection/`, the Elastic runtime
-in `byakugan/elastic/`, the repo ships its own standalone stack under
-`elastic/`, and the engine no longer writes SQLite at all). The text below is
-the original decision record, kept as written — path and store references in
-it describe the repos as they stood on 2026-09-20.
+projection contract lives in `model/projection/` and renders the repo-root
+`elastic/` config tree (component/index templates + the Byakugan Kibana
+space, in the shape of DX_DFIR's own `elastic/`), the Elastic runtime is
+`byakugan/elastic/`, the standalone tool is the GoDFIR-toolz-built
+`get-sybers/byakugan` image loading into any Elasticsearch — this repo ships
+no stack of its own — and the engine no longer writes SQLite at all). The
+text below is the original decision record, kept as written — path and store
+references in it describe the repos as they stood on 2026-09-20.
 
 This document decides what replaces SQLite as the
 database Byakugan's consumers query, and lays out the migration across the

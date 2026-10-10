@@ -45,7 +45,7 @@ DECLARED, DERIVED = "declared", "derived"
 
 # The authoritative row shapes: the exporters write EXACTLY these keys, in
 # this order (minus the SQLite `id` autoincrement the old store used — there
-# is no surrogate key any more). elastic/projection/relationships.yml and
+# is no surrogate key any more). model/projection/relationships.yml and
 # inferred.yml declare the SAME column lists (the CAR->ECS boundary contract);
 # tests/test_projection_rel_drift.py re-pins the two against each other.
 REL_COLUMNS = ("timestamp", "source_host", "relationship", "source_object", "source_guid",

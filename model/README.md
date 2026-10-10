@@ -4,10 +4,12 @@ A **human-navigable, human-readable** snapshot of the two models this project
 runs on, materialized as static YAML (plus the SQL schema snapshots) so the shape
 of the model is reviewable without checking out the submodules or running the
 pipeline. Everything here is **generated from the project's own model code** at
-the pinned submodules — never hand-written — and is fully regenerable. (The
-hand-authored CAR → ECS boundary contract that used to live alongside it here,
-`projection/`, has since moved to [`elastic/projection/`](../elastic/projection/)
-— the Elastic home; see below.)
+the pinned submodules — never hand-written — and is fully regenerable, with
+two deliberate exceptions, the hand-authored boundary contracts that decide
+how the model leaves the engine: [`projection/`](projection/README.md)
+(CAR → ECS, from which the repo-root `elastic/` config tree is rendered) and
+[`stix/`](stix/README.md) (CAR → STIX); both are *validated against* the
+generated model here — see below.
 
 This implements the intent of issue #33: keep the static relationship/data-source
 model as YAML, co-located with a generator and this README.
@@ -67,8 +69,8 @@ where Byakugan's evidence is finer-grained than ATT&CK's elements). The gap
 register behind the declarations is
 [`docs/research/relationship-model-gaps.md`](../docs/research/relationship-model-gaps.md).
 
-(`projection/` — the hand-authored CAR -> ECS boundary contract — used to be
-here too; it now lives at [`elastic/projection/`](../elastic/projection/).)
+(`projection/` and `stix/` — the hand-authored boundary contracts — sit beside
+these; see their own READMEs.)
 
 ### `car/objects/<object>.yml` — the 13 CAR objects
 
@@ -169,17 +171,17 @@ included) → rebuild the stores (`--batch --force`; a remint tool follows). The
 check — and the generator itself — refuse an identity whose guid moved without
 its version. See `docs/CAR-Pipeline.md` §7.1.
 
-### `projection/` — moved to `elastic/projection/` — the Elastic home
+### `projection/` — the hand-authored CAR → ECS boundary contract
 
-The hand-authored CAR → ECS boundary contract (the static YAML that decides
-how each CAR object and field lands in ECS 8.x, plus the rendered Elastic/
-Kibana assets) used to live here as `model/projection/`. It is still
-**validated against** `car/objects/*.yml` (a CAR field without a decision
-fails the same way it always did), but the contract itself is Elastic's, not
-a materialized snapshot of the submodule models this directory otherwise
-holds — so it now lives at [`elastic/projection/`](../elastic/projection/),
-alongside the rest of Byakugan's Elastic story. See
-[`elastic/projection/README.md`](../elastic/projection/README.md).
+The static YAML that decides how each CAR object and field lands in ECS 8.x
+(`conventions.yml`, `objects/<object>.yml`, `relationships.yml`,
+`inferred.yml`, `content.yml`, `ecs_types.yml`). Hand-authored, **validated
+against** `car/objects/*.yml` (`validate.py`: a CAR field without a decision
+fails), and **rendered** by `render_elastic.py` into the repo-root
+[`elastic/`](../elastic/README.md) config tree — the `logs-car.*`
+component/index templates and the Byakugan Kibana space — which is the
+generated, drift-gated artefact `byakugan load --setup` applies. See
+[`projection/README.md`](projection/README.md).
 
 ## Regenerating
 

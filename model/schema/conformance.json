@@ -30,7 +30,7 @@
    "name": "elastic-rendered",
    "engine": "python",
    "command": "python -m byakugan.conform --strict",
-   "proves": "The rendered Elastic assets (component/index templates, Kibana bundle)"
+   "proves": "The rendered Elastic config tree (elastic/: component/index templates,"
   },
   {
    "name": "enrichment-structure",
