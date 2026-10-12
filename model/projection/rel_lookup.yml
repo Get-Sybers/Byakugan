@@ -1,0 +1,174 @@
+# HAND-AUTHORED contract — validated by `python model/projection/validate.py`,
+# rendered by `python model/projection/render_elastic.py`.
+#
+# The `car-relationships-<namespace>` LOOKUP INDEX: a NATIVE-Elastic join layer
+# over the same declared + derived edges relationships.yml projects to the
+# logs-car.rel-<namespace> timeline stream. It exists IN ADDITION to that stream
+# and to `byakugan timeline` / `dx byakugan export-timeline` (the flat,
+# materialised union) — neither changes. What this adds is the one thing a flat
+# edge stream cannot do on its own: let Elasticsearch itself resolve an object to
+# its relationships, inline, at query time —
+#
+#     FROM logs-car.*-<ns> | LOOKUP JOIN car-relationships-<ns> ON event.id
+#
+# stamps every CAR object row with its edges (the related guid, the verb, the
+# direction, the provenance) the same way rules/car-detections stamps detection
+# hits onto evidence lines. `index.mode: lookup` (single shard, enforced by
+# Elasticsearch) is what makes an index joinable — the same mechanism, and the
+# same ES|QL `LOOKUP JOIN` GA (>= 9.0), the car-detections contract already uses.
+#
+# ONE LOOKUP ROW PER (edge, endpoint). For each edge S --relationship--> T two
+# rows are emitted: one keyed on S's guid (direction `out`, related = T) and one
+# keyed on T's guid (direction `in`, related = S) — so a join from EITHER
+# endpoint finds the edge. This is NOT a straight column -> field projection like
+# relationships.yml: the per-endpoint fan-out, the direction, the conditional
+# process.entity_id key and the inferred-endpoint flag are the TRANSFORM, which
+# lives in byakugan/elastic/projection.py (`project_relationship_lookup`) — the
+# mapping is data, the transform is code (docs/design/schema-layers.md). This file
+# declares the OUTPUT shape (the lookup index's mappings, its join keys, its
+# deterministic _id) — the single source the renderer and the projector agree on,
+# which tests/test_projection_rel_lookup.py binds them to.
+#
+# Source: a car_relationships.jsonl row (byakugan/superset.py REL_COLUMNS — the
+# same rows relationships.yml projects). No new CAR data, no new source column.
+
+object: rel_lookup
+index: car-relationships              # the lookup index base name; the per-namespace index is
+                                      # car-relationships-<namespace> (the loader's --namespace, as
+                                      # with every logs-car.<object>-<namespace> data stream)
+index_pattern: car-relationships-*    # the index template's index_patterns
+priority: 500                         # above the built-in logs-*-* template, as car-detections is
+
+# index.mode: lookup is what makes the index joinable in ES|QL LOOKUP JOIN
+# (single shard, enforced by Elasticsearch — car-detections.index-template.json
+# carries the same two settings). Not a data stream: a lookup index is a plain
+# index, created on first write from this template; the loader bulk-`create`s
+# into it with the deterministic _id below, so a re-load is idempotent (409s
+# tolerated) exactly as the data streams are.
+settings:
+  index.mode: lookup
+  index.number_of_replicas: 0
+
+# The fields LOOKUP JOIN matches on — the SAME name must exist on both sides, so
+# these are the object rows' own ECS key names (the CAR->ECS projection owned by
+# conventions.yml decides them; this file only depends on them):
+#   event.id         — every CAR object row carries its guid here. The default
+#                      join: FROM logs-car.*-<ns> | LOOKUP JOIN car-relationships-<ns> ON event.id.
+#   process.entity_id — a process row carries its guid here too, AND rows owned by
+#                      that process (file/module/thread/... via owning_guid) carry
+#                      it under the same name — so joining ON process.entity_id
+#                      cascades a process endpoint's relationships onto the
+#                      process AND its children in one pass (the car-detections
+#                      cascade, applied to the graph). The projector sets
+#                      process.entity_id only when the LOCAL endpoint is a process.
+join_keys:
+  - event.id
+  - process.entity_id
+
+document_id:
+  recipe: sha1(local_guid | direction | relationship | related_guid | timestamp | class | identity_key)
+  note: >-
+    the local endpoint's guid + the direction + the edge's own discriminators, so the two rows one
+    edge fans out to never collide and a re-load is idempotent. local_guid / related_guid / direction
+    are the per-endpoint synthetics (source_guid|target_guid and out|in — see `synthetics`);
+    relationship / timestamp / class / identity_key are the edge's own car_relationships.jsonl columns
+    — the SAME discriminators relationships.yml's own document_id hashes, so a null component renders
+    as an empty string (joiner positions fixed) and timestamp is the RAW verbatim string
+    (car.related.timestamp), never the normalised one, for the same id-reproducibility reason.
+
+# The per-endpoint values the projector derives that are NOT car_relationships.jsonl
+# columns — named so validate.py accepts them as legitimate document_id components:
+#   local_guid   — the endpoint this row keys on (source_guid on the `out` row, target_guid on `in`)
+#   related_guid — the OTHER endpoint (target_guid on `out`, source_guid on `in`)
+#   direction    — out | in
+synthetics: [local_guid, related_guid, direction]
+
+# The lookup index mappings (dynamic: strict — every path a row can carry is
+# declared here, nothing else; the projector emits exactly these). `from:` records
+# which car_relationships.jsonl column (or synthetic) supplies each field, as prose
+# — the fan-out/direction logic itself is code (project_relationship_lookup).
+fields:
+  - path: event.id
+    type: keyword
+    from: local_guid
+    note: the local endpoint's guid — the primary join key (source_guid on the out row, target_guid on the in row).
+  - path: process.entity_id
+    type: keyword
+    from: local_guid
+    note: >-
+      the cascade join key — the local endpoint's guid, set ONLY when the local endpoint object is a
+      process (car-detections parity: a process-keyed lookup row then also stamps the process's owned
+      children, which carry owning_guid as process.entity_id).
+  - path: car.related.relationship
+    type: keyword
+    from: relationship
+    note: the ATT&CK-vocabulary edge verb (created, loaded, accessed, executed ...), verbatim from the edge.
+  - path: car.related.direction
+    type: keyword
+    from: direction
+    note: >-
+      out — the joined object is this edge's SOURCE (related is the target); in — the joined object is
+      this edge's TARGET (related is the source). The one synthetic a reader filters on to pick a direction.
+  - path: car.related.object
+    type: keyword
+    from: target_object|source_object
+    note: the CAR object at the OTHER end (target_object on the out row, source_object on the in row).
+  - path: car.related.guid
+    type: keyword
+    from: target_guid|source_guid
+    note: >-
+      the OTHER endpoint's guid — the pivot onward: its own logs-car.<car.related.object>-<ns> row, or
+      (car.related.inferred true) logs-car.inferred-<ns>. Absent when that endpoint carries no guid.
+  - path: car.related.endpoint_object
+    type: keyword
+    from: source_object|target_object
+    note: >-
+      the CAR object this row KEYS ON (source_object on the out row, target_object on the in row) —
+      so a car-detections-style ON process.entity_id cascade stays interpretable: it tells you the
+      stamp belongs to the owning process endpoint, not to the child row it landed on.
+  - path: car.related.class
+    type: keyword
+    from: class
+    note: declared | derived — the edge's provenance tier (byakugan.superset DECLARED/DERIVED), verbatim.
+  - path: car.related.confidence
+    type: keyword
+    from: confidence
+    note: the edge's confidence word (definitive / heuristic / a derive rule's own word), verbatim.
+  - path: car.related.method
+    type: keyword
+    from: method
+    note: how the edge was established (native_guid, pid_window, luid, image_path, a derived-rule identity), verbatim.
+  - path: car.related.identity_key
+    type: keyword
+    from: identity_key
+    note: the shared-identity field a DERIVED edge converged on; null on a DECLARED edge. A document_id discriminator.
+  - path: car.related.inferred
+    type: boolean
+    from: inferred_end
+    note: >-
+      true when the OTHER endpoint is an inferred_node rather than an observed row (inferred_end names
+      THIS edge's inferred end; the projector sets inferred: true when that end is the related one) —
+      the hint to resolve car.related.guid against logs-car.inferred-<ns>.
+  - path: car.related.timestamp
+    type: keyword
+    from: timestamp
+    note: >-
+      the edge's own observed time, kept verbatim (the string the _id hashes). Deliberately NOT
+      @timestamp: a lookup row must not carry @timestamp, or LOOKUP JOIN would OVERWRITE the joined
+      object's own @timestamp (lookup fields replace same-named source fields) and break the timeline.
+
+# A reader's first query — the native join, the object-to-its-relationships pivot
+# this whole file exists to enable (mirrors rules/car-detections/join-keys.yml's
+# own example_query).
+example_query: |
+  FROM logs-car.*-default METADATA _id, _index
+  | LOOKUP JOIN car-relationships-default ON event.id
+  | WHERE car.related.guid IS NOT NULL
+  | KEEP @timestamp, event.id, car.object, car.related.direction, car.related.relationship,
+         car.related.object, car.related.guid, car.related.class, car.related.confidence
+  | SORT @timestamp ASC
+  | LIMIT 1000
+
+requires:
+  elasticsearch: ">=9.0 (LOOKUP JOIN GA; technical preview in 8.18)"
+  licence: basic

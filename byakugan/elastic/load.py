@@ -23,8 +23,10 @@ Two modes, selected by `--es-url` (empty = bundle, the default — no network
 is ever opened without it; the explicit default-off opt-in the container
 framework's `network: optional` requires):
 
-  bundle  render `<out>/elastic/logs-car.<stream>-<ns>.ndjson` (one file per
-          data stream actually populated — 13 CAR objects + rel + inferred + content,
+  bundle  render `<out>/elastic/<stream>.ndjson` (one file per populated target —
+          the 13 CAR-object data streams + rel + inferred + content, PLUS the
+          car-relationships-<ns> LOOKUP index — model/projection/rel_lookup.yml,
+          a native-Elastic join layer in ADDITION to logs-car.rel-*,
           Elasticsearch `_bulk` NDJSON: a `{"create": {"_id": ...}}` line then
           the document, compact + sorted-key JSON for byte-determinism) plus
           `elastic/manifest.json` (contract version, namespace, per-stream
@@ -34,8 +36,8 @@ framework's `network: optional` requires):
           `<es>/<stream>/_bulk` in chunks, treats 409 (version_conflict) as
           already-present, and verifies per-stream document counts with an
           `_search` ids query. `--setup` additionally PUTs the rendered
-          component/index templates (the repo-root elastic/templates/) before
-          loading, and — with `--kibana-url` — creates the Byakugan Kibana
+          component/index/lookup templates (the repo-root elastic/templates/)
+          before loading, and — with `--kibana-url` — creates the Byakugan Kibana
           space and imports its saved objects (elastic/dashboards/byakugan/).
 
 Discovery mirrors byakugan/timeline.py's `_find_stores`, keyed on the JSONL
@@ -123,11 +125,22 @@ def jsonschema_first_error(validator, row) -> str | None:
 
 def _consume(path: str, source_key: str, project, namespace: str, streams: dict,
             stats: dict, skip_reasons: dict, failures: list,
-            nonconforming: dict) -> None:
+            nonconforming: dict, derived: bool = False) -> None:
+    """Project every row of `path` into `streams`. `project` returns `None`/`[]`
+    (a normal skip — SKIP_NO_TIMESTAMP), a single `(stream, doc_id, doc)`, or a
+    LIST of them (project_relationship_lookup fans one edge out to up to two
+    car-relationships rows).
+
+    `derived=True` marks a DERIVED re-read of rows a primary pass already consumed
+    (the lookup pass over car_relationships.jsonl, which the edge-stream pass
+    already validated, skip-tallied and failure-tallied): its extra documents and
+    records still count, but validation / no-timestamp skips / parse failures are
+    NOT re-tallied — the primary pass owns those for this file, so a timeless or
+    malformed edge is not counted twice."""
     if not os.path.isfile(path):
         return
     basename = os.path.basename(path)
-    validator = _row_validators()[_ROW_KINDS.get(basename, "event")]
+    validator = None if derived else _row_validators()[_ROW_KINDS.get(basename, "event")]
     with open(path, encoding="utf-8", errors="replace") as fh:
         for lineno, line in enumerate(fh, 1):
             line = line.strip()
@@ -135,27 +148,31 @@ def _consume(path: str, source_key: str, project, namespace: str, streams: dict,
                 continue
             try:
                 row = json.loads(line)
-                err = jsonschema_first_error(validator, row)
-                if err is not None:
-                    # count-and-carry: tallied, never blocking — the row
-                    # still loads exactly as before the gate existed
-                    stats["nonconforming"] = stats.get("nonconforming", 0) + 1
-                    key = f"{basename}: {err}"
-                    nonconforming[key] = nonconforming.get(key, 0) + 1
+                if validator is not None:
+                    err = jsonschema_first_error(validator, row)
+                    if err is not None:
+                        # count-and-carry: tallied, never blocking — the row
+                        # still loads exactly as before the gate existed
+                        stats["nonconforming"] = stats.get("nonconforming", 0) + 1
+                        key = f"{basename}: {err}"
+                        nonconforming[key] = nonconforming.get(key, 0) + 1
                 result = project(row, namespace)
             except Exception as e:                                  # noqa: BLE001 — one bad row never aborts the load
-                stats["failed"] += 1
-                failures.append({"source": source_key, "file": basename, "line": lineno,
-                                 "error": str(e)})
+                if not derived:
+                    stats["failed"] += 1
+                    failures.append({"source": source_key, "file": basename, "line": lineno,
+                                     "error": str(e)})
                 continue
-            if result is None:
-                stats["skipped"] += 1
-                skip_reasons[projection.SKIP_NO_TIMESTAMP] = skip_reasons.get(
-                    projection.SKIP_NO_TIMESTAMP, 0) + 1
+            if not result:                                          # None or [] — nothing to load
+                if not derived:
+                    stats["skipped"] += 1
+                    skip_reasons[projection.SKIP_NO_TIMESTAMP] = skip_reasons.get(
+                        projection.SKIP_NO_TIMESTAMP, 0) + 1
                 continue
-            stream, doc_id, doc = result
-            streams.setdefault(stream, []).append((doc_id, doc))
-            stats["records"] += 1
+            items = [result] if isinstance(result, tuple) else result
+            for stream, doc_id, doc in items:
+                streams.setdefault(stream, []).append((doc_id, doc))
+            stats["records"] += len(items)
 
 
 def project_tree(car_dir: str, sources: list[str], namespace: str) -> dict:
@@ -182,6 +199,14 @@ def project_tree(car_dir: str, sources: list[str], namespace: str) -> dict:
                  projection.project_inferred, namespace, streams, stats, skip_reasons, failures, nonconforming)
         _consume(os.path.join(source, "car_content.jsonl"), key,
                  projection.project_content, namespace, streams, stats, skip_reasons, failures, nonconforming)
+        # the car-relationships-<ns> LOOKUP index: a DERIVED second pass over the
+        # SAME car_relationships.jsonl the edge stream above consumed (one edge ->
+        # up to two per-endpoint lookup rows), so the already-validated,
+        # already-skip-tallied edges are not re-tallied (derived=True). See
+        # projection.project_relationship_lookup / model/projection/rel_lookup.yml.
+        _consume(os.path.join(source, "car_relationships.jsonl"), key,
+                 projection.project_relationship_lookup, namespace, streams, stats,
+                 skip_reasons, failures, nonconforming, derived=True)
         per_source[key] = stats
     return {"streams": streams, "per_source": per_source, "skip_reasons": skip_reasons,
             "nonconforming": nonconforming,
@@ -372,10 +397,10 @@ def push_all(es_url: str, streams: dict, headers: dict, context: ssl.SSLContext 
 
 # --------------------------------------------------------------------------- #
 # Setup: the rendered elastic/ config tree (model/projection/render_elastic.py)
-# — templates/component + templates/index PUT in that order, then the Kibana
-# spaces: every dashboards/<id>/space.json created (or updated when a field
-# differs) and that directory's *.ndjson imported into it as ONE payload,
-# the same walk DX_DFIR's dxdfir_stack role does over its own tree.
+# — templates/component + templates/index + templates/lookup PUT in that order,
+# then the Kibana spaces: every dashboards/<id>/space.json created (or updated
+# when a field differs) and that directory's *.ndjson imported into it as ONE
+# payload, the same walk DX_DFIR's dxdfir_stack role does over its own tree.
 # --------------------------------------------------------------------------- #
 TEMPLATES_DIR = os.path.join(projection.ELASTIC_DIR, "templates")
 DASHBOARDS_DIR = os.path.join(projection.ELASTIC_DIR, "dashboards")
@@ -521,15 +546,21 @@ def run_kibana_setup(kibana_url: str, headers: dict, context: ssl.SSLContext | N
 
 def run_setup(es_url: str, headers: dict, context: ssl.SSLContext | None,
              kibana_url: str | None) -> dict:
-    """PUT every rendered component template then index template
-    (elastic/templates/{component,index}/), skipping any already applied
+    """PUT every rendered component template, then index template, then lookup
+    index template (elastic/templates/{component,index,lookup}/ — the last is
+    car-relationships, index.mode=lookup), skipping any already applied
     unchanged; with `kibana_url`, also the Kibana spaces and their saved
     objects (elastic/dashboards/) — see run_kibana_setup."""
     applied: list[str] = []
     unchanged: list[str] = []
     errors: list[str] = []
+    # component first (the index templates compose them), then the data-stream
+    # index templates, then the standalone lookup index template(s)
+    # (templates/lookup/ — car-relationships, index.mode=lookup — PUT as an
+    # ordinary _index_template; it composes nothing, so its order is free).
     for kind, prefix in (("component", "_component_template"),
-                         ("index", "_index_template")):
+                         ("index", "_index_template"),
+                         ("lookup", "_index_template")):
         for path in sorted(glob.glob(os.path.join(TEMPLATES_DIR, kind, "*.json"))):
             name = os.path.splitext(os.path.basename(path))[0]
             with open(path, encoding="utf-8") as fh:

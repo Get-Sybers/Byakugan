@@ -11,7 +11,7 @@ aliases, a real least-privilege identity, a real re-push — which only CI
 Elasticsearch + Kibana started with plain `docker run`, no compose file or
 stack of this repo's own) can run, since this sandbox has no Docker daemon.
 
-Five steps, run in order against one namespace:
+Six steps, run in order against one namespace:
 
   A. Materialise a small, honest CAR tree — 2 sources, run through the ACTUAL
      engine surfaces (`byakugan.store.CarStore`, `byakugan.superset.build_from_events`,
@@ -27,10 +27,16 @@ Five steps, run in order against one namespace:
      `process.command_line` — see `model/projection/render_elastic.py`)
      finds the one process row seeded with it; a `logs-car.rel-*` document
      carries `car.rel.relationship`.
+  C2. The native relationship JOIN, live: `FROM logs-car.process-<ns> | LOOKUP
+     JOIN car-relationships-<ns> ON event.id` stamps process rows with their
+     edges (car.related.*) — the layer the car-relationships lookup index
+     (model/projection/rel_lookup.yml) adds ON TOP of the logs-car.rel-* edge
+     stream and `byakugan timeline`, never replacing them.
   D. Re-push the SAME tree, `--force`, authenticated as `byakugan_loader`
      (role `logs_car_writer`: create_doc/create_index/read/view_index_metadata
-     on `logs-car.*` only — no template/cluster privileges; the workflow
-     creates both with the same two calls DX_DFIR's stack deploy makes) —
+     on `logs-car.*` and `car-relationships-*` only — no template/cluster
+     privileges; the workflow creates both with the same two calls DX_DFIR's
+     stack deploy makes) —
      proves both idempotency (100% already_present against a live cluster)
      and that this identity's narrower grant is sufficient for the
      steady-state path.
@@ -225,6 +231,15 @@ def _search(args, stream: str, body: dict, user: str, password: str):
     return load.http_json(url, "POST", json.dumps(body, separators=(",", ":")), headers, load.ssl_context(None))
 
 
+def _query(args, esql: str, user: str, password: str):
+    """POST _query (ES|QL) — the LOOKUP JOIN surface step C2 proves. Returns the
+    parsed `{columns, values}` response."""
+    headers = {**load.auth_headers("", user, password), "Content-Type": "application/json"}
+    url = f"{args.es_url.rstrip('/')}/_query"
+    return load.http_json(url, "POST", json.dumps({"query": esql}, separators=(",", ":")),
+                         headers, load.ssl_context(None))
+
+
 # --------------------------------------------------------------------------- #
 # Step B: first load, push mode, as the elastic superuser.
 # --------------------------------------------------------------------------- #
@@ -239,8 +254,12 @@ def step_b_first_load(args, car_dir: str, out_dir: str) -> dict:
 
     # "rel" = the relationship timeline; "content" = the attribution layer
     # (the seeded hashes mint content nodes — global by content key — so
-    # car_content.jsonl populates logs-car.content-* since the D5 stream landed)
+    # car_content.jsonl populates logs-car.content-* since the D5 stream landed).
+    # car-relationships-<ns> = the relationship LOOKUP index (NOT a logs-car.*
+    # data stream): the native-Elastic join layer the edges also fan out to
+    # (model/projection/rel_lookup.yml) — in addition to logs-car.rel-*.
     expected_streams = {f"logs-car.{o}-{args.namespace}" for o in (*STREAM_OBJECTS, "rel", "content")}
+    expected_streams.add(f"car-relationships-{args.namespace}")
     got_streams = set(summary["streams"])
     _check(got_streams == expected_streams,
           f"step B: populated streams {sorted(got_streams)} != expected {sorted(expected_streams)}")
@@ -316,6 +335,46 @@ def step_c_alias_and_field_proof(args, info: dict) -> None:
     event_id = (hit_source.get("event") or {}).get("id")
     _proof(f"step C OK: car.process.command_line={seeded!r} -> 1 hit (event.id={event_id}); "
           f"{rel_stream} doc car.rel.relationship={rel_value!r} present")
+
+
+# --------------------------------------------------------------------------- #
+# Step C2: the native-Elastic relationship join, live — the one claim the
+# car-relationships LOOKUP index exists to make (model/projection/rel_lookup.yml).
+# --------------------------------------------------------------------------- #
+def step_c2_lookup_join_proof(args) -> None:
+    """ES|QL `FROM logs-car.process-<ns> | LOOKUP JOIN car-relationships-<ns> ON
+    event.id` stamps each process row with its relationships inline. Asserts the
+    join resolves at least one edge (car.related.*), proving the lookup index is
+    in lookup mode and joinable — the native layer, in ADDITION to the
+    logs-car.rel-* edge stream step C just proved and to `byakugan timeline`."""
+    _proof("step C2: native LOOKUP JOIN proof (logs-car.process-* -> car-relationships-*)")
+    ns = args.namespace
+    esql = (f"FROM logs-car.process-{ns} "
+            f"| LOOKUP JOIN car-relationships-{ns} ON event.id "
+            f"| WHERE car.related.guid IS NOT NULL "
+            f"| KEEP event.id, car.related.direction, car.related.relationship, "
+            f"car.related.object, car.related.guid "
+            f"| LIMIT 50")
+    status, parsed, raw = _query(args, esql, args.es_user, args.es_password)
+    _check(status == 200 and isinstance(parsed, dict) and "values" in parsed,
+          f"step C2: POST _query LOOKUP JOIN: HTTP {status}, body={raw[:300]!r}")
+    cols = [c.get("name") for c in parsed.get("columns") or []]
+    values = parsed.get("values") or []
+    _check(bool(values),
+          f"step C2: LOOKUP JOIN returned 0 rows — no process row resolved a relationship "
+          f"(columns={cols}); the car-relationships-{ns} join did not stamp anything")
+    # every returned row must carry a related guid + verb (the WHERE guarantees the
+    # guid; assert the stamp is whole, not a null-padded join artefact)
+    rel_i = cols.index("car.related.relationship") if "car.related.relationship" in cols else None
+    guid_i = cols.index("car.related.guid") if "car.related.guid" in cols else None
+    _check(rel_i is not None and guid_i is not None,
+          f"step C2: LOOKUP JOIN result is missing car.related.* columns: {cols}")
+    stamped = [row for row in values if row[guid_i] and row[rel_i]]
+    _check(bool(stamped),
+          f"step C2: no joined row carried both car.related.guid and car.related.relationship "
+          f"(columns={cols}, first row={values[0] if values else None})")
+    _proof(f"step C2 OK: LOOKUP JOIN ON event.id stamped {len(stamped)} process row(s) with their "
+          f"relationships (e.g. {dict(zip(cols, stamped[0]))})")
 
 
 # --------------------------------------------------------------------------- #
@@ -421,6 +480,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         b_summary = step_b_first_load(args, car_dir, out_dir)
         step_c_alias_and_field_proof(args, info)
+        step_c2_lookup_join_proof(args)
         d_summary = step_d_idempotent_least_priv(args, car_dir, out_dir)
         step_e_timeline_bytecompare(args, car_dir, work_dir)
     except (OSError, RuntimeError) as e:
@@ -435,6 +495,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"  streams:                 {', '.join(sorted(b_summary['streams']))}")
     print(f"  documents (1st load):    {total_docs} created, as {args.es_user}")
     print(f"  alias hit:               car.process.command_line == {info['seeded_command_line']!r} -> 1")
+    print("  relationship join:       LOOKUP JOIN car-relationships-* ON event.id stamped process rows")
     print(f"  re-push (2nd load):      {already}/{total_docs} already_present, as {args.loader_user} "
          "(least privilege)")
     print("  timeline:                byte-identical, local build vs --elastic")

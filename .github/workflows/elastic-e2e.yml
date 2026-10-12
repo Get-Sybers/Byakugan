@@ -89,11 +89,12 @@ jobs:
           curl -sf -X POST -u "elastic:${ELASTIC_PASSWORD}" -H 'Content-Type: application/json' \
             "${ES_URL}/_security/user/kibana_system/_password" \
             -d "{\"password\":\"${KIBANA_SYSTEM_PASSWORD}\"}"
-          # create_doc/create_index/read/view_index_metadata on logs-car.* only —
+          # create_doc/create_index/read/view_index_metadata on logs-car.* and the
+          # car-relationships-* LOOKUP index (model/projection/rel_lookup.yml) only —
           # evidence immutability at the credential layer (step D authenticates as it)
           curl -sf -X PUT -u "elastic:${ELASTIC_PASSWORD}" -H 'Content-Type: application/json' \
             "${ES_URL}/_security/role/logs_car_writer" \
-            -d '{"indices":[{"names":["logs-car.*"],"privileges":["create_doc","create_index","read","view_index_metadata"]}]}'
+            -d '{"indices":[{"names":["logs-car.*","car-relationships-*"],"privileges":["create_doc","create_index","read","view_index_metadata"]}]}'
           curl -sf -X PUT -u "elastic:${ELASTIC_PASSWORD}" -H 'Content-Type: application/json' \
             "${ES_URL}/_security/user/byakugan_loader" \
             -d "{\"password\":\"${BYAKUGAN_LOADER_PASSWORD}\",\"roles\":[\"logs_car_writer\"],\"full_name\":\"byakugan load (CAR to logs-car.*)\"}"
