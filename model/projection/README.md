@@ -30,6 +30,8 @@ model/projection/
 ├── relationships.yml              relationship-timeline row (REL_COLUMNS) -> logs-car.rel-* (the edge timeline)
 ├── inferred.yml                   inferred-node row (INFERRED_COLUMNS) -> logs-car.inferred-*
 ├── content.yml                    content-node row (CONTENT_COLUMNS) -> logs-car.content-*
+├── rel_lookup.yml                 the car-relationships LOOKUP index (one row per edge-endpoint) — a
+│                                  NATIVE-Elastic ES|QL LOOKUP JOIN layer over relationships.yml's edges
 ├── ecs_types.yml                  mapping-type overrides (date/long/ip/float/boolean) for the
 │                                  non-keyword `ecs:`/`also:`/`derived:` targets objects/*.yml uses
 ├── validate.py                    the drift check (pyyaml only) — exit 1 on any problem
@@ -39,6 +41,7 @@ model/projection/
 elastic/                           GENERATED, committed (see elastic/README.md)
 ├── templates/component/           logs-car@header, logs-car@<object> (13), @rel, @inferred, @content
 ├── templates/index/               logs-car-<object> (13), -rel, -inferred, -content
+├── templates/lookup/              car-relationships (index.mode: lookup; the ES|QL LOOKUP JOIN layer)
 └── dashboards/byakugan/           the Byakugan Kibana space: space.json + its saved objects
 ```
 
@@ -123,7 +126,7 @@ a bad mapping is worse than an honest `native`.
 
 ```sh
 python model/projection/validate.py      # exit 1 + a problem list on drift; one-line summary on success
-pytest -q tests/test_projection_contract.py tests/test_projection_rel_drift.py   # the same, as tests
+pytest -q tests/test_projection_contract.py tests/test_projection_rel_drift.py tests/test_projection_rel_lookup.py   # the same, as tests
 ```
 
 `validate.py` asserts: every CAR object has a file and there is no orphan
@@ -139,7 +142,12 @@ column lists (no dup, no unknown key), every entry's `type:` (or an
 columns, and `constants:` carries the data_stream identity — and it checks
 `ecs_types.yml` itself: every path is ECS- or `car.*`-shaped, and every
 non-keyword override is actually used somewhere in the contract (no dead
-overrides).
+overrides). It also checks `rel_lookup.yml` (the car-relationships LOOKUP-index
+projection): `index.mode: lookup`, join keys that are ECS-shaped and mapped,
+each field a `path` + `type`, and a `document_id.recipe` over `REL_COLUMNS` plus
+its declared synthetics — while `tests/test_projection_rel_lookup.py` binds the
+projector's emitted paths to that declared `fields:` set (a `dynamic: strict`
+index would reject any drift).
 
 ## Rendered assets
 
@@ -171,6 +179,17 @@ such a tree verbatim:
   component, logs-car@custom]`, with `ignore_missing_component_templates` so
   the template applies before DX_DFIR creates its own `@custom`
   customization component.
+- `elastic/templates/lookup/car-relationships.json` — the relationship LOOKUP
+  index (`rel_lookup.yml`): NOT a composed data-stream template but a single
+  self-contained index template (`index.mode: lookup`, `dynamic: strict`,
+  `index_patterns: car-relationships-*`), in the shape
+  [`rules/car-detections`](../../rules/car-detections/car-detections.index-template.json)
+  uses, so ES|QL `LOOKUP JOIN car-relationships-<ns> ON event.id` stamps each
+  CAR object with its relationships (`car.related.*`) inline — a native join
+  layer ON TOP of the `logs-car.rel-*` edge stream and `byakugan timeline`,
+  never replacing them. The loader derives its rows from the same
+  `car_relationships.jsonl` (one edge → up to two per-endpoint rows;
+  `byakugan.elastic.projection.project_relationship_lookup`).
 - `elastic/dashboards/byakugan/` — the **Byakugan Kibana space**:
   `space.json` (id `byakugan`, steel blue, as Kibana's spaces API takes it),
   `00-data-views.ndjson` (the `logs-car.*` data view) and

@@ -12,9 +12,12 @@ elastic/
 │   ├── component/             # component templates, one logs-car@<model> each:
 │   │                          #   logs-car@header (the common header every stream composes first),
 │   │                          #   logs-car@<object> (13), logs-car@rel, logs-car@inferred, logs-car@content
-│   └── index/                 # one index template per data stream (logs-car-<object> ×13, -rel, -inferred, -content):
-│                              #   index_patterns logs-car.<stream>-*, data_stream: {}, priority 500,
-│                              #   composed_of [logs-car@header, logs-car@<stream>, logs-car@custom]
+│   ├── index/                 # one index template per data stream (logs-car-<object> ×13, -rel, -inferred, -content):
+│   │                          #   index_patterns logs-car.<stream>-*, data_stream: {}, priority 500,
+│   │                          #   composed_of [logs-car@header, logs-car@<stream>, logs-car@custom]
+│   └── lookup/                # the relationship LOOKUP index template (NOT a data stream):
+│                              #   car-relationships (index.mode: lookup, dynamic: strict, priority 500,
+│                              #   index_patterns car-relationships-*) — the ES|QL LOOKUP JOIN layer
 └── dashboards/
     └── byakugan/              # the Byakugan Kibana SPACE: space.json + its saved objects
         ├── space.json         #   id byakugan, name Byakugan, initials By, steel blue (#4682B4), every feature enabled
@@ -34,6 +37,47 @@ There are no ingest pipelines: the CAR → ECS projection happens engine-side
 (`byakugan.elastic.projection`), so a `logs-car.*` document arrives already
 shaped. There is no Filebeat config: `byakugan load` is the only writer.
 
+## The relationship lookup join (`car-relationships-<namespace>`)
+
+The relationships Byakugan derives reach Elastic two ways, and the second is
+**in addition to** the first — neither replaces the flat CAR timeline
+`dx byakugan export-timeline` (`byakugan timeline`) writes:
+
+- **`logs-car.rel-<namespace>`** — the relationship *timeline* stream
+  (`relationships.yml`): one flat `source →verb→ target` edge document per
+  edge, interleaved with the object events on the `@timestamp` axis. What the
+  export-timeline union reads.
+- **`car-relationships-<namespace>`** — a native-Elastic **lookup index**
+  (`templates/lookup/car-relationships.json`, rendered from
+  [`model/projection/rel_lookup.yml`](../model/projection/README.md)): one row
+  per **(edge, endpoint)**, so an object can be resolved to its relationships
+  *inline, at query time* — the one thing a flat edge stream cannot do itself.
+  `index.mode: lookup` (single shard, enforced by Elasticsearch) is what makes
+  it joinable, exactly as [`rules/car-detections`](../rules/car-detections/join-keys.yml)
+  stamps detection hits onto evidence lines:
+
+  ```esql
+  FROM logs-car.*-<namespace>
+  | LOOKUP JOIN car-relationships-<namespace> ON event.id
+  | WHERE car.related.guid IS NOT NULL
+  | KEEP @timestamp, event.id, car.object, car.related.direction,
+         car.related.relationship, car.related.object, car.related.guid
+  | SORT @timestamp ASC
+  ```
+
+  Each matched object row comes back stamped with `car.related.*` — the related
+  guid, the verb, the `direction` (`out`/`in`), and the edge's provenance
+  (`class`/`confidence`/`method`). Join on `event.id` for an object's own edges,
+  or on `process.entity_id` to cascade a process's edges onto the files, modules
+  and threads it owns (the car-detections cascade key). The index carries no
+  `@timestamp` (a lookup row's would overwrite the joined object's own through
+  `LOOKUP JOIN`); the edge's observed time is kept verbatim at
+  `car.related.timestamp`. Requires `LOOKUP JOIN` (GA since Elasticsearch 9.0).
+
+`byakugan load` populates it from the same `car_relationships.jsonl` the edge
+stream reads (deterministic `_id`, 409-tolerant, like every other stream), and
+`--setup` PUTs its template alongside the component/index templates.
+
 ## How it is deployed
 
 `byakugan load` reads this tree out of the engine's own checkout — or, in the
@@ -42,7 +86,8 @@ builds from this repository, out of the baked `/opt/byakugan/elastic/` — and
 applies it on a push-mode run with `--setup` (`BYAKUGAN_LOAD_SETUP=1`):
 
 1. every `templates/component/*.json` is PUT as `_component_template/<name>`,
-   then every `templates/index/*.json` as `_index_template/<name>` — each GET
+   then every `templates/index/*.json` and `templates/lookup/*.json` (the
+   `car-relationships` lookup index) as `_index_template/<name>` — each GET
    first and left alone when the stored body already matches, so a re-setup
    is a no-op;
 2. with a Kibana URL (`--kibana-url` / `BYAKUGAN_LOAD_KIBANA_URL`): the

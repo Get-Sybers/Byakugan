@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "contract": "car-ecs-projection",
+    "description": "Byakugan car-relationships lookup index: one row per (edge, endpoint) over the same declared+derived edges logs-car.rel-* holds. ES|QL `LOOKUP JOIN car-relationships-<namespace> ON event.id` stamps each CAR object row with its relationships (car.related.*) inline \u2014 the tagged-evidence-line model (rules/car-detections) applied to the CAR graph. index.mode=lookup is what makes it joinable (single shard, enforced by Elasticsearch). IN ADDITION to logs-car.rel-* and `byakugan timeline`, never replacing them. See rel_lookup.yml.",
+    "document_id": "sha1(local_guid | direction | relationship | related_guid | timestamp | class | identity_key)",
+    "generated_by": "python model/projection/render_elastic.py",
+    "join_keys": [
+      "event.id",
+      "process.entity_id"
+    ],
+    "recompute_on": "any projection change (conventions.yml, objects/*.yml, ecs_types.yml, relationships.yml, inferred.yml)",
+    "source": [
+      "model/projection/conventions.yml",
+      "model/projection/rel_lookup.yml"
+    ],
+    "version": 3
+  },
+  "index_patterns": [
+    "car-relationships-*"
+  ],
+  "priority": 500,
+  "template": {
+    "mappings": {
+      "dynamic": "strict",
+      "properties": {
+        "car": {
+          "properties": {
+            "related": {
+              "properties": {
+                "class": {
+                  "type": "keyword"
+                },
+                "confidence": {
+                  "type": "keyword"
+                },
+                "direction": {
+                  "type": "keyword"
+                },
+                "endpoint_object": {
+                  "type": "keyword"
+                },
+                "guid": {
+                  "type": "keyword"
+                },
+                "identity_key": {
+                  "type": "keyword"
+                },
+                "inferred": {
+                  "type": "boolean"
+                },
+                "method": {
+                  "type": "keyword"
+                },
+                "object": {
+                  "type": "keyword"
+                },
+                "relationship": {
+                  "type": "keyword"
+                },
+                "timestamp": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "event": {
+          "properties": {
+            "id": {
+              "type": "keyword"
+            }
+          }
+        },
+        "process": {
+          "properties": {
+            "entity_id": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "settings": {
+      "index.mode": "lookup",
+      "index.number_of_replicas": 0
+    }
+  }
+}

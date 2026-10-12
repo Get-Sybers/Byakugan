@@ -17,6 +17,9 @@ the same configuration-as-data shape DX_DFIR's own elastic/ tree uses
       templates/index/logs-car-rel.json
       templates/index/logs-car-inferred.json
       templates/index/logs-car-content.json
+      templates/lookup/car-relationships.json         the relationship LOOKUP index (index.mode=lookup;
+                                                      ES|QL LOOKUP JOIN; rel_lookup.yml) — in addition
+                                                      to logs-car.rel-*, never replacing it
       dashboards/byakugan/space.json                  the Byakugan Kibana SPACE (id byakugan)
       dashboards/byakugan/00-data-views.ndjson        the logs-car.* data view
       dashboards/byakugan/car-timeline.ndjson         the CAR timeline: saved search, Lens histogram, dashboard
@@ -56,6 +59,7 @@ OBJECTS_DIR = os.path.join(HERE, "objects")
 RELATIONSHIPS_PATH = os.path.join(HERE, "relationships.yml")
 INFERRED_PATH = os.path.join(HERE, "inferred.yml")
 CONTENT_PATH = os.path.join(HERE, "content.yml")
+REL_LOOKUP_PATH = os.path.join(HERE, "rel_lookup.yml")
 ECS_TYPES_PATH = os.path.join(HERE, "ecs_types.yml")
 ELASTIC_DIR = os.path.join(REPO_ROOT, "elastic")
 # the subtrees of elastic/ this renderer OWNS (written, drift-checked, orphans
@@ -310,6 +314,42 @@ def render_index_template(index_pattern: str, component_name: str, extra_sources
 
 
 # --------------------------------------------------------------------------- #
+# The relationship LOOKUP index (rel_lookup.yml) — NOT a data stream and NOT a
+# composed logs-car@<model> template: a single self-contained index template
+# with index.mode=lookup, in the shape rules/car-detections/car-detections.index-
+# template.json uses, so ES|QL `LOOKUP JOIN car-relationships-<ns> ON event.id`
+# can stamp each CAR object with its relationships. The loader's run_setup PUTs
+# it from templates/lookup/ alongside the component/index templates.
+# --------------------------------------------------------------------------- #
+def render_rel_lookup(doc: dict, contract: dict) -> dict:
+    """rel_lookup.yml -> the car-relationships lookup index template. The mapping
+    is `dynamic: strict` (every field a lookup row can carry is declared in
+    rel_lookup.yml `fields:`; the projector emits exactly those); the join keys
+    and the deterministic _id recipe ride in `_meta` the way car-detections
+    records its own."""
+    props = {e["path"]: {"type": e["type"]} for e in doc.get("fields") or []}
+    meta = _component_meta(contract, ["model/projection/rel_lookup.yml"])
+    meta["description"] = (
+        "Byakugan car-relationships lookup index: one row per (edge, endpoint) over the same "
+        "declared+derived edges logs-car.rel-* holds. ES|QL `LOOKUP JOIN car-relationships-<namespace> "
+        "ON event.id` stamps each CAR object row with its relationships (car.related.*) inline — the "
+        "tagged-evidence-line model (rules/car-detections) applied to the CAR graph. index.mode=lookup "
+        "is what makes it joinable (single shard, enforced by Elasticsearch). IN ADDITION to "
+        "logs-car.rel-* and `byakugan timeline`, never replacing them. See rel_lookup.yml.")
+    meta["join_keys"] = list(doc.get("join_keys") or [])
+    meta["document_id"] = (doc.get("document_id") or {}).get("recipe")
+    return {
+        "index_patterns": [doc["index_pattern"]],
+        "priority": doc.get("priority", 500),
+        "_meta": meta,
+        "template": {
+            "settings": dict(doc.get("settings") or {}),
+            "mappings": {"dynamic": "strict", "properties": _nest(props)},
+        },
+    }
+
+
+# --------------------------------------------------------------------------- #
 # Kibana assets, as ONE SPACE (dashboards/byakugan/): space.json + the data
 # view (00-data-views.ndjson) + the CAR timeline (car-timeline.ndjson: saved
 # search + Lens histogram + the dashboard, the dashboard LAST in its file —
@@ -491,6 +531,7 @@ def render_all() -> tuple[dict[str, str], list[str]]:
     relationships = _load(RELATIONSHIPS_PATH)
     inferred = _load(INFERRED_PATH)
     content = _load(CONTENT_PATH)
+    rel_lookup = _load(REL_LOOKUP_PATH)
     ecs_types = (_load(ECS_TYPES_PATH) or {}).get("types") or {}
 
     files: dict[str, str] = {}
@@ -514,6 +555,9 @@ def render_all() -> tuple[dict[str, str], list[str]]:
             render_edge_component(doc, header_paths, contract, source))
         files[f"templates/index/logs-car-{stream}.json"] = _dump_json(render_index_template(
             f"logs-car.{stream}-*", f"logs-car@{stream}", [source], contract))
+
+    files[f"templates/lookup/{rel_lookup['index']}.json"] = _dump_json(
+        render_rel_lookup(rel_lookup, contract))
 
     files[f"dashboards/{SPACE_ID}/space.json"] = _dump_json(render_space())
     files[f"dashboards/{SPACE_ID}/00-data-views.ndjson"] = render_data_views_ndjson()

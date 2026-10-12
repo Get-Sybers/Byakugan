@@ -32,6 +32,11 @@ overrides) are checked too, on their own terms (validate_edges):
   * `document_id.recipe` names only real source columns; `constants:` carries
     the data_stream identity (event.kind/module/dataset, data_stream.type/
     dataset, ecs.version), consistent with `dataset:`;
+  * rel_lookup.yml (the car-relationships LOOKUP-index projection — a DERIVED
+    view of relationships.yml's edges) declares a coherent output shape:
+    index.mode=lookup, join keys that are ECS-shaped AND mapped, each field a
+    path+type, and a document_id recipe over REL_COLUMNS + its declared
+    synthetics;
   * every ecs_types.yml path is ECS- or car.*-shaped, and every non-keyword
     override is actually used by some contract file — no dead overrides.
 
@@ -58,6 +63,7 @@ OBJECTS_DIR = os.path.join(HERE, "objects")
 RELATIONSHIPS_PATH = os.path.join(HERE, "relationships.yml")
 INFERRED_PATH = os.path.join(HERE, "inferred.yml")
 CONTENT_PATH = os.path.join(HERE, "content.yml")
+REL_LOOKUP_PATH = os.path.join(HERE, "rel_lookup.yml")
 ECS_TYPES_PATH = os.path.join(HERE, "ecs_types.yml")
 
 # ECS 8.x top-level field sets (+ the base fields). A cheap guard against
@@ -93,6 +99,9 @@ INFERRED_COLUMNS = ["node_id", "source_host", "object", "identity_key", "identit
 CONTENT_COLUMNS = ["node_id", "kind", "identity_key", "identity_value", "ref_count",
                    "properties", "first_seen", "last_seen"]
 EDGE_ENTRY_KEYS = {"car", "ecs", "type", "also", "also_type", "note"}
+# rel_lookup.yml field entries declare an output mapping path + type (+ prose
+# `from:` recording which REL_COLUMN / synthetic supplies it), not a car->ecs map.
+REL_LOOKUP_ENTRY_KEYS = {"path", "type", "from", "note"}
 _RECIPE_SHA1 = re.compile(r"^sha1\((.*)\)$")
 
 
@@ -368,6 +377,83 @@ def _validate_edge(where: str, doc: dict, expected_object: str, expected_stream:
     _validate_edge_fields(where, doc, columns, ecs_types, errors, used_paths)
 
 
+def _validate_rel_lookup(where: str, doc: dict, rel_columns: list[str], errors: list[str]) -> None:
+    """rel_lookup.yml — the car-relationships LOOKUP-index projection. Unlike
+    relationships.yml this is a DERIVED view of the SAME edges (REL_COLUMNS), not
+    a straight column->field map: byakugan.elastic.projection.project_relationship_lookup
+    owns the per-endpoint fan-out (the mapping is data, the transform is code). So
+    this checks the declared OUTPUT shape the renderer and the projector both read
+    — object/index/pattern/priority, index.mode=lookup, the join keys (ECS-shaped
+    AND mapped), every field's path+type, the `from:` provenance, and the
+    document_id recipe (REL_COLUMNS + the declared synthetics). The projector's
+    emitted paths ⊆ this `fields:` set is asserted live by
+    tests/test_projection_rel_lookup.py (dynamic: strict would reject any drift)."""
+    if not isinstance(doc, dict):
+        errors.append(f"{where}: top-level document must be a mapping")
+        return
+    if doc.get("object") != "rel_lookup":
+        errors.append(f"{where}: object: must be 'rel_lookup'")
+    index = doc.get("index")
+    if not isinstance(index, str) or not index:
+        errors.append(f"{where}: index: must be a non-empty string")
+        index = ""
+    if doc.get("index_pattern") != f"{index}-*":
+        errors.append(f"{where}: index_pattern: must be '{index}-*'")
+    if not isinstance(doc.get("priority"), int):
+        errors.append(f"{where}: priority: must be an integer")
+    settings = doc.get("settings")
+    if not isinstance(settings, dict) or settings.get("index.mode") != "lookup":
+        errors.append(f"{where} settings: must set 'index.mode: lookup' (what makes the index LOOKUP-joinable)")
+
+    synthetics = set(doc.get("synthetics") or [])
+    known = set(rel_columns) | synthetics
+    fields = doc.get("fields")
+    paths: set[str] = set()
+    if not isinstance(fields, list) or not fields:
+        errors.append(f"{where} fields: must be a non-empty list of mapping entries")
+        fields = []
+    for i, e in enumerate(fields):
+        if not isinstance(e, dict) or not e.get("path"):
+            errors.append(f"{where} fields[{i}]: entry needs a path:")
+            continue
+        p = str(e["path"])
+        ew = f"{where} fields[{p}]"
+        unknown = sorted(set(e) - REL_LOOKUP_ENTRY_KEYS)
+        if unknown:
+            errors.append(f"{ew}: unknown key(s) {unknown}")
+        _check_path(p, ew, errors, allow_custom=True)
+        if p in paths:
+            errors.append(f"{ew}: duplicate path")
+        paths.add(p)
+        if e.get("type") not in NATIVE_TYPES:
+            errors.append(f"{ew}: needs a type: (one of {sorted(NATIVE_TYPES)})")
+        for tok in str(e.get("from") or "").split("|"):
+            tok = tok.strip()
+            if tok and tok not in known:
+                errors.append(f"{ew}: from: '{tok}' names no car_relationships column or declared synthetic")
+
+    join_keys = doc.get("join_keys")
+    if not isinstance(join_keys, list) or not join_keys:
+        errors.append(f"{where} join_keys: at least one is required (LOOKUP JOIN matches on it)")
+    for k in join_keys or []:
+        _check_path(k, f"{where} join_keys", errors, allow_custom=True)
+        if k not in paths:
+            errors.append(f"{where} join_keys: '{k}' is not one of the declared field paths "
+                          "(a join key must be mapped in the lookup index)")
+
+    dr = doc.get("document_id") or {}
+    recipe = dr.get("recipe")
+    if not isinstance(recipe, str) or not recipe.strip():
+        errors.append(f"{where} document_id: needs a recipe: string")
+    else:
+        for c in _recipe_components(recipe):
+            if c not in known:
+                errors.append(f"{where} document_id.recipe: component '{c}' names no car_relationships "
+                              "column or declared synthetic")
+    if not isinstance(dr.get("note"), str) or not dr["note"].strip():
+        errors.append(f"{where} document_id: needs a note:")
+
+
 def _collect_used_ecs_paths(conventions: dict, objects: dict[str, dict],
                             rel_doc: dict, inferred_doc: dict,
                             content_doc: dict | None = None) -> set[str]:
@@ -421,19 +507,21 @@ def _validate_ecs_types(ecs_types: dict, used_paths: set[str], errors: list[str]
                           "(conventions.yml, objects/*.yml, relationships.yml, inferred.yml) — dead override")
 
 
-def load_edge_docs() -> tuple[dict, dict, dict, dict]:
-    """(relationships.yml doc, inferred.yml doc, content.yml doc,
+def load_edge_docs() -> tuple[dict, dict, dict, dict, dict]:
+    """(relationships.yml, inferred.yml, content.yml, rel_lookup.yml docs,
     ecs_types.yml {path: {type, note}})."""
     ecs_types = (_load(ECS_TYPES_PATH) or {}).get("types") or {}
-    return _load(RELATIONSHIPS_PATH), _load(INFERRED_PATH), _load(CONTENT_PATH), ecs_types
+    return (_load(RELATIONSHIPS_PATH), _load(INFERRED_PATH), _load(CONTENT_PATH),
+            _load(REL_LOOKUP_PATH), ecs_types)
 
 
 def validate_edges(conventions: dict, objects: dict[str, dict], rel_doc: dict,
-                   inferred_doc: dict, content_doc: dict, ecs_types: dict) -> list[str]:
-    """Every relationships.yml / inferred.yml / content.yml / ecs_types.yml problem;
-    [] means in step. Kept separate from validate() (which stays exactly the
-    objects/*.yml <-> CAR-model check it always was) so neither check's signature
-    or behaviour disturbs the other."""
+                   inferred_doc: dict, content_doc: dict, rel_lookup_doc: dict,
+                   ecs_types: dict) -> list[str]:
+    """Every relationships.yml / inferred.yml / content.yml / rel_lookup.yml /
+    ecs_types.yml problem; [] means in step. Kept separate from validate() (which
+    stays exactly the objects/*.yml <-> CAR-model check it always was) so neither
+    check's signature or behaviour disturbs the other."""
     errors: list[str] = []
     used_paths: set[str] = set()
     _validate_edge("relationships.yml", rel_doc, "rel", "logs-car.rel-*", "car.rel",
@@ -442,16 +530,18 @@ def validate_edges(conventions: dict, objects: dict[str, dict], rel_doc: dict,
                   INFERRED_COLUMNS, ecs_types, errors, used_paths)
     _validate_edge("content.yml", content_doc, "content", "logs-car.content-*", "car.content",
                   CONTENT_COLUMNS, ecs_types, errors, used_paths)
+    _validate_rel_lookup("rel_lookup.yml", rel_lookup_doc, REL_COLUMNS, errors)
     used_paths |= _collect_used_ecs_paths(conventions, objects, rel_doc, inferred_doc,
                                           content_doc)
     _validate_ecs_types(ecs_types, used_paths, errors)
     return errors
 
 
-def edge_summary(rel_doc: dict, inferred_doc: dict, content_doc: dict) -> str:
+def edge_summary(rel_doc: dict, inferred_doc: dict, content_doc: dict, rel_lookup_doc: dict) -> str:
     return (f" | rel: {len(rel_doc.get('fields') or [])} fields, "
             f"inferred: {len(inferred_doc.get('fields') or [])} fields, "
-            f"content: {len(content_doc.get('fields') or [])} fields")
+            f"content: {len(content_doc.get('fields') or [])} fields, "
+            f"rel_lookup: {len(rel_lookup_doc.get('fields') or [])} fields")
 
 
 def validate(car: dict[str, dict], conventions: dict, objects: dict[str, dict]) -> list[str]:
@@ -490,15 +580,17 @@ def main() -> int:
         print(f"no CAR objects found under {CAR_OBJECTS_DIR}", file=sys.stderr)
         return 1
     conventions, objects = load_contract()
-    rel_doc, inferred_doc, content_doc, ecs_types = load_edge_docs()
+    rel_doc, inferred_doc, content_doc, rel_lookup_doc, ecs_types = load_edge_docs()
     errors = validate(car, conventions, objects)
-    errors += validate_edges(conventions, objects, rel_doc, inferred_doc, content_doc, ecs_types)
+    errors += validate_edges(conventions, objects, rel_doc, inferred_doc, content_doc,
+                             rel_lookup_doc, ecs_types)
     if errors:
         print(f"car-ecs projection DRIFT: {len(errors)} problem(s)", file=sys.stderr)
         for e in errors:
             print(f"  - {e}", file=sys.stderr)
         return 1
-    print(summary(car, conventions, objects) + edge_summary(rel_doc, inferred_doc, content_doc))
+    print(summary(car, conventions, objects)
+          + edge_summary(rel_doc, inferred_doc, content_doc, rel_lookup_doc))
     return 0
 
 

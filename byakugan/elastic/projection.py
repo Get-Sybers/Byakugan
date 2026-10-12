@@ -96,6 +96,7 @@ OBJECTS_DIR = os.path.join(MODEL_DIR, "objects")
 RELATIONSHIPS_PATH = os.path.join(MODEL_DIR, "relationships.yml")
 INFERRED_PATH = os.path.join(MODEL_DIR, "inferred.yml")
 CONTENT_PATH = os.path.join(MODEL_DIR, "content.yml")
+REL_LOOKUP_PATH = os.path.join(MODEL_DIR, "rel_lookup.yml")
 ECS_TYPES_PATH = os.path.join(MODEL_DIR, "ecs_types.yml")
 
 # The one, always-the-same reason project_event/project_relationship/
@@ -425,6 +426,12 @@ def load_contract() -> dict:
         "relationships": _compile_edge(_yaml(RELATIONSHIPS_PATH)),
         "inferred": _compile_edge(_yaml(INFERRED_PATH)),
         "content": _compile_edge(_yaml(CONTENT_PATH)),
+        # the car-relationships-<ns> lookup index is a DERIVED view of the same
+        # edges relationships.yml projects (project_relationship_lookup owns the
+        # per-endpoint fan-out transform; the mapping is data, the transform is
+        # code). Loaded raw — only `index` is read at runtime; validate.py and
+        # render_elastic.py read the rest of the declared shape.
+        "rel_lookup": _yaml(REL_LOOKUP_PATH),
     }
     return _cache
 
@@ -689,6 +696,74 @@ def project_relationship(row: dict, namespace: str):
         return None
     doc_id = _edge_document_id(plan["document_id"].get("recipe", ""), row)
     return f"logs-car.rel-{namespace}", doc_id, doc
+
+
+def project_relationship_lookup(row: dict, namespace: str) -> list[tuple[str, str, dict]]:
+    """A `car_relationships.jsonl` row -> up to TWO `car-relationships-<namespace>`
+    LOOKUP-index documents (one per endpoint that carries a guid):
+    `[(index, doc_id, doc), ...]`, or `[]` when `row["timestamp"]` does not parse
+    (SKIP_NO_TIMESTAMP — the SAME gate project_relationship uses, so the lookup
+    mirrors exactly the edges the logs-car.rel stream holds).
+
+    The native-Elastic join layer (model/projection/rel_lookup.yml): for an edge
+    source --relationship--> target, the `out` row is keyed on the source's guid
+    (related = target) and the `in` row on the target's guid (related = source),
+    so `LOOKUP JOIN car-relationships-<ns> ON event.id` finds an object's edges
+    from either end. This is the transform rel_lookup.yml declares only in prose
+    (the mapping is data, the fan-out is code — docs/design/schema-layers.md);
+    tests/test_projection_rel_lookup.py binds the two. Deliberately carries NO
+    @timestamp (a lookup row's @timestamp would overwrite the joined object's own
+    through LOOKUP JOIN); the edge's observed time is kept verbatim at
+    car.related.timestamp, the string the deterministic _id hashes."""
+    if parse_ts(row.get("timestamp")) is None:
+        return []
+    index = f"{load_contract()['rel_lookup'].get('index') or 'car-relationships'}-{namespace}"
+    ts = row.get("timestamp")
+    relationship, klass = row.get("relationship"), row.get("class")
+    confidence, method = row.get("confidence"), row.get("method")
+    identity_key, inferred_end = row.get("identity_key"), row.get("inferred_end")
+    src_guid, src_object = row.get("source_guid"), row.get("source_object")
+    tgt_guid, tgt_object = row.get("target_guid"), row.get("target_object")
+
+    # (direction, local guid/object this row keys on, the OTHER endpoint, whether
+    # that other endpoint is the edge's inferred_node end) — one tuple per endpoint.
+    endpoints = (
+        ("out", src_guid, src_object, tgt_guid, tgt_object, inferred_end == "target"),
+        ("in", tgt_guid, tgt_object, src_guid, src_object, inferred_end == "source"),
+    )
+    out: list[tuple[str, str, dict]] = []
+    for direction, local_guid, local_object, related_guid, related_object, related_inferred in endpoints:
+        if _blank(local_guid):
+            continue                                   # no join key -> no lookup row for this endpoint
+        doc: dict = {}
+        _nest_set(doc, "event.id", local_guid)
+        if local_object == "process":                  # the car-detections cascade key (rel_lookup.yml)
+            _nest_set(doc, "process.entity_id", local_guid)
+        if not _blank(relationship):
+            _nest_set(doc, "car.related.relationship", relationship)
+        _nest_set(doc, "car.related.direction", direction)
+        if not _blank(related_object):
+            _nest_set(doc, "car.related.object", related_object)
+        if not _blank(related_guid):
+            _nest_set(doc, "car.related.guid", related_guid)
+        if not _blank(local_object):
+            _nest_set(doc, "car.related.endpoint_object", local_object)
+        if not _blank(klass):
+            _nest_set(doc, "car.related.class", klass)
+        if not _blank(confidence):
+            _nest_set(doc, "car.related.confidence", confidence)
+        if not _blank(method):
+            _nest_set(doc, "car.related.method", method)
+        if not _blank(identity_key):
+            _nest_set(doc, "car.related.identity_key", identity_key)
+        _nest_set(doc, "car.related.inferred", bool(related_inferred))
+        if not _blank(ts):
+            _nest_set(doc, "car.related.timestamp", ts)
+        # the rel_lookup.yml recipe: local_guid | direction | relationship |
+        # related_guid | timestamp | class | identity_key (timestamp verbatim).
+        doc_id = sha1_id(local_guid, direction, relationship, related_guid, ts, klass, identity_key)
+        out.append((index, doc_id, doc))
+    return out
 
 
 def project_inferred(row: dict, namespace: str):

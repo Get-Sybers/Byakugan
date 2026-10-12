@@ -74,10 +74,13 @@ def test_bundle_mode_streams_ids_and_manifest(tmp_path):
 
     assert summary["status"] == "ok" and summary["mode"] == "bundle"
     # process + module + rel + inferred populated (2 sources each); file has
-    # no timestamp anywhere, so logs-car.file-default is never created
+    # no timestamp anywhere, so logs-car.file-default is never created. The rel
+    # edges ALSO fan out to the car-relationships-default LOOKUP index (one bundle,
+    # not a logs-car.* data stream) — model/projection/rel_lookup.yml.
     elastic = os.path.join(out, "elastic")
     files = sorted(os.listdir(elastic))
     assert files == sorted([
+        "car-relationships-default.ndjson",
         "logs-car.inferred-default.ndjson", "logs-car.module-default.ndjson",
         "logs-car.process-default.ndjson", "logs-car.rel-default.ndjson",
         "manifest.json"])
@@ -405,7 +408,8 @@ def test_push_mode_every_stream_failing_is_failed(tmp_path, es_stub):
     car = str(tmp_path / "car")
     _build_tree(car, sources=("s1",))
     state["fail_streams"] = {"logs-car.process-default", "logs-car.module-default",
-                             "logs-car.rel-default", "logs-car.inferred-default"}
+                             "logs-car.rel-default", "logs-car.inferred-default",
+                             "car-relationships-default"}
     out = str(tmp_path / "out")
     summary = load.run(car, out, "default", es_url=es_url)
     assert summary["status"] == "failed"
