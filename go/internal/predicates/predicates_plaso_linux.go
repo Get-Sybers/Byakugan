@@ -113,7 +113,7 @@ func plasoLinuxRecStr(r *record.Record, key string) string {
 // letter is ASCII, so mapping those two runes to 'i' in the SUBJECT before
 // matching reproduces CPython exactly — it can only create matches CPython
 // also makes, and never suppresses one. (No plaso timestamp_desc carries
-// them; the predicate vectors pin the behavior anyway.)
+// them; the predicate vectors pin the behaviour anyway.)
 func plasoLinuxTD(r *record.Record) string {
 	return plasoLinuxDottedI.Replace(plasoLinuxRecStr(r, "timestamp_desc"))
 }

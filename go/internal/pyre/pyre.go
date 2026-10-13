@@ -84,7 +84,7 @@ func (r *Regexp) Matches(s string) bool { return r.search(s) != nil }
 // or group 1 did not participate (Python's m.group(1) is None).
 func (r *Regexp) Group1(s string) (string, bool) {
 	idx := r.search(s)
-	if idx == nil || len(idx) < 4 || idx[2] < 0 {
+	if len(idx) < 4 || idx[2] < 0 {
 		return "", false
 	}
 	return s[idx[2]:idx[3]], true
@@ -118,7 +118,7 @@ func rewrite(pat string) string {
 	return b.String()
 }
 
-// splitNegLookahead recognizes the start-anchored negative-lookahead idiom
+// splitNegLookahead recognises the start-anchored negative-lookahead idiom
 // `<^|\A>(?!NEG)REST` and returns the translated (deny, accept) patterns.
 // A lookahead anywhere else is an error (never used by the tables; refusing
 // is safer than silently mis-matching).

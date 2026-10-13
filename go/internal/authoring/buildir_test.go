@@ -38,13 +38,13 @@ func TestBuildIRMatchesCommittedIR(t *testing.T) {
 		gc, wc := canon(got), canon(want)
 		if gc != wc {
 			// sections can be large; bound the echo
-			max := 1200
+			limit := 1200
 			gs, ws := gc, wc
-			if len(gs) > max {
-				gs = gs[:max] + "…"
+			if len(gs) > limit {
+				gs = gs[:limit] + "…"
 			}
-			if len(ws) > max {
-				ws = ws[:max] + "…"
+			if len(ws) > limit {
+				ws = ws[:limit] + "…"
 			}
 			t.Errorf("section %q differs from committed IR\n  built: %s\n  want:  %s", sec, gs, ws)
 		}

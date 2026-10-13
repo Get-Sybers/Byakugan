@@ -127,8 +127,8 @@ func cmdParse(args []string) int {
 			if err != nil {
 				return err
 			}
-			out.WriteString(s)
-			out.WriteByte('\n')
+			_, _ = out.WriteString(s)
+			_ = out.WriteByte('\n')
 		}
 		return nil
 	}

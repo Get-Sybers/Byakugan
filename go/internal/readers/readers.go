@@ -9,7 +9,7 @@
 //     comma), skip blank / "[" / "]" lines, skip undecodable-JSON lines
 //     silently.
 //
-// tests/parity/gen_reader_vectors.py records the Python behavior on crafted
+// tests/parity/gen_reader_vectors.py records the Python behaviour on crafted
 // byte inputs; readers_test.go replays it.
 package readers
 

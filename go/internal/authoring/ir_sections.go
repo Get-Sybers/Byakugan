@@ -1,7 +1,7 @@
 // The static (non-map) IR sections — marker kinds, routes, evtx_maps, adapters,
 // canon_user, spindle, golden — authored here in Go. Bootstrapped once from the
 // committed ir.json when authoring moved out of Python; hand-maintained since.
-// `byakugan-parse gen-ir` serializes them and `gen-ir --check` gates drift.
+// `byakugan-parse gen-ir` serialises them and `gen-ir --check` gates drift.
 
 package authoring
 
