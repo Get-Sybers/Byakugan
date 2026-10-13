@@ -33,6 +33,9 @@ on:
       - scripts/e2e_elastic.py
       - .github/workflows/elastic-e2e.yml
 
+permissions:
+  contents: read
+
 env:
   ELASTIC_VERSION: 9.5.4
   ELASTIC_PASSWORD: ci-elastic-superuser-pw
@@ -47,6 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           # scripts/e2e_elastic.py builds a real CarStore (byakugan.store),
           # whose carmodel.load() reads model/sources/car/data_model/*.yaml —
           # the pinned CAR submodule — for every invocation, including

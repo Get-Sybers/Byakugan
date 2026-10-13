@@ -1,0 +1,38 @@
+# Dependabot (DX_DFIR docs/reference/build-and-test.md §2.1, §6): weekly,
+# grouped pull requests, a seven-day cooldown after every upstream release.
+# Three pin sets live here: the action SHA pins in .github/workflows/*.yml,
+# the Go module in go/, and the pinned Python inventory. Nothing lands unless
+# the lint-and-test gate passes and the owner approves.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: gomod
+    directory: /go
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      go-modules:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      python:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
