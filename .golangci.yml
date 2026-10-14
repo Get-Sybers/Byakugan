@@ -1,6 +1,6 @@
 # golangci-lint v2 — the lint half of the Go gate (build-and-test.md §3.2;
 # go-standards.md §5, §6, §10, §11). `golangci-lint config verify` checks this
-# file; the binary version CI pins lives in .github/workflows/ci.yml.
+# file; the binary version CI pins lives in .github/workflows/lint.yml.
 #
 # The linter set is the standard's. Every exclusion below says why. Three
 # rules the code does not meet yet are left out, with their count on adoption
