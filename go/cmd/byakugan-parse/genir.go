@@ -10,7 +10,7 @@ import (
 )
 
 // cmdGenIR is the Go-native replacement for `python -m byakugan.export_ir`: it
-// serializes the Go-authored IR (authoring.BuildIR) to ir.json byte-identically
+// serialises the Go-authored IR (authoring.BuildIR) to ir.json byte-identically
 // to the old Python output (indent=1, ensure_ascii=False, trailing newline).
 //
 //	byakugan-parse gen-ir --out go/internal/ir/ir.json        # (re)write the file

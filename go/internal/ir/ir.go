@@ -1,5 +1,5 @@
 // Package ir loads the embedded intermediate representation — the JSON that the
-// Go authoring layer (go/internal/authoring) serializes to ir.json via
+// Go authoring layer (go/internal/authoring) serialises to ir.json via
 // `byakugan-parse gen-ir` (the committed file this package embeds). The IR is
 // the single source of truth the Go engine parses from; `gen-ir --check` in CI
 // holds it in step with the authoring tables.

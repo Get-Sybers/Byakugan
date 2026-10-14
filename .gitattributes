@@ -1,0 +1,21 @@
+# Line endings: normalised to LF in the repository; one research CSV is kept
+# as committed
+* text=auto
+docs/research/event-warrant-map.csv -text
+
+# Fixtures and archives are never normalised or diffed as text
+*.gz binary
+*.zst binary
+*.db binary
+*.sqlite binary
+*.evtx binary
+*.bin binary
+
+# CI scaffolding never ships in an archive export
+.github/ export-ignore
+.editorconfig export-ignore
+.gitattributes export-ignore
+.golangci.yml export-ignore
+
+# linguist
+docs/** linguist-documentation

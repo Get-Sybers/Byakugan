@@ -5,7 +5,7 @@
 // Python json.loads distinguishes we distinguish (int vs float by token
 // shape, dict order, NaN/Infinity), and Dumps/Canonical re-encode exactly the
 // bytes json.dumps would emit (tests/parity/gen_pyjson_vectors.py records the
-// reference behavior; pyjson_test.go replays it).
+// reference behaviour; pyjson_test.go replays it).
 package pyjson
 
 import (
@@ -110,7 +110,7 @@ func appendCodePoint(b *strings.Builder, r rune) {
 	b.WriteRune(r)
 }
 
-// nextRune decodes the next code point of a WTF-8 string, recognizing the
+// nextRune decodes the next code point of a WTF-8 string, recognising the
 // surrogate sequences utf8.DecodeRuneInString rejects.
 func nextRune(s string, i int) (r rune, size int) {
 	c := s[i]

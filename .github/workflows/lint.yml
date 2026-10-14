@@ -1,9 +1,28 @@
 name: lint-and-test
 
+# The gate: the Python harness and the Go engine, verified together
+# (CONTRIBUTING.md). all_green is the one status check a branch ruleset
+# requires (DX_DFIR docs/reference/build-and-test.md §1).
+
 on:
-  push:
+  # a pull request is the unit of review and carries the required check;
+  # main gets post-merge coverage; a branch without a pull request runs on
+  # demand. (push on every branch beside pull_request ran each commit twice.)
   pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # the Go lint pin, in one place; the `uses:` SHA pins below are Dependabot's
+  GOLANGCI_LINT_VERSION: v2.14.0
 
 jobs:
   lint-and-test:
@@ -12,6 +31,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive     # model/sources/car is the model source; model/sources/forensicartifacts rides along (refresh-time only)
+          persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.12'
@@ -35,6 +55,11 @@ jobs:
           fi
       - name: Go build + vet + test
         run: make -C go build test
+      - name: golangci-lint (.golangci.yml, config verified)
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: ${{ env.GOLANGCI_LINT_VERSION }}
+          working-directory: go
       - name: Go engine completeness (every IR predicate is ported)
         run: ./go/bin/byakugan-parse ir-check --in go/internal/ir/ir.json
       - name: ir.json is in sync with the Go authoring tables (gen-ir)
@@ -43,3 +68,19 @@ jobs:
         # the Go binary is on disk, so the CAR map tests (tests/go_engine.py)
         # exercise the real engine here rather than skipping.
         run: pytest -q
+
+  all_green:
+    name: all_green
+    if: always()
+    needs: [lint-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every required job succeeded
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          printf '%s\n' "$RESULTS"
+          if printf '%s\n' "$RESULTS" | grep -Eq '"result": *"(failure|cancelled|skipped)"'; then
+            echo "::error::a required job failed, was cancelled or was skipped"
+            exit 1
+          fi

@@ -1,6 +1,6 @@
 GO ?= go
 
-.PHONY: build test vet fmt clean gen-ir gen-ir-check
+.PHONY: build test vet fmt lint clean gen-ir gen-ir-check
 
 build:
 	$(GO) build -o bin/byakugan-parse ./cmd/byakugan-parse
@@ -26,3 +26,11 @@ fmt:
 
 clean:
 	rm -rf bin
+
+# golangci-lint with the repository's .golangci.yml (DX_DFIR
+# docs/reference/build-and-test.md §3.2); CI pins the version in
+# .github/workflows/lint.yml
+lint:
+	@command -v golangci-lint >/dev/null 2>&1 || { echo "golangci-lint is not installed: see https://golangci-lint.run/docs/welcome/install/"; exit 1; }
+	golangci-lint config verify
+	golangci-lint run ./...

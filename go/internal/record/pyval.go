@@ -1,10 +1,11 @@
 // Python value semantics shared by the resolver, predicates and readers:
 // str() (PyStr), truthiness (Truthy), str.strip() whitespace (Strip), and
-// int()/float() conversions — each ported from the CPython behavior the
+// int()/float() conversions — each ported from the CPython behaviour the
 // live engine exercises (parity vectors pin them).
 package record
 
 import (
+	"errors"
 	"math"
 	"math/big"
 	"strconv"
@@ -201,12 +202,13 @@ func pyFloatParse(s string) (float64, bool) {
 	return f, true
 }
 
-// parseFloatStrict is strconv.ParseFloat with Python's overflow behavior:
+// parseFloatStrict is strconv.ParseFloat with Python's overflow behaviour:
 // a syntactically valid but out-of-range literal is ±inf, not an error.
 func parseFloatStrict(s string) (float64, error) {
 	f, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		if ne, ok := err.(*strconv.NumError); ok && ne.Err == strconv.ErrRange {
+		var ne *strconv.NumError
+		if errors.As(err, &ne) && errors.Is(ne.Err, strconv.ErrRange) {
 			return f, nil
 		}
 		return 0, err

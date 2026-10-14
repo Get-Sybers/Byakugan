@@ -198,7 +198,7 @@ func (d *decoder) string_() (string, error) {
 				// exactly like Python
 				if r >= 0xD800 && r <= 0xDBFF && strings.HasPrefix(d.s[d.i:], "\\u") {
 					save := d.i
-					d.i += 1 // step to 'u'
+					d.i++ // step to 'u'
 					lo, err := d.uEscape()
 					if err == nil && lo >= 0xDC00 && lo <= 0xDFFF {
 						r = 0x10000 + (r-0xD800)<<10 + (lo - 0xDC00)
