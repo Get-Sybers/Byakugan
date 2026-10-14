@@ -5,8 +5,12 @@ name: lint-and-test
 # requires (DX_DFIR docs/reference/build-and-test.md §1).
 
 on:
-  push:
+  # a pull request is the unit of review and carries the required check;
+  # main gets post-merge coverage; a branch without a pull request runs on
+  # demand. (push on every branch beside pull_request ran each commit twice.)
   pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
