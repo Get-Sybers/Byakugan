@@ -15,7 +15,7 @@ from byakugan import schema_gen
 from byakugan.exchange.attack_index import load_attack_index
 from byakugan.exchange.objects import EVIDENCE_PROPERTIES
 
-from tests.test_stix import _H, _ev, _proc
+from test_stix import _H, _ev, _proc
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WIRE = os.path.join(_ROOT, "model", "schema", "wire")
