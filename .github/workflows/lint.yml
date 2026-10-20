@@ -38,13 +38,15 @@ jobs:
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: '1.27'
-          cache: false              # the go module is stdlib-only — no go.sum
+          cache: false              # the parse engine (go/) is stdlib-only; go/l1physical fetches its deps on demand
       - name: Install
         run: |
           python -m pip install --upgrade pip
           pip install -e '.[dev]' yamale yamllint
       - name: Spindle identity registry + model/spindle snapshot are in sync with the code
         run: python -m byakugan.spindle --check
+      - name: L1-physical registry DDL is in sync with the code
+        run: python -m byakugan.l1physical --check
       - name: yamllint
         run: yamllint -c .yamllint docs/to-be-validated/
       - name: gofmt
@@ -60,6 +62,16 @@ jobs:
         with:
           version: ${{ env.GOLANGCI_LINT_VERSION }}
           working-directory: go
+      # The L1-physical registry is its OWN Go module (go/l1physical) so pulling
+      # modernc.org/sqlite never touches the stdlib-only parse engine; `go` in go/
+      # does not descend into it, so it is built, tested and linted on its own.
+      - name: L1-physical registry module (go/l1physical) build + vet + test
+        run: make -C go/l1physical test
+      - name: golangci-lint — L1-physical registry module
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: ${{ env.GOLANGCI_LINT_VERSION }}
+          working-directory: go/l1physical
       - name: Go engine completeness (every IR predicate is ported)
         run: ./go/bin/byakugan-parse ir-check --in go/internal/ir/ir.json
       - name: ir.json is in sync with the Go authoring tables (gen-ir)
