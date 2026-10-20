@@ -207,3 +207,34 @@ def test_engine_and_detection_leaves_are_never_sources(tmp_path):
     jsonl(str(tmp_path / "detections" / "hayabusa" / "case-a" / "HOST01" / "timeline.jsonl"), {"k": "v"})
     jsonl(str(tmp_path / "detections" / "yara" / "HOST01" / "yara.jsonl"), {"k": "v"})
     assert pipeline.discover_sources(str(tmp_path)) == []
+
+
+# --------------------------------------------------------------------------- #
+# The FLAT lane layout DX_DFIR writes after the output flatten:
+# <lane>/[<collection>/]<subtool>/<asset-id>.jsonl — one file per (parser,
+# evidence asset), named for the ASSET, so the sub-tool is only the parent dir
+# (not the file name the older <subtool>/<item>/<subtool>.jsonl tree carried).
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize("collection", [None, "case-a"])
+def test_flat_lane_layout_is_discovered_and_routed(tmp_path, collection):
+    c = [collection] if collection else []
+    tag = f"{collection}_" if collection else ""
+    wl = os.path.join(str(tmp_path), "windowlicker", *c)
+    dh = os.path.join(str(tmp_path), "daemonhunter", *c)
+    jsonl(os.path.join(wl, "goevtx", "HOST01.jsonl"), GOEVTX_4624)
+    jsonl(os.path.join(wl, "gore", "img.E01.jsonl"), GORE_VALUE)
+    open(os.path.join(wl, "goevtx", "HOST02.jsonl.part"), "w").close()   # still being written
+    # the Layer-1 knowledge store stays per-item and is enrichment, never a source
+    jsonl(os.path.join(dh, "knowledge", "srv.E01", "etc_os-release", "gohost.jsonl"), {"k": "v"})
+    found = {name: (path, host) for name, path, host in pipeline.discover_sources(str(tmp_path))}
+    # each flat <subtool>/<asset-id>.jsonl is one source — the FILE, no host;
+    # the .part still being written and the knowledge store are not sources
+    assert {n: p for n, (p, _h) in found.items()} == {
+        f"windowlicker_{tag}goevtx_HOST01": os.path.join(wl, "goevtx", "HOST01.jsonl"),
+        f"windowlicker_{tag}gore_img.E01": os.path.join(wl, "gore", "img.E01.jsonl"),
+    }
+    assert all(h is None for _p, h in found.values())
+    assert not any("HOST02" in n or "knowledge" in n for n in found)
+    # routed by the <subtool>/ parent dir, not the asset-named file
+    assert pipeline.route(os.path.join(wl, "goevtx", "HOST01.jsonl")) == pipeline.EVTX_MAPS
+    assert pipeline.route(os.path.join(wl, "gore", "img.E01.jsonl")) == ["recmd_batch"]

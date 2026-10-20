@@ -19,6 +19,16 @@ All notable changes are documented here, following
   checkout, and superseded runs of the same ref are cancelled.
 
 ### Fixed
+- The CAR build now reads the **flat lane layout** DX_DFIR's output flatten
+  produces: `<lane>/<subtool>/<asset-id>.jsonl` — one file per (parser, evidence
+  asset), named for the asset. Previously both source discovery
+  (`_framework_sources`, `_evtx_sources`) and `route()` keyed on the old
+  `<subtool>.jsonl` filename, so a file named for the asset matched nothing and
+  no `car_*.jsonl` was written. `route()` now falls back to the `<subtool>/`
+  parent directory, and `_framework_sources` yields one source per flat
+  `<subtool>/<asset-id>.jsonl` file (the sub-tool set `_SUBTOOL_DIRS` derived
+  from the `<tool>.jsonl` routes). The older nested
+  `<subtool>/<item>/<subtool>.jsonl` tree still discovers unchanged.
 - The findings the new Go lint surfaced, none of which changes behaviour:
   `errors.As` for the `*strconv.NumError` check; the two `ir.json` writer
   calls explicitly discarded; a test local that shadowed the `max` builtin

@@ -67,12 +67,29 @@ ROUTES: list[tuple[str, list[str]]] = _from_ir.load_routes()
 GODFIR_TOOLS = ("gore", "gojle", "gole", "goamcache", "goappcompat", "gosbe",
                 "gorb", "gomft", "goese", "goprefetch", "gowxt")
 
+# The sub-tool directory names of the flat lane layout
+# (`<lane>/<subtool>/<asset-id>.jsonl`): one file per (parser, evidence asset),
+# named for the ASSET, so the sub-tool — the routing signal — is the file's
+# parent dir, not its name (the older `<subtool>/<item>/<subtool>.jsonl` tree
+# carried it in the filename). Derived from the `<tool>.jsonl` routes, so
+# whatever byakugan can route it can also discover.
+_SUBTOOL_DIRS: frozenset[str] = frozenset(
+    p[:-6] for p, _ in ROUTES if p.endswith(".jsonl"))
+
 
 def route(path: str) -> list[str]:
     name = os.path.basename(path)
     for pattern, keys in ROUTES:
         if pattern in name:
             return keys
+    # Flat lane layout (`<subtool>/<asset-id>.jsonl`): the file is named for the
+    # evidence asset, so the routing signal is its parent dir. Route it as if the
+    # file were `<subtool>.jsonl`.
+    if name.endswith(".jsonl"):
+        parent = os.path.basename(os.path.dirname(path)) + ".jsonl"
+        for pattern, keys in ROUTES:
+            if pattern in parent:
+                return keys
     return []
 
 
@@ -426,7 +443,11 @@ def _framework_sources(gt: str, prefix: str, legacy_hosts: bool):
     `<tool>/<item>/` flat, `<collection>/<tool>/<host>/<item>/` scoped) or one
     of GODFIR_TOOLS — one source each, and no host is claimed (the item is a
     path, not a host; the maps carry what the records say). An `<item>.part`
-    still being written is not an item. With `legacy_hosts`, an immediate
+    still being written is not an item. A flat lane run instead writes
+    `<subtool>/<asset-id>.jsonl` — one file per evidence asset, named for the
+    asset — directly under the sub-tool dir; each such file is one source, its
+    `<subtool>/` parent (in `_SUBTOOL_DIRS`) the routing signal. With
+    `legacy_hosts`, an immediate
     subdirectory that is neither a tool directory nor holds items is the
     older `godfir-toolz/<host>/` tree: one source per host directory,
     upper-cased name as the fallback host."""
@@ -435,10 +456,20 @@ def _framework_sources(gt: str, prefix: str, legacy_hosts: bool):
         rel = os.path.relpath(cur, gt)
         if rel == ".":
             continue
-        ancestors = set(rel.split(os.sep)[:-1])
+        parts = rel.split(os.sep)
+        # Flat lane layout: `<subtool>/<asset-id>.jsonl` — each asset file is one
+        # source (one parser's records for one evidence asset), the sub-tool its
+        # parent dir. Yielded per FILE, not per dir, so two assets never merge.
+        if parts[-1] in _SUBTOOL_DIRS:
+            for f in files:                      # _walk sorts them
+                if f.endswith(".jsonl"):         # the .part -> .jsonl rename is atomic: a .jsonl is finished
+                    seen_item.add(parts[0])
+                    yield f"{prefix}_{_fold(rel)}_{f[:-6]}", os.path.join(cur, f), None
+            continue
+        ancestors = set(parts[:-1])
         if any(f.endswith(".jsonl") and (f[:-6] in ancestors or f[:-6] in GODFIR_TOOLS)
                for f in files):
-            seen_item.add(rel.split(os.sep)[0])
+            seen_item.add(parts[0])
             yield f"{prefix}_{_fold(rel)}", cur, None
     if not legacy_hosts:
         return
@@ -480,9 +511,11 @@ def discover_sources(processed_dir: str) -> list[tuple[str, str, str | None]]:
       container — one source each; likewise under a top-level jsonl/ (a
       psort output root mounted directly);
     - windowlicker/, daemonhunter/ (and the older godfir-toolz/): every
-      Go-tool item directory (`<tool>.jsonl` under its sub-tool level) is one
-      source; godfir-toolz/<host>/ (not a tool dir): one source per host
-      directory, upper-cased dir name as the fallback host;
+      Go-tool item directory (`<tool>.jsonl` under its sub-tool level), and
+      every flat `<subtool>/<asset-id>.jsonl` (one file per evidence asset,
+      routed by its sub-tool parent), is one source; godfir-toolz/<host>/ (not
+      a tool dir): one source per host directory, upper-cased dir name as the
+      fallback host;
     - anamnesis/ (and the older memory/): every <image>/car.db, Anamnesis'
       finished CAR (passthrough).
 
