@@ -52,7 +52,7 @@ _ROOT = os.path.dirname(_HERE)
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
-from byakugan import build_data_model, carmodel, spindle, store, superset  # noqa: E402
+from byakugan import build_data_model, carmodel, l1physical, spindle, store, superset  # noqa: E402
 
 _CAR_DM = os.path.join(_ROOT, "model", "sources", "car", "data_model")
 
@@ -470,6 +470,17 @@ def gen_spindle() -> int:
         raise SystemExit(f"spindle snapshot not written — {exc}") from None
 
 
+def gen_l1_physical() -> str:
+    """go/l1physical/schema.sql: the L1-physical registry DDL byakugan owns — the
+    static source of truth the Go shared module (go/l1physical) go:embeds and
+    byakugan's own Python (byakugan.l1physical) reads. Emitted here, like the
+    spindle snapshot, from the one renderer so the two consumers cannot drift
+    (byakugan.l1physical.verify_ddl / `python -m byakugan.l1physical --check`).
+    It lives under go/ (not model/) because go:embed cannot reach outside its
+    module — the same shape as go/internal/ir/ir.json."""
+    return l1physical.write_ddl()
+
+
 def main() -> int:
     n_car = gen_car_objects()
     n_obj = gen_model_objects()
@@ -477,11 +488,13 @@ def main() -> int:
     gen_relationship_schema()
     n_pairs, n_edges = gen_relationships()
     n_sp = gen_spindle()
+    ddl = gen_l1_physical()
     print(f"model/ materialized: {n_car} CAR object files | "
           f"{n_obj} superset model-objects | {n_rel} relationship-types | "
           f"relationship-schema | declared/derived relationships "
           f"({n_pairs} (object, action) pairs, {n_edges} special edges) | "
           f"{n_sp} spindle files")
+    print(f"L1-physical DDL: {os.path.relpath(ddl, _ROOT)}")
     print(f"pins: car @ {CAR_SHA[:12]} | attack-datasources @ {ADS_SHA[:12]}")
     return 0
 
