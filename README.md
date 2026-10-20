@@ -183,6 +183,7 @@ CI gate: `model/spindle/` (`spindle --check`), `model/schema/` (`schema_gen --ch
 | [docs/Anamnesis-Interchange.md](docs/Anamnesis-Interchange.md) | the Anamnesis car.db contract: schema, the translation, what the second enrich pass does (and does not) do to it |
 | [docs/CAR-Extraction-Rules.md](docs/CAR-Extraction-Rules.md) | the four extraction principles every CAR object is built by |
 | [docs/CAR-CrossSource.md](docs/CAR-CrossSource.md) | the deferred cross-source aggregate stage (correlating across per-source stores) |
+| [docs/L1-Physical-Registry.md](docs/L1-Physical-Registry.md) | the artefact spindle-identity registry (`L1-physical.db`): the per-asset host→disk→volume→image object, host-identity reconciliation, and the Go module + Python read path |
 | [docs/Elastic-Store-Plan.md](docs/Elastic-Store-Plan.md) | the served-store decision (SQLite → Elasticsearch, not a graph DB) and the cross-repo migration plan |
 | [docs/STIX-Exchange.md](docs/STIX-Exchange.md) | the STIX 2.1 / OpenCTI exchange: what a hit becomes, ids and versioning, the property extension, the CTI round-trip |
 | [docs/ForensicArtifacts-Ingest.md](docs/ForensicArtifacts-Ingest.md) | the refresh-time ForensicArtifacts ingest: the index contract and the refresh procedure |

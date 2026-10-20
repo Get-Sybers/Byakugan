@@ -64,7 +64,7 @@ rows and lining detections up against them. A separate design note works the lay
 
 | Doc | What it proposes |
 |-----|------------------|
-| [Evidence Spine — a raw-evidence ownership graph (CASE/UCO)](https://github.com/Get-Sybers/DX_DFIR/-/blob/main/docs/research/evidence-spine.md) | a compact CASE/UCO graph (host → disk → volume → file → extraction) for the raw-data layer; decoupled from `car.db`/`superset.db`, meeting the analysis graph only at the processed artefact |
+| [Evidence Spine — a raw-evidence ownership graph (CASE/UCO)](../evidence-spine.md) | a compact CASE/UCO graph (host → disk → volume → file → extraction) for the raw-data layer; decoupled from `car.db`/`superset.db`, meeting the analysis graph only at the processed artefact |
 
 It is a proposal (no code yet), and it is where the spindle identity the arc above
 *mines out of CAR `native`* would instead be recorded authoritatively at intake.
