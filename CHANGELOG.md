@@ -29,6 +29,11 @@ All notable changes are documented here, following
   `<subtool>/<asset-id>.jsonl` file (the sub-tool set `_SUBTOOL_DIRS` derived
   from the `<tool>.jsonl` routes). The older nested
   `<subtool>/<item>/<subtool>.jsonl` tree still discovers unchanged.
+- `tests/test_schema_wire.py` imported `from tests.test_stix import …`, but the
+  suite runs with `pythonpath = ["tests"]` (every other helper import is
+  top-level), so `tests` is not an importable package and collection of the
+  WHOLE suite aborted with `ModuleNotFoundError` (pre-existing since #133).
+  Switched to the top-level `from test_stix import …`; all 564 tests collect.
 - The findings the new Go lint surfaced, none of which changes behaviour:
   `errors.As` for the `*strconv.NumError` check; the two `ir.json` writer
   calls explicitly discarded; a test local that shadowed the `max` builtin
